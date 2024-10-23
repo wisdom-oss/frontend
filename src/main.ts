@@ -1,6 +1,6 @@
 import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './app/app.config';
-import { AppComponent } from './app/app.component';
+import { CoreComponent } from './core/core.component';
+import { wisdomAppConfig } from './config';
 
-bootstrapApplication(AppComponent, appConfig)
+bootstrapApplication(CoreComponent, wisdomAppConfig)
   .catch((err) => console.error(err));
