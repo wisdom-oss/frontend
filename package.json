@@ -17,6 +17,8 @@
     "@angular/platform-browser": "^18.2.0",
     "@angular/platform-browser-dynamic": "^18.2.0",
     "@angular/router": "^18.2.0",
+    "@ng-icons/core": "^29.5.1",
+    "@ng-icons/remixicon": "^29.5.1",
     "bulma": "^1.0.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
