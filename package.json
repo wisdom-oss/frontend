@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "lint": "oxlint",
-    "fmt": "primp src -r; prettier . --write",
+    "fmt": "primp src -r && prettier . --write",
     "doc": "npm run compodoc:build",
     "compodoc:build": "compodoc -p tsconfig.doc.json",
     "compodoc:build-and-serve": "compodoc -p tsconfig.doc.json -s",
