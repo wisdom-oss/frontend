@@ -19,10 +19,7 @@
     "importHelpers": true,
     "target": "ES2023",
     "module": "ES2022",
-    "lib": [
-      "ES2023",
-      "dom"
-    ]
+    "lib": ["ES2023", "dom"]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

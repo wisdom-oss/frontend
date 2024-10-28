@@ -1,12 +1,10 @@
-import { Component } from '@angular/core';
+import {Component} from "@angular/core";
 
 @Component({
-  selector: 'wisdom-core',
+  selector: "wisdom-core",
   standalone: true,
   imports: [],
-  templateUrl: './core.component.html',
-  styles: ``
+  templateUrl: "./core.component.html",
+  styles: ``,
 })
-export class CoreComponent {
-
-}
+export class CoreComponent {}

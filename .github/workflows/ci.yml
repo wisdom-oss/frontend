@@ -15,7 +15,7 @@ jobs:
           key: ${{ runner.os }}-dev-node_modules-${{ hashFiles('package-lock.json') }}
       - run: npm ci --include dev
       - run: npm run build
-    
+
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -39,3 +39,15 @@ jobs:
           key: ${{ runner.os }}-dev-node_modules-${{ hashFiles('package-lock.json') }}
       - run: npm ci --include dev
       - run: npm run doc
+
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: volta-cli/action@v4
+      - uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-dev-node_modules-${{ hashFiles('package-lock.json') }}
+      - run: npm ci --include dev
+      - run: npx prettier . --check
