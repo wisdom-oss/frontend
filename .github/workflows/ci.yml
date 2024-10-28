@@ -28,7 +28,7 @@ jobs:
       - run: npm ci --include dev
       - run: npm run lint
 
-  docs:
+  doc:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,4 +38,4 @@ jobs:
           path: node_modules
           key: ${{ runner.os }}-dev-node_modules-${{ hashFiles('package-lock.json') }}
       - run: npm ci --include dev
-      - run: npm run docs
+      - run: npm run doc
