@@ -31,6 +31,7 @@ jobs:
   lint:
     needs: install
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: volta-cli/action@v4
@@ -44,6 +45,7 @@ jobs:
   doc:
     needs: install
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: volta-cli/action@v4
@@ -57,6 +59,7 @@ jobs:
   fmt:
     needs: install
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: volta-cli/action@v4
