@@ -45,6 +45,11 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               {
+                "glob": "**/*.{png,svg}",
+                "input": "node_modules/@wisdom-oss/brand",
+                "output": "brand"
+              },
+              {
                 "glob": "**/*",
                 "input": "public"
               }
