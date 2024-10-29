@@ -25,6 +25,7 @@
     "@angular/router": "^18.2.0",
     "@ng-icons/core": "^29.5.1",
     "@ng-icons/remixicon": "^29.5.1",
+    "ajv": "^8.17.1",
     "bulma": "^1.0.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
