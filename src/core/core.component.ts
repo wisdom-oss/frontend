@@ -1,10 +1,13 @@
 import {Component} from "@angular/core";
+import {NgIconComponent, provideIcons } from "@ng-icons/core";
+import {remixLogoutBoxLine, remixMenu2Line} from "@ng-icons/remixicon";
 
 @Component({
   selector: "wisdom-core",
   standalone: true,
-  imports: [],
+  imports: [NgIconComponent],
   templateUrl: "./core.component.html",
-  styles: ``,
+  styleUrl: "./core.component.scss",
+  providers: [provideIcons({remixMenu2Line, remixLogoutBoxLine})]
 })
 export class CoreComponent {}

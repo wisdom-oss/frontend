@@ -1,1 +1,66 @@
-<p>core works!</p>
+<nav class="navbar is-primary">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item pt-0 pb-0">
+        <img id="brand-logo" src="/brand/svg/standalone_white.svg">
+        <span class="title">WISdoM-OSS</span>
+      </a>
+    </div>
+    <div class="navbar-menu">
+      <div class="navbar-start">
+        <div class="navbar-item">
+          <a class="button">
+            <span class="icon is-small">
+              <ng-icon name="remixMenu2Line"></ng-icon>
+            </span>
+          </a>
+        </div>
+      </div>
+
+      <div class="navbar-end">
+        <!-- <div class="navbar-item">
+          <div class="buttons">
+            <a class="button is-dark">Github</a>
+            <a class="button is-link">Download</a>
+          </div>
+        </div> -->
+
+        <div class="navbar-item">
+          <!-- TODO: make this clickable -->
+          <div class="dropdown is-right">
+            <div class="dropdown-trigger">
+              <div id="user-profile-button" class="button">
+
+              </div>
+            </div>
+            <div class="dropdown-menu">
+              <div class="dropdown-content">
+                <div class="dropdown-item has-text-centered">
+                  <p class="icon-text has-text-weight-bold is-flex-wrap-nowrap">
+                    <span style="white-space: nowrap;">Tim Hesse</span>
+                  </p>
+                  <p>{{"@thesse"}}</p>
+                </div>
+                <hr class="dropdown-divider">
+                <a class="dropdown-item has-text-centered pr-5">
+                  <span class="icon-text">
+                    <span class="icon">
+                      <ng-icon name="remixLogoutBoxLine"></ng-icon>
+                    </span>
+                    <span>Logout</span>
+                  </span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<section class="hero is-fullheight-with-navbar">
+  <div class="hero-body">
+    <p class="title">Fullheight hero with navbar</p>
+  </div>
+</section>
