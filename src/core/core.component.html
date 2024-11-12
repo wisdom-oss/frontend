@@ -1,14 +1,14 @@
 <nav class="navbar is-primary">
   <div class="container">
-    <div class="navbar-brand">
+    <div class="navbar-brand is-user-select-none">
       <a class="navbar-item pt-0 pb-0">
         <img id="brand-logo" src="/brand/svg/standalone_white.svg" />
-        <span class="title">WISdoM-OSS</span>
+        <span class="title has-text-light">WISdoM-OSS</span>
       </a>
     </div>
     <div class="navbar-menu">
       <div class="navbar-start">
-        <div class="navbar-item">
+        <div class="navbar-item is-user-select-none">
           <a class="button">
             <span class="icon is-small">
               <ng-icon name="remixMenu2Line"></ng-icon>
@@ -18,17 +18,34 @@
       </div>
 
       <div class="navbar-end">
-        <!-- <div class="navbar-item">
-          <div class="buttons">
-            <a class="button is-dark">Github</a>
-            <a class="button is-link">Download</a>
+        <div
+          class="navbar-item has-dropdown is-user-select-none"
+          is-active-toggle
+        >
+          <div class="navbar-link">
+            <p class="icon-text">
+              <span class="icon">
+                <ng-icon name="remixTranslate2"></ng-icon>
+              </span>
+              <span>English</span>
+            </p>
           </div>
-        </div> -->
+          <div class="navbar-dropdown">
+            <div class="navbar-item is-justify-content-center">
+              <a class="p-1 has-text-inherit">Deutsch</a>
+            </div>
+            <div class="navbar-item is-justify-content-center">
+              <a class="p-1 has-text-inherit">English</a>
+            </div>
+          </div>
+        </div>
 
         <div class="navbar-item">
-          <!-- TODO: make this clickable -->
-          <div class="dropdown is-right">
-            <div class="dropdown-trigger">
+          <div
+            class="dropdown is-right"
+            [class.is-active]="userDropdownActive()"
+          >
+            <div class="dropdown-trigger" (click)="userDropdownActive.toggle()">
               <div id="user-profile-button" class="button"></div>
             </div>
             <div class="dropdown-menu">
