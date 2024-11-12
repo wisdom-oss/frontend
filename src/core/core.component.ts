@@ -1,5 +1,5 @@
 import {Component} from "@angular/core";
-import {NgIconComponent, provideIcons } from "@ng-icons/core";
+import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {remixLogoutBoxLine, remixMenu2Line} from "@ng-icons/remixicon";
 
 @Component({
@@ -8,6 +8,6 @@ import {remixLogoutBoxLine, remixMenu2Line} from "@ng-icons/remixicon";
   imports: [NgIconComponent],
   templateUrl: "./core.component.html",
   styleUrl: "./core.component.scss",
-  providers: [provideIcons({remixMenu2Line, remixLogoutBoxLine})]
+  providers: [provideIcons({remixMenu2Line, remixLogoutBoxLine})],
 })
 export class CoreComponent {}
