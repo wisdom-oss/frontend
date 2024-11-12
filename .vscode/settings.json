@@ -10,5 +10,6 @@
     "**/.factorypath": true,
     "**/.project": true,
     "**/.settings": true
-  }
+  },
+  "cSpell.language": "en,de-DE"
 }
