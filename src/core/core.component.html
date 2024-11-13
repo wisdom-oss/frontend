@@ -1,81 +1,11 @@
-<nav class="navbar is-primary">
-  <div class="container">
-    <div class="navbar-brand is-user-select-none">
-      <a class="navbar-item pt-0 pb-0">
-        <img id="brand-logo" src="/brand/svg/standalone_white.svg" />
-        <span class="title has-text-light">WISdoM-OSS</span>
-      </a>
+<navbar (sidebarClick)="sidebarActive.toggle()"></navbar>
+<div class="columns m-0 is-fullheight-with-navbar">
+  <aside class="column"></aside>
+  <section class="column columns m-0 p-0 container">
+    <div *ngIf="sidebarActive()" class="column p-0">
+      <sidebar></sidebar> 
     </div>
-    <div class="navbar-menu">
-      <div class="navbar-start">
-        <div class="navbar-item is-user-select-none">
-          <a class="button">
-            <span class="icon is-small">
-              <ng-icon name="remixMenu2Line"></ng-icon>
-            </span>
-          </a>
-        </div>
-      </div>
-
-      <div class="navbar-end">
-        <div
-          class="navbar-item has-dropdown is-user-select-none"
-          is-active-toggle
-        >
-          <div class="navbar-link">
-            <p class="icon-text">
-              <span class="icon">
-                <ng-icon name="remixTranslate2"></ng-icon>
-              </span>
-              <span>English</span>
-            </p>
-          </div>
-          <div class="navbar-dropdown">
-            <div class="navbar-item is-justify-content-center">
-              <a class="p-1 has-text-inherit">Deutsch</a>
-            </div>
-            <div class="navbar-item is-justify-content-center">
-              <a class="p-1 has-text-inherit">English</a>
-            </div>
-          </div>
-        </div>
-
-        <div class="navbar-item">
-          <div
-            class="dropdown is-right"
-            [class.is-active]="userDropdownActive()"
-          >
-            <div class="dropdown-trigger" (click)="userDropdownActive.toggle()">
-              <div id="user-profile-button" class="button"></div>
-            </div>
-            <div class="dropdown-menu">
-              <div class="dropdown-content">
-                <div class="dropdown-item has-text-centered">
-                  <p class="icon-text has-text-weight-bold is-flex-wrap-nowrap">
-                    <span style="white-space: nowrap">Tim Hesse</span>
-                  </p>
-                  <p>{{ "@thesse" }}</p>
-                </div>
-                <hr class="dropdown-divider" />
-                <a class="dropdown-item has-text-centered pr-5">
-                  <span class="icon-text">
-                    <span class="icon">
-                      <ng-icon name="remixLogoutBoxLine"></ng-icon>
-                    </span>
-                    <span>Logout</span>
-                  </span>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</nav>
-
-<section class="hero is-fullheight-with-navbar">
-  <div class="hero-body">
-    <p class="title">Fullheight hero with navbar</p>
-  </div>
-</section>
+    <div class="column"></div>
+  </section>
+  <aside class="column"></aside> 
+</div>

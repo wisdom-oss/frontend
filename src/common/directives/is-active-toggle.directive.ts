@@ -1,4 +1,4 @@
-import {signal, Directive} from "@angular/core";
+import {Directive} from "@angular/core";
 
 import {signals} from "../signals";
 

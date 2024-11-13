@@ -1,0 +1,9 @@
+nav {
+  height: calc(100% + 2 * var(--bulma-box-padding));
+  margin-top: calc(-1 * var(--bulma-box-padding));
+  padding: {
+    top: calc(2 * var(--bulma-box-padding));
+    bottom: calc(2 * var(--bulma-box-padding));
+  }
+  max-width: 20em;
+}

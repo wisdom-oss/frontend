@@ -9,18 +9,20 @@ import {signal, WritableSignal} from "@angular/core";
  * require.
  */
 export namespace signals {
-  export interface ToggleableSignal extends WritableSignal<boolean> {
-    toggle(): () => {};
+  export type ToggleableSignal<S extends WritableSignal<boolean>> = S & {
+    toggle(): void;
   }
-
-  export function toggleable(initialValue: boolean): ToggleableSignal {
-    let s = signal(initialValue);
+  
+  export function toggleable(initial: boolean): ToggleableSignal<WritableSignal<boolean>>;
+  export function toggleable<S extends WritableSignal<boolean>>(initial: S): ToggleableSignal<S>; 
+  export function toggleable<S extends WritableSignal<boolean>>(initial: boolean | S) {
+    let s = typeof initial == "boolean" ? signal(initial) : initial;
     return Object.defineProperty(s, "toggle", {
       writable: false,
       value: () => {
         let value = s();
         s.set(!value);
       },
-    }) as ToggleableSignal;
+    });
   }
 }
