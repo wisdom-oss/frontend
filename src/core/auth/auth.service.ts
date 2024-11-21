@@ -1,12 +1,13 @@
-import {HttpClient, HttpParams} from "@angular/common/http";
+import {HttpClient, HttpContext, HttpParams} from "@angular/common/http";
 import {computed, signal, Injectable} from "@angular/core";
 import {ActivatedRoute, Router} from "@angular/router";
 import Ajv, {JSONSchemaType} from "ajv";
+import {JTDDataType} from "ajv/dist/core";
 import {jwtDecode} from "jwt-decode";
 import {firstValueFrom} from "rxjs";
 
 import {StorageService} from "../../common/storage.service";
-import { JTDDataType } from "ajv/dist/core";
+import {httpContexts} from "../../common/http-contexts";
 
 const API_URL = "/api/auth";
 
@@ -66,7 +67,11 @@ export class AuthService {
   }
 
   async callback(code: string, state: string) {
-    let tokenSet = await this.generateTokenSet("authorization_code", code, state);
+    let tokenSet = await this.generateTokenSet(
+      "authorization_code",
+      code,
+      state,
+    );
 
     this.storeTokenSet(tokenSet);
 
@@ -77,7 +82,9 @@ export class AuthService {
   logout() {}
 
   async refresh() {
-    let refreshToken = this.storage.session.get(REFRESH_TOKEN_KEY) ?? this.storage.local.get(REFRESH_TOKEN_KEY);
+    let refreshToken =
+      this.storage.session.get(REFRESH_TOKEN_KEY) ??
+      this.storage.local.get(REFRESH_TOKEN_KEY);
     if (!refreshToken) throw new RefreshTokenError({missing: true});
 
     // TODO: try-catch this
@@ -91,8 +98,7 @@ export class AuthService {
     if (remember) {
       this.storage.local.set(ACCESS_TOKEN_KEY, tokenSet.accessToken);
       this.storage.local.set(REFRESH_TOKEN_KEY, tokenSet.refreshToken);
-    }
-    else {
+    } else {
       this.storage.session.set(ACCESS_TOKEN_KEY, tokenSet.accessToken);
       this.storage.session.set(REFRESH_TOKEN_KEY, tokenSet.refreshToken);
     }
@@ -124,23 +130,24 @@ export class AuthService {
     }
 
     let response = await firstValueFrom(
-      this.http.post(`${API_URL}/token`, params),
+      this.http.post<JTDDataType<typeof TOKEN_SET_SCHEMA>>(
+        `${API_URL}/token`,
+        params,
+        {
+          context: new HttpContext().set(
+            httpContexts.validateSchema,
+            TOKEN_SET_SCHEMA,
+          ),
+        },
+      ),
     );
 
-    let validate = this.ajv.compile(TOKEN_SET_SCHEMA);
-    if (!validate(response)) {
-      // TODO: make a better error handler
-      console.error(validate.errors);
-      throw new Error("Invalid response.");
-    }
-
-    let resTokenSet = response as JTDDataType<typeof TOKEN_SET_SCHEMA>;
     return {
-      accessToken: resTokenSet.access_token,
-      expiresIn: resTokenSet.expires_in,
+      accessToken: response.access_token,
+      expiresIn: response.expires_in,
       tokenType: "bearer",
-      refreshToken: resTokenSet.refresh_token,
-    }
+      refreshToken: response.refresh_token,
+    };
   }
 }
 
@@ -155,18 +162,15 @@ const TOKEN_SET_SCHEMA = {
 
 export namespace AuthService {
   export interface TokenSet {
-    accessToken: string,
-    expiresIn: number,
-    tokenType: "bearer",
-    refreshToken: string,
+    accessToken: string;
+    expiresIn: number;
+    tokenType: "bearer";
+    refreshToken: string;
   }
 }
 
 class RefreshTokenError extends Error {
-  constructor(why: {
-    missing?: boolean,
-    expired?: boolean,
-  }) {
+  constructor(why: {missing?: boolean; expired?: boolean}) {
     let message = "Refreshing tokens failed.";
     if (why.missing) message += " No refresh token stored.";
     if (why.expired) message += " Refresh token expired.";
