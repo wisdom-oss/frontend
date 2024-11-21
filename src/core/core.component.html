@@ -3,9 +3,11 @@
   <aside class="column"></aside>
   <section class="column columns m-0 p-0 container">
     <div *ngIf="sidebarActive()" class="column p-0">
-      <sidebar></sidebar> 
+      <sidebar></sidebar>
     </div>
-    <div class="column"></div>
+    <div class="column">
+      <router-outlet></router-outlet>
+    </div>
   </section>
-  <aside class="column"></aside> 
+  <aside class="column"></aside>
 </div>

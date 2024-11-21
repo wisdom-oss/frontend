@@ -1,4 +1,4 @@
-import {Component, model, output} from "@angular/core";
+import {model, output, Component} from "@angular/core";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {
   remixLogoutBoxLine,

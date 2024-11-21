@@ -1,8 +1,17 @@
+import {Component} from "@angular/core";
 import {bootstrapApplication} from "@angular/platform-browser";
+import {RouterOutlet} from "@angular/router";
 
-import {CoreComponent} from "./core/core.component";
 import {wisdomAppConfig} from "./config";
 
-bootstrapApplication(CoreComponent, wisdomAppConfig).catch(err =>
+@Component({
+  selector: "app",
+  standalone: true,
+  imports: [RouterOutlet],
+  template: "<router-outlet></router-outlet>",
+})
+class AppComponent {}
+
+bootstrapApplication(AppComponent, wisdomAppConfig).catch(err =>
   console.error(err),
 );
