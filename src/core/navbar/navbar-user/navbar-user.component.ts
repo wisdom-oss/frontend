@@ -1,11 +1,11 @@
 import {NgIf} from "@angular/common";
-import {signal, Component, computed, OnInit} from "@angular/core";
+import {computed, Component} from "@angular/core";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {remixLoginBoxLine, remixLogoutBoxLine} from "@ng-icons/remixicon";
 
 import {signals} from "../../../common/signals";
 import {AuthService} from "../../auth/auth.service";
-import { UserService } from "../../user.service";
+import {UserService} from "../../user.service";
 
 @Component({
   selector: "navbar-user",

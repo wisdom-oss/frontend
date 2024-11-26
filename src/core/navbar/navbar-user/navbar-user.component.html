@@ -22,13 +22,16 @@
       <div class="dropdown-item has-text-centered">
         <p class="icon-text has-text-weight-bold is-flex-wrap-nowrap">
           <span style="white-space: nowrap">
-            {{userDetails()!.name}}
+            {{ userDetails()!.name }}
           </span>
         </p>
         <p>{{ "@" + userDetails()!.username }}</p>
       </div>
       <hr class="dropdown-divider" />
-      <a class="dropdown-item has-text-centered pr-5" (click)="authService.logout()">
+      <a
+        class="dropdown-item has-text-centered pr-5"
+        (click)="authService.logout()"
+      >
         <span class="icon-text">
           <span class="icon">
             <ng-icon name="remixLogoutBoxLine"></ng-icon>

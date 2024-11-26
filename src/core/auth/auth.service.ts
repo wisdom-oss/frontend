@@ -1,14 +1,12 @@
 import {HttpClient, HttpContext, HttpParams} from "@angular/common/http";
 import {computed, signal, Injectable} from "@angular/core";
-import {ActivatedRoute, Router} from "@angular/router";
-import Ajv, {JSONSchemaType} from "ajv";
+import {Router} from "@angular/router";
 import {JTDDataType} from "ajv/dist/core";
 import {jwtDecode} from "jwt-decode";
 import {firstValueFrom} from "rxjs";
 
 import {StorageService} from "../../common/storage.service";
 import {httpContexts} from "../../common/http-contexts";
-import { UserService } from "../user.service";
 
 const API_URL = "/api/auth";
 
@@ -84,12 +82,13 @@ export class AuthService {
     this.storage.local.remove(ACCESS_TOKEN_KEY);
     this.storage.session.remove(REFRESH_TOKEN_KEY);
     this.storage.local.remove(REFRESH_TOKEN_KEY);
-    
+
     let refreshToken = this.refreshToken();
     if (refreshToken) {
       let params = new HttpParams().set("token", refreshToken);
-      try {await firstValueFrom(this.http.post(`${API_URL}/revoke`, params))}
-      catch {}
+      try {
+        await firstValueFrom(this.http.post(`${API_URL}/revoke`, params));
+      } catch {}
     }
 
     this.accessToken.set(null);
@@ -153,10 +152,9 @@ export class AuthService {
         `${API_URL}/token`,
         params,
         {
-          context: new HttpContext().set(
-            httpContexts.validateSchema,
-            TOKEN_SET_SCHEMA,
-          ).set(httpContexts.authenticate, false),
+          context: new HttpContext()
+            .set(httpContexts.validateSchema, TOKEN_SET_SCHEMA)
+            .set(httpContexts.authenticate, false),
         },
       ),
     );
