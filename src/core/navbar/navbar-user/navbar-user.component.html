@@ -30,7 +30,11 @@
   [class.is-active]="userDropdownActive()"
 >
   <div class="dropdown-trigger" (click)="userDropdownActive.toggle()">
-    <div id="user-profile-button" class="button"></div>
+    <div 
+      id="user-profile-button" 
+      class="button"
+      [style.background-image]="userAvatar()"
+    ></div>
   </div>
   <div class="dropdown-menu">
     <div class="dropdown-content">

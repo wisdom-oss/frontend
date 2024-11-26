@@ -5,6 +5,7 @@ $nearly-full-height: calc(var(--bulma-navbar-height) - 0.8em);
   border-radius: 100%;
   height: $nearly-full-height;
   width: $nearly-full-height;
+  background-size: cover;
 }
 
 .has-opacity-60 {

@@ -1,8 +1,8 @@
 import {NgIf} from "@angular/common";
-import {computed, Component, signal, Signal, WritableSignal} from "@angular/core";
+import {computed, Component, signal, Signal, WritableSignal, effect} from "@angular/core";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {remixLoginBoxLine, remixLogoutBoxLine, remixRotateLockFill} from "@ng-icons/remixicon";
-
+import { image as gravatar } from "gravatar-gen";
 import {signals} from "../../../common/signals";
 import {AuthService} from "../../auth/auth.service";
 import {UserService} from "../../user.service";
@@ -27,10 +27,12 @@ const REMEMBER_LOGIN_KEY = "remember";
 export class NavbarUserComponent {
   private storage: StorageService.Storages;
 
-  rememberLogin: WritableSignal<boolean>;
-  userDropdownActive = signals.toggleable(false);
-  loggedIn = computed(() => !!this.authService.accessToken());
-  userDetails = computed(() => this.userService.userDetails());
+  readonly rememberLogin: WritableSignal<boolean>;
+  readonly userDropdownActive = signals.toggleable(false);
+
+  readonly loggedIn = computed(() => !!this.authService.accessToken());
+  readonly userDetails = computed(() => this.userService.userDetails());
+  readonly userAvatar = signal("none");
 
   constructor(
     readonly authService: AuthService,
@@ -44,6 +46,13 @@ export class NavbarUserComponent {
     this.storage = storage.instance(NavbarUserComponent);
     let remember = this.storage.local.get(REMEMBER_LOGIN_KEY) ?? "true";
     this.rememberLogin = signal(JSON.parse(remember));
+
+    effect(async () => {
+      let userDetails = this.userService.userDetails();
+      if (!userDetails) return this.userAvatar.set("none");
+      let url = await gravatar(userDetails.email, {defaultImage: "identicon"});
+      this.userAvatar.set(`url("${url}")`);
+    }, {allowSignalWrites: true});
   }
 
   toggleRemember() {
