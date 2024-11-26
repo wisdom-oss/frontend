@@ -1,12 +1,27 @@
 <div *ngIf="!loggedIn()">
-  <a class="button" (click)="authService.login()">
-    <span class="icon-text">
-      <span class="icon">
-        <ng-icon name="remixLoginBoxLine"></ng-icon>
+  <div class="buttons has-addons">
+    <a 
+      class="button" 
+      (click)="authService.login(rememberLogin())"
+    >
+      <span class="icon-text">
+        <span class="icon">
+          <ng-icon name="remixLoginBoxLine"></ng-icon>
+        </span>
+        <span>Login</span>
       </span>
-      <span>Login</span>
-    </span>
-  </a>
+    </a>
+    <button class="button" id="remember">
+      <span 
+        class="icon"
+        [class.has-text-primary]="rememberLogin()"
+        [class.has-opacity-60]="!rememberLogin()"
+        (click)="toggleRemember()"
+      >
+        <ng-icon size="1.6em" name="remixRotateLockFill"></ng-icon>
+      </span>
+    </button>
+  </div>
 </div>
 
 <div

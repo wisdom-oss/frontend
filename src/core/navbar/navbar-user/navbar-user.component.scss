@@ -6,3 +6,7 @@ $nearly-full-height: calc(var(--bulma-navbar-height) - 0.8em);
   height: $nearly-full-height;
   width: $nearly-full-height;
 }
+
+.has-opacity-60 {
+  filter: opacity(0.6);
+}
