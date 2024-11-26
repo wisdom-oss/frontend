@@ -1,12 +1,23 @@
 import {NgIf} from "@angular/common";
-import {computed, Component, signal, Signal, WritableSignal, effect} from "@angular/core";
+import {
+  computed,
+  effect,
+  signal,
+  Component,
+  WritableSignal,
+} from "@angular/core";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
-import {remixLoginBoxLine, remixLogoutBoxLine, remixRotateLockFill} from "@ng-icons/remixicon";
-import { image as gravatar } from "gravatar-gen";
+import {
+  remixLoginBoxLine,
+  remixLogoutBoxLine,
+  remixRotateLockFill,
+} from "@ng-icons/remixicon";
+import {image as gravatar} from "gravatar-gen";
+
 import {signals} from "../../../common/signals";
 import {AuthService} from "../../auth/auth.service";
 import {UserService} from "../../user.service";
-import { StorageService } from "../../../common/storage.service";
+import {StorageService} from "../../../common/storage.service";
 
 const REMEMBER_LOGIN_KEY = "remember";
 
@@ -47,12 +58,17 @@ export class NavbarUserComponent {
     let remember = this.storage.local.get(REMEMBER_LOGIN_KEY) ?? "true";
     this.rememberLogin = signal(JSON.parse(remember));
 
-    effect(async () => {
-      let userDetails = this.userService.userDetails();
-      if (!userDetails) return this.userAvatar.set("none");
-      let url = await gravatar(userDetails.email, {defaultImage: "identicon"});
-      this.userAvatar.set(`url("${url}")`);
-    }, {allowSignalWrites: true});
+    effect(
+      async () => {
+        let userDetails = this.userService.userDetails();
+        if (!userDetails) return this.userAvatar.set("none");
+        let url = await gravatar(userDetails.email, {
+          defaultImage: "identicon",
+        });
+        this.userAvatar.set(`url("${url}")`);
+      },
+      {allowSignalWrites: true},
+    );
   }
 
   toggleRemember() {

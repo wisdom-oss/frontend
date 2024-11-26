@@ -1,9 +1,6 @@
 <div *ngIf="!loggedIn()">
   <div class="buttons has-addons">
-    <a 
-      class="button" 
-      (click)="authService.login(rememberLogin())"
-    >
+    <a class="button" (click)="authService.login(rememberLogin())">
       <span class="icon-text">
         <span class="icon">
           <ng-icon name="remixLoginBoxLine"></ng-icon>
@@ -12,7 +9,7 @@
       </span>
     </a>
     <button class="button" id="remember">
-      <span 
+      <span
         class="icon"
         [class.has-text-primary]="rememberLogin()"
         [class.has-opacity-60]="!rememberLogin()"
@@ -30,8 +27,8 @@
   [class.is-active]="userDropdownActive()"
 >
   <div class="dropdown-trigger" (click)="userDropdownActive.toggle()">
-    <div 
-      id="user-profile-button" 
+    <div
+      id="user-profile-button"
       class="button"
       [style.background-image]="userAvatar()"
     ></div>
