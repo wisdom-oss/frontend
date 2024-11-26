@@ -1,0 +1,39 @@
+<div *ngIf="!loggedIn()">
+  <a class="button" (click)="authService.login()">
+    <span class="icon-text">
+      <span class="icon">
+        <ng-icon name="remixLoginBoxLine"></ng-icon>
+      </span>
+      <span>Login</span>
+    </span>
+  </a>
+</div>
+
+<div
+  *ngIf="loggedIn()"
+  class="dropdown is-right"
+  [class.is-active]="userDropdownActive()"
+>
+  <div class="dropdown-trigger" (click)="userDropdownActive.toggle()">
+    <div id="user-profile-button" class="button"></div>
+  </div>
+  <div class="dropdown-menu">
+    <div class="dropdown-content">
+      <div class="dropdown-item has-text-centered">
+        <p class="icon-text has-text-weight-bold is-flex-wrap-nowrap">
+          <span style="white-space: nowrap">Tim Hesse</span>
+        </p>
+        <p>{{ "@thesse" }}</p>
+      </div>
+      <hr class="dropdown-divider" />
+      <a class="dropdown-item has-text-centered pr-5">
+        <span class="icon-text">
+          <span class="icon">
+            <ng-icon name="remixLogoutBoxLine"></ng-icon>
+          </span>
+          <span>Logout</span>
+        </span>
+      </a>
+    </div>
+  </div>
+</div>

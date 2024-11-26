@@ -1,6 +1,5 @@
 import {
   HttpEvent,
-  HttpInterceptorFn,
   HttpHandler,
   HttpInterceptor,
   HttpRequest,
@@ -8,7 +7,8 @@ import {
   HttpEventType,
 } from "@angular/common/http";
 import {Injectable} from "@angular/core";
-import Ajv, {DefinedError} from "ajv";
+import {DefinedError} from "ajv";
+import Ajv from "ajv/dist/jtd";
 import {tap, Observable} from "rxjs";
 
 import {httpContexts} from "../common/http-contexts";
@@ -35,6 +35,7 @@ export class SchemaValidationInterceptor implements HttpInterceptor {
         if (!validate(response.body)) {
           // this casting is given in the example for ajv
           // see: https://ajv.js.org/guide/typescript.html#type-safe-error-handling
+          console.error(validate.errors);
           throw new this.Error(
             response.body,
             validate.errors as DefinedError[],

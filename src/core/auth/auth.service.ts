@@ -8,6 +8,7 @@ import {firstValueFrom} from "rxjs";
 
 import {StorageService} from "../../common/storage.service";
 import {httpContexts} from "../../common/http-contexts";
+import { UserService } from "../user.service";
 
 const API_URL = "/api/auth";
 
@@ -22,15 +23,12 @@ const CURRENT_URL_KEY = "url";
 export class AuthService {
   readonly RefreshTokenError = RefreshTokenError;
 
-  // TODO: outsource this into a service
-  private ajv = new Ajv();
-
   private storage: StorageService.Storages;
 
-  private accessToken = signal<string | undefined>(undefined);
-  private refreshToken = signal<string | undefined>(undefined);
+  readonly accessToken = signal<string | undefined>(undefined);
+  readonly refreshToken = signal<string | undefined>(undefined);
 
-  private decodedAccessToken = computed(() => {
+  readonly decodedAccessToken = computed(() => {
     let accessToken = this.accessToken();
     if (!accessToken) return undefined;
     return jwtDecode(accessToken);
@@ -40,6 +38,7 @@ export class AuthService {
     private http: HttpClient,
     private router: Router,
     storage: StorageService,
+    private userService: UserService,
   ) {
     this.storage = storage.instance(AuthService);
     this.loadTokens();
@@ -62,8 +61,10 @@ export class AuthService {
   login(remember: boolean = true) {
     this.storage.session.set(REMEMBER_LOGIN_KEY, JSON.stringify(remember));
     this.storage.session.set(CURRENT_URL_KEY, this.router.url);
-    let redirectUri = `${window.location.origin}/callback`;
-    this.router.navigateByUrl(`/api/auth/login?redirect_uri=${redirectUri}`);
+    let origin = window.location.origin;
+    let redirectUri = `${origin}/callback`;
+    let navigateUrl = `${origin}${API_URL}/login?redirect_uri=${redirectUri}`;
+    window.location.assign(navigateUrl);
   }
 
   async callback(code: string, state: string) {
@@ -74,9 +75,11 @@ export class AuthService {
     );
 
     this.storeTokenSet(tokenSet);
+    
+    this.userService.fetchUserDetails();
 
     let redirect = this.storage.session.take(CURRENT_URL_KEY);
-    if (redirect) this.router.navigateByUrl(redirect);
+    return redirect;
   }
 
   logout() {}
@@ -88,7 +91,8 @@ export class AuthService {
     if (!refreshToken) throw new RefreshTokenError({missing: true});
 
     // TODO: try-catch this
-    await this.generateTokenSet("refresh_token", refreshToken);
+    let tokenSet = await this.generateTokenSet("refresh_token", refreshToken);
+    this.storeTokenSet(tokenSet);
   }
 
   storeTokenSet(tokenSet: AuthService.TokenSet) {
@@ -118,14 +122,14 @@ export class AuthService {
     ...data: string[]
   ): Promise<AuthService.TokenSet> {
     let params = new HttpParams();
-    params.set("grant_type", grantType);
+    params = params.set("grant_type", grantType);
     switch (grantType) {
       case "refresh_token":
-        params.set("refresh_token", data[0]);
+        params = params.set("refresh_token", data[0]);
         break;
       case "authorization_code":
-        params.set("code", data[0]);
-        params.set("state", data[1]);
+        params = params.set("code", data[0]);
+        params = params.set("state", data[1]);
         break;
     }
 
@@ -142,6 +146,10 @@ export class AuthService {
       ),
     );
 
+    if (response.token_type.trim().toLowerCase() !== "bearer") {
+      console.warn("Response token type wasn't 'bearer'");
+    }
+
     return {
       accessToken: response.access_token,
       expiresIn: response.expires_in,
@@ -155,7 +163,7 @@ const TOKEN_SET_SCHEMA = {
   properties: {
     access_token: {type: "string"},
     expires_in: {type: "int32"},
-    token_type: {enum: ["bearer"]},
+    token_type: {type: "string"},
     refresh_token: {type: "string"},
   },
 } as const;

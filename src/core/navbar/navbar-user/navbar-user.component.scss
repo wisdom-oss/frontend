@@ -1,0 +1,8 @@
+// TODO: avoid this duplication somehow
+$nearly-full-height: calc(var(--bulma-navbar-height) - 0.8em);
+
+#user-profile-button {
+  border-radius: 100%;
+  height: $nearly-full-height;
+  width: $nearly-full-height;
+}
