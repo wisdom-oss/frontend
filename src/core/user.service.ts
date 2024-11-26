@@ -1,9 +1,10 @@
 import {HttpClient, HttpContext} from "@angular/common/http";
-import {signal, Injectable} from "@angular/core";
+import {signal, Injectable, effect} from "@angular/core";
 import {JTDDataType} from "ajv/dist/jtd";
 import {firstValueFrom} from "rxjs";
 
 import {httpContexts} from "../common/http-contexts";
+import { AuthService } from "./auth/auth.service";
 
 const API_URL = "/api/auth";
 
@@ -13,7 +14,15 @@ const API_URL = "/api/auth";
 export class UserService {
   readonly userDetails = signal<UserService.UserDetails | null>(null);
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService,
+  ) {
+    effect(() => {
+      if (this.authService.accessToken()) this.fetchUserDetails();
+      else this.userDetails.set(null);
+    }, {allowSignalWrites: true});
+  }
 
   async fetchUserDetails(userId: string = "me") {
     let userDetails = await firstValueFrom(
@@ -26,7 +35,6 @@ export class UserService {
     );
 
     this.userDetails.set(userDetails);
-    console.log(userDetails);
     return userDetails;
   }
 }
@@ -44,5 +52,6 @@ const USER_DETAILS_SCHEMA = {
     username: {type: "string"},
     disabled: {type: "boolean"},
     administrator: {type: "boolean"},
+    permissions: {values: {elements: {type: "string"}}}
   },
 } as const;

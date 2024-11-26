@@ -25,12 +25,12 @@ export class AuthService {
 
   private storage: StorageService.Storages;
 
-  readonly accessToken = signal<string | undefined>(undefined);
-  readonly refreshToken = signal<string | undefined>(undefined);
+  readonly accessToken = signal<string | null>(null);
+  readonly refreshToken = signal<string | null>(null);
 
   readonly decodedAccessToken = computed(() => {
     let accessToken = this.accessToken();
-    if (!accessToken) return undefined;
+    if (!accessToken) return null;
     return jwtDecode(accessToken);
   });
 
@@ -38,7 +38,6 @@ export class AuthService {
     private http: HttpClient,
     private router: Router,
     storage: StorageService,
-    private userService: UserService,
   ) {
     this.storage = storage.instance(AuthService);
     this.loadTokens();
@@ -75,14 +74,27 @@ export class AuthService {
     );
 
     this.storeTokenSet(tokenSet);
-    
-    this.userService.fetchUserDetails();
 
     let redirect = this.storage.session.take(CURRENT_URL_KEY);
     return redirect;
   }
 
-  logout() {}
+  async logout() {
+    this.storage.session.remove(ACCESS_TOKEN_KEY);
+    this.storage.local.remove(ACCESS_TOKEN_KEY);
+    this.storage.session.remove(REFRESH_TOKEN_KEY);
+    this.storage.local.remove(REFRESH_TOKEN_KEY);
+    
+    let refreshToken = this.refreshToken();
+    if (refreshToken) {
+      let params = new HttpParams().set("token", refreshToken);
+      try {await firstValueFrom(this.http.post(`${API_URL}/revoke`, params))}
+      catch {}
+    }
+
+    this.accessToken.set(null);
+    this.refreshToken.set(null);
+  }
 
   async refresh() {
     let refreshToken =
@@ -106,6 +118,9 @@ export class AuthService {
       this.storage.session.set(ACCESS_TOKEN_KEY, tokenSet.accessToken);
       this.storage.session.set(REFRESH_TOKEN_KEY, tokenSet.refreshToken);
     }
+
+    this.accessToken.set(tokenSet.accessToken);
+    this.refreshToken.set(tokenSet.refreshToken);
   }
 
   async generateTokenSet(
@@ -141,7 +156,7 @@ export class AuthService {
           context: new HttpContext().set(
             httpContexts.validateSchema,
             TOKEN_SET_SCHEMA,
-          ),
+          ).set(httpContexts.authenticate, false),
         },
       ),
     );
