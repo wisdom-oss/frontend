@@ -26,7 +26,7 @@ const REMEMBER_LOGIN_KEY = "remember";
   standalone: true,
   imports: [NgIconComponent, NgIf],
   templateUrl: "./navbar-user.component.html",
-  styleUrl: "./navbar-user.component.scss",
+  styleUrl: "../navbar.component.scss",
   providers: [
     provideIcons({
       remixLogoutBoxLine,

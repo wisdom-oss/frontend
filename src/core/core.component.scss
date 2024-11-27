@@ -1,3 +1,11 @@
+@use "../variables.scss" as var;
+
+@media screen and (max-width: var.$fullhd) {
+  aside {
+    display: none;
+  }
+}
+
 .is-fullheight-with-navbar {
   $height: calc(100vh - var(--bulma-navbar-height));
   height: $height;

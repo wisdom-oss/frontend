@@ -1,10 +1,26 @@
-.navbar {
-  max-height: var(--bulma-navbar-height);
-}
-
+@use "../../variables.scss" as var;
 $nearly-full-height: calc(var(--bulma-navbar-height) - 0.8em);
+
+.navbar {
+  padding: {
+    right: calc(var.$gap / 2);
+    left: calc(var.$gap / 2);
+  }
+  max-height: $nearly-full-height;
+}
 
 #brand-logo {
   height: $nearly-full-height;
   max-height: $nearly-full-height;
+}
+
+#user-profile-button {
+  border-radius: 100%;
+  height: $nearly-full-height;
+  width: $nearly-full-height;
+  background-size: cover;
+}
+
+.has-opacity-60 {
+  filter: opacity(0.6);
 }
