@@ -8,8 +8,8 @@
         <span>Login</span>
       </span>
     </a>
-    <button 
-      class="button has-tooltip-bottom" 
+    <button
+      class="button has-tooltip-bottom"
       data-tooltip="Remember Login"
       id="remember"
     >
@@ -41,6 +41,13 @@
     <div class="dropdown-content">
       <div class="dropdown-item has-text-centered">
         <p class="icon-text has-text-weight-bold is-flex-wrap-nowrap">
+          <span
+            *ngIf="userDetails()!.administrator"
+            class="icon has-tooltip-top"
+            data-tooltip="Administrator"
+          >
+            <ng-icon name="remixVipCrown2Fill"></ng-icon>
+          </span>
           <span style="white-space: nowrap">
             {{ userDetails()!.name }}
           </span>

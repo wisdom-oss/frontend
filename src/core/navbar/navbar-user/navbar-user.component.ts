@@ -11,6 +11,7 @@ import {
   remixLoginBoxLine,
   remixLogoutBoxLine,
   remixRotateLockFill,
+  remixVipCrown2Fill,
 } from "@ng-icons/remixicon";
 import {image as gravatar} from "gravatar-gen";
 
@@ -32,6 +33,7 @@ const REMEMBER_LOGIN_KEY = "remember";
       remixLogoutBoxLine,
       remixLoginBoxLine,
       remixRotateLockFill,
+      remixVipCrown2Fill,
     }),
   ],
 })
