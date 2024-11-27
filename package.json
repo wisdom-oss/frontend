@@ -27,6 +27,7 @@
     "@creativebulma/bulma-tooltip": "github:deather/bulma-tooltip",
     "@ng-icons/core": "^29.5.1",
     "@ng-icons/remixicon": "^29.5.1",
+    "@ngx-translate/core": "^16.0.3",
     "@twemoji/svg": "^15.0.0",
     "@wisdom-oss/brand": "github:wisdom-oss/brand",
     "ajv": "^8.17.1",
