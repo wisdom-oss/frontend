@@ -1,7 +1,5 @@
 import {signal, Directive, Input, WritableSignal} from "@angular/core";
 
-import {signals} from "../signals";
-
 /**
  * Directive to toggle `is-active` class on click event.
  */
