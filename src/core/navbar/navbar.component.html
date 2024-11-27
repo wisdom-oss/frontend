@@ -20,7 +20,10 @@
       <div class="navbar-end">
         <div
           class="navbar-item has-dropdown is-user-select-none"
+          [class.is-active]="langSelectActive()"
           is-active-toggle
+          is-auto-hide
+          [is-active-signal]="langSelectActive"
         >
           <div class="navbar-link">
             <p class="icon-text">

@@ -19,13 +19,14 @@ import {signals} from "../../../common/signals";
 import {AuthService} from "../../auth/auth.service";
 import {UserService} from "../../user.service";
 import {StorageService} from "../../../common/storage.service";
+import {IsAutoHideDirective} from "../../../common/directives/is-auto-hide.directive";
 
 const REMEMBER_LOGIN_KEY = "remember";
 
 @Component({
   selector: "navbar-user",
   standalone: true,
-  imports: [NgIconComponent, NgIf],
+  imports: [NgIconComponent, NgIf, IsAutoHideDirective],
   templateUrl: "./navbar-user.component.html",
   styleUrl: "../navbar.component.scss",
   providers: [

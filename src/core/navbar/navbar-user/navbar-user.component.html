@@ -29,6 +29,8 @@
   *ngIf="userDetails()"
   class="dropdown is-right"
   [class.is-active]="userDropdownActive()"
+  is-auto-hide
+  [is-active-signal]="userDropdownActive"
 >
   <div class="dropdown-trigger" (click)="userDropdownActive.toggle()">
     <div

@@ -5,6 +5,8 @@ import {remixMenu2Line, remixTranslate2} from "@ng-icons/remixicon";
 
 import {NavbarUserComponent} from "./navbar-user/navbar-user.component";
 import {IsActiveToggleDirective} from "../../common/directives/is-active-toggle.directive";
+import {IsAutoHideDirective} from "../../common/directives/is-auto-hide.directive";
+import {signals} from "../../common/signals";
 
 @Component({
   selector: "navbar",
@@ -14,6 +16,7 @@ import {IsActiveToggleDirective} from "../../common/directives/is-active-toggle.
     IsActiveToggleDirective,
     NavbarUserComponent,
     RouterLink,
+    IsAutoHideDirective,
   ],
   templateUrl: "./navbar.component.html",
   styleUrl: "./navbar.component.scss",
@@ -25,5 +28,6 @@ import {IsActiveToggleDirective} from "../../common/directives/is-active-toggle.
   ],
 })
 export class NavbarComponent {
-  sidebarClick = output();
+  readonly sidebarClick = output();
+  readonly langSelectActive = signals.toggleable(false);
 }

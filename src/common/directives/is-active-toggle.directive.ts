@@ -1,4 +1,4 @@
-import {Directive} from "@angular/core";
+import {signal, Directive, Input, WritableSignal} from "@angular/core";
 
 import {signals} from "../signals";
 
@@ -10,9 +10,14 @@ import {signals} from "../signals";
   standalone: true,
   host: {
     "[class.is-active]": "isActive()",
-    "(click)": "isActive.toggle()",
+    "(click)": "toggle()",
   },
 })
 export class IsActiveToggleDirective {
-  isActive = signals.toggleable(false);
+  @Input("is-active-signal")
+  isActive: WritableSignal<boolean> = signal(false, {equal: () => false});
+
+  toggle() {
+    this.isActive.set(!this.isActive());
+  }
 }
