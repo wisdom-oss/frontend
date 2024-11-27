@@ -9,10 +9,7 @@
     "**/.classpath": true,
     "**/.factorypath": true,
     "**/.project": true,
-    "**/.settings": true,
-    "[!s]*/**": true,
-    "s[!r]*/**": true,
-    "sr[!c]*/**": true
+    "**/.settings": true
   },
   "cSpell.language": "en,de-DE"
 }
