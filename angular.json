@@ -53,6 +53,11 @@
                 "output": "brand"
               },
               {
+                "glob": "**/*.svg",
+                "input": "node_modules/@twemoji",
+                "output": "twemoji"
+              },
+              {
                 "glob": "**/*",
                 "input": "public"
               }

@@ -1,4 +1,5 @@
 import {output, Component} from "@angular/core";
+import {RouterLink} from "@angular/router";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {remixMenu2Line, remixTranslate2} from "@ng-icons/remixicon";
 
@@ -8,7 +9,12 @@ import {IsActiveToggleDirective} from "../../common/directives/is-active-toggle.
 @Component({
   selector: "navbar",
   standalone: true,
-  imports: [NgIconComponent, IsActiveToggleDirective, NavbarUserComponent],
+  imports: [
+    NgIconComponent,
+    IsActiveToggleDirective,
+    NavbarUserComponent,
+    RouterLink,
+  ],
   templateUrl: "./navbar.component.html",
   styleUrl: "./navbar.component.scss",
   providers: [
