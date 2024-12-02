@@ -28,17 +28,23 @@ export class UserService {
   }
 
   async fetchUserDetails(userId: string = "me") {
-    let userDetails = await firstValueFrom(
-      this.http.get<UserService.UserDetails>(`${API_URL}/users/${userId}`, {
-        context: new HttpContext().set(
-          httpContexts.validateSchema,
-          USER_DETAILS_SCHEMA,
-        ),
-      }),
-    );
-
-    this.userDetails.set(userDetails);
-    return userDetails;
+    try {
+      let userDetails = await firstValueFrom(
+        this.http.get<UserService.UserDetails>(`${API_URL}/users/${userId}`, {
+          context: new HttpContext().set(
+            httpContexts.validateSchema,
+            USER_DETAILS_SCHEMA,
+          ),
+        }),
+      );
+  
+      this.userDetails.set(userDetails);
+      return userDetails;
+    }
+    catch (e) {
+      console.error(e);
+      throw e;
+    }
   }
 }
 

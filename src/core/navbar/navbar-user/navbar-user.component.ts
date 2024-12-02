@@ -53,10 +53,6 @@ export class NavbarUserComponent {
     readonly userService: UserService,
     storage: StorageService,
   ) {
-    if (this.authService.accessToken()) {
-      this.userService.fetchUserDetails();
-    }
-
     this.storage = storage.instance(NavbarUserComponent);
     let remember = this.storage.local.get(REMEMBER_LOGIN_KEY) ?? "true";
     this.rememberLogin = signal(JSON.parse(remember));
