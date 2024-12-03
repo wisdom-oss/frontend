@@ -37,11 +37,10 @@ export class UserService {
           ),
         }),
       );
-  
+
       this.userDetails.set(userDetails);
       return userDetails;
-    }
-    catch (e) {
+    } catch (e) {
       console.error(e);
       throw e;
     }

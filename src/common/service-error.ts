@@ -6,4 +6,4 @@ export interface ServiceError {
   instance?: string;
   errors?: string[];
   host: string;
-};
+}
