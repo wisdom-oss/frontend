@@ -12,6 +12,7 @@ import {routes} from "./routes";
 import {SchemaValidationInterceptor} from "./core/schema-validation.interceptor";
 import {apiInterceptor} from "./core/api.interceptor";
 import {authInterceptor} from "./core/auth/auth.interceptor";
+import { errorInterceptor } from "./core/error.interceptor";
 
 export const wisdomAppConfig: ApplicationConfig = {
   providers: [
@@ -21,6 +22,7 @@ export const wisdomAppConfig: ApplicationConfig = {
     provideHttpClient(
       withInterceptors([apiInterceptor, authInterceptor]),
       withInterceptorsFromDi(),
+      withInterceptors([errorInterceptor])
     ),
     {
       provide: HTTP_INTERCEPTORS,

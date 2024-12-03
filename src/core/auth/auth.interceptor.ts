@@ -17,21 +17,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         let currentTime = Math.floor(Date.now() / 1000);
         if (jwtDecoded.exp < currentTime) {
           // token expired, try to refresh
-          try {
-            await authService.refresh();
-          }
-          catch (e) {
-            if (!(e instanceof HttpErrorResponse)) throw e;
-            switch (e.status) {
-              // add more if necessary
-              case HttpStatusCode.BadRequest:
-              case HttpStatusCode.Unauthorized:
-                authService.refreshToken.set(null);
-                authService.accessToken.set(null);
-                await authService.logout();
-            }
-            throw e;
-          }
+          await authService.refresh();
         }
       }
 
