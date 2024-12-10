@@ -5,10 +5,9 @@ import {RouterOutlet} from "@angular/router";
 import {wisdomAppConfig} from "./config";
 
 @Component({
-  selector: "app",
-  standalone: true,
-  imports: [RouterOutlet],
-  template: "<router-outlet></router-outlet>",
+    selector: "app",
+    imports: [RouterOutlet],
+    template: "<router-outlet></router-outlet>"
 })
 class AppComponent {}
 

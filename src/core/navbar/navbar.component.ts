@@ -9,23 +9,22 @@ import {IsAutoHideDirective} from "../../common/directives/is-auto-hide.directiv
 import {signals} from "../../common/signals";
 
 @Component({
-  selector: "navbar",
-  standalone: true,
-  imports: [
-    NgIconComponent,
-    IsActiveToggleDirective,
-    NavbarUserComponent,
-    RouterLink,
-    IsAutoHideDirective,
-  ],
-  templateUrl: "./navbar.component.html",
-  styleUrl: "./navbar.component.scss",
-  providers: [
-    provideIcons({
-      remixMenu2Line,
-      remixTranslate2,
-    }),
-  ],
+    selector: "navbar",
+    imports: [
+        NgIconComponent,
+        IsActiveToggleDirective,
+        NavbarUserComponent,
+        RouterLink,
+        IsAutoHideDirective,
+    ],
+    templateUrl: "./navbar.component.html",
+    styleUrl: "./navbar.component.scss",
+    providers: [
+        provideIcons({
+            remixMenu2Line,
+            remixTranslate2,
+        }),
+    ]
 })
 export class NavbarComponent {
   readonly sidebarClick = output();

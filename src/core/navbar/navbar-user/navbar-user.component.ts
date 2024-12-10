@@ -24,19 +24,18 @@ import {IsAutoHideDirective} from "../../../common/directives/is-auto-hide.direc
 const REMEMBER_LOGIN_KEY = "remember";
 
 @Component({
-  selector: "navbar-user",
-  standalone: true,
-  imports: [NgIconComponent, NgIf, IsAutoHideDirective],
-  templateUrl: "./navbar-user.component.html",
-  styleUrl: "../navbar.component.scss",
-  providers: [
-    provideIcons({
-      remixLogoutBoxLine,
-      remixLoginBoxLine,
-      remixRotateLockFill,
-      remixVipCrown2Fill,
-    }),
-  ],
+    selector: "navbar-user",
+    imports: [NgIconComponent, NgIf, IsAutoHideDirective],
+    templateUrl: "./navbar-user.component.html",
+    styleUrl: "../navbar.component.scss",
+    providers: [
+        provideIcons({
+            remixLogoutBoxLine,
+            remixLoginBoxLine,
+            remixRotateLockFill,
+            remixVipCrown2Fill,
+        }),
+    ]
 })
 export class NavbarUserComponent {
   private storage: StorageService.Storages;
