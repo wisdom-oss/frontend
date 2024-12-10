@@ -4,10 +4,10 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {AuthService} from "../auth.service";
 
 @Component({
-    selector: "wisdom-callback",
-    imports: [],
-    templateUrl: "./callback.component.html",
-    styles: ``
+  selector: "wisdom-callback",
+  imports: [],
+  templateUrl: "./callback.component.html",
+  styles: ``,
 })
 export class CallbackComponent implements OnInit {
   constructor(

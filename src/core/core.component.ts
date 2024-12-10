@@ -8,13 +8,13 @@ import {signals} from "../common/signals";
 import {IsAutoHideDirective} from "../common/directives/is-auto-hide.directive";
 
 @Component({
-    selector: "core",
-    imports: [RouterOutlet, NavbarComponent, SidebarComponent, NgIf],
-    templateUrl: "./core.component.html",
-    styleUrl: "./core.component.scss",
-    host: {
-        "(click)": "onClick($event)",
-    }
+  selector: "core",
+  imports: [RouterOutlet, NavbarComponent, SidebarComponent, NgIf],
+  templateUrl: "./core.component.html",
+  styleUrl: "./core.component.scss",
+  host: {
+    "(click)": "onClick($event)",
+  },
 })
 export class CoreComponent {
   sidebarActive = signals.toggleable(true);
