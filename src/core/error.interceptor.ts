@@ -4,7 +4,7 @@ import {
   HttpErrorResponse,
 } from "@angular/common/http";
 import {inject} from "@angular/core";
-import TagUri from "@cptpiepmatz/tag-uri";
+import {TagUri} from "@cptpiepmatz/tag-uri";
 import {catchError, throwError} from "rxjs";
 
 import {AuthService} from "./auth/auth.service";
