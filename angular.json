@@ -63,7 +63,8 @@
               }
             ],
             "styles": ["src/styles.scss"],
-            "scripts": []
+            "scripts": [],
+            "allowedCommonJsDependencies": ["ajv"]
           },
           "configurations": {
             "production": {
