@@ -20,7 +20,7 @@
     "target": "ES2023",
     "module": "ES2022",
     "lib": ["ES2023", "dom"],
-    "plugins": [{ "name": "typescript-plugin-toml" }]
+    "plugins": [{"name": "typescript-plugin-toml"}]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

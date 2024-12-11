@@ -40,7 +40,12 @@
         "build": {
           "builder": "@angular-builders/custom-esbuild:application",
           "options": {
-            "plugins": [{"path": "node_modules/esbuild-plugin-toml/index.js", "options": {}}],
+            "plugins": [
+              {
+                "path": "node_modules/esbuild-plugin-toml/index.js",
+                "options": {}
+              }
+            ],
             "outputPath": "dist/wisdom-oss/frontend",
             "index": "src/index.html",
             "browser": "src/main.ts",
