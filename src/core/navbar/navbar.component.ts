@@ -2,6 +2,7 @@ import {output, Component} from "@angular/core";
 import {RouterLink} from "@angular/router";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {remixMenu2Line, remixTranslate2} from "@ng-icons/remixicon";
+import {TranslateDirective, TranslateService} from "@ngx-translate/core";
 
 import {NavbarUserComponent} from "./navbar-user/navbar-user.component";
 import {IsActiveToggleDirective} from "../../common/directives/is-active-toggle.directive";
@@ -16,6 +17,7 @@ import {signals} from "../../common/signals";
     NavbarUserComponent,
     RouterLink,
     IsAutoHideDirective,
+    TranslateDirective,
   ],
   templateUrl: "./navbar.component.html",
   styleUrl: "./navbar.component.scss",
@@ -29,4 +31,6 @@ import {signals} from "../../common/signals";
 export class NavbarComponent {
   readonly sidebarClick = output();
   readonly langSelectActive = signals.toggleable(false);
+
+  constructor(protected translate: TranslateService) {}
 }

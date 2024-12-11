@@ -6,6 +6,7 @@ import {
 } from "@angular/common/http";
 import {provideZoneChangeDetection, ApplicationConfig} from "@angular/core";
 import {provideRouter} from "@angular/router";
+import {provideTranslateService} from "@ngx-translate/core";
 import {provideCharts, withDefaultRegisterables} from "ng2-charts";
 
 import {routes} from "./routes";
@@ -19,6 +20,7 @@ export const wisdomAppConfig: ApplicationConfig = {
     provideZoneChangeDetection({eventCoalescing: true}),
     provideRouter(routes),
     provideCharts(withDefaultRegisterables()),
+    provideTranslateService(),
     provideHttpClient(
       withInterceptors([apiInterceptor, authInterceptor]),
       withInterceptorsFromDi(),

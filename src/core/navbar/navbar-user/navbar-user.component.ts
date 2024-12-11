@@ -13,6 +13,7 @@ import {
   remixRotateLockFill,
   remixVipCrown2Fill,
 } from "@ng-icons/remixicon";
+import {TranslateDirective} from "@ngx-translate/core";
 import {image as gravatar} from "gravatar-gen";
 
 import {signals} from "../../../common/signals";
@@ -25,7 +26,7 @@ const REMEMBER_LOGIN_KEY = "remember";
 
 @Component({
   selector: "navbar-user",
-  imports: [NgIconComponent, NgIf, IsAutoHideDirective],
+  imports: [NgIconComponent, NgIf, IsAutoHideDirective, TranslateDirective],
   templateUrl: "./navbar-user.component.html",
   styleUrl: "../navbar.component.scss",
   providers: [
