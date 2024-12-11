@@ -46,16 +46,19 @@
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
+    "@angular-builders/custom-esbuild": "^19.0.0-beta.0",
     "@angular/build": "^19.0.4",
     "@angular/cli": "^19.0.4",
     "@angular/compiler-cli": "^19.0.3",
     "@compodoc/compodoc": "^1.1.26",
+    "esbuild-plugin-toml": "^0.0.1",
     "jsr": "^0.13.2",
     "npm-check-updates": "^17.1.11",
     "oxlint": "^0.10.3",
     "prettier": "^3.4.2",
     "pretty-ts-imports": "^1.1.0",
-    "typescript": "~5.5.2"
+    "typescript": "~5.5.2",
+    "typescript-plugin-toml": "^0.5.0"
   },
   "volta": {
     "node": "22.10.0"
