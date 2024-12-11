@@ -57,17 +57,14 @@ export class NavbarUserComponent {
     let remember = this.storage.local.get(REMEMBER_LOGIN_KEY) ?? "true";
     this.rememberLogin = signal(JSON.parse(remember));
 
-    effect(
-      async () => {
-        let userDetails = this.userService.userDetails();
-        if (!userDetails) return this.userAvatar.set("none");
-        let url = await gravatar(userDetails.email, {
-          defaultImage: "identicon",
-        });
-        this.userAvatar.set(`url("${url}")`);
-      },
-      {allowSignalWrites: true},
-    );
+    effect(async () => {
+      let userDetails = this.userService.userDetails();
+      if (!userDetails) return this.userAvatar.set("none");
+      let url = await gravatar(userDetails.email, {
+        defaultImage: "identicon",
+      });
+      this.userAvatar.set(`url("${url}")`);
+    });
   }
 
   toggleRemember() {

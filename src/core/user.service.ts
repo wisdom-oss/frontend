@@ -18,13 +18,10 @@ export class UserService {
     private http: HttpClient,
     private authService: AuthService,
   ) {
-    effect(
-      () => {
-        if (this.authService.accessToken()) this.fetchUserDetails();
-        else this.userDetails.set(null);
-      },
-      {allowSignalWrites: true},
-    );
+    effect(() => {
+      if (this.authService.accessToken()) this.fetchUserDetails();
+      else this.userDetails.set(null);
+    });
   }
 
   async fetchUserDetails(userId: string = "me") {

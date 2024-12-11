@@ -4,7 +4,7 @@ const PREFIX = "wisdom-oss/frontend";
 type AnyConstructor = new (...args: any[]) => any;
 
 /**
- * Provides storage management for session and local storage with class-based 
+ * Provides storage management for session and local storage with class-based
  * key scoping.
  * Ensures no duplicate class registration for storage instances.
  */
@@ -19,7 +19,7 @@ export class StorageService {
 
   /**
    * Registers a class and creates scoped access to session and local storage.
-   * 
+   *
    * @param any The class constructor used for scoping keys.
    * @returns An object providing access to both session and local storage.
    * @throws {DuplicateClassError} If the class has already been registered.
@@ -35,7 +35,7 @@ export class StorageService {
 
   /**
    * Constructs a scoped storage key.
-   * 
+   *
    * @param any The class constructor used for scoping.
    * @param key The specific key to scope.
    * @returns A prefixed string key for storage.
@@ -46,7 +46,7 @@ export class StorageService {
 
   /**
    * Creates a storage object with scoped get, set, remove, and take methods.
-   * 
+   *
    * @param any - The class constructor used for key scoping.
    * @param storage - The browser storage (sessionStorage or localStorage).
    * @returns A `Storage` interface providing scoped storage operations.
@@ -119,7 +119,7 @@ class DuplicateClassError extends Error {
 
   /**
    * Creates a new `DuplicateClassError`.
-   * 
+   *
    * @param any The class constructor causing the duplicate error.
    */
   constructor(any: AnyConstructor) {

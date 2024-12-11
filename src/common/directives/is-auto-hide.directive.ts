@@ -39,15 +39,12 @@ export class IsAutoHideDirective {
     private service: IsAutoHideDirective.Service,
     private elementRef: ElementRef,
   ) {
-    effect(
-      () => {
-        let element = service.trigger();
-        if (!elementRef.nativeElement.contains(element)) {
-          this.isActive.set(false);
-        }
-      },
-      {allowSignalWrites: true},
-    );
+    effect(() => {
+      let element = service.trigger();
+      if (!elementRef.nativeElement.contains(element)) {
+        this.isActive.set(false);
+      }
+    });
   }
 }
 
