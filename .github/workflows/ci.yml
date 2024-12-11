@@ -68,4 +68,4 @@ jobs:
           path: node_modules
           key: ${{ runner.os }}-dev-node_modules-${{ hashFiles('package-lock.json') }}
       - run: npm ci --include dev
-      - run: npx prettier . --check
+      - run: npx prettier . --check --plugin prettier-plugin-toml

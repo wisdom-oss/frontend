@@ -8,7 +8,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "lint": "oxlint",
-    "fmt": "primp src -r && prettier . --write",
+    "fmt": "primp src -r && prettier . --write --plugin prettier-plugin-toml",
     "doc": "npm run compodoc:build",
     "compodoc:build": "compodoc -p tsconfig.doc.json",
     "compodoc:build-and-serve": "compodoc -p tsconfig.doc.json -s",
@@ -55,7 +55,8 @@
     "jsr": "^0.13.2",
     "npm-check-updates": "^17.1.11",
     "oxlint": "^0.10.3",
-    "prettier": "^3.4.2",
+    "prettier": "3.4.2",
+    "prettier-plugin-toml": "2.0.1",
     "pretty-ts-imports": "^1.1.0",
     "typescript": "~5.5.2",
     "typescript-plugin-toml": "^0.5.0"
