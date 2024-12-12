@@ -1,1 +1,12 @@
-<p>growl works!</p>
+<div class="card block is-fullheight is-flex is-flex-direction-column">
+  <div class="card-content p-0 is-clipped is-flex-grow-1">
+    <mgl-map
+      class="is-fullheight"
+      [style]="'https://tiles.versatiles.org/assets/styles/colorful.json'"
+      [zoom]="[9]"
+      [center]="{lat: 53.1434501, lon: 8.2145521}"
+      [preserveDrawingBuffer]="true"
+    ></mgl-map>
+  </div>
+  <div class="card-content">stuff here</div>
+</div>
