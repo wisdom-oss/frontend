@@ -24,3 +24,11 @@ $nearly-full-height: calc(var(--bulma-navbar-height) - 0.8em);
 .has-opacity-60 {
   filter: opacity(0.6);
 }
+
+#remember::before {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  transform: translateX(-100%) translateY(100%) translateX(0.2em)
+    translateY(0.2em);
+}
