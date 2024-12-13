@@ -18,6 +18,10 @@ de = "Anmelden"
 en = "Logout"
 de = "Abmelden"
 
+[remember]
+en = "Remember Login"
+de = "Angemeldet bleiben"
+
 [callback.redirect]
 en = "Redirecting you..."
 de = "Wir leiten dich gleich weiter..."
