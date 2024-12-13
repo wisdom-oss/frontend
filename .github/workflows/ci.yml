@@ -43,7 +43,7 @@ jobs:
       - run: npm run lint -- --deny-warnings
 
   doc:
-    # verify that documentation can be built, will be moved to own pipeline 
+    # verify that documentation can be built, will be moved to own pipeline
     # once new documentation setup is done
     needs: install
     runs-on: ubuntu-latest
