@@ -21,12 +21,19 @@ import {AuthService} from "../../auth/auth.service";
 import {UserService} from "../../user.service";
 import {StorageService} from "../../../common/storage.service";
 import {IsAutoHideDirective} from "../../../common/directives/is-auto-hide.directive";
+import {TranslateAttrDirective} from "../../../common/directives/translate-attr.directive";
 
 const REMEMBER_LOGIN_KEY = "remember";
 
 @Component({
   selector: "navbar-user",
-  imports: [NgIconComponent, NgIf, IsAutoHideDirective, TranslateDirective],
+  imports: [
+    NgIconComponent,
+    NgIf,
+    IsAutoHideDirective,
+    TranslateDirective,
+    TranslateAttrDirective,
+  ],
   templateUrl: "./navbar-user.component.html",
   styleUrl: "../navbar.component.scss",
   providers: [

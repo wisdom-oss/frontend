@@ -1,13 +1,29 @@
 import {Component, OnInit} from "@angular/core";
-import {ActivatedRoute, Router} from "@angular/router";
+import {RouterLink, ActivatedRoute, Router} from "@angular/router";
+import {provideIcons, NgIcon} from "@ng-icons/core";
+import {
+  remixArrowGoBackFill,
+  remixHome2Fill,
+  remixMagicFill,
+  remixSparkling2Fill,
+} from "@ng-icons/remixicon";
+import {TranslateDirective} from "@ngx-translate/core";
 
 import {AuthService} from "../auth.service";
 
 @Component({
   selector: "wisdom-callback",
-  imports: [],
+  imports: [NgIcon, RouterLink, TranslateDirective],
   templateUrl: "./callback.component.html",
   styles: ``,
+  providers: [
+    provideIcons({
+      remixMagicFill,
+      remixSparkling2Fill,
+      remixHome2Fill,
+      remixArrowGoBackFill,
+    }),
+  ],
 })
 export class CallbackComponent implements OnInit {
   constructor(
