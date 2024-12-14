@@ -29,5 +29,4 @@ FROM sigoden/dufs
 RUN apk upgrade --no-cache
 WORKDIR /wisdom-oss
 COPY --link --from=build-app /app/dist/wisdom-oss/frontend/browser /wisdom-oss/app
-COPY --link --from=build-server /cargo/bin/dufs /wisdom-oss/
-ENTRYPOINT [ "./dufs", "app", "--render-index" ]
+ENTRYPOINT [ "dufs", "app", "--render-index" ]
