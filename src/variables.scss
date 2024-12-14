@@ -1,0 +1,10 @@
+// Global variables for the frontend.
+//
+// Use this module to access custom or original Bulma variables without pulling
+// in the whole Bulma library everywhere.
+// You can also define other global variables here as needed.
+
+@forward "../node_modules/bulma/sass/utilities/" with (
+  $primary: #0088aa,
+  $fullhd: 1920px
+);

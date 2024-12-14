@@ -1,0 +1,25 @@
+@use "../../variables.scss" as var;
+
+$light-primary: color-mix(in lab, var.$primary 10%, var.$white-ter);
+
+nav {
+  height: calc(100% + 2 * var(--bulma-box-padding));
+  margin-top: calc(-1 * var(--bulma-box-padding));
+  padding: {
+    top: calc(2 * var(--bulma-box-padding));
+    bottom: calc(2 * var(--bulma-box-padding));
+  }
+  max-width: 20em;
+  width: 20em;
+  background-color: color-mix(in lab, $light-primary, black 5%);
+}
+
+@media (prefers-color-scheme: dark) {
+  nav {
+    background-color: color-mix(
+      in srgb,
+      black 40%,
+      var(--bulma-box-background-color)
+    );
+  }
+}

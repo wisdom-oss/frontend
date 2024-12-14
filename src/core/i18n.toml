@@ -1,0 +1,35 @@
+[lang] # the currently selected language
+en = "English"
+de = "Deutsch"
+
+[langs.english] # labels for english language
+en = "English"
+de = "Englisch"
+
+[langs.german] # labels for german language
+en = "German"
+de = "Deutsch"
+
+[login]
+en = "Login"
+de = "Anmelden"
+
+[logout]
+en = "Logout"
+de = "Abmelden"
+
+[remember]
+en = "Remember Login"
+de = "Angemeldet bleiben"
+
+[callback.redirect]
+en = "Redirecting you..."
+de = "Wir leiten dich gleich weiter..."
+
+[callback.not-working]
+en = "If that is not working:"
+de = "Wenn das nicht funktioniert:"
+
+[callback.home]
+en = "Back to Home"
+de = "Zurück zur Startseite"
