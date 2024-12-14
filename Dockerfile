@@ -26,7 +26,7 @@ RUN volta run npm run build
 
 # host the app via the static file server
 FROM sigoden/dufs
-RUN apk upgrade --no-cache
 WORKDIR /wisdom-oss
-COPY --link --from=build-app /app/dist/wisdom-oss/frontend/browser /wisdom-oss/app
-ENTRYPOINT [ "dufs", "app", "--render-index" ]
+COPY --from=build-app /app/dist/wisdom-oss/frontend/browser /wisdom-oss/app
+EXPOSE 5000
+ENTRYPOINT [ "dufs", "--render-index", "-b0.0.0.0", "-p5000", "app" ]
