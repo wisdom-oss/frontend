@@ -24,19 +24,8 @@ RUN volta run npm ci
 COPY --link . .
 RUN volta run npm run build
 
-
-# build a file server to use for hosting the static files
-FROM rust:alpine AS build-server
-RUN apk upgrade --no-cache
-RUN apk add --no-cache musl-dev build-base
-
-ENV CARGO_HOME=/cargo
-ARG DUFS_VERSION
-RUN cargo install dufs --version $DUFS_VERSION --locked
-
-
 # host the app via the static file server
-FROM alpine:latest AS app 
+FROM sigoden/dufs
 RUN apk upgrade --no-cache
 WORKDIR /wisdom-oss
 COPY --link --from=build-app /app/dist/wisdom-oss/frontend/browser /wisdom-oss/app
