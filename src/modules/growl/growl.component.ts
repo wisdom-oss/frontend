@@ -1,5 +1,8 @@
 import {Component} from "@angular/core";
 import {MapComponent} from "@maplibre/ngx-maplibre-gl";
+import {StyleSpecification} from "maplibre-gl";
+
+import colorful from "../../common/map/styles/colorful.json";
 
 @Component({
   selector: "wisdom-growl",
@@ -7,4 +10,6 @@ import {MapComponent} from "@maplibre/ngx-maplibre-gl";
   templateUrl: "./growl.component.html",
   styles: ``,
 })
-export class GrowlComponent {}
+export class GrowlComponent {
+  readonly style = colorful as any as StyleSpecification;
+}
