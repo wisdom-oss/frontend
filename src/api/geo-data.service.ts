@@ -12,7 +12,7 @@ import {firstValueFrom} from "rxjs";
 import {httpContexts} from "../common/http-contexts";
 import {typeUtils} from "../common/type-utils";
 
-const URL = "/api/geodata";
+const URL = "/api/geodata" as const;
 
 @Injectable({
   providedIn: "root",
