@@ -1,13 +1,25 @@
 <div class="card block is-fullheight is-flex is-flex-direction-column">
-  <div class="card-content p-0 is-clipped is-flex-grow-1">
+  <div class="card-content p-0 is-clipped is-flex-grow-1 is-fullheight">
     <mgl-map
       class="is-fullheight"
       [style]="style"
-      [zoom]="[9]"
+      [zoom]="[7]"
       [center]="{lat: 53.1434501, lon: 8.2145521}"
       [preserveDrawingBuffer]="true"
     >
-      <mgl-layer id="marker" type="symbol"></mgl-layer>
+      @for (
+        station of groundwaterMeasurementStations | async;
+        track station.key
+      ) {
+        <mgl-marker
+          [lngLat]="{
+            lat: station.geometry.coordinates[1],
+            lon: station.geometry.coordinates[0],
+          }"
+        >
+          <growl-groundwater-level-station-marker></growl-groundwater-level-station-marker>
+        </mgl-marker>
+      }
     </mgl-map>
   </div>
   <div class="card-content">stuff here</div>
