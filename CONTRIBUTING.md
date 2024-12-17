@@ -142,9 +142,9 @@ Key directories:
 
 8. **Routing**:
 
-  - Add routes to `src/routes.ts`, usually as a child for the `""` route.
-  - Make the route accessible by adding a `routerLink` to 
-    `src/core/sidebar/sidebar.component.html`.
+- Add routes to `src/routes.ts`, usually as a child for the `""` route.
+- Make the route accessible by adding a `routerLink` to
+  `src/core/sidebar/sidebar.component.html`.
 
 ## License
 
