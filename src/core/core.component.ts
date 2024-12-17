@@ -30,7 +30,7 @@ export class CoreComponent {
     effect(() =>
       this.storage.session.set("sidebar", JSON.stringify(this.sidebarActive())),
     );
-    
+
     this.sidebarActive.set(
       JSON.parse(this.storage.session.get("sidebar") ?? "true"),
     );
