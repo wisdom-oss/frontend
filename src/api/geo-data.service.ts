@@ -10,6 +10,7 @@ import {GeoJSON} from "geojson";
 import {catchError, firstValueFrom} from "rxjs";
 
 import {httpContexts} from "../common/http-contexts";
+import {typeUtils} from "../common/type-utils";
 
 const URL = "/api/geodata";
 
@@ -75,10 +76,11 @@ export class GeoDataService {
 export namespace GeoDataService {
   export type LayerInformation = JTDDataType<typeof LAYER_INFORMATION>;
   export type AvailableLayers = JTDDataType<typeof AVAILABLE_LAYERS_SCHEMA>;
-  export type LayerContents = (Omit<
-    JTDDataType<typeof LAYER_CONTENTS>[0],
-    "geometry"
-  > & {geometry: GeoJSON})[];
+  export type LayerContents = typeUtils.UpdateElements<
+    JTDDataType<typeof LAYER_CONTENTS>,
+    "geometry",
+    {geometry: GeoJSON}
+  >;
 }
 
 const LAYER_INFORMATION = {
