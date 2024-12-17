@@ -1,12 +1,12 @@
 import {AsyncPipe} from "@angular/common";
 import {
+  signal,
   AfterViewChecked,
   ViewChild,
   Component,
   OnInit,
   AfterViewInit,
   HostListener,
-  signal,
 } from "@angular/core";
 import {
   LayerComponent,
@@ -20,7 +20,7 @@ import {GroundwaterLevelStationMarkerComponent} from "./map/groundwater-level-st
 import {GeoDataService} from "../../api/geo-data.service";
 import colorful from "../../common/map/styles/colorful.json";
 import {typeUtils} from "../../common/type-utils";
-import { ResizeMapOnLoadDirective } from "../../common/directives/resize-map-on-load.directive";
+import {ResizeMapOnLoadDirective} from "../../common/directives/resize-map-on-load.directive";
 
 type Points = typeUtils.UpdateElements<
   GeoDataService.LayerContents,
@@ -35,7 +35,7 @@ type Points = typeUtils.UpdateElements<
     MarkerComponent,
     GroundwaterLevelStationMarkerComponent,
     AsyncPipe,
-    ResizeMapOnLoadDirective
+    ResizeMapOnLoadDirective,
   ],
   templateUrl: "./growl.component.html",
   styles: ``,
@@ -66,7 +66,7 @@ export class GrowlComponent implements OnInit {
     let zoom = event.target.getZoom();
     let scale = zoom / 7;
 
-    let size = 40 * (scale + ((scale - 1) * 2));
+    let size = 40 * (scale + (scale - 1) * 2);
     this.markerSize.set(size + "px");
     console.log(this.markerSize());
   }

@@ -53,10 +53,10 @@ export class GeoDataService {
   async fetchLayerContents(
     layerRef: string,
     filter?: {
-      relation: "within" | "overlaps" | "contains",
-      otherLayer: string,
-      key: string[],
-    }
+      relation: "within" | "overlaps" | "contains";
+      otherLayer: string;
+      key: string[];
+    },
   ): Promise<GeoDataService.LayerContents | null> {
     try {
       if (filter) {
@@ -64,17 +64,19 @@ export class GeoDataService {
         for (let [key, value] of Object.entries({
           relation: filter.relation,
           other_layer: filter.otherLayer,
-          key: filter.key
-        })) queryParams.push(`${key}=${value}`);
+          key: filter.key,
+        }))
+          queryParams.push(`${key}=${value}`);
 
         let url = `${URL}/content/${layerRef}/filtered?${queryParams.join("&")}`;
         return await firstValueFrom(
-          this.http.get<GeoDataService.LayerContents>(
-            url, {
-              context: new HttpContext().set(httpContexts.validateSchema, LAYER_CONTENTS)
-            }
-          )
-        )
+          this.http.get<GeoDataService.LayerContents>(url, {
+            context: new HttpContext().set(
+              httpContexts.validateSchema,
+              LAYER_CONTENTS,
+            ),
+          }),
+        );
       }
 
       return await firstValueFrom(
@@ -98,9 +100,14 @@ export class GeoDataService {
   identify(keys: string[]): Promise<GeoDataService.IdentifiedObjects> {
     let queryParams = keys.map(k => `key=${k}`);
     let url = `${URL}/identify?${queryParams.join("=")}`;
-    return firstValueFrom(this.http.get<GeoDataService.IdentifiedObjects>(url, {
-      context: new HttpContext().set(httpContexts.validateSchema, IDENTIFIED_OBJECTS)
-    }));
+    return firstValueFrom(
+      this.http.get<GeoDataService.IdentifiedObjects>(url, {
+        context: new HttpContext().set(
+          httpContexts.validateSchema,
+          IDENTIFIED_OBJECTS,
+        ),
+      }),
+    );
   }
 }
 
@@ -153,7 +160,7 @@ const LAYER_CONTENTS = {
 } as const;
 
 const IDENTIFIED_OBJECTS = {
- values: {
-  values: LAYER_CONTENT
- }
+  values: {
+    values: LAYER_CONTENT,
+  },
 } as const;

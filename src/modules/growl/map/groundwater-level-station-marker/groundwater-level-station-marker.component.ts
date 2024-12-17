@@ -1,4 +1,13 @@
-import {AfterViewInit, Component, effect, ElementRef, input, Renderer2, signal, ViewChild} from "@angular/core";
+import {
+  effect,
+  input,
+  signal,
+  ViewChild,
+  Component,
+  AfterViewInit,
+  ElementRef,
+  Renderer2,
+} from "@angular/core";
 
 @Component({
   selector: "growl-groundwater-level-station-marker",
@@ -10,7 +19,10 @@ export class GroundwaterLevelStationMarkerComponent implements AfterViewInit {
   private svg = signal<SVGElement | undefined>(undefined);
   readonly size = input("40px");
 
-  constructor(private host: ElementRef, private renderer: Renderer2) {
+  constructor(
+    private host: ElementRef,
+    private renderer: Renderer2,
+  ) {
     effect(() => {
       let svg = this.svg();
       if (!svg) return;

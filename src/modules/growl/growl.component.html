@@ -18,7 +18,9 @@
             lon: station.geometry.coordinates[0],
           }"
         >
-          <growl-groundwater-level-station-marker [size]="markerSize()"></growl-groundwater-level-station-marker>
+          <growl-groundwater-level-station-marker
+            [size]="markerSize()"
+          ></growl-groundwater-level-station-marker>
         </mgl-marker>
       }
     </mgl-map>
