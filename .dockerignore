@@ -1,0 +1,9 @@
+# Compiled output
+/dist
+/tmp
+/out-tsc
+/bazel-out
+/docs
+
+# Node
+/node_modules
