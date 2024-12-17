@@ -135,9 +135,16 @@ Key directories:
      or shared styles.
 
 7. **Exports**:
+
    - Each file should export a single symbol for better namespace management.
    - Use the [`namespace`](https://www.typescriptlang.org/docs/handbook/namespaces.html)
      keyword to group multiple symbols under one export.
+
+8. **Routing**:
+
+- Add routes to `src/routes.ts`, usually as a child for the `""` route.
+- Make the route accessible by adding a `routerLink` to
+  `src/core/sidebar/sidebar.component.html`.
 
 ## License
 
