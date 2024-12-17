@@ -6,6 +6,7 @@
       [zoom]="[7]"
       [center]="{lat: 53.1434501, lon: 8.2145521}"
       [preserveDrawingBuffer]="true"
+      (zoomEvt)="onZoom($event)"
     >
       @for (
         station of groundwaterMeasurementStations | async;
@@ -17,7 +18,7 @@
             lon: station.geometry.coordinates[0],
           }"
         >
-          <growl-groundwater-level-station-marker></growl-groundwater-level-station-marker>
+          <growl-groundwater-level-station-marker [size]="markerSize()"></growl-groundwater-level-station-marker>
         </mgl-marker>
       }
     </mgl-map>

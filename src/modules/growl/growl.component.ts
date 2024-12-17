@@ -6,6 +6,7 @@ import {
   OnInit,
   AfterViewInit,
   HostListener,
+  signal,
 } from "@angular/core";
 import {
   LayerComponent,
@@ -13,7 +14,7 @@ import {
   MarkerComponent,
 } from "@maplibre/ngx-maplibre-gl";
 import {Point} from "geojson";
-import {StyleSpecification} from "maplibre-gl";
+import {MapLibreEvent, StyleSpecification} from "maplibre-gl";
 
 import {GroundwaterLevelStationMarkerComponent} from "./map/groundwater-level-station-marker/groundwater-level-station-marker.component";
 import {GeoDataService} from "../../api/geo-data.service";
@@ -40,8 +41,8 @@ type Points = typeUtils.UpdateElements<
   styles: ``,
 })
 export class GrowlComponent implements OnInit {
-  readonly style = colorful as any as StyleSpecification;
-  @ViewChild(MapComponent) map?: MapComponent;
+  protected markerSize = signal("40px");
+  protected style = colorful as any as StyleSpecification;
 
   readonly groundwaterMeasurementStations: Promise<Points>;
 
@@ -53,17 +54,20 @@ export class GrowlComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.geo
-      .fetchLayerInformation("groundwater_measurement_stations")
-      .then(data => console.log(data));
-    this.geo
-      .fetchLayerContents("groundwater_measurement_stations")
-      .then(data => console.log(data));
+    // this.geo
+    //   .fetchLayerInformation("groundwater_measurement_stations")
+    //   .then(data => console.log(data));
+    // this.geo
+    //   .fetchLayerContents("groundwater_measurement_stations")
+    //   .then(data => console.log(data));
   }
 
-  @HostListener("window:load")
-  onLoad() {
-    // enforce resizing on initial load
-    this.map!.mapInstance.resize();
+  onZoom(event: MapLibreEvent): void {
+    let zoom = event.target.getZoom();
+    let scale = zoom / 7;
+
+    let size = 40 * (scale + ((scale - 1) * 2));
+    this.markerSize.set(size + "px");
+    console.log(this.markerSize());
   }
 }
