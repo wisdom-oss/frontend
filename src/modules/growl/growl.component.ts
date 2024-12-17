@@ -19,6 +19,7 @@ import {GroundwaterLevelStationMarkerComponent} from "./map/groundwater-level-st
 import {GeoDataService} from "../../api/geo-data.service";
 import colorful from "../../common/map/styles/colorful.json";
 import {typeUtils} from "../../common/type-utils";
+import { ResizeMapOnLoadDirective } from "../../common/directives/resize-map-on-load.directive";
 
 type Points = typeUtils.UpdateElements<
   GeoDataService.LayerContents,
@@ -33,6 +34,7 @@ type Points = typeUtils.UpdateElements<
     MarkerComponent,
     GroundwaterLevelStationMarkerComponent,
     AsyncPipe,
+    ResizeMapOnLoadDirective
   ],
   templateUrl: "./growl.component.html",
   styles: ``,
