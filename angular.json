@@ -70,7 +70,7 @@
             ],
             "styles": ["src/styles.scss"],
             "scripts": [],
-            "allowedCommonJsDependencies": ["ajv", "maplibre-gl"],
+            "allowedCommonJsDependencies": ["ajv"],
             "stylePreprocessorOptions": {
               "sass": {
                 "silenceDeprecations": ["global-builtin"]
@@ -82,8 +82,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "5MB",
-                  "maximumError": "10MB"
+                  "maximumWarning": "1500kB",
+                  "maximumError": "3MB"
                 },
                 {
                   "type": "anyComponentStyle",

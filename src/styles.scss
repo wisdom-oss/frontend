@@ -4,8 +4,6 @@
 @use "../node_modules/bulma-switch/src/sass" as bulma-switch;
 @use "../node_modules/@creativebulma/bulma-tooltip/src/sass" as bulma-tooltip;
 
-@import "../node_modules/maplibre-gl/dist/maplibre-gl.css";
-
 html {
   // override bulma's default behavior
   overflow-y: auto;

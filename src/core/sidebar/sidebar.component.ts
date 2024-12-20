@@ -1,7 +1,7 @@
 import {ViewChildren, Component, AfterViewInit, QueryList} from "@angular/core";
 import {NavigationEnd, RouterLink, Router} from "@angular/router";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
-import {remixDatabase2Fill, remixMap2Fill} from "@ng-icons/remixicon";
+import {remixBookLine, remixBookShelfLine} from "@ng-icons/remixicon";
 import {filter} from "rxjs";
 
 import {SidebarLinkDirective} from "./sidebar-link.directive";
@@ -13,8 +13,8 @@ import {SidebarLinkDirective} from "./sidebar-link.directive";
   styleUrl: "./sidebar.component.scss",
   providers: [
     provideIcons({
-      remixMap2Fill,
-      remixDatabase2Fill,
+      remixBookShelfLine,
+      remixBookLine,
     }),
   ],
 })
