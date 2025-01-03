@@ -7,8 +7,11 @@ import {GreeterComponent} from "./core/greeter/greeter.component";
 export const routes: Routes = [
   {path: "callback", component: CallbackComponent},
   {
-    path: "**",
+    path: "",
     component: CoreComponent,
-    children: [{path: "", component: GreeterComponent}],
+    children: [
+      {path: "", component: GreeterComponent}, // Default child route
+    ],
   },
+  {path: "**", redirectTo: ""}, // Wildcard fallback
 ];
