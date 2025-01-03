@@ -5,10 +5,13 @@ import {CoreComponent} from "./core/core.component";
 import {GreeterComponent} from "./core/greeter/greeter.component";
 
 export const routes: Routes = [
-  { path: "callback", component: CallbackComponent },
-  { path: "", component: CoreComponent, children: [
-      { path: "", component: GreeterComponent }, // Default child route
-    ] 
+  {path: "callback", component: CallbackComponent},
+  {
+    path: "",
+    component: CoreComponent,
+    children: [
+      {path: "", component: GreeterComponent}, // Default child route
+    ],
   },
-  { path: "**", redirectTo: "" }, // Wildcard fallback
+  {path: "**", redirectTo: ""}, // Wildcard fallback
 ];
