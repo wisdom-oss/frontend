@@ -11,8 +11,9 @@ export const routes: Routes = [
     path: "",
     component: CoreComponent,
     children: [
-      {path: "", component: GreeterComponent},
+      {path: "", component: GreeterComponent}, // Default child route
       {path: "growl", component: GrowlComponent},
     ],
   },
+  {path: "**", redirectTo: ""}, // Wildcard fallback
 ];
