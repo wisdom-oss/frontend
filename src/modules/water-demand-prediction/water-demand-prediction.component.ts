@@ -1,6 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ChartConfiguration, ChartData, ChartDataset, ChartType, Plugin } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
+import { WaterDemandPredictionService } from '../../api/water-demand-prediction.service';
+import { Observable } from 'rxjs';
+import { SingleSmartmeter } from './water-demand-prediction.interface';
 
 @Component({
   selector: 'wisdom-water-demand-prediction',
@@ -10,15 +13,10 @@ import { BaseChartDirective } from 'ng2-charts';
 })
 export class WaterDemandPredictionComponent implements OnInit {
 
-  ngOnInit() {
-    this.addGraphToChart(this.test_data, "Test")
-    this.addGraphToChart(this.test_data_2, "Testoman")
-
-  }
-
   test_data: number[] = [1,2,3,4,5,6,7,8,9]
   test_data_2: number[] = [5,6,7,8,9,10,11,12]
 
+  singleFetchdata: SingleSmartmeter | undefined
 
   /**
    * The chart object, referenced from the html template
@@ -99,6 +97,15 @@ export class WaterDemandPredictionComponent implements OnInit {
     datasets: [], // data points
   };
 
+  constructor(public waterDemandService: WaterDemandPredictionService) { }
+
+  ngOnInit() {
+    this.addGraphToChart(this.test_data, "Test")
+    this.addGraphToChart(this.test_data_2, "Testoman")
+    this.fetchSingleSmartmeter()
+
+  }
+
 /**
    * Function to add new lines dynamically to the graph
    * @param label new data label
@@ -134,5 +141,55 @@ generateRandomColor(): string {
 
   return `rgb(${r}, ${g}, ${b})`; // Return the color in rgb() format
 }
+
+/**
+ * generic method which inputs a function of a service to operate
+ * @param extractionMethod the function in the corresponding service to use
+ * @param responseField structure of the expected answer
+ * @param destinationField name of parameter to extract from response
+ */
+extractData(extractionMethod: () => Observable<any>, destinationField: keyof this): void {
+  extractionMethod().subscribe({
+    next: (response) => {
+      // Dynamically assign the response field to the destination field
+      this[destinationField] = response;
+    },
+    error: (error) => {
+      console.log(error);
+    },
+    complete: () => {
+      this.createGraphFromSmartmeter();
+    }
+  });
+}
+
+fetchSingleSmartmeter(): void {
+  this.extractData(() => this.waterDemandService.fetchDataOfSmartmeter(), "singleFetchdata")
+}
+
+/**
+ * uses the singleSmartmeter interface and expands the values into separate lists
+ * which can be used in a chart
+ */
+createGraphFromSmartmeter(): void {
+  let labels: string[] = [];
+  let nums: number[] = [];
+
+  if (this.singleFetchdata) {
+    this.singleFetchdata.dateObserved.forEach((value) => {
+      labels.push(value);
+    });
+    this.singleFetchdata.numValue.forEach((value) => {
+      nums.push(value);
+    })
+
+    this.chartData.labels = labels;
+    this.addGraphToChart(nums, this.singleFetchdata.name)
+
+  }
+
+}
+
+
 
 }
