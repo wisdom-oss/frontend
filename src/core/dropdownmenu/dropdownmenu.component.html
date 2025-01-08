@@ -1,24 +1,26 @@
 <div class="dropdown is-hoverable">
-    <div class="dropdown-trigger">
-      <button class="button">
-        <span>{{ menuName }}</span>
-        <span class="icon is-small">
-          <i class="fas fa-angle-down"></i>
-        </span>
-      </button>
-    </div>
-    <div class="dropdown-menu" id="dropdown-menu" role="menu">
-      <div class="dropdown-content">
-        <ng-container *ngIf="options; else loading">
-          <a *ngFor="let item of options || []" class="dropdown-item" (click)="safeChoice(item, $event)">
-            {{ item }}
-          </a>
-        </ng-container>
-        <ng-template #loading>
-          <a class="dropdown-item is-disabled">Loading...</a>
-        </ng-template>
-      </div>
+  <div class="dropdown-trigger">
+    <button class="button">
+      <span>{{ menuName }}</span>
+      <span class="icon is-small">
+        <i class="fas fa-angle-down"></i>
+      </span>
+    </button>
+  </div>
+  <div class="dropdown-menu" id="dropdown-menu" role="menu">
+    <div class="dropdown-content">
+      <ng-container *ngIf="options; else loading">
+        <a
+          *ngFor="let item of options || []"
+          class="dropdown-item"
+          (click)="safeChoice(item, $event)"
+        >
+          {{ item }}
+        </a>
+      </ng-container>
+      <ng-template #loading>
+        <a class="dropdown-item is-disabled">Loading...</a>
+      </ng-template>
     </div>
   </div>
-  
-  
+</div>

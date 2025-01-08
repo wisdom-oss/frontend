@@ -1,24 +1,22 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {CommonModule} from "@angular/common";
+import {Component, EventEmitter, Input, Output} from "@angular/core";
 
 @Component({
-  selector: 'wisdom-dropdownmenu',
+  selector: "wisdom-dropdownmenu",
   imports: [CommonModule],
-  templateUrl: './dropdownmenu.component.html',
-  styles: ``
+  templateUrl: "./dropdownmenu.component.html",
+  styles: ``,
 })
 export class DropdownmenuComponent {
-
   /**
    * module name, when no name applied -> Test
    */
-  @Input() menuName: string = "Test"
+  @Input() menuName: string = "Test";
 
   /**
    * default options if no array is submitted.
    */
-  @Input() options: string[] = ["A", "B", "C"
-  ]
+  @Input() options: string[] = ["A", "B", "C"];
 
   /**
    * event emitter submitting chosen option to parent component
@@ -28,7 +26,7 @@ export class DropdownmenuComponent {
   /**
    * chosen option, empty if none is chosen yet
    */
-  choice!: string
+  choice!: string;
 
   /**
    * stop event from misshappening, reselecting choice attribute,
