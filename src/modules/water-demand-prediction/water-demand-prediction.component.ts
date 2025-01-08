@@ -3,21 +3,22 @@ import { ChartConfiguration, ChartData, ChartDataset, ChartType, Plugin } from '
 import { BaseChartDirective } from 'ng2-charts';
 import { WaterDemandPredictionService } from '../../api/water-demand-prediction.service';
 import { Observable } from 'rxjs';
-import { SingleSmartmeter } from './water-demand-prediction.interface';
+import { SingleSmartmeter, KindOfSmartmeter } from './water-demand-prediction.interface';
 import { CommonModule } from '@angular/common';
+import { DropdownmenuComponent } from '../../core/dropdownmenu/dropdownmenu.component';
 
 @Component({
   selector: 'wisdom-water-demand-prediction',
-  imports: [BaseChartDirective, CommonModule],
+  imports: [BaseChartDirective, CommonModule, DropdownmenuComponent],
   templateUrl: './water-demand-prediction.component.html',
   styles: ``
 })
 export class WaterDemandPredictionComponent implements OnInit {
 
+  dropdownMenuName = "Select Smartmeter"
+  dropdownOptions!: string[]
   test_data: number[] = [1,2,3,4,5,6,7,8,9]
   test_data_2: number[] = [5,6,7,8,9,10,11,12]
-
-  kindOfSmartmeter: string[] | undefined
 
   singleFetchdata: SingleSmartmeter | undefined
 
@@ -166,7 +167,7 @@ extractData(extractionMethod: () => Observable<any>, destinationField: keyof thi
       console.log(error);
     },
     complete: () => {
-      this.createGraphFromSmartmeter();
+
     }
   });
 }
@@ -176,7 +177,17 @@ fetchSingleSmartmeter(): void {
 }
 
 fetchMeterInformation(): void {
-  this.extractData(()=> this.waterDemandService.fetchKindOfSmartmeter(), "kindOfSmartmeter")
+  this.waterDemandService.fetchKindOfSmartmeter().subscribe({
+    next: (response: KindOfSmartmeter) => {
+      this.dropdownOptions = response.data
+    },
+    error: (error) => {
+      console.log(error);
+    },
+    complete: () => {
+    }
+  });
+  
 }
 
 /**

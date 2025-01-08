@@ -6,3 +6,7 @@ export interface SingleSmartmeter {
     numValue: [];
     dateObserved: [];
 }
+
+export interface KindOfSmartmeter {
+    data: string[] 
+}

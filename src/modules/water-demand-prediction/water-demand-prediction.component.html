@@ -1,11 +1,12 @@
 <div
-  class="is-flex is-flex-direction-column is-align-items-center is-justify-content-center is-fullwidth is-fullheight"
->
+  class="is-flex is-flex-direction-column is-align-items-center is-justify-content-center"  
+> <!-- is-fullwidth is-fullheight-->
     <!-- Graph Module-->
         <div class="box is-fullwidth is-fullheight">
             <canvas baseChart [data]="chartData" [options]="chartOptions" [type]="chartType" [plugins]="chartPlugins"></canvas>
         </div>
         <div>
+          <wisdom-dropdownmenu [menuName]="dropdownMenuName" [options]="dropdownOptions"></wisdom-dropdownmenu>
           <button class="button is-primary">Choose Smartmeter</button>
           <button class="button is-primary">Change Selection</button>
           <button class="button is-primary">Change Selection</button>
