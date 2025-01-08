@@ -6,7 +6,7 @@
             <canvas baseChart [data]="chartData" [options]="chartOptions" [type]="chartType" [plugins]="chartPlugins"></canvas>
         </div>
         <div>
-          <wisdom-dropdownmenu [menuName]="dropdownMenuName" [options]="dropdownOptions"></wisdom-dropdownmenu>
+          <wisdom-dropdownmenu [menuName]="dropdownMenuName" [options]="dropdownOptions" (choiceChange)="handleDropDownSelection($event)"></wisdom-dropdownmenu>
           <button class="button is-primary">Choose Smartmeter</button>
           <button class="button is-primary">Change Selection</button>
           <button class="button is-primary">Change Selection</button>

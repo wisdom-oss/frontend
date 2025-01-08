@@ -48,7 +48,6 @@ export class WaterDemandPredictionService {
     }
   }
 
-
   fetchSingleConsumptionData(): Observable<any> {
     return this.sendRequest("get", "/test")
   }
@@ -59,6 +58,10 @@ export class WaterDemandPredictionService {
 
   fetchKindOfSmartmeter(): Observable<any> {
     return this.sendRequest("get","/meterInformation")
+  }
+
+  fetchSingleData(nameOfSmartmeter: string): Observable<any> {
+    return this.sendRequest("post", "/postRequest", {"name": nameOfSmartmeter})
   }
 
   /**

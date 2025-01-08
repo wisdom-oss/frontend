@@ -17,6 +17,9 @@ export class WaterDemandPredictionComponent implements OnInit {
 
   dropdownMenuName = "Select Smartmeter"
   dropdownOptions!: string[]
+  dropdownChoice!: string
+
+
   test_data: number[] = [1,2,3,4,5,6,7,8,9]
   test_data_2: number[] = [5,6,7,8,9,10,11,12]
 
@@ -106,9 +109,6 @@ export class WaterDemandPredictionComponent implements OnInit {
   ngOnInit() {
       
     this.fetchMeterInformation();
-
-
-
     this.addGraphToChart(this.test_data, "Test");
     this.addGraphToChart(this.test_data_2, "Testoman");
     this.fetchSingleSmartmeter();
@@ -188,6 +188,24 @@ fetchMeterInformation(): void {
     }
   });
   
+}
+
+handleDropDownSelection(choice: string): void {
+  this.dropdownChoice = choice;
+}
+
+
+fetchSingleMeter(): void {
+  this.waterDemandService.fetchSingleData(this.dropdownChoice).subscribe({
+    next: (response: KindOfSmartmeter) => {
+      this.dropdownOptions = response.data
+    },
+    error: (error) => {
+      console.log(error);
+    },
+    complete: () => {
+    }
+  });
 }
 
 /**
