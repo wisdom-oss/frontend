@@ -4,10 +4,11 @@ import { BaseChartDirective } from 'ng2-charts';
 import { WaterDemandPredictionService } from '../../api/water-demand-prediction.service';
 import { Observable } from 'rxjs';
 import { SingleSmartmeter } from './water-demand-prediction.interface';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'wisdom-water-demand-prediction',
-  imports: [BaseChartDirective],
+  imports: [BaseChartDirective, CommonModule],
   templateUrl: './water-demand-prediction.component.html',
   styles: ``
 })
@@ -15,6 +16,8 @@ export class WaterDemandPredictionComponent implements OnInit {
 
   test_data: number[] = [1,2,3,4,5,6,7,8,9]
   test_data_2: number[] = [5,6,7,8,9,10,11,12]
+
+  kindOfSmartmeter: string[] | undefined
 
   singleFetchdata: SingleSmartmeter | undefined
 
@@ -100,9 +103,14 @@ export class WaterDemandPredictionComponent implements OnInit {
   constructor(public waterDemandService: WaterDemandPredictionService) { }
 
   ngOnInit() {
-    this.addGraphToChart(this.test_data, "Test")
-    this.addGraphToChart(this.test_data_2, "Testoman")
-    this.fetchSingleSmartmeter()
+      
+    this.fetchMeterInformation();
+
+
+
+    this.addGraphToChart(this.test_data, "Test");
+    this.addGraphToChart(this.test_data_2, "Testoman");
+    this.fetchSingleSmartmeter();
 
   }
 
@@ -167,6 +175,10 @@ fetchSingleSmartmeter(): void {
   this.extractData(() => this.waterDemandService.fetchDataOfSmartmeter(), "singleFetchdata")
 }
 
+fetchMeterInformation(): void {
+  this.extractData(()=> this.waterDemandService.fetchKindOfSmartmeter(), "kindOfSmartmeter")
+}
+
 /**
  * uses the singleSmartmeter interface and expands the values into separate lists
  * which can be used in a chart
@@ -189,7 +201,5 @@ createGraphFromSmartmeter(): void {
   }
 
 }
-
-
 
 }

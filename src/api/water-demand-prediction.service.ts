@@ -57,6 +57,10 @@ export class WaterDemandPredictionService {
     return this.sendRequest("get", "/realData")
   }
 
+  fetchKindOfSmartmeter(): Observable<any> {
+    return this.sendRequest("get","/meterInformation")
+  }
+
   /**
      * creates an Observable with an error to subscribe to it and logs the information in the console.
      * @param msg error meesage
