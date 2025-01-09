@@ -3,14 +3,18 @@
       <button class="button">
         <span>{{ menuName }}</span>
         <span class="icon is-small">
-          <i class="fas fa-angle-down"></i>
+          <i class="ri-arrow-down-s-line"></i>
         </span>
       </button>
     </div>
     <div class="dropdown-menu" id="dropdown-menu" role="menu">
       <div class="dropdown-content">
         <ng-container *ngIf="options; else loading">
-          <a *ngFor="let item of options || []" class="dropdown-item" (click)="safeChoice(item, $event)">
+          <a
+            *ngFor="let item of options || []"
+            class="dropdown-item"
+            (click)="safeChoice(item, $event)"
+          >
             {{ item }}
           </a>
         </ng-container>
@@ -20,5 +24,3 @@
       </div>
     </div>
   </div>
-  
-  
