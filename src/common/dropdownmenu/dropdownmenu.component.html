@@ -1,26 +1,27 @@
-<div class="dropdown is-hoverable">
-    <div class="dropdown-trigger">
-      <button class="button">
-        <span>{{ menuName }}</span>
-        <span class="icon is-small">
-          <i class="ri-arrow-down-s-line"></i>
-        </span>
-      </button>
-    </div>
-    <div class="dropdown-menu" id="dropdown-menu" role="menu">
-      <div class="dropdown-content">
-        <ng-container *ngIf="options; else loading">
-          <a
-            *ngFor="let item of options || []"
-            class="dropdown-item"
-            (click)="safeChoice(item, $event)"
-          >
-            {{ item }}
-          </a>
-        </ng-container>
-        <ng-template #loading>
-          <a class="dropdown-item is-disabled">Loading...</a>
-        </ng-template>
-      </div>
+<div class="dropdown" 
+     [ngClass]="{'is-hoverable': toggleHoverable, 'is-active': !toggleHoverable && isDropdownOpen}">
+  <div class="dropdown-trigger">
+    <button class="button" (click)="toggleDropdown()">
+      <span>{{ changeMenuName() ? (choice() || menuName()) : menuName() }}</span>
+      <span class="icon is-small">
+        <i class="ri-arrow-down-s-line"></i>
+      </span>
+    </button>
+  </div>
+  <div class="dropdown-menu" id="dropdown-menu" role="menu">
+    <div class="dropdown-content">
+      <ng-container *ngIf="options(); else loading">
+        <a
+          *ngFor="let item of options()"
+          class="dropdown-item"
+          (click)="selectChoice(item)"
+        >
+          {{ item }}
+        </a>
+      </ng-container>
+      <ng-template #loading>
+        <a class="dropdown-item is-disabled">Loading...</a>
+      </ng-template>
     </div>
   </div>
+</div>

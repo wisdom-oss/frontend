@@ -1,43 +1,66 @@
-import {Component, EventEmitter, input, Output, signal} from "@angular/core";
+import {Component, input, signal} from "@angular/core";
+import { CommonModule } from "@angular/common";
 
 @Component({
   selector: 'dropdown',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './dropdownmenu.component.html',
   styles: ``
 })
 
 export class DropdownmenuComponent {
+ 
   /**
-   * module name, when no name applied -> Test
-   */  
-    menuName = input("Test");
-  
-  /**
-   * default options if no array is submitted.
+   * name of menu with default value
    */
-  options = input(["A","B","C"]);
+  menuName = input("Test");
 
   /**
-   * event emitter submitting chosen option to parent component
+   * default options if no new are provided
    */
-  @Output() choiceChange = new EventEmitter<string>();
+  options = input(["A", "B", "C"]); 
 
   /**
-   * chosen option, empty if none is chosen yet
+   * flag, if menu name should change after option select
+   * default true
+   */
+  changeMenuName = input(true);
+
+  /**
+   * selected choice, to process
    */
   choice = signal("");
 
   /**
-   * stop event from misshappening, reselecting choice attribute,
-   * emitting choice to parent component
-   * @param newChoice selected choice in dropdown
-   * @param event emitter to transport chosen choice
+   * toggle if dropdown is hoverable or clickable
+   * true hoverable
+   * false clickable
+   * default false
    */
-  safeChoice(newChoice: string, event: Event): void {
-    event.preventDefault();
-    this.choice = newChoice;
-    this.choiceChange.emit(this.choice);
+  toggleHoverable = false;
+
+  /**
+   * tracks state of dropdown
+   */
+  isDropdownOpen = false;
+
+  /**
+   * set the selected choice
+   * @param selected chosen option
+   */
+  selectChoice(selected: string): void {
+    this.choice.set(selected);
+    console.log('Selected choice:', this.choice());
   }
+
+  /**
+   * open/close dropdown when toggleHoverable is false
+   */
+  toggleDropdown() {
+    if (!this.toggleHoverable) {
+      this.isDropdownOpen = !this.isDropdownOpen;
+    }
+  }
+
 }
