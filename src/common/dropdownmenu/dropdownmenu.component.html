@@ -10,7 +10,7 @@
   </div>
   <div class="dropdown-menu" id="dropdown-menu" role="menu">
     <div class="dropdown-content">
-      <ng-container *ngIf="options(); else loading">
+      <ng-container *ngIf="options()?.length; else loading">
         <a
           *ngFor="let item of options()"
           class="dropdown-item"
@@ -20,7 +20,7 @@
         </a>
       </ng-container>
       <ng-template #loading>
-        <a class="dropdown-item is-disabled" translate="dropdownmenu.loadtemplate"></a>
+        <a class="dropdown-item is-disabled" translate="dropdownmenu.loadtemplate">Loading...</a>
       </ng-template>
     </div>
   </div>
