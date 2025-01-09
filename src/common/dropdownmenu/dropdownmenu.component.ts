@@ -2,11 +2,13 @@ import {CommonModule} from "@angular/common";
 import {Component, EventEmitter, Input, Output} from "@angular/core";
 
 @Component({
-  selector: "wisdom-dropdownmenu",
-  imports: [CommonModule],
-  templateUrl: "./dropdownmenu.component.html",
-  styles: ``,
+  selector: 'wisdom-dropdownmenu',
+  standalone: true,
+  imports: [],
+  templateUrl: './dropdownmenu.component.html',
+  styles: ``
 })
+
 export class DropdownmenuComponent {
   /**
    * module name, when no name applied -> Test
