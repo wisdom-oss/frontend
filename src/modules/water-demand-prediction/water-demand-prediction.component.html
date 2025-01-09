@@ -6,7 +6,11 @@
             <canvas baseChart [data]="chartData" [options]="chartOptions" [type]="chartType" [plugins]="chartPlugins"></canvas>
         </div>
         <div>
+<<<<<<< Updated upstream
           <wisdom-dropdownmenu [menuName]="dropdownMenuName" [options]="dropdownOptions" (choiceChange)="handleDropDownSelection($event)"></wisdom-dropdownmenu>
+=======
+          <dropdown [menuName]="dropdownMenuName" [options]="dropdownOptions" [changeMenuName]="true"> </dropdown>
+>>>>>>> Stashed changes
           <button class="button is-primary">Choose Smartmeter</button>
           <button class="button is-primary">Change Selection</button>
           <button class="button is-primary">Change Selection</button>
