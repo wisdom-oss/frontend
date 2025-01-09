@@ -38,7 +38,7 @@ export class DropdownmenuComponent {
    * false clickable
    * default false
    */
-  toggleHoverable = false;
+  toggleHoverable = true;
 
   /**
    * tracks state of dropdown

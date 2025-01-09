@@ -5,9 +5,11 @@ import {
 
 import {asserts} from "./common/asserts";
 import core from "./core/i18n.toml";
+import dropdownmenu from "./common/dropdownmenu/i18n.toml";
 
 // add translations to this record
-const modules: NestedStringRecord = {core};
+const modules: NestedStringRecord = {core, dropdownmenu};
+
 
 export function configureTranslations(service: TranslateService) {
   let defaultLanguage = service.getBrowserLang() ?? "en";
