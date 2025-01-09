@@ -185,6 +185,7 @@ fetchMeterInformation(): void {
       console.log(error);
     },
     complete: () => {
+      console.log(this.dropdownOptions)
     }
   });
   
