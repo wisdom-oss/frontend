@@ -4,12 +4,11 @@ import { BaseChartDirective } from 'ng2-charts';
 import { WaterDemandPredictionService } from '../../api/water-demand-prediction.service';
 import { Observable } from 'rxjs';
 import { SingleSmartmeter, KindOfSmartmeter } from './water-demand-prediction.interface';
-import { CommonModule } from '@angular/common';
 import { DropdownmenuComponent } from '../../common/dropdownmenu/dropdownmenu.component';
 
 @Component({
   selector: 'wisdom-water-demand-prediction',
-  imports: [BaseChartDirective, CommonModule, DropdownmenuComponent],
+  imports: [BaseChartDirective, DropdownmenuComponent],
   templateUrl: './water-demand-prediction.component.html',
   styles: ``
 })
