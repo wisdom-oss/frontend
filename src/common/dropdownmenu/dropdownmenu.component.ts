@@ -19,7 +19,7 @@ export class DropdownmenuComponent {
   /**
    * default options if no new are provided
    */
-  options = input(["A", "B", "C"]); 
+  options = input<string[]>([]); 
 
   /**
    * flag, if menu name should change after option select
@@ -38,7 +38,7 @@ export class DropdownmenuComponent {
    * false clickable
    * default false
    */
-  toggleHoverable = true;
+  toggleHoverable = false;
 
   /**
    * tracks state of dropdown
