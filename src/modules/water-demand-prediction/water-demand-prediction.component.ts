@@ -5,11 +5,7 @@ import { WaterDemandPredictionService } from '../../api/water-demand-prediction.
 import { Observable } from 'rxjs';
 import { SingleSmartmeter, KindOfSmartmeter } from './water-demand-prediction.interface';
 import { CommonModule } from '@angular/common';
-<<<<<<< Updated upstream
-import { DropdownmenuComponent } from '../../core/dropdownmenu/dropdownmenu.component';
-=======
 import { DropdownmenuComponent } from '../../common/dropdownmenu/dropdownmenu.component';
->>>>>>> Stashed changes
 
 @Component({
   selector: 'wisdom-water-demand-prediction',
@@ -20,13 +16,8 @@ import { DropdownmenuComponent } from '../../common/dropdownmenu/dropdownmenu.co
 export class WaterDemandPredictionComponent implements OnInit {
 
   dropdownMenuName = "Select Smartmeter"
-<<<<<<< Updated upstream
-  dropdownOptions!: string[]
-  dropdownChoice!: string
-=======
   dropdownOptions: string[] = []
   dropdownChoice: string | undefined
->>>>>>> Stashed changes
 
 
   test_data: number[] = [1,2,3,4,5,6,7,8,9]
@@ -205,12 +196,9 @@ handleDropDownSelection(choice: string): void {
 
 
 fetchSingleMeter(): void {
-<<<<<<< Updated upstream
-=======
 
   if(this.dropdownChoice)
 
->>>>>>> Stashed changes
   this.waterDemandService.fetchSingleData(this.dropdownChoice).subscribe({
     next: (response: KindOfSmartmeter) => {
       this.dropdownOptions = response.data
