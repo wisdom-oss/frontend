@@ -14,7 +14,7 @@
         <a
           *ngFor="let item of options()"
           class="dropdown-item"
-          (click)="selectChoice(item)"
+          (click)="selectChoice(item); toggleDropdown()"
         >
           {{ item }}
         </a>
