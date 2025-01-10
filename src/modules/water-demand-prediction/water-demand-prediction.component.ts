@@ -16,7 +16,7 @@ export class WaterDemandPredictionComponent implements OnInit {
 
   dropdownMenuName = "Select Smartmeter"
   dropdownOptions: string[] = []
-  dropdownChoice: string | undefined
+  dropdownChoice: string | undefined = "urn:ngsi-ld:Device:family-household"
 
 
   test_data: number[] = [1,2,3,4,5,6,7,8,9]
@@ -39,7 +39,7 @@ export class WaterDemandPredictionComponent implements OnInit {
    */
   chartOptions: ChartConfiguration['options'] = {
     responsive: true,
-    maintainAspectRatio: true,
+    maintainAspectRatio: false,
     scales: {
       y: {
         stacked: false,
@@ -110,9 +110,29 @@ export class WaterDemandPredictionComponent implements OnInit {
     this.fetchMeterInformation();
     this.addGraphToChart(this.test_data, "Test");
     this.addGraphToChart(this.test_data_2, "Testoman");
-    this.fetchSingleSmartmeter();
 
   }
+
+/**
+ * uses the singleSmartmeter interface and expands the values into separate lists
+ * which can be used in a chart
+ */
+createGraphFromSmartmeter(): void {
+  let labels: string[] = [];
+  let nums: number[] = [];
+
+  if (this.singleFetchdata) {
+    this.singleFetchdata.dateObserved.forEach((value) => {
+      labels.push(value);
+    });
+    this.singleFetchdata.numValue.forEach((value) => {
+      nums.push(value);
+    })
+
+    this.chartData.labels = labels;
+    this.addGraphToChart(nums, this.singleFetchdata.name)
+  }
+}
 
 /**
    * Function to add new lines dynamically to the graph
@@ -171,12 +191,28 @@ extractData(extractionMethod: () => Observable<any>, destinationField: keyof thi
   });
 }
 
+testFetch(): void {
+  this.extractData(() => this.waterDemandService.fetchSingleSmartmeter("urn:ngsi-ld:Device:family-household"), "singleFetchdata")
+
+}
+
 fetchSingleSmartmeter(): void {
-  this.extractData(() => this.waterDemandService.fetchDataOfSmartmeter(), "singleFetchdata")
+  // BUG: Change parameter to be extracted from dropdown!
+  this.waterDemandService.fetchSingleSmartmeter("urn:ngsi-ld:Device:family-household").subscribe({
+    next: (response) => {
+      this.singleFetchdata = response
+    },
+    error: (error) => {
+      console.log(error);
+    },
+    complete: () => {
+      this.createGraphFromSmartmeter();
+    }
+  });
 }
 
 fetchMeterInformation(): void {
-  this.waterDemandService.fetchKindOfSmartmeter().subscribe({
+  this.waterDemandService.fetchMeterInformation().subscribe({
     next: (response: KindOfSmartmeter) => {
       this.dropdownOptions = response.data
     },
@@ -184,54 +220,9 @@ fetchMeterInformation(): void {
       console.log(error);
     },
     complete: () => {
-      console.log(this.dropdownOptions)
+
     }
   });
   
 }
-
-handleDropDownSelection(choice: string): void {
-  this.dropdownChoice = choice;
-}
-
-
-fetchSingleMeter(): void {
-
-  if(this.dropdownChoice)
-
-  this.waterDemandService.fetchSingleData(this.dropdownChoice).subscribe({
-    next: (response: KindOfSmartmeter) => {
-      this.dropdownOptions = response.data
-    },
-    error: (error) => {
-      console.log(error);
-    },
-    complete: () => {
-    }
-  });
-}
-
-/**
- * uses the singleSmartmeter interface and expands the values into separate lists
- * which can be used in a chart
- */
-createGraphFromSmartmeter(): void {
-  let labels: string[] = [];
-  let nums: number[] = [];
-
-  if (this.singleFetchdata) {
-    this.singleFetchdata.dateObserved.forEach((value) => {
-      labels.push(value);
-    });
-    this.singleFetchdata.numValue.forEach((value) => {
-      nums.push(value);
-    })
-
-    this.chartData.labels = labels;
-    this.addGraphToChart(nums, this.singleFetchdata.name)
-
-  }
-
-}
-
 }

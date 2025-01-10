@@ -35,33 +35,28 @@ export class WaterDemandPredictionService {
       body: requestBody
     };
 
+    let final_url: string | undefined
+
     if(PROD_STATUS) {
-
-        const normalUrl = this.router.parseUrl('/api/' + API_PREFIX + url).toString();
-
-        return this.http.request<T>(method, normalUrl, requestOptions) as Observable<T>;
+        final_url = this.router.parseUrl('/api/' + API_PREFIX + url).toString();
     } else {
-
-        const localUrl = this.router.parseUrl('/' + DEV_PREFIX + '/' + API_PREFIX + url).toString();
-
-        return this.http.request<T>(method, localUrl, requestOptions) as Observable<T>;
+        final_url = this.router.parseUrl('/' + DEV_PREFIX + '/' + API_PREFIX + url).toString();
     }
+    
+    return this.http.request<T>(method, final_url, requestOptions) as Observable<T>;
+
   }
 
-  fetchSingleConsumptionData(): Observable<any> {
+  fetchTest(): Observable<any> {
     return this.sendRequest("get", "/test")
   }
 
-  fetchDataOfSmartmeter(): Observable<any> {
-    return this.sendRequest("get", "/realData")
-  }
-
-  fetchKindOfSmartmeter(): Observable<any> {
+  fetchMeterInformation(): Observable<any> {
     return this.sendRequest("get","/meterInformation")
   }
 
-  fetchSingleData(nameOfSmartmeter: string): Observable<any> {
-    return this.sendRequest("post", "/postRequest", {"name": nameOfSmartmeter})
+  fetchSingleSmartmeter(nameOfSmartmeter: string): Observable<any> {
+    return this.sendRequest("post", "/singleSmartmeter", {"name": nameOfSmartmeter})
   }
 
   /**
