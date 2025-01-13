@@ -1,66 +1,55 @@
-import {Component, input, signal} from "@angular/core";
-import { CommonModule } from "@angular/common";
+import {Component, input, signal, output, effect, computed} from "@angular/core";
+import { CommonModule} from "@angular/common";
+import { NgIconComponent, provideIcons } from "@ng-icons/core";
+import { remixArrowDownSLine, remixArrowUpSLine } from "@ng-icons/remixicon";
+import { TranslatePipe, TranslateService } from "@ngx-translate/core";
 
 @Component({
   selector: 'dropdown',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, NgIconComponent, TranslatePipe],
   templateUrl: './dropdownmenu.component.html',
-  styles: ``
+  styles: ``,
+  providers: [
+    provideIcons({
+      remixArrowDownSLine,
+      remixArrowUpSLine
+    })
+  ]
 })
-
 export class DropdownmenuComponent {
  
-  /**
-   * name of menu with default value
-   */
-  menuName = input("Test");
+  /** Name of menu. */
+  readonly menuName = input.required<string>();
+
+  /** Selectable options of the menu. */
+  readonly options = input.required<Record<string, string>>(); 
+  protected readonly optionsIter = computed(() => Object.entries(this.options()));
 
   /**
-   * default options if no new are provided
+   * Flag, if menu name should display selected choice.
+   * @default true
    */
-  options = input<string[]>([]); 
+  readonly changeMenuName = input(true);
 
-  /**
-   * flag, if menu name should change after option select
-   * default true
-   */
-  changeMenuName = input(true);
+  /** Selected choice. */
+  readonly choice = signal<string | undefined>(undefined);
+  protected choiceOutput = output<string>({alias: "choice"});
+  protected choiceName = computed(() => {
+    let choice = this.choice();
+    if (choice) return this.options()[choice];
+    return this.menuName();
+  });
 
-  /**
-   * selected choice, to process
-   */
-  choice = signal("");
+  /** Define the kind of dropdown menu. */
+  readonly kind = input.required<"hover" | "click">();
 
-  /**
-   * toggle if dropdown is hoverable or clickable
-   * true hoverable
-   * false clickable
-   * default false
-   */
-  toggleHoverable = false;
+  protected readonly isActive = signal(false);
 
-  /**
-   * tracks state of dropdown
-   */
-  isDropdownOpen = false;
-
-  /**
-   * set the selected choice
-   * @param selected chosen option
-   */
-  selectChoice(selected: string): void {
-    this.choice.set(selected);
-    console.log('Selected choice:', this.choice());
+  constructor(private translate: TranslateService) {
+    effect(() => {
+      let choice = this.choice();
+      if (choice) this.choiceOutput.emit(choice);
+    });
   }
-
-  /**
-   * open/close dropdown when toggleHoverable is false
-   */
-  toggleDropdown() {
-    if (!this.toggleHoverable) {
-      this.isDropdownOpen = !this.isDropdownOpen;
-    }
-  }
-
 }
