@@ -14,13 +14,20 @@ import { DropdownmenuComponent } from '../../common/dropdownmenu/dropdownmenu.co
 })
 export class WaterDemandPredictionComponent implements OnInit {
 
-  dropdownMenuName = "Select Smartmeter"
-  dropdownOptions: string[] = []
-  dropdownChoice: string | undefined = "urn:ngsi-ld:Device:family-household"
+  menuSmartmeter = "Select Smartmeter";
+  optionsSmartmeter: Record<string, string> = {};
+  choiceSmartmeter?: string;
 
-
-  test_data: number[] = [1,2,3,4,5,6,7,8,9]
-  test_data_2: number[] = [5,6,7,8,9,10,11,12]
+  menuTime = "Select Timeframe";
+  optionsTime: Record<string, string> = {
+    "one day": "water-demand-prediction.timeframe.one-day", 
+    "one week": "water-demand-prediction.timeframe.one-week", 
+    "one month": "water-demand-prediction.timeframe.one-month", 
+    "three months": "water-demand-prediction.timeframe.three-months",
+    "six months": "water-demand-prediction.timeframe.six-months", 
+    "one year": "water-demand-prediction.timeframe.one-year"
+  };
+  choiceTime?: string;
 
   singleFetchdata: SingleSmartmeter | undefined
 
@@ -108,8 +115,7 @@ export class WaterDemandPredictionComponent implements OnInit {
   ngOnInit() {
       
     this.fetchMeterInformation();
-    this.addGraphToChart(this.test_data, "Test");
-    this.addGraphToChart(this.test_data_2, "Testoman");
+    this.fetchSingleSmartmeter();
 
   }
 
@@ -141,6 +147,7 @@ createGraphFromSmartmeter(): void {
    * @param borderColor color to use
    */
 addGraphToChart(dataPoints: number[], label: string): void {
+
   // Create a new dataset
   const newDataset: ChartDataset<'line'> = {
     label: label,
@@ -151,6 +158,12 @@ addGraphToChart(dataPoints: number[], label: string): void {
 
   // Add the new dataset to the existing chart data
   this.chartData.datasets.push(newDataset);
+
+  console.log(this.chartData.datasets[0].label)
+
+  this.chartData.datasets.forEach(() => {
+  })
+
 
   // Update the chart to reflect the changes
   if (this.chart) {
@@ -191,14 +204,20 @@ extractData(extractionMethod: () => Observable<any>, destinationField: keyof thi
   });
 }
 
-testFetch(): void {
-  this.extractData(() => this.waterDemandService.fetchSingleSmartmeter("urn:ngsi-ld:Device:family-household"), "singleFetchdata")
-
-}
-
 fetchSingleSmartmeter(): void {
+
+  if(!this.choiceSmartmeter) {
+    console.log("no choice  yet");
+    return
+  }
+
+  if(!this.choiceTime) {
+    console.log("no timeframe given");
+    return
+  }
+
   // BUG: Change parameter to be extracted from dropdown!
-  this.waterDemandService.fetchSingleSmartmeter("urn:ngsi-ld:Device:family-household").subscribe({
+  this.waterDemandService.fetchSingleSmartmeter(this.choiceSmartmeter, this.choiceTime).subscribe({
     next: (response) => {
       this.singleFetchdata = response
     },
@@ -214,7 +233,7 @@ fetchSingleSmartmeter(): void {
 fetchMeterInformation(): void {
   this.waterDemandService.fetchMeterInformation().subscribe({
     next: (response: KindOfSmartmeter) => {
-      this.dropdownOptions = response.data
+      this.optionsSmartmeter = Object.fromEntries(response.data.map(item => [item, item]))
     },
     error: (error) => {
       console.log(error);

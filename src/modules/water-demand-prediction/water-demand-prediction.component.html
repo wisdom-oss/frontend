@@ -2,11 +2,27 @@
   class="is-flex is-flex-direction-column is-fullwidth is-fullheight"  
 > <!-- is-fullwidth is-fullheight-->
     <!-- Graph Module-->
-        <div class="box" style="width: 160vh; height: 80vh;">
-            <canvas baseChart [data]="chartData" [options]="chartOptions" [type]="chartType" [plugins]="chartPlugins"></canvas>
+        <div class="box" style="width: 90vh; height: 45vh;">
+          <canvas baseChart [data]="chartData" [options]="chartOptions" [type]="chartType" [plugins]="chartPlugins"></canvas>
         </div>
         <div>
-          <dropdown [menuName]="dropdownMenuName" [options]="dropdownOptions" [changeMenuName]="true"> </dropdown>
-          <button class="button is-primary" (click)="fetchSingleSmartmeter()">Choose Smartmeter</button>
+          <dropdown 
+            [menuName]="menuSmartmeter" 
+            [options]="optionsSmartmeter" 
+            [changeMenuName]="true"
+            kind="hover"
+            (choice)="choiceSmartmeter = $event"
+          ></dropdown>
+          <dropdown 
+            [menuName]="menuTime" 
+            [options]="optionsTime" 
+            [changeMenuName]="true"
+            kind="hover"
+            (choice)="choiceTime = $event"
+          ></dropdown>
+          <button 
+            class="button is-primary is-rounded" 
+            (click)="fetchSingleSmartmeter()"
+          >Display Smartmeter</button>
         </div>
 </div>
