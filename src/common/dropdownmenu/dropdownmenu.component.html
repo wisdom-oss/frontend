@@ -1,27 +1,30 @@
-<div class="dropdown" 
-     [ngClass]="{'is-hoverable': toggleHoverable, 'is-active': !toggleHoverable && isDropdownOpen}">
+<div 
+  class="dropdown" 
+  [class.is-hoverable]="kind() == 'hover'"
+  [class.is-active]="isActive()"
+  (mouseenter)="kind() == 'hover' && isActive.set(true)"
+  (mouseleave)="kind() == 'hover' && isActive.set(false)"
+>
   <div class="dropdown-trigger">
-    <button class="button" (click)="toggleDropdown()">
-      <span>{{ changeMenuName() ? (choice() || menuName()) : menuName() }}</span>
+    <button 
+      class="button is-rounded" 
+      (click)="kind() == 'click' && isActive.set(!isActive())"
+    >
+      <span>{{ changeMenuName() ? choiceName(): menuName() | translate }}</span>
       <span class="icon is-small">
-        <i class="ri-arrow-down-s-line"></i>
+        <ng-icon *ngIf(!isActive()) name="remixArrowUpSLine"></ng-icon>
+        <ng-icon *ngIf(isActive()) name="remixArrowDownSLine"></ng-icon>
       </span>
     </button>
   </div>
   <div class="dropdown-menu" id="dropdown-menu" role="menu">
     <div class="dropdown-content">
-      <ng-container *ngIf="options()?.length; else loading">
-        <a
-          *ngFor="let item of options()"
+      @for (item of optionsIter(); track item[0]) {
+        <a 
+          (click)="choice.set(item[0])" 
           class="dropdown-item"
-          (click)="selectChoice(item); toggleDropdown()"
-        >
-          {{ item }}
-        </a>
-      </ng-container>
-      <ng-template #loading>
-        <a class="dropdown-item is-disabled" translate="dropdownmenu.loadtemplate">Loading...</a>
-      </ng-template>
+        >{{item[1] | translate}}</a>
+      }
     </div>
   </div>
 </div>

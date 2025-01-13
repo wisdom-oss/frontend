@@ -1,0 +1,23 @@
+[timeframe.one-day]
+en = "one day"
+de = "ein Tag"
+
+[timeframe.one-week]
+en = "one week"
+de = "eine Woche"
+
+[timeframe.one-month]
+en = "one month"
+de = "ein Monat"
+
+[timeframe.three-months]
+en = "three months"
+de = "drei Monate"
+
+[timeframe.six-months]
+en = "six months"
+de = "sechs Monate"
+
+[timeframe.one-year]
+en = "one year"
+de = "ein Jahr"
