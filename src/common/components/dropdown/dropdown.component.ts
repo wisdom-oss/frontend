@@ -1,30 +1,38 @@
-import {Component, input, signal, output, effect, computed} from "@angular/core";
-import { CommonModule} from "@angular/common";
-import { NgIconComponent, provideIcons } from "@ng-icons/core";
-import { remixArrowDownSLine, remixArrowUpSLine } from "@ng-icons/remixicon";
-import { TranslatePipe, TranslateService } from "@ngx-translate/core";
+import {CommonModule} from "@angular/common";
+import {
+  computed,
+  effect,
+  input,
+  output,
+  signal,
+  Component,
+} from "@angular/core";
+import {provideIcons, NgIconComponent} from "@ng-icons/core";
+import {remixArrowDownSLine, remixArrowUpSLine} from "@ng-icons/remixicon";
+import {TranslatePipe, TranslateService} from "@ngx-translate/core";
 
 @Component({
-  selector: 'dropdown',
+  selector: "dropdown",
   standalone: true,
   imports: [CommonModule, NgIconComponent, TranslatePipe],
-  templateUrl: './dropdown.component.html',
+  templateUrl: "./dropdown.component.html",
   styles: ``,
   providers: [
     provideIcons({
       remixArrowDownSLine,
-      remixArrowUpSLine
-    })
-  ]
+      remixArrowUpSLine,
+    }),
+  ],
 })
 export class DropdownComponent {
- 
   /** Name of menu. */
   readonly menuName = input.required<string>();
 
   /** Selectable options of the menu. */
-  readonly options = input.required<Record<string, string>>(); 
-  protected readonly optionsIter = computed(() => Object.entries(this.options()));
+  readonly options = input.required<Record<string, string>>();
+  protected readonly optionsIter = computed(() =>
+    Object.entries(this.options()),
+  );
 
   /**
    * Flag, if menu name should display selected choice.
