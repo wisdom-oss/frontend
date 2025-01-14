@@ -8,7 +8,7 @@ import { TranslatePipe, TranslateService } from "@ngx-translate/core";
   selector: 'dropdown',
   standalone: true,
   imports: [CommonModule, NgIconComponent, TranslatePipe],
-  templateUrl: './dropdownmenu.component.html',
+  templateUrl: './dropdown.component.html',
   styles: ``,
   providers: [
     provideIcons({
@@ -17,7 +17,7 @@ import { TranslatePipe, TranslateService } from "@ngx-translate/core";
     })
   ]
 })
-export class DropdownmenuComponent {
+export class DropdownComponent {
  
   /** Name of menu. */
   readonly menuName = input.required<string>();
