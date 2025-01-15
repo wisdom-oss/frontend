@@ -5,13 +5,11 @@ import {
 
 import {asserts} from "./common/asserts";
 import core from "./core/i18n.toml";
-import dropdownmenu from "./common/dropdownmenu/i18n.toml";
 import waterDemandPrediction from "./modules/water-demand-prediction/i18n.toml";
 
 // add translations to this record
 const modules: NestedStringRecord = {
-  core, 
-  dropdownmenu, 
+  core,
   "water-demand-prediction": waterDemandPrediction
 };
 

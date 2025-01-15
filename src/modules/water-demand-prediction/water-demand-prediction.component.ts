@@ -7,7 +7,7 @@ import { SingleSmartmeter, KindOfSmartmeter } from './water-demand-prediction.in
 import { DropdownmenuComponent } from '../../common/dropdownmenu/dropdownmenu.component';
 
 @Component({
-  selector: 'wisdom-water-demand-prediction',
+  selector: 'water-demand-prediction',
   imports: [BaseChartDirective, DropdownmenuComponent],
   templateUrl: './water-demand-prediction.component.html',
   styles: ``
