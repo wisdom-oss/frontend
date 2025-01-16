@@ -51,8 +51,8 @@ export class WaterDemandPredictionService {
     return this.sendRequest("get","/meterInformation")
   }
 
-  fetchSingleSmartmeter(nameOfSmartmeter: string, timeframe: string): Observable<any> {
-    return this.sendRequest("post", "/singleSmartmeter", {"name": nameOfSmartmeter, "timeframe": timeframe})
+  fetchSingleSmartmeter(nameOfSmartmeter: string, timeframe: string, startingTime: string): Observable<any> {
+    return this.sendRequest("post", "/singleSmartmeter", {"name": nameOfSmartmeter, "timeframe": timeframe, "startingTime":startingTime})
   }
 
   /**

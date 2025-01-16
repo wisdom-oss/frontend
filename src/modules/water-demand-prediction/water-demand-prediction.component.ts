@@ -28,6 +28,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     "one year": "water-demand-prediction.timeframe.one-year"
   };
   choiceTime?: string;
+  startingTime: string = "2021-05-26T00:00:00"
 
   singleFetchdata: SingleSmartmeter | undefined
 
@@ -217,7 +218,7 @@ fetchSingleSmartmeter(): void {
   }
 
   // BUG: Change parameter to be extracted from dropdown!
-  this.waterDemandService.fetchSingleSmartmeter(this.choiceSmartmeter, this.choiceTime).subscribe({
+  this.waterDemandService.fetchSingleSmartmeter(this.choiceSmartmeter, this.choiceTime, this.startingTime).subscribe({
     next: (response) => {
       this.singleFetchdata = response
     },
