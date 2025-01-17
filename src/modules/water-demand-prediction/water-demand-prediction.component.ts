@@ -244,4 +244,23 @@ fetchMeterInformation(): void {
   });
   
 }
+
+resetChart(): void {
+  if(!this.chart) {
+    console.log("No Chart to alter")
+  }
+
+  if(!this.chartData) {
+    console.log("Cannot reset empty data");
+  }
+  
+  this.chartData.datasets = [];
+  this.chartData.labels = this.standardLabels;
+  this.chart?.update();
+  console.log("Delete all requested Datasets");
+
 }
+
+
+}
+
