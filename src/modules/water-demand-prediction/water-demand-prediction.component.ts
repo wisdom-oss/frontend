@@ -159,11 +159,6 @@ addGraphToChart(dataPoints: number[], label: string): void {
   // Add the new dataset to the existing chart data
   this.chartData.datasets.push(newDataset);
 
-  console.log(this.chartData.datasets[0].label)
-
-  this.chartData.datasets.forEach(() => {
-  })
-
 
   // Update the chart to reflect the changes
   if (this.chart) {
