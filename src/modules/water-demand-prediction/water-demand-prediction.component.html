@@ -1,30 +1,43 @@
-<div
-  class="is-flex is-flex-direction-column is-fullwidth is-fullheight"  
-> <!-- is-fullwidth is-fullheight-->
-    <!-- Graph Module-->
-        <div class="box" style="width: 90vh; height: 45vh;">
-          <canvas baseChart [data]="chartData" [options]="chartOptions" [type]="chartType" [plugins]="chartPlugins"></canvas>
-        </div>
-        <div>
-          <dropdown 
-            [menuName]="menuSmartmeter" 
-            [options]="optionsSmartmeter" 
-            [changeMenuName]="true"
-            kind="hover"
-            (choice)="choiceSmartmeter = $event"
-          ></dropdown>
-          <dropdown 
-            [menuName]="menuTime" 
-            [options]="optionsTime" 
-            [changeMenuName]="true"
-            kind="hover"
-            (choice)="choiceTime = $event"
-          ></dropdown>
-          <button 
-            class="button is-primary is-rounded" 
-            (click)="fetchSingleSmartmeter()"
-          >Display Smartmeter</button>
-        <button class="button is-primary" (click)="resetChart()">Reset Chart</button>
+<div class="is-fullwidth is-fullheight">
+  <!-- module box style="width: 80vh; height: 40vh; --> 
+  <div class="is-flex is-flex-direction-column is-align-items-center">
+    <!-- graph container box -->
+     <div class="box" style="width: 100vh; height: 50vh;">
+      <canvas baseChart [data]="chartData" [options]="chartOptions" [type]="chartType" [plugins]="chartPlugins"></canvas>
+     </div>
+     <div class="">
+      <!-- drop down menus -->
+      <dropdown 
+      [menuName]="menuSmartmeter" 
+      [options]="optionsSmartmeter" 
+      [changeMenuName]="true"
+      kind="hover"
+      (choice)="choiceSmartmeter = $event"
+    ></dropdown>
+    <dropdown 
+      [menuName]="menuTime" 
+      [options]="optionsTime" 
+      [changeMenuName]="true"
+      kind="hover"
+      (choice)="choiceTime = $event"
+    ></dropdown>
+    <dropdown 
+      [menuName]="menuResolution" 
+      [options]="optionsResolution" 
+      [changeMenuName]="true"
+      kind="hover"
+      (choice)="choiceResolution = $event"
+    ></dropdown>
+    </div>
+    <div class="is-flex is-justify-content-space-between">
+    <button class="button is-primary is-rounded" (click)="resetChart()">Reset Chart</button>
+      <button 
+        class="button is-primary is-rounded" 
+        (click)="fetchSingleSmartmeter()"
+      >Display Smartmeter</button>
+    </div>
+  </div>
 
-        </div>
 </div>
+
+

@@ -3,6 +3,7 @@
  */
 export interface SingleSmartmeter {
     name: string;
+    resolution: string;
     numValue: [];
     dateObserved: [];
 }

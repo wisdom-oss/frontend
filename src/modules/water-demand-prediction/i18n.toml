@@ -21,3 +21,19 @@ de = "sechs Monate"
 [timeframe.one-year]
 en = "one year"
 de = "ein Jahr"
+
+[timeframe.all]
+en = "whole period"
+de = "gesamter Zeitraum"
+
+[resolution.hourly]
+en = "hourly"
+de = "stündlich"
+
+[resolution.daily]
+en = "daily"
+de = "täglich"
+
+[resolution.weekly]
+en = "weekly"
+de = "wöchentlich"

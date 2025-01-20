@@ -25,16 +25,33 @@ export class WaterDemandPredictionComponent implements OnInit {
     "one month": "water-demand-prediction.timeframe.one-month", 
     "three months": "water-demand-prediction.timeframe.three-months",
     "six months": "water-demand-prediction.timeframe.six-months", 
-    "one year": "water-demand-prediction.timeframe.one-year"
+    "one year": "water-demand-prediction.timeframe.one-year",
+    "all": "water-demand-prediction.timeframe.all"
   };
   choiceTime?: string;
 
-  singleFetchdata: SingleSmartmeter | undefined
+  menuResolution = "Select Resolution";
+  optionsResolution: Record<string, string> = {
+    "hourly": "water-demand-prediction.resolution.hourly",
+    "daily": "water-demand-prediction.resolution.daily",
+    "weekly": "water-demand-prediction.resolution.weekly"
+  };
+  choiceResolution?: string;
+
+  allSingleFetchData: Record<string,SingleSmartmeter> = {}
 
   /**
    * The chart object, referenced from the html template
    */
   @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
+
+  /**
+   * data skeleton for the line graph
+   */
+  chartData: ChartData = {
+    labels: [], // X-axis labels
+    datasets: [], // data points
+  };
 
   /**
    * type of graph to use in chart
@@ -92,78 +109,51 @@ export class WaterDemandPredictionComponent implements OnInit {
 
   chartPlugins = [this.backgroundPlugin];
 
-  /**
-   * standard xAxis labels for prediction values
-   */
-  standardLabels: string[] = ['01:00', '02:00', '03:00',
-    '04:00', '05:00', '06:00', '07:00',
-    '08:00', '09:00', '10:00', '11:00',
-    '12:00', '13:00', '14:00', '15:00',
-    '16:00', '17:00', '18:00', '19:00',
-    '20:00', '21:00', '22:00', '23:00']
-
-  /**
-   * data skeleton for the line graph
-   */
-  chartData: ChartData<'line'> = {
-    labels: this.standardLabels, // X-axis labels
-    datasets: [], // data points
-  };
+  
 
   constructor(public waterDemandService: WaterDemandPredictionService) { }
 
   ngOnInit() {
       
     this.fetchMeterInformation();
-    this.fetchSingleSmartmeter();
 
   }
 
-/**
- * uses the singleSmartmeter interface and expands the values into separate lists
- * which can be used in a chart
- */
-createGraphFromSmartmeter(): void {
-  let labels: string[] = [];
-  let nums: number[] = [];
-
-  if (this.singleFetchdata) {
-    this.singleFetchdata.dateObserved.forEach((value) => {
-      labels.push(value);
-    });
-    this.singleFetchdata.numValue.forEach((value) => {
-      nums.push(value);
-    })
-
-    this.chartData.labels = labels;
-    this.addGraphToChart(nums, this.singleFetchdata.name)
-  }
-}
-
-/**
-   * Function to add new lines dynamically to the graph
-   * @param label new data label
-   * @param dataPoints the new prediction values
-   * @param borderColor color to use
+  /**
+   * add all graphs to the chart. graphs are filtered based on 
+   * their resolution to only display uniform graphs.
+   * @param resolution hourly, weekly, daily
    */
-addGraphToChart(dataPoints: number[], label: string): void {
+addGraphsToChart(resolution: string): void {
 
-  // Create a new dataset
-  const newDataset: ChartDataset<'line'> = {
-    label: label,
-    data: dataPoints,
-    borderColor: this.generateRandomColor(),
-    fill: false,
-  };
+  this.resetChart();
 
-  // Add the new dataset to the existing chart data
-  this.chartData.datasets.push(newDataset);
+  let data: Record<string, SingleSmartmeter> = Object.keys(this.allSingleFetchData)
+  .filter(key => this.allSingleFetchData[key].resolution === resolution)
+  .reduce((acc, key) => {acc[key] = this.allSingleFetchData[key];
+    return acc;
+  }, {} as Record<string, SingleSmartmeter>);
 
+  Object.keys(data).forEach((key) => {
+    // Create a new dataset
+    const newDataset: ChartDataset<'line'> = {
+      label: this.allSingleFetchData[key].name,
+      data: this.allSingleFetchData[key].numValue,
+      borderColor: this.generateRandomColor(),
+      fill: false,
+    };
 
-  // Update the chart to reflect the changes
-  if (this.chart) {
+    this.chartData.labels = this.allSingleFetchData[key].dateObserved;
+    this.chartData.datasets.push(newDataset);
+
+    // Update the chart to reflect the changes
+    if (!this.chart) {
+      console.log("No chart initialized!");
+      return
+    }
     this.chart.update();
-  }
+
+  })
 }
 
 /**
@@ -176,6 +166,24 @@ generateRandomColor(): string {
   const b = Math.floor(Math.random() * 256); // Random blue value (0-255)
 
   return `rgb(${r}, ${g}, ${b})`; // Return the color in rgb() format
+}
+
+/**
+ * fetches all smartmeter names
+ */
+fetchMeterInformation(): void {
+  this.waterDemandService.fetchMeterInformation().subscribe({
+    next: (response: KindOfSmartmeter) => {
+      this.optionsSmartmeter = Object.fromEntries(response.data.map(item => [item, item]))
+    },
+    error: (error) => {
+      console.log(error);
+    },
+    complete: () => {
+
+    }
+  });
+  
 }
 
 /**
@@ -200,7 +208,6 @@ extractData(extractionMethod: () => Observable<any>, destinationField: keyof thi
 }
 
 fetchSingleSmartmeter(): void {
-
   if(!this.choiceSmartmeter) {
     console.log("no choice  yet");
     return
@@ -211,24 +218,16 @@ fetchSingleSmartmeter(): void {
     return
   }
 
-  // BUG: Change parameter to be extracted from dropdown!
-  this.waterDemandService.fetchSingleSmartmeter(this.choiceSmartmeter, this.choiceTime).subscribe({
-    next: (response) => {
-      this.singleFetchdata = response
-    },
-    error: (error) => {
-      console.log(error);
-    },
-    complete: () => {
-      this.createGraphFromSmartmeter();
-    }
-  });
-}
+  if(!this.choiceResolution) {
+    console.log("no resolution chosen");
+    return
+  }
 
-fetchMeterInformation(): void {
-  this.waterDemandService.fetchMeterInformation().subscribe({
-    next: (response: KindOfSmartmeter) => {
-      this.optionsSmartmeter = Object.fromEntries(response.data.map(item => [item, item]))
+  this.waterDemandService.fetchSingleSmartmeter(this.choiceSmartmeter, this.choiceTime, this.choiceResolution).subscribe({
+    next: (response: SingleSmartmeter) => {
+      // add response info to the Record with name as key
+      this.allSingleFetchData[response.name] = response;
+      this.addGraphsToChart(response.resolution);
     },
     error: (error) => {
       console.log(error);
@@ -237,7 +236,6 @@ fetchMeterInformation(): void {
 
     }
   });
-  
 }
 
 resetChart(): void {
@@ -250,12 +248,11 @@ resetChart(): void {
   }
   
   this.chartData.datasets = [];
-  this.chartData.labels = this.standardLabels;
+  this.chartData.labels = [];
   this.chart?.update();
   console.log("Delete all requested Datasets");
 
 }
-
 
 }
 
