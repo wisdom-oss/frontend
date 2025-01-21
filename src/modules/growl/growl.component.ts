@@ -1,17 +1,16 @@
 import {AsyncPipe} from "@angular/common";
-import {
-  signal,
-  Component,
-  OnInit,
-} from "@angular/core";
+import {signal, Component, OnInit} from "@angular/core";
 import {
   ControlComponent,
   MapComponent,
   MarkerComponent,
   AttributionControlDirective,
   NavigationControlDirective,
+  GeoJSONSourceComponent,
+  FeatureComponent,
+  LayerComponent,
 } from "@maplibre/ngx-maplibre-gl";
-import {Point} from "geojson";
+import {Point, Polygon} from "geojson";
 import {MapLibreEvent, StyleSpecification} from "maplibre-gl";
 
 import {GroundwaterLevelStationMarkerComponent} from "./map/groundwater-level-station-marker/groundwater-level-station-marker.component";
@@ -28,17 +27,26 @@ type Points = typeUtils.UpdateElements<
   {geometry: Point}
 >;
 
+type Polygons = typeUtils.UpdateElements<
+  GeoDataService.LayerContents,
+  "geometry",
+  {geometry: Polygon}
+>;
+
 @Component({
   selector: "growl",
   imports: [
+    AsyncPipe,
+    AttributionControlDirective,
+    ControlComponent,
+    FeatureComponent,
+    GeoJSONSourceComponent,
+    GroundwaterLevelStationMarkerComponent,
+    LayerComponent,
+    LegendControlComponent,
     MapComponent,
     MarkerComponent,
-    ControlComponent,
     NavigationControlDirective,
-    AttributionControlDirective,
-    GroundwaterLevelStationMarkerComponent,
-    LegendControlComponent,
-    AsyncPipe,
     ResizeMapOnLoadDirective,
   ],
   templateUrl: "./growl.component.html",
@@ -49,6 +57,7 @@ export class GrowlComponent implements OnInit {
   protected markerSize = signal(GrowlComponent.calculateMarkerSize(this.zoom));
   protected style = colorful as any as StyleSpecification;
 
+  readonly groundwaterBodies: Promise<Polygons>;
   readonly groundwaterMeasurementStations: Promise<Points>;
   readonly attribution = signal(`
     <a href="https://www.nlwkn.niedersachsen.de/opendata" target="_blank">
@@ -64,15 +73,14 @@ export class GrowlComponent implements OnInit {
       .fetchLayerContents("groundwater_measurement_stations")
       .then(contents => contents ?? [])
       .then(p => p.filter(({geometry}) => geometry.type === "Point") as Points);
+
+    this.groundwaterBodies = this.geo
+      .fetchLayerContents("groundwater_bodies")
+      .then(contents => contents ?? [])
+      .then(p => p.filter(({geometry}) => geometry.type === "Polygon") as Polygons);
   }
 
   async ngOnInit() {
-    // this.geo
-    //   .fetchLayerInformation("groundwater_measurement_stations")
-    //   .then(data => console.log(data));
-    // this.geo
-    //   .fetchLayerContents("groundwater_measurement_stations")
-    //   .then(data => console.log(data));
     let locations = await this.gl.fetchRecorderLocations();
     let location = await this.gl.fetchRecorderLocation(locations[0].websiteID);
     console.log(location);

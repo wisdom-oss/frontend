@@ -23,6 +23,22 @@
       <mgl-control position="bottom-left">
         <growl-legend-control></growl-legend-control>
       </mgl-control>
+      <mgl-geojson-source id="groundwater-bodies-source">
+        @for (
+          body of groundwaterBodies | async;
+          track body.key
+        ) {
+          <mgl-feature [geometry]="body.geometry"></mgl-feature>
+        }
+      </mgl-geojson-source>
+      <mgl-layer
+        id="groundwater-bodies-layer"
+        type="fill"
+        source="groundwater-bodies-source"
+        [paint]="{
+          'fill-outline-color': '#0088aa',
+        }"
+      ></mgl-layer>
       @for (
         station of groundwaterMeasurementStations | async;
         track station.key
