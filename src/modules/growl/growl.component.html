@@ -6,8 +6,23 @@
       [zoom]="[zoom]"
       [center]="{lat: 53.1434501, lon: 8.2145521}"
       [preserveDrawingBuffer]="true"
+      [attributionControl]="false"
       (zoomEvt)="onZoom($event)"
     >
+      <mgl-control
+        mglNavigation
+        [showCompass]="false"
+        position="top-left"
+      ></mgl-control>
+      <mgl-control
+        mglAttribution
+        position="bottom-right"
+        [compact]="true"
+        [customAttribution]="[attribution()]"
+      ></mgl-control>
+      <mgl-control position="bottom-left">
+        <growl-legend-control></growl-legend-control>
+      </mgl-control>
       @for (
         station of groundwaterMeasurementStations | async;
         track station.key
@@ -20,6 +35,7 @@
         >
           <growl-groundwater-level-station-marker
             [size]="markerSize()"
+            color="red"
           ></growl-groundwater-level-station-marker>
         </mgl-marker>
       }

@@ -9,9 +9,12 @@ import {
   HostListener,
 } from "@angular/core";
 import {
+  ControlComponent,
   LayerComponent,
   MapComponent,
   MarkerComponent,
+  AttributionControlDirective,
+  NavigationControlDirective,
 } from "@maplibre/ngx-maplibre-gl";
 import {Point} from "geojson";
 import {MapLibreEvent, StyleSpecification} from "maplibre-gl";
@@ -22,6 +25,7 @@ import {GroundwaterLevelsService} from "../../api/groundwater-levels.service";
 import colorful from "../../common/map/styles/colorful.json";
 import {typeUtils} from "../../common/type-utils";
 import {ResizeMapOnLoadDirective} from "../../common/directives/resize-map-on-load.directive";
+import { LegendControlComponent } from "./map/legend-control/legend-control.component";
 
 type Points = typeUtils.UpdateElements<
   GeoDataService.LayerContents,
@@ -34,7 +38,11 @@ type Points = typeUtils.UpdateElements<
   imports: [
     MapComponent,
     MarkerComponent,
+    ControlComponent,
+    NavigationControlDirective,
+    AttributionControlDirective,
     GroundwaterLevelStationMarkerComponent,
+    LegendControlComponent,
     AsyncPipe,
     ResizeMapOnLoadDirective,
   ],
@@ -47,6 +55,11 @@ export class GrowlComponent implements OnInit {
   protected style = colorful as any as StyleSpecification;
 
   readonly groundwaterMeasurementStations: Promise<Points>;
+  readonly attribution = signal(`
+    <a href="https://www.nlwkn.niedersachsen.de/opendata" target="_blank">
+      2024 Niedersächsischer Landesbetrieb für Wasserwirtschaft, Küsten- und Naturschutz (NLWKN)
+    </a>
+  `);
 
   constructor(
     private geo: GeoDataService,
@@ -67,7 +80,7 @@ export class GrowlComponent implements OnInit {
     //   .then(data => console.log(data));
     let locations = await this.gl.fetchRecorderLocations();
     let location = await this.gl.fetchRecorderLocation(locations[0].websiteID);
-    console.log(location)
+    console.log(location);
   }
 
   onZoom(event: MapLibreEvent): void {
@@ -82,9 +95,11 @@ export class GrowlComponent implements OnInit {
       [4, 15],
       [14, 50],
     ] as const;
-    let a = (fixpoints[1][1] - fixpoints[0][1]) / (fixpoints[1][0] - fixpoints[0][0]);
+
+    let a =
+      (fixpoints[1][1] - fixpoints[0][1]) / (fixpoints[1][0] - fixpoints[0][0]);
     let b = fixpoints[0][1] - a * fixpoints[0][0];
-    
-    return (a * zoom + b) + "px";
+
+    return a * zoom + b + "px";
   }
 }
