@@ -1,9 +1,6 @@
 <div class="maplibregl-ctrl-group p-1 pr-2">
   <table>
-    @for (
-      item of legendItemsIter;
-      track item[0]
-    ) {
+    @for (item of legendItemsIter; track item[0]) {
       <tr class="level mb-0 is-mobile">
         <div class="level-left" style="gap: unset">
           <td class="level-item mr-0">
@@ -15,8 +12,8 @@
             </span>
           </td>
           <td class="level-item">
-            ({{count()[item[0]]}})
-            {{item[0] == "null" ? "Keine aktuellen Daten" : item[0]}}
+            ({{ count()[item[0]] }})
+            {{ item[0] == "null" ? "Keine aktuellen Daten" : item[0] }}
           </td>
         </div>
       </tr>

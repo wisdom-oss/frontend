@@ -20,12 +20,12 @@ import {Point} from "geojson";
 import {MapLibreEvent, StyleSpecification} from "maplibre-gl";
 
 import {GroundwaterLevelStationMarkerComponent} from "./map/groundwater-level-station-marker/groundwater-level-station-marker.component";
+import {LegendControlComponent} from "./map/legend-control/legend-control.component";
 import {GeoDataService} from "../../api/geo-data.service";
 import {GroundwaterLevelsService} from "../../api/groundwater-levels.service";
 import colorful from "../../common/map/styles/colorful.json";
 import {typeUtils} from "../../common/type-utils";
 import {ResizeMapOnLoadDirective} from "../../common/directives/resize-map-on-load.directive";
-import { LegendControlComponent } from "./map/legend-control/legend-control.component";
 
 type Points = typeUtils.UpdateElements<
   GeoDataService.LayerContents,
@@ -90,15 +90,15 @@ export class GrowlComponent implements OnInit {
   }
 
   protected static calculateMarkerSize(zoom: number): string {
-    const fixpoints = [
+    const fp = [
+      // fix points
       // zoom -> size
       [4, 15],
       [14, 50],
     ] as const;
 
-    let a =
-      (fixpoints[1][1] - fixpoints[0][1]) / (fixpoints[1][0] - fixpoints[0][0]);
-    let b = fixpoints[0][1] - a * fixpoints[0][0];
+    let a = (fp[1][1] - fp[0][1]) / (fp[1][0] - fp[0][0]);
+    let b = fp[0][1] - a * fp[0][0];
 
     return a * zoom + b + "px";
   }
