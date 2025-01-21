@@ -42,7 +42,8 @@ type Points = typeUtils.UpdateElements<
   styles: ``,
 })
 export class GrowlComponent implements OnInit {
-  protected markerSize = signal("40px");
+  protected zoom = 7;
+  protected markerSize = signal(GrowlComponent.calculateMarkerSize(this.zoom));
   protected style = colorful as any as StyleSpecification;
 
   readonly groundwaterMeasurementStations: Promise<Points>;
@@ -71,9 +72,19 @@ export class GrowlComponent implements OnInit {
 
   onZoom(event: MapLibreEvent): void {
     let zoom = event.target.getZoom();
-    let scale = zoom / 7;
+    let size = GrowlComponent.calculateMarkerSize(zoom);
+    this.markerSize.set(size);
+  }
 
-    let size = 40 * (scale + (scale - 1) * 1.5);
-    this.markerSize.set(size + "px");
+  protected static calculateMarkerSize(zoom: number): string {
+    const fixpoints = [
+      // zoom -> size
+      [4, 15],
+      [14, 50],
+    ] as const;
+    let a = (fixpoints[1][1] - fixpoints[0][1]) / (fixpoints[1][0] - fixpoints[0][0]);
+    let b = fixpoints[0][1] - a * fixpoints[0][0];
+    
+    return (a * zoom + b) + "px";
   }
 }
