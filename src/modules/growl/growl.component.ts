@@ -1,16 +1,11 @@
 import {AsyncPipe} from "@angular/common";
 import {
   signal,
-  AfterViewChecked,
-  ViewChild,
   Component,
   OnInit,
-  AfterViewInit,
-  HostListener,
 } from "@angular/core";
 import {
   ControlComponent,
-  LayerComponent,
   MapComponent,
   MarkerComponent,
   AttributionControlDirective,

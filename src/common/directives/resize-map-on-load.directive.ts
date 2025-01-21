@@ -1,7 +1,6 @@
 import {
   effect,
   signal,
-  ViewChild,
   Directive,
   AfterViewInit,
   HostListener,

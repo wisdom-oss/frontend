@@ -2,7 +2,6 @@ import {
   effect,
   input,
   signal,
-  ViewChild,
   Component,
   AfterViewInit,
   ElementRef,
