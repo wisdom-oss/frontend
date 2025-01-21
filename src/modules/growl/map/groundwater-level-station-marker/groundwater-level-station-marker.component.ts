@@ -17,7 +17,12 @@ import {
 })
 export class GroundwaterLevelStationMarkerComponent implements AfterViewInit {
   private svg = signal<SVGElement | undefined>(undefined);
+  private filler = signal<SVGPathElement | undefined>(undefined);
+  private backgroundFiller = signal<SVGPathElement | undefined>(undefined);
+
   readonly size = input("40px");
+  readonly color = input<string | undefined>(undefined);
+  readonly backgroundColor = input<string | undefined>(undefined);
 
   constructor(
     private host: ElementRef,
@@ -31,9 +36,28 @@ export class GroundwaterLevelStationMarkerComponent implements AfterViewInit {
       this.renderer.setStyle(svg, "height", size);
       this.renderer.setStyle(svg, "width", size);
     });
+
+    effect(() => {
+      let filler = this.filler();
+      if (!filler) return;
+
+      let color = this.color();
+      this.renderer.setStyle(filler, "fill", color);
+    });
+
+    effect(() => {
+      let backgroundFiller = this.backgroundFiller();
+      if (!backgroundFiller) return;
+
+      let backgroundColor = this.backgroundColor();
+      this.renderer.setStyle(backgroundFiller, "fill", backgroundColor);
+    });
   }
 
   ngAfterViewInit(): void {
-    this.svg.set(this.host.nativeElement.querySelector("svg"));
+    let native = this.host.nativeElement;
+    this.svg.set(native.querySelector("svg"));
+    this.filler.set(native.querySelector("#filler"));
+    this.backgroundFiller.set(native.querySelector("#background-filler rect"));
   }
 }
