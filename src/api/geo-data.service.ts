@@ -132,6 +132,7 @@ const LAYER_INFORMATION = {
     description: {type: "string"},
     attribution: {type: "string"},
     crs: {type: "uint32"},
+    private: {type: "boolean"},
   },
 } as const;
 
@@ -140,15 +141,17 @@ const AVAILABLE_LAYERS_SCHEMA = {
 } as const;
 
 const LAYER_CONTENT = {
-  optionalProperties: {
+  properties: {
     id: {type: "uint32"},
     name: {type: "string"},
     key: {type: "string"},
-    additionalProperties: {
+    geometry: {
       optionalProperties: {},
       additionalProperties: true,
     },
-    geometry: {
+  },
+  optionalProperties: {
+    additionalProperties: {
       optionalProperties: {},
       additionalProperties: true,
     },
