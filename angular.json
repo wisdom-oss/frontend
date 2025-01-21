@@ -70,7 +70,7 @@
             ],
             "styles": ["src/styles.scss"],
             "scripts": [],
-            "allowedCommonJsDependencies": ["ajv"],
+            "allowedCommonJsDependencies": ["ajv", "dayjs"],
             "stylePreprocessorOptions": {
               "sass": {
                 "silenceDeprecations": ["global-builtin"]

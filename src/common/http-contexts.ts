@@ -1,5 +1,6 @@
 import {HttpContextToken} from "@angular/common/http";
 import {Schema} from "ajv";
+import {Duration} from "dayjs/plugin/duration";
 
 /**
  * Centralized collection of HTTP context tokens used in the frontend.
@@ -25,4 +26,21 @@ export const httpContexts = {
    * An error will be thrown if the response does not match the schema.
    */
   validateSchema: new HttpContextToken<Schema | undefined>(() => undefined),
+
+  /**
+   * Indicates whether a response should be cached in the IndexedDB.
+   *
+   * By default, no responses are cached (`undefined` is returned by default).
+   *
+   * To enable caching, provide a tuple with the following elements:
+   *
+   * - `string`:
+   *  A unique key to identify the cached response.
+   *  Ensure keys are globally unique to prevent collisions, as the cache store
+   *  is shared across the application.
+   *
+   * - `Duration`:
+   *  The duration for which the response should remain valid.
+   */
+  cache: new HttpContextToken<undefined | [string, Duration]>(() => undefined),
 };
