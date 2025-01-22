@@ -13,7 +13,7 @@
             [plugins]="chartPlugins"
           ></canvas>
         </div>
-        <div class="">
+        <div>
           <!-- drop down menus -->
           <dropdown
             [menuName]="menuSmartmeter"
@@ -51,6 +51,16 @@
         </div>
       </div>
     </div>
-    <div class="column">TEST</div>
+    <div class="column">
+      <div class="box is-fullwidth" style="height: 55vh">
+        <canvas
+          baseChart
+          [data]="chartData"
+          [options]="chartOptions"
+          [type]="chartType"
+          [plugins]="chartPlugins"
+        ></canvas>
+      </div>
+    </div>
   </div>
 </div>
