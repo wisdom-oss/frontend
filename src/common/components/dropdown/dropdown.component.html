@@ -1,0 +1,31 @@
+<div
+  class="dropdown"
+  [class.is-hoverable]="kind() == 'hover'"
+  [class.is-active]="isActive()"
+  (mouseenter)="kind() == 'hover' && isActive.set(true)"
+  (mouseleave)="kind() == 'hover' && isActive.set(false)"
+>
+  <div class="dropdown-trigger">
+    <button
+      class="button is-rounded"
+      (click)="kind() == 'click' && isActive.set(!isActive())"
+    >
+      <span>{{
+        changeMenuName() ? choiceName() : (menuName() | translate)
+      }}</span>
+      <span class="icon is-small">
+        <ng-icon *ngIf(!isActive()) name="remixArrowUpSLine"></ng-icon>
+        <ng-icon *ngIf(isActive()) name="remixArrowDownSLine"></ng-icon>
+      </span>
+    </button>
+  </div>
+  <div class="dropdown-menu" id="dropdown-menu" role="menu">
+    <div class="dropdown-content">
+      @for (item of optionsIter(); track item[0]) {
+        <a (click)="choice.set(item[0])" class="dropdown-item">{{
+          item[1] | translate
+        }}</a>
+      }
+    </div>
+  </div>
+</div>
