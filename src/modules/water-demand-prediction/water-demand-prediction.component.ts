@@ -1,4 +1,10 @@
-import {ViewChild, Component, OnInit} from "@angular/core";
+import {
+  ViewChild,
+  ViewChildren,
+  Component,
+  OnInit,
+  QueryList,
+} from "@angular/core";
 import {
   ChartConfiguration,
   ChartData,
@@ -50,9 +56,13 @@ export class WaterDemandPredictionComponent implements OnInit {
   allSingleFetchData: Record<string, SingleSmartmeter> = {};
 
   /**
-   * The chart object, referenced from the html template
+   * The chart object, referenced from the html template.
+   * ViewChildren is a list of charts, because when using ViewChild,
+   * only ever the first chart gets updated at all.
    */
-  @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
+  @ViewChildren(BaseChartDirective) charts:
+    | QueryList<BaseChartDirective>
+    | undefined;
 
   /**
    * data skeleton for the line graph
@@ -156,12 +166,22 @@ export class WaterDemandPredictionComponent implements OnInit {
       this.chartData.labels = this.allSingleFetchData[key].dateObserved;
       this.chartData.datasets.push(newDataset);
 
-      // Update the chart to reflect the changes
-      if (!this.chart) {
-        console.log("No chart initialized!");
+      this.updateCharts();
+    });
+  }
+
+  updateCharts(): void {
+    if (!this.charts) {
+      console.log("No chart initialized!");
+      return;
+    }
+
+    this.charts.forEach(child => {
+      if (!child.chart) {
+        console.log("No chart in charts!");
         return;
       }
-      this.chart.update();
+      child.chart.update();
     });
   }
 
@@ -252,17 +272,26 @@ export class WaterDemandPredictionComponent implements OnInit {
   }
 
   resetChart(): void {
-    if (!this.chart) {
-      console.log("No Chart to alter");
+    this.chartData.datasets = [];
+    this.chartData.labels = [];
+
+    if (!this.charts) {
+      console.log("No chart initialized!");
+      return;
     }
 
     if (!this.chartData) {
       console.log("Cannot reset empty data");
     }
 
-    this.chartData.datasets = [];
-    this.chartData.labels = [];
-    this.chart?.update();
+    this.charts.forEach(child => {
+      if (!child.chart) {
+        console.log("No chart in charts!");
+        return;
+      }
+      child.chart.update();
+    });
+
     console.log("Delete all requested Datasets");
   }
 }
