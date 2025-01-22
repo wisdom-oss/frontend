@@ -10,7 +10,7 @@ import waterDemandPrediction from "./modules/water-demand-prediction/i18n.toml";
 // add translations to this record
 const modules: NestedStringRecord = {
   core,
-  "water-demand-prediction": waterDemandPrediction
+  "water-demand-prediction": waterDemandPrediction,
 };
 
 export function configureTranslations(service: TranslateService) {

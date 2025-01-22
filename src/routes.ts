@@ -12,7 +12,10 @@ export const routes: Routes = [
     component: CoreComponent,
     children: [
       {path: "", component: GreeterComponent}, // Default child route
-      {path: "water-demand-prediction", component: WaterDemandPredictionComponent}, 
+      {
+        path: "water-demand-prediction",
+        component: WaterDemandPredictionComponent,
+      },
     ],
   },
   {path: "**", redirectTo: ""}, // Wildcard fallback
