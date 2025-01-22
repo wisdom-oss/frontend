@@ -1,13 +1,6 @@
 <!-- Bulma is globally available. -->
-
-<!-- debug check
-<div class="box">
-    <h1>Database List test check</h1>
-    <button (click)="getDebugMessage()">TestConnection!</button>
-    <div *ngIf="pMeters"></div>
-  </div>-->
   
-<div [style]="{ height: '90vh', overflow: 'auto'}">
+<div class="container is-flex is-flex-direction-column" [style]="{ height: '90vh', width: '95%', overflow: 'auto'}">
   <!-- Physical Meter Field-->
   <div class="box" [style]="{ height: heightPM }">
     <h1 class="title has-text-centered is-size-3">Smart Meter List</h1>
@@ -226,6 +219,7 @@
             <th>Used Algorithm</th>
             <th>Comment</th>
             <th>Trained Virtual Meter</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
