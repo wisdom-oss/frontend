@@ -1,0 +1,91 @@
+[smart.meter.list]
+en = "Smart Meter List"
+de = "Smart-Meter-Liste"
+
+[virtual.meter.list]
+en = "Virtual Meter List"
+de = "Virtual-Meter-Liste"
+
+[button.add]
+en = "Add"
+de = "Hinzufügen"
+
+[button.delete]
+en = "Delete"
+de = "Löschen"
+
+[button.train]
+en = "Train"
+de = "Trainiere"
+
+[button.create.forecast]
+en = "Create Forecast"
+de = "Erzeuge Vorhersage"
+
+[input.enter.name]
+en = "Enter Name"
+de = "Namen eingeben"
+
+[input.add.comment]
+en = "Add a comment"
+de = "Kommentar einfügen"
+
+[dropdown.option]
+en = "--Please choose an option--"
+de = "--Bitte wähle eine Option aus--"
+
+[table.name]
+en = "Name"
+de = "Name"
+
+[table.date]
+en = "Date"
+de = "Datum"
+
+[table.country]
+en = "Country"
+de = "Land"
+
+[table.locality]
+en = "Locality"
+de = "Ort"
+
+[table.address]
+en = "Address"
+de = "Adresse"
+
+[table.description]
+en = "Description"
+de = "Beschreibung"
+
+[table.submeter.amount]
+en = "SubMeter Amount"
+de = "SubMeter Anzahl"
+
+[table.supermeter.amount]
+en = "SuperMeter Amount"
+de = "SuperMeter Anzahl"
+
+[table.used.algorithm]
+en = "Used Algorithm"
+de = "Angewandter Algorithmus"
+
+[table.comment]
+en = "Comment"
+de = "Kommentar"
+
+[table.virtual.meter.trained]
+en = "Trained Virtual Meter"
+de = "Trainierte Virtual-Meter"
+
+[model.training]
+en = "Model Training"
+de = "Modell-Training"
+
+[model.trained]
+en = "Trained Models"
+de = "Trainierte Modelle"
+
+[water.consumption.predicted]
+en = "Predicted Water Consumption"
+de = "Vorhergesagter Wasserverbrauch"

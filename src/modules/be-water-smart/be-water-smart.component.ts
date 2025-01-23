@@ -10,11 +10,12 @@ import {
 } from "./bsw-interfaces";
 import { CommonModule, NgFor } from "@angular/common";
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from "@ngx-translate/core";
 
 @Component({
   selector: 'be-water-smart',
   templateUrl: "be-water-smart.component.html",
-  imports: [NgFor, CommonModule, FormsModule],
+  imports: [NgFor, CommonModule, FormsModule, TranslatePipe],
   styleUrls: ['be-water-smart.css'],
   
 })
@@ -121,6 +122,7 @@ export class BeWaterSmartComponent implements OnInit {
    * variable determining if chart gets displayed
    */
   dataAvailable: boolean = false;
+
 
   constructor(public bwsService: BeWaterSmartService) { }
 

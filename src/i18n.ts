@@ -5,9 +5,13 @@ import {
 
 import {asserts} from "./common/asserts";
 import core from "./core/i18n.toml";
+import beWaterSmart from "./modules/be-water-smart/i18n.toml";
 
 // add translations to this record
-const modules: NestedStringRecord = {core};
+const modules: NestedStringRecord = {
+  core,
+  "bws": beWaterSmart
+};
 
 export function configureTranslations(service: TranslateService) {
   let defaultLanguage = service.getBrowserLang() ?? "en";

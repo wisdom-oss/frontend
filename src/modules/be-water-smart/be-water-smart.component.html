@@ -3,7 +3,7 @@
 <div class="container is-flex is-flex-direction-column" [style]="{ height: '90vh', width: '95%', overflow: 'auto'}">
   <!-- Physical Meter Field-->
   <div class="box" [style]="{ height: heightPM }">
-    <h1 class="title has-text-centered is-size-3">Smart Meter List</h1>
+    <h1 class="title has-text-centered is-size-3">{{"bws.smart.meter.list" | translate}}</h1>
     <div
       class="table-container"
       [style]="{ height: heightTable, overflow: pMeters ? 'auto' : 'hidden' }"
@@ -12,12 +12,12 @@
         <thead>
           <tr>
             <th></th>
-            <th>Name</th>
-            <th>Date</th>
-            <th>Country</th>
-            <th>Locality</th>
-            <th>Address</th>
-            <th>Description</th>
+            <th>{{"bws.table.name" | translate}}</th>
+            <th>{{"bws.table.date" | translate}}</th>
+            <th>{{"bws.table.country" | translate}}</th>
+            <th>{{"bws.table.locality" | translate}}</th>
+            <th>{{"bws.table.address" | translate}}</th>
+            <th>{{"bws.table.description" | translate}}</th>
           </tr>
         </thead>
         <tbody>
@@ -69,7 +69,7 @@
   
   <!-- Virtual Meter Field-->
   <div class="box" [style]="{ height: heightVM }">
-    <h1 class="title has-text-centered is-size-3">Virtual Meter List</h1>
+    <h1 class="title has-text-centered is-size-3">{{"bws.virtual.meter.list" | translate}}</h1>
     <!--Form Field for adding Virtual Meter-->
     <div class="field is-grouped">
       <div class="control">
@@ -77,7 +77,7 @@
           class="input"
           type="text"
           [(ngModel)]="newVMeterName"
-          placeholder="Enter Virtual Meter Name"
+          placeholder='{{"bws.input.enter.name" | translate}}'
         />
       </div>
       <div class="control">
@@ -87,7 +87,7 @@
           (click)="addVMeter()"
           [disabled]="!selectedPhysicalMeters.length"
         >
-          <abbr title="Tick a Physical Meter to continue"> Add </abbr>
+          <abbr title="Tick a Physical Meter to continue">{{"bws.button.add" | translate}}</abbr>
         </button>
       </div>
     </div>
@@ -103,11 +103,11 @@
         <thead>
           <tr>
             <th></th>
-            <th>Name</th>
-            <th>Date</th>
-            <th>SubMeter Amount</th>
-            <th>SuperMeter Amount</th>
-            <th>Description</th>
+            <th>{{"bws.table.name" | translate}}</th>
+            <th>{{"bws.table.date" | translate}}</th>
+            <th>{{"bws.table.submeter.amount" | translate}}</th>
+            <th>{{"bws.table.supermeter.amount" | translate}}</th>
+            <th>{{"bws.table.description" | translate}}</th>
             <th></th>
           </tr>
         </thead>
@@ -155,7 +155,7 @@
                 class="button is-danger"
                 (click)="deleteVMeterById(item.id, i)"
               >
-                Delete
+              {{"bws.button.delete" | translate}}
               </button>
             </td>
           </tr>
@@ -163,21 +163,21 @@
       </table>
     </div>
     <!-- Field for training a model -->
-    <h1 class="title has-text-centered is-size-4">Model Training</h1>
+    <h1 class="title has-text-centered is-size-4">{{"bws.model.training" | translate}}</h1>
     <div class="field is-grouped is-justify-content-center">
       <div class="control">
         <!-- Add the input field for comments here -->
         <input
           type="text"
           class="input"
-          placeholder="Add a comment"
+          placeholder='{{"bws.input.add.comment" | translate}}'
           [(ngModel)]="modelComment"
         />
       </div>
       <div class="control">
         <div class="select is-fullwidth">
           <select name="selectedAlgorithm" [(ngModel)]="selectedAlgorithm">
-            <option value="">--Please choose an option--</option>
+            <option value="">{{"bws.dropdown.option" | translate}}</option>
             <option
               *ngFor="let item of algorithms; let i = index"
               [ngValue]="item"
@@ -196,7 +196,7 @@
           [disabled]="!selectedVirtualMeter"
           (click)="trainModel()"
         >
-          Train
+         {{"bws.button.train" | translate}}
         </button>
       </div>
     </div>
@@ -204,7 +204,7 @@
   
   <!-- Model Field-->
   <div class="box">
-    <h1 class="title has-text-centered is-size-3">Trained Models</h1>
+    <h1 class="title has-text-centered is-size-3">{{"bws.model.trained" | translate}}</h1>
     <div
       class="table-container"
       [style]="{
@@ -216,9 +216,9 @@
         <thead>
           <tr>
             <th></th>
-            <th>Used Algorithm</th>
-            <th>Comment</th>
-            <th>Trained Virtual Meter</th>
+            <th>{{"bws.table.used.algorithm" | translate}}</th>
+            <th>{{"bws.table.comment" | translate}}</th>
+            <th>{{"bws.table.virtual.meter.trained" | translate}}</th>
             <th></th>
           </tr>
         </thead>
@@ -252,7 +252,7 @@
                 class="button is-danger"
                 (click)="deleteModel(item.refMeter, item.algorithm, i)"
               >
-                Delete
+              {{"bws.button.delete" | translate}}
               </button>
             </td>
           </tr>
@@ -262,9 +262,9 @@
   </div>
   <!-- ForeCast Creation -->
   <div class="box" [style]="{ height: heightForecast }">
-    <h1 class="title has-text-centered is-size-3">Predicted Water Consumption</h1>
+    <h1 class="title has-text-centered is-size-3">{{"bws.water.consumption.predicted" | translate}}</h1>
     <button class="button is-info" (click)="getForecast()">
-      Create forecast
+      {{"bws.button.create.forecast" | translate}}
     </button>
     <div style="display: block" [style]="{ height: heightForecastGraph }">
       <canvas id="lineChart"></canvas>
