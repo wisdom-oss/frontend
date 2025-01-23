@@ -37,3 +37,19 @@ de = "täglich"
 [resolution.weekly]
 en = "weekly"
 de = "wöchentlich"
+
+[smartmeter.atypical]
+en = "atypical household"
+de = "atypischer Haushalt"
+
+[smartmeter.family]
+en = "family household"
+de = "Familienhaushalt"
+
+[smartmeter.retired]
+en = "retired household"
+de = "Ruhestandshaushalt"
+
+[smartmeter.single]
+en = "single household"
+de = "Single Haushalt"

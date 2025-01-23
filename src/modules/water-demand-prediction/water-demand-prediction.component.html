@@ -13,6 +13,18 @@
             [plugins]="chartPlugins"
           ></canvas>
         </div>
+        <div class="is-flex is-justify-content-space-between">
+          <!-- buttons -->
+          <button class="button is-primary is-rounded" (click)="resetChart()">
+            Reset Chart
+          </button>
+          <button
+            class="button is-primary is-rounded"
+            (click)="fetchSingleSmartmeter()"
+          >
+            Display Smartmeter
+          </button>
+        </div>
         <div>
           <!-- drop down menus -->
           <dropdown
@@ -36,18 +48,6 @@
             kind="hover"
             (choice)="choiceResolution = $event"
           ></dropdown>
-        </div>
-        <div class="is-flex is-justify-content-space-between">
-          <!-- buttons -->
-          <button class="button is-primary is-rounded" (click)="resetChart()">
-            Reset Chart
-          </button>
-          <button
-            class="button is-primary is-rounded"
-            (click)="fetchSingleSmartmeter()"
-          >
-            Display Smartmeter
-          </button>
         </div>
       </div>
     </div>

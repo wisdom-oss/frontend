@@ -1,5 +1,4 @@
 import {
-  ViewChild,
   ViewChildren,
   Component,
   OnInit,
@@ -16,7 +15,6 @@ import {BaseChartDirective} from "ng2-charts";
 import {Observable} from "rxjs";
 
 import {
-  KindOfSmartmeter,
   SingleSmartmeter,
 } from "./water-demand-prediction.interface";
 import {WaterDemandPredictionService} from "../../api/water-demand-prediction.service";
@@ -202,10 +200,10 @@ export class WaterDemandPredictionComponent implements OnInit {
    */
   fetchMeterInformation(): void {
     this.waterDemandService.fetchMeterInformation().subscribe({
-      next: (response: KindOfSmartmeter) => {
-        this.optionsSmartmeter = Object.fromEntries(
-          response.data.map(item => [item, item]),
-        );
+      next: (response) => {
+        this.optionsSmartmeter = response;
+        console.log(this.optionsSmartmeter);
+
       },
       error: error => {
         console.log(error);
