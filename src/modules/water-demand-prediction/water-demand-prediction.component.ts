@@ -3,7 +3,6 @@ import {
   ChartConfiguration,
   ChartData,
   ChartDataset,
-  Plugin,
   ChartType,
 } from "chart.js";
 import {BaseChartDirective} from "ng2-charts";
@@ -43,6 +42,8 @@ export class WaterDemandPredictionComponent implements OnInit {
     weekly: "water-demand-prediction.resolution.weekly",
   };
   choiceResolution?: string;
+
+  fetchedData: SingleSmartmeter[] = [];
 
   allSingleFetchData: Record<string, SingleSmartmeter> = {};
 
@@ -108,39 +109,58 @@ export class WaterDemandPredictionComponent implements OnInit {
   }
 
   /**
-   * add all graphs to the chart. graphs are filtered based on
-   * their resolution to only display uniform graphs.
-   * @param resolution hourly, weekly, daily
+   * Checks if data to request is already fetched and ignores the call in that case
+   * returns true if no double request is taken
    */
-  addGraphsToChart(resolution: string): void {
-    this.resetChart();
+  checkForDoubleEntry(): boolean {
 
-    let data: Record<string, SingleSmartmeter> = Object.keys(
-      this.allSingleFetchData,
-    )
-      .filter(key => this.allSingleFetchData[key].resolution === resolution)
-      .reduce(
-        (acc, key) => {
-          acc[key] = this.allSingleFetchData[key];
-          return acc;
-        },
-        {} as Record<string, SingleSmartmeter>,
-      );
+    console.log(this.fetchedData);
 
-    Object.keys(data).forEach(key => {
-      // Create a new dataset
-      const newDataset: ChartDataset<"line"> = {
-        label: this.allSingleFetchData[key].name,
-        data: this.allSingleFetchData[key].numValue,
-        borderColor: this.generateRandomColor(),
-        fill: false,
-      };
+    this.fetchedData.forEach(entry => {
 
-      this.chartData.labels = this.allSingleFetchData[key].dateObserved;
-      this.chartData.datasets.push(newDataset);
+      console.log(this.choiceSmartmeter);
+      console.log(entry.name);
 
-      this.updateCharts();
+
+      if (this.choiceSmartmeter == entry.name && this.choiceResolution == entry.resolution && this.choiceTime == entry.timeframe) {
+        console.log("duplicate parameters found, not adding current one");
+        return false;
+      }
+      return;
     });
+
+    return true;
+    
+  }
+
+  showCorrectGraphs(timeframe: string, resolution: string): void {
+    this.fetchedData.forEach(item => {
+      if ((item.resolution != resolution) || item.timeframe != timeframe) {
+        return;
+      }
+
+      this.displayGraph(item);
+
+    })
+  }
+
+  displayGraph(chartInfos: SingleSmartmeter): void {
+
+    let newDataset = this.createNewDataset(chartInfos.name, chartInfos.numValue);
+    this.chartData.labels = chartInfos.dateObserved;
+    this.chartData.datasets.push(newDataset);
+    this.updateCharts();
+
+  }
+
+  createNewDataset(label: string, data: number[]): ChartDataset {
+    const newDataset: ChartDataset<"line"> = {
+      label: label,
+      data: data,
+      borderColor: this.generateRandomColor(),
+      fill: false,
+    };
+    return newDataset;
   }
 
   updateCharts(): void {
@@ -210,7 +230,7 @@ export class WaterDemandPredictionComponent implements OnInit {
 
   fetchSingleSmartmeter(): void {
     if (!this.choiceSmartmeter) {
-      console.log("no choice  yet");
+      console.log("no smartmeter chosen");
       return;
     }
 
@@ -224,6 +244,14 @@ export class WaterDemandPredictionComponent implements OnInit {
       return;
     }
 
+    let t = this.checkForDoubleEntry();
+    // CONTINUE HERE; DATASETS ARE BEING DUPLICATED
+
+    if(!this.checkForDoubleEntry()) {
+      console.log("Data already requested");
+      return;
+    }
+
     this.waterDemandService
       .fetchSingleSmartmeter(
         this.choiceSmartmeter,
@@ -232,9 +260,11 @@ export class WaterDemandPredictionComponent implements OnInit {
       )
       .subscribe({
         next: (response: SingleSmartmeter) => {
+          this.fetchedData.push(response);
+          this.showCorrectGraphs(response.timeframe, response.resolution);
           // add response info to the Record with name as key
-          this.allSingleFetchData[response.name] = response;
-          this.addGraphsToChart(response.resolution);
+          //this.allSingleFetchData[response.name] = response;
+          //this.addGraphsToChart(response.resolution);
         },
         error: error => {
           console.log(error);
@@ -244,26 +274,49 @@ export class WaterDemandPredictionComponent implements OnInit {
   }
 
   resetChart(): void {
-    this.chartData.datasets = [];
     this.chartData.labels = [];
-
-    if (!this.charts) {
-      console.log("No chart initialized!");
-      return;
-    }
-
-    if (!this.chartData) {
-      console.log("Cannot reset empty data");
-    }
-
-    this.charts.forEach(child => {
-      if (!child.chart) {
-        console.log("No chart in charts!");
-        return;
-      }
-      child.chart.update();
-    });
-
-    console.log("Delete all requested Datasets");
+    this.chartData.datasets = [];
+    this.fetchedData = [];
+    //this.allSingleFetchData = {};
+    this.updateCharts();
   }
+
+  
+  /**
+   * add all graphs to the chart. graphs are filtered based on
+   * their resolution to only display uniform graphs.
+   * @param resolution hourly, weekly, daily
+   */
+  addGraphsToChart(resolution: string): void {
+    this.resetChart();
+
+    let data: Record<string, SingleSmartmeter> = Object.keys(
+      this.allSingleFetchData,
+    )
+      .filter(key => this.allSingleFetchData[key].resolution === resolution)
+      .reduce(
+        (acc, key) => {
+          acc[key] = this.allSingleFetchData[key];
+          return acc;
+        },
+        {} as Record<string, SingleSmartmeter>,
+      );
+
+    Object.keys(data).forEach(key => {
+      // Create a new dataset
+      const newDataset: ChartDataset<"line"> = {
+        label: this.allSingleFetchData[key].name,
+        data: this.allSingleFetchData[key].numValue,
+        borderColor: this.generateRandomColor(),
+        fill: false,
+      };
+
+      this.chartData.labels = this.allSingleFetchData[key].dateObserved;
+      this.chartData.datasets.push(newDataset);
+
+      this.updateCharts();
+    });
+  }
+
+
 }
