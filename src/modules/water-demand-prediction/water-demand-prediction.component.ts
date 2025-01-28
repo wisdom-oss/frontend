@@ -1,9 +1,4 @@
-import {
-  ViewChildren,
-  Component,
-  OnInit,
-  QueryList,
-} from "@angular/core";
+import {ViewChildren, Component, OnInit, QueryList} from "@angular/core";
 import {
   ChartConfiguration,
   ChartData,
@@ -14,9 +9,7 @@ import {
 import {BaseChartDirective} from "ng2-charts";
 import {Observable} from "rxjs";
 
-import {
-  SingleSmartmeter,
-} from "./water-demand-prediction.interface";
+import {SingleSmartmeter} from "./water-demand-prediction.interface";
 import {WaterDemandPredictionService} from "../../api/water-demand-prediction.service";
 import {DropdownComponent} from "../../common/components/dropdown/dropdown.component";
 
@@ -108,24 +101,6 @@ export class WaterDemandPredictionComponent implements OnInit {
     },
   };
 
-  /**
-   * color of the ng2chart
-   */
-  chartColor: string = "#ffffff";
-
-  backgroundPlugin: Plugin<"bar"> = {
-    id: "custom_canvas_background_color",
-    beforeDraw: chart => {
-      const ctx = chart.ctx;
-      ctx.save();
-      ctx.fillStyle = this.chartColor; // Set the background color to white
-      ctx.fillRect(0, 0, chart.width, chart.height);
-      ctx.restore();
-    },
-  };
-
-  chartPlugins = [this.backgroundPlugin];
-
   constructor(public waterDemandService: WaterDemandPredictionService) {}
 
   ngOnInit() {
@@ -200,10 +175,9 @@ export class WaterDemandPredictionComponent implements OnInit {
    */
   fetchMeterInformation(): void {
     this.waterDemandService.fetchMeterInformation().subscribe({
-      next: (response) => {
+      next: response => {
         this.optionsSmartmeter = response;
         console.log(this.optionsSmartmeter);
-
       },
       error: error => {
         console.log(error);
