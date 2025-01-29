@@ -72,6 +72,18 @@ export class WaterDemandPredictionService {
     });
   }
 
+  fetchSinglePredictionSmartmeter(
+    nameOfSmartmeter: string,
+    timeframe: string,
+    resolution: string,
+  ): Observable<any> {
+    return this.sendRequest("post", "/predSingleSmartmeter", {
+      name: nameOfSmartmeter,
+      timeframe: timeframe,
+      resolution: resolution,
+    });
+  }
+
   /**
    * creates an Observable with an error to subscribe to it and logs the information in the console.
    * @param msg error meesage

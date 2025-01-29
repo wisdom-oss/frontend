@@ -7,7 +7,7 @@
         <div class="box is-fullwidth" style="height: 55vh">
           <canvas
             baseChart
-            [data]="chartData"
+            [data]="chartDataCurrentValues"
             [options]="chartOptions"
             [type]="chartType"
           ></canvas>
@@ -58,13 +58,32 @@
             (choice)="choiceSmartmeter = $event"
           ></dropdown>
         </div>
+        <div>
+          <!-- menus for prediction values -->
+          <button
+          class="button is-primary is-rounded"
+          (click)="fetchPredSingleSmartmeter()"
+        >
+          Request Prediction
+        </button>
+        <button
+          class="button is-primary is-rounded"
+          (click)="
+            showPredictionGraphs(
+              this.choiceResolution ? this.choiceResolution : 'hourly'
+            )
+          "
+        >
+          Display Prediction Values
+        </button>
+        </div>
       </div>
     </div>
     <div class="column">
       <div class="box is-fullwidth" style="height: 55vh">
         <canvas
           baseChart
-          [data]="chartData"
+          [data]="chartDataPredictedValues"
           [options]="chartOptions"
           [type]="chartType"
         ></canvas>

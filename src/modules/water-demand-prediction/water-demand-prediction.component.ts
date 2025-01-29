@@ -3,7 +3,7 @@ import {ChartConfiguration, ChartData, ChartDataset, ChartType} from "chart.js";
 import {BaseChartDirective} from "ng2-charts";
 import {Observable} from "rxjs";
 
-import {SingleSmartmeter} from "./water-demand-prediction.interface";
+import {SingleSmartmeter, PredictionSingleSmartmeter} from "./water-demand-prediction.interface";
 import {WaterDemandPredictionService} from "../../api/water-demand-prediction.service";
 import {DropdownComponent} from "../../common/components/dropdown/dropdown.component";
 
@@ -41,6 +41,9 @@ export class WaterDemandPredictionComponent implements OnInit {
   /** saves all requested data by resolution */
   dataPerResolution: Record<string, SingleSmartmeter[]> = {};
 
+  /** saves all predicted values by resolution */
+  predPerResolution: Record<string, PredictionSingleSmartmeter[]> = {};
+
   /**
    * The chart object, referenced from the html template.
    * ViewChildren is a list of charts, because when using ViewChild,
@@ -53,7 +56,15 @@ export class WaterDemandPredictionComponent implements OnInit {
   /**
    * data skeleton for the line graph
    */
-  chartData: ChartData = {
+  chartDataCurrentValues: ChartData = {
+    labels: [], // X-axis labels
+    datasets: [], // data points
+  };
+
+  /**
+   * data skeleton for the line graph
+   */
+  chartDataPredictedValues: ChartData = {
     labels: [], // X-axis labels
     datasets: [], // data points
   };
@@ -69,6 +80,11 @@ export class WaterDemandPredictionComponent implements OnInit {
   chartOptions: ChartConfiguration["options"] = {
     responsive: true,
     maintainAspectRatio: false,
+    elements: {
+      line: {
+        tension: 0.4, // Smooth curve
+      },
+    },
     scales: {
       y: {
         stacked: false,
@@ -108,13 +124,39 @@ export class WaterDemandPredictionComponent implements OnInit {
    */
   showGraphs(resolution: string): void {
     // reset data to begin
-    this.chartData.labels = [];
-    this.chartData.datasets = [];
+    this.chartDataCurrentValues.labels = [];
+    this.chartDataCurrentValues.datasets = [];
 
     this.dataPerResolution[resolution].forEach(entry => {
-      let newDataset = this.createNewDataset(entry.name, entry.numValue);
-      this.chartData.datasets.push(newDataset);
-      this.chartData.labels = entry.dateObserved;
+      let newDataset = this.createNewDataset(entry.name, entry.numValue, false);
+      this.chartDataCurrentValues.datasets.push(newDataset);
+      this.chartDataCurrentValues.labels = entry.dateObserved;
+    });
+
+    this.updateCharts();
+  }
+
+  /**
+   * shows all graphs based on the selected resolution
+   * @param resolution choice of hourly, daily, weekly
+   */
+  showPredictionGraphs(resolution: string): void {
+    // reset data to begin
+    this.chartDataPredictedValues.labels = [];
+    this.chartDataPredictedValues.datasets = [];
+
+    this.predPerResolution[resolution].forEach(entry => {
+      this.chartDataPredictedValues.labels = entry.dateObserved;
+
+      let predData = this.createNewDataset(entry.name, entry.pred_values, false);
+      this.chartDataPredictedValues.datasets.push(predData);
+
+      let lower_conf_int = this.createNewDataset(entry.name, entry.lower_conf_values, "-1");
+      this.chartDataPredictedValues.datasets.push(lower_conf_int);
+
+      let upper_conf_int = this.createNewDataset(entry.name, entry.upper_conf_values, "+1");
+      this.chartDataPredictedValues.datasets.push(upper_conf_int);
+
     });
 
     this.updateCharts();
@@ -124,14 +166,15 @@ export class WaterDemandPredictionComponent implements OnInit {
    * create a new dataset for chartjs from the given data
    * @param label label of the chartdata
    * @param data data points
+   * @param fillOption: false, "-1" (lower confidence interval) "+1" upper confidence interval
    * @returns new dataset
    */
-  createNewDataset(label: string, data: number[]): ChartDataset {
+  createNewDataset(label: string, data: number[], fillOption: any): ChartDataset {
     const newDataset: ChartDataset<"line"> = {
       label: label,
       data: data,
       borderColor: this.generateRandomColor(),
-      fill: false,
+      fill: fillOption,
     };
     return newDataset;
   }
@@ -211,6 +254,7 @@ export class WaterDemandPredictionComponent implements OnInit {
         this.choiceResolution,
         this.choiceTime,
         this.choiceSmartmeter,
+        this.dataPerResolution
       )
     ) {
       console.log("Data already requested. API Request cancelled.");
@@ -242,6 +286,59 @@ export class WaterDemandPredictionComponent implements OnInit {
       });
   }
 
+  fetchPredSingleSmartmeter(): void {
+    if (!this.choiceResolution) {
+      console.log("no resolution chosen");
+      return;
+    }
+
+    if (!this.choiceTime) {
+      console.log("no timeframe given");
+      return;
+    }
+
+    if (!this.choiceSmartmeter) {
+      console.log("no smartmeter chosen");
+      return;
+    }
+
+    if (
+      !this.preventDoublingData(
+        this.choiceResolution,
+        this.choiceTime,
+        this.choiceSmartmeter,
+        this.predPerResolution
+      )
+    ) {
+      console.log("Data already requested. API Request cancelled.");
+      return;
+    }
+
+    this.waterDemandService
+      .fetchSinglePredictionSmartmeter(
+        this.choiceSmartmeter,
+        this.choiceTime,
+        this.choiceResolution,
+      )
+      .subscribe({
+        next: (response: PredictionSingleSmartmeter) => {
+          // create new key of resolution and save smartmeter data to it
+          if (response.resolution in this.predPerResolution) {
+            this.predPerResolution[response.resolution].push(response);
+            // use existing key and push smartmeter data in it
+          } else {
+            this.predPerResolution[response.resolution] = [response];
+          }
+        },
+        error: error => {
+          console.log(error);
+        },
+        complete: () => {
+          console.log(this.predPerResolution);
+        },
+      });
+  }
+
   /** checks if data was already requested
    * false if data is already requested
    * true if request should be made
@@ -250,12 +347,13 @@ export class WaterDemandPredictionComponent implements OnInit {
     resolution: string,
     timeframe: string,
     name: string,
+    usedRecord: any
   ): boolean {
     // Check if record is empty or key is not yet registered.
-    if (!this.dataPerResolution || !this.dataPerResolution[resolution]) {
+    if (!usedRecord || !usedRecord[resolution]) {
       return true;
     }
-    for (const item of this.dataPerResolution[resolution]) {
+    for (const item of usedRecord[resolution]) {
       if (item.name === name && item.timeframe === timeframe) {
         return false;
       }
@@ -284,8 +382,12 @@ export class WaterDemandPredictionComponent implements OnInit {
   }
 
   resetChart(): void {
-    this.chartData.labels = [];
-    this.chartData.datasets = [];
+    this.chartDataCurrentValues.labels = [];
+    this.chartDataCurrentValues.datasets = [];
+
+    this.chartDataPredictedValues.labels = [];
+    this.chartDataPredictedValues.datasets = [];
+    
     this.dataPerResolution = {};
     this.updateCharts();
   }
