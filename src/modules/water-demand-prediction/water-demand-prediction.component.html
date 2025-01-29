@@ -21,17 +21,27 @@
             class="button is-primary is-rounded"
             (click)="fetchSingleSmartmeter()"
           >
+            Request Smartmeter
+          </button>
+          <button
+            class="button is-primary is-rounded"
+            (click)="
+              showGraphs(
+                this.choiceResolution ? this.choiceResolution : 'hourly'
+              )
+            "
+          >
             Display Smartmeter
           </button>
         </div>
         <div>
           <!-- drop down menus -->
           <dropdown
-            [menuName]="menuSmartmeter"
-            [options]="optionsSmartmeter"
+            [menuName]="menuResolution"
+            [options]="optionsResolution"
             [changeMenuName]="true"
             kind="hover"
-            (choice)="choiceSmartmeter = $event"
+            (choice)="choiceResolution = $event"
           ></dropdown>
           <dropdown
             [menuName]="menuTime"
@@ -41,11 +51,11 @@
             (choice)="choiceTime = $event"
           ></dropdown>
           <dropdown
-            [menuName]="menuResolution"
-            [options]="optionsResolution"
+            [menuName]="menuSmartmeter"
+            [options]="optionsSmartmeter"
             [changeMenuName]="true"
             kind="hover"
-            (choice)="choiceResolution = $event"
+            (choice)="choiceSmartmeter = $event"
           ></dropdown>
         </div>
       </div>
