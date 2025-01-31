@@ -151,10 +151,10 @@ export class WaterDemandPredictionComponent implements OnInit {
       let predData = this.createNewDataset(entry.name, entry.pred_values, false);
       this.chartDataPredictedValues.datasets.push(predData);
 
-      let lower_conf_int = this.createNewDataset(entry.name, entry.lower_conf_values, "-1");
+      let lower_conf_int = this.createNewDataset("lower_confidence_interval", entry.lower_conf_values, 0);
       this.chartDataPredictedValues.datasets.push(lower_conf_int);
 
-      let upper_conf_int = this.createNewDataset(entry.name, entry.upper_conf_values, "+1");
+      let upper_conf_int = this.createNewDataset("upper_confidence_interval", entry.upper_conf_values, 0);
       this.chartDataPredictedValues.datasets.push(upper_conf_int);
 
     });
@@ -166,14 +166,21 @@ export class WaterDemandPredictionComponent implements OnInit {
    * create a new dataset for chartjs from the given data
    * @param label label of the chartdata
    * @param data data points
-   * @param fillOption: false, "-1" (lower confidence interval) "+1" upper confidence interval
+   * @param fillOption: false, 0 for confidence interval
    * @returns new dataset
    */
   createNewDataset(label: string, data: number[], fillOption: any): ChartDataset {
+    let color = "transparent";
+
+    // to display confidence intervalls 
+    if (fillOption === false) {
+      color = this.generateRandomColor();
+    }
+
     const newDataset: ChartDataset<"line"> = {
       label: label,
       data: data,
-      borderColor: this.generateRandomColor(),
+      borderColor: color,
       fill: fillOption,
     };
     return newDataset;
@@ -314,6 +321,8 @@ export class WaterDemandPredictionComponent implements OnInit {
       return;
     }
 
+    console.log("Prediction requested. Pending.")
+    
     this.waterDemandService
       .fetchSinglePredictionSmartmeter(
         this.choiceSmartmeter,
