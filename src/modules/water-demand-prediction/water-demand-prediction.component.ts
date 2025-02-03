@@ -1,8 +1,6 @@
 import {ViewChildren, Component, OnInit, QueryList} from "@angular/core";
 import {ChartConfiguration, ChartData, ChartDataset, ChartType} from "chart.js";
 import {BaseChartDirective} from "ng2-charts";
-import {Observable} from "rxjs";
-
 import {SingleSmartmeter, PredictionSingleSmartmeter} from "./water-demand-prediction.interface";
 import {WaterDemandPredictionService} from "../../api/water-demand-prediction.service";
 import {DropdownComponent} from "../../common/components/dropdown/dropdown.component";
@@ -133,7 +131,7 @@ export class WaterDemandPredictionComponent implements OnInit {
       this.chartDataCurrentValues.labels = entry.dateObserved;
     });
 
-    this.updateCharts();
+    this.updateCharts(0);
   }
 
   /**
@@ -148,7 +146,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     this.predPerResolution[resolution].forEach(entry => {
       this.chartDataPredictedValues.labels = entry.dateObserved;
 
-      let predData = this.createNewDataset(entry.name, entry.pred_values, false);
+      let predData = this.createNewDataset(entry.name, entry.numValue, false);
       this.chartDataPredictedValues.datasets.push(predData);
 
       let lower_conf_int = this.createNewDataset("lower_confidence_interval", entry.lower_conf_values, 0);
@@ -159,7 +157,7 @@ export class WaterDemandPredictionComponent implements OnInit {
 
     });
 
-    this.updateCharts();
+    this.updateCharts(1);
   }
 
   /**
@@ -214,68 +212,31 @@ export class WaterDemandPredictionComponent implements OnInit {
   }
 
   /**
-   * generic method which inputs a function of a service to operate
-   * @param extractionMethod the function in the corresponding service to use
-   * @param responseField structure of the expected answer
-   * @param destinationField name of parameter to extract from response
-   */
-  extractData(
-    extractionMethod: () => Observable<any>,
-    destinationField: keyof this,
-  ): void {
-    extractionMethod().subscribe({
-      next: response => {
-        // Dynamically assign the response field to the destination field
-        this[destinationField] = response;
-      },
-      error: error => {
-        console.log(error);
-      },
-      complete: () => {},
-    });
-  }
-
-  /**
    * fetches data of a single smartmeter and saves it into the record
    * checks if any substantial part of the api request is faulty
    * @returns when any variable is missing.
    */
   fetchSingleSmartmeter(): void {
-    if (!this.choiceResolution) {
-      console.log("no resolution chosen");
+    if (!this.checkForDefinedRequestParameters()) {
       return;
     }
 
-    if (!this.choiceTime) {
-      console.log("no timeframe given");
-      return;
-    }
-
-    if (!this.choiceSmartmeter) {
-      console.log("no smartmeter chosen");
-      return;
-    }
-
-    if (
-      !this.preventDoublingData(
-        this.choiceResolution,
-        this.choiceTime,
-        this.choiceSmartmeter,
-        this.dataPerResolution
-      )
-    ) {
-      console.log("Data already requested. API Request cancelled.");
+    if (!this.checkForUniqueData(this.choiceResolution!,
+      this.choiceTime!,
+      this.choiceSmartmeter!,
+      this.dataPerResolution)) {
       return;
     }
 
     this.waterDemandService
       .fetchSingleSmartmeter(
-        this.choiceSmartmeter,
-        this.choiceTime,
-        this.choiceResolution,
+        this.choiceSmartmeter!,
+        this.choiceTime!,
+        this.choiceResolution!,
       )
       .subscribe({
         next: (response: SingleSmartmeter) => {
+
           // create new key of resolution and save smartmeter data to it
           if (response.resolution in this.dataPerResolution) {
             this.dataPerResolution[response.resolution].push(response);
@@ -283,51 +244,36 @@ export class WaterDemandPredictionComponent implements OnInit {
           } else {
             this.dataPerResolution[response.resolution] = [response];
           }
+
         },
         error: error => {
           console.log(error);
         },
         complete: () => {
-          console.log(this.dataPerResolution);
+
         },
       });
   }
 
   fetchPredSingleSmartmeter(): void {
-    if (!this.choiceResolution) {
-      console.log("no resolution chosen");
+    if (!this.checkForDefinedRequestParameters()) {
       return;
     }
 
-    if (!this.choiceTime) {
-      console.log("no timeframe given");
+    if (!this.checkForUniqueData(this.choiceResolution!,
+      this.choiceTime!,
+      this.choiceSmartmeter!,
+      this.predPerResolution)) {
       return;
     }
 
-    if (!this.choiceSmartmeter) {
-      console.log("no smartmeter chosen");
-      return;
-    }
+    console.log("Start fetching predicted Values. Please wait.")
 
-    if (
-      !this.preventDoublingData(
-        this.choiceResolution,
-        this.choiceTime,
-        this.choiceSmartmeter,
-        this.predPerResolution
-      )
-    ) {
-      console.log("Data already requested. API Request cancelled.");
-      return;
-    }
-
-    console.log("Prediction requested. Pending.")
-    
     this.waterDemandService
       .fetchSinglePredictionSmartmeter(
-        this.choiceSmartmeter,
-        this.choiceTime,
-        this.choiceResolution,
+        this.choiceSmartmeter!,
+        this.choiceTime!,
+        this.choiceResolution!,
       )
       .subscribe({
         next: (response: PredictionSingleSmartmeter) => {
@@ -344,6 +290,7 @@ export class WaterDemandPredictionComponent implements OnInit {
         },
         complete: () => {
           console.log(this.predPerResolution);
+          console.log("Finalized prediction request.")
         },
       });
   }
@@ -391,36 +338,20 @@ export class WaterDemandPredictionComponent implements OnInit {
     return true;    
   }
 
-  /** checks if data was already requested
-   * false if data is already requested
-   * true if request should be made
-   */
-  preventDoublingData(
-    resolution: string,
-    timeframe: string,
-    name: string,
-    usedRecord: any
-  ): boolean {
-    // Check if record is empty or key is not yet registered.
-    if (!usedRecord || !usedRecord[resolution]) {
-      return true;
-    }
-    for (const item of usedRecord[resolution]) {
-      if (item.name === name && item.timeframe === timeframe) {
-        return false;
-      }
-    }
-    console.log("Data validated, start API request");
-    return true;
-  }
-
   /**
    * update all charts in ViewChildren
+   * update only one chart based on index given, when given one.
    * @returns if there is no chart
    */
-  updateCharts(): void {
+  updateCharts(indexOfChart?: number): void {
     if (!this.charts) {
       console.log("No chart initialized!");
+      return;
+    }
+
+    // add 1 to update the first graph, add 2 to update the prediction graph only
+    if(indexOfChart) {
+      this.charts.toArray()[indexOfChart].update();
       return;
     }
 
@@ -433,6 +364,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     });
   }
 
+  /** Completely erases data from the graph elements */
   resetChart(): void {
     this.chartDataCurrentValues.labels = [];
     this.chartDataCurrentValues.datasets = [];
@@ -441,6 +373,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     this.chartDataPredictedValues.datasets = [];
     
     this.dataPerResolution = {};
+    this.predPerResolution = {};
     this.updateCharts();
   }
   
