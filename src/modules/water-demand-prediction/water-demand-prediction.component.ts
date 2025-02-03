@@ -26,7 +26,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     "three months": "water-demand-prediction.timeframe.three-months",
     "six months": "water-demand-prediction.timeframe.six-months",
     "one year": "water-demand-prediction.timeframe.one-year",
-    all: "water-demand-prediction.timeframe.all",
+    "all": "water-demand-prediction.timeframe.all",
   };
   choiceTime?: string;
 
@@ -400,4 +400,5 @@ export class WaterDemandPredictionComponent implements OnInit {
     this.dataPerResolution = {};
     this.updateCharts();
   }
+  
 }
