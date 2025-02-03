@@ -348,6 +348,49 @@ export class WaterDemandPredictionComponent implements OnInit {
       });
   }
 
+  /** check for undefined parameters. True when every parameter is defined, else false*/
+  checkForDefinedRequestParameters(): boolean {
+    if (!this.choiceResolution) {
+      console.error("no resolution chosen");
+      return false;
+    }
+
+    if (!this.choiceTime) {
+      console.error("no timeframe given");
+      return false;
+    }
+
+    if (!this.choiceSmartmeter) {
+      console.error("no smartmeter chosen");
+      return false;
+    }
+
+    return true;
+
+  }
+
+  /** check if the requested dataset would be unique or not. True if unique, else false */
+  checkForUniqueData(resolution: string,
+    timeframe: string,
+    name: string,
+    usedRecord: any): boolean {
+
+    // if neither record or resolution is already present, data request must be unique
+    if (!usedRecord || !usedRecord[resolution]) {
+      return true;
+    }
+
+    // when name of record and timeframe are equal, datasets are the same data. 
+    for (let item of usedRecord[resolution]) {
+      if (name === item.name && timeframe === item.timeframe) {
+        (console.log(name + ": " + timeframe + " already exist in resolution of: " + resolution ))
+        return false;
+      }
+    }
+
+    return true;    
+  }
+
   /** checks if data was already requested
    * false if data is already requested
    * true if request should be made
