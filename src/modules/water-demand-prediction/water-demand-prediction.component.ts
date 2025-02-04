@@ -126,7 +126,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     this.chartDataCurrentValues.datasets = [];
 
     this.dataPerResolution[resolution].forEach(entry => {
-      let newDataset = this.createNewDataset(entry.name, entry.numValue, false);
+      let newDataset = this.createNewDataset(entry.numValue, entry.name, resolution, entry.timeframe, false);
       this.chartDataCurrentValues.datasets.push(newDataset);
       this.chartDataCurrentValues.labels = entry.dateObserved;
     });
@@ -146,13 +146,13 @@ export class WaterDemandPredictionComponent implements OnInit {
     this.predPerResolution[resolution].forEach(entry => {
       this.chartDataPredictedValues.labels = entry.dateObserved;
 
-      let predData = this.createNewDataset(entry.name, entry.numValue, false);
+      let predData = this.createNewDataset(entry.numValue,entry.name, resolution, entry.timeframe, false);
       this.chartDataPredictedValues.datasets.push(predData);
 
-      let lower_conf_int = this.createNewDataset("lower_confidence_interval", entry.lower_conf_values, 0);
+      let lower_conf_int = this.createNewDataset(entry.lower_conf_values, "lower_confidence_interval", resolution, entry.timeframe, 0);
       this.chartDataPredictedValues.datasets.push(lower_conf_int);
 
-      let upper_conf_int = this.createNewDataset("upper_confidence_interval", entry.upper_conf_values, 0);
+      let upper_conf_int = this.createNewDataset(entry.upper_conf_values, "upper_confidence_interval", resolution, entry.timeframe, 0);
       this.chartDataPredictedValues.datasets.push(upper_conf_int);
 
     });
@@ -167,12 +167,12 @@ export class WaterDemandPredictionComponent implements OnInit {
    * @param fillOption: false, 0 for confidence interval
    * @returns new dataset
    */
-  createNewDataset(label: string, data: number[], fillOption: any): ChartDataset {
+  createNewDataset(data: number[], label: string,  resolution: string, timeframe: string, fillOption: any): ChartDataset {
     let color = "transparent";
 
     // to display confidence intervalls 
     if (fillOption === false) {
-      color = this.generateRandomColor();
+      color = this.stringToColor(label + resolution + timeframe)
     }
 
     const newDataset: ChartDataset<"line"> = {
@@ -185,15 +185,29 @@ export class WaterDemandPredictionComponent implements OnInit {
   }
 
   /**
-   * generate a random color from the color wheel
-   * @returns random color code as string
-   */
-  generateRandomColor(): string {
-    const r = Math.floor(Math.random() * 256); // Random red value (0-255)
-    const g = Math.floor(Math.random() * 256); // Random green value (0-255)
-    const b = Math.floor(Math.random() * 256); // Random blue value (0-255)
-
-    return `rgb(${r}, ${g}, ${b})`; // Return the color in rgb() format
+ * Generates deterministically a hex color code from any string.
+ *
+ * This is a modernized version of this
+ * [StackOverflow reply](https://stackoverflow.com/a/16348977/15800714).
+ * @param str A string to generate a hex color for
+ * @param map A color map for predefined strings
+ *
+ * @returns A hex color code in the style of '#abc123'
+ */
+  stringToColor(str: string, map?: Record<string, string>): string {
+    if (map && map[str]) {
+      return map[str];
+    }
+    let hash = 0;
+    for (let s of str) {
+      hash = s.charCodeAt(0) + ((hash << 5) - hash);
+    }
+    let color = "#";
+    for (let i = 0; i < 3; i++) {
+      let value = (hash >> (i * 8)) & 0xFF;
+      color += ("00" + value.toString(16)).slice(-2);
+    }
+    return color;
   }
 
   /**
@@ -205,7 +219,7 @@ export class WaterDemandPredictionComponent implements OnInit {
         this.optionsSmartmeter = response;
       },
       error: error => {
-        console.log(error);
+        console.error(error);
       },
       complete: () => {},
     });
@@ -279,6 +293,8 @@ export class WaterDemandPredictionComponent implements OnInit {
         next: (response: PredictionSingleSmartmeter) => {
           // create new key of resolution and save smartmeter data to it
           if (response.resolution in this.predPerResolution) {
+            let color = this.stringToColor(response.name + response.resolution + response.timeframe);
+            // add color and change interface
             this.predPerResolution[response.resolution].push(response);
             // use existing key and push smartmeter data in it
           } else {
