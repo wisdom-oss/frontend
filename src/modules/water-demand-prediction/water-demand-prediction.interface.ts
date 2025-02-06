@@ -2,11 +2,21 @@
  * interface for the response to the single smartmeter data values
  */
 export interface SingleSmartmeter {
-    name: string;
-    numValue: [];
-    dateObserved: [];
+  name: string;
+  resolution: string;
+  timeframe: string;
+  numValue: [];
+  dateObserved: [];
 }
 
-export interface KindOfSmartmeter {
-    data: string[] 
+export interface PredictionSingleSmartmeter {
+  name: string;
+  resolution: string;
+  timeframe: string;
+  lower_conf_values: [];
+  upper_conf_values: [];
+  pred_values: [];
+  dateObserved: [];
 }
+
+
