@@ -1,248 +1,396 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { ChartConfiguration, ChartData, ChartDataset, ChartType, Plugin } from 'chart.js';
-import { BaseChartDirective } from 'ng2-charts';
-import { WaterDemandPredictionService } from '../../api/water-demand-prediction.service';
-import { Observable } from 'rxjs';
-import { SingleSmartmeter, KindOfSmartmeter } from './water-demand-prediction.interface';
-import { DropdownmenuComponent } from '../../common/dropdownmenu/dropdownmenu.component';
+import {ViewChildren, Component, OnInit, QueryList} from "@angular/core";
+import {ChartConfiguration, ChartData, ChartDataset, ChartType} from "chart.js";
+import {BaseChartDirective} from "ng2-charts";
+import {SingleSmartmeter, PredictionSingleSmartmeter} from "./water-demand-prediction.interface";
+import {WaterDemandPredictionService} from "../../api/water-demand-prediction.service";
+import {DropdownComponent} from "../../common/components/dropdown/dropdown.component";
 
 @Component({
-  selector: 'water-demand-prediction',
-  imports: [BaseChartDirective, DropdownmenuComponent],
-  templateUrl: './water-demand-prediction.component.html',
-  styles: ``
+  selector: "water-demand-prediction",
+  imports: [BaseChartDirective, DropdownComponent],
+  templateUrl: "./water-demand-prediction.component.html",
+  styles: ``,
 })
 export class WaterDemandPredictionComponent implements OnInit {
-
   menuSmartmeter = "Select Smartmeter";
   optionsSmartmeter: Record<string, string> = {};
   choiceSmartmeter?: string;
 
   menuTime = "Select Timeframe";
   optionsTime: Record<string, string> = {
-    "one day": "water-demand-prediction.timeframe.one-day", 
-    "one week": "water-demand-prediction.timeframe.one-week", 
-    "one month": "water-demand-prediction.timeframe.one-month", 
+    "one day": "water-demand-prediction.timeframe.one-day",
+    "one week": "water-demand-prediction.timeframe.one-week",
+    "one month": "water-demand-prediction.timeframe.one-month",
     "three months": "water-demand-prediction.timeframe.three-months",
-    "six months": "water-demand-prediction.timeframe.six-months", 
-    "one year": "water-demand-prediction.timeframe.one-year"
+    "six months": "water-demand-prediction.timeframe.six-months",
+    "one year": "water-demand-prediction.timeframe.one-year",
+    "all": "water-demand-prediction.timeframe.all",
   };
   choiceTime?: string;
-  startingTime: string = "2021-05-26T00:00:00"
 
-  singleFetchdata: SingleSmartmeter | undefined
+  menuResolution = "Select Resolution";
+  optionsResolution: Record<string, string> = {
+    hourly: "water-demand-prediction.resolution.hourly",
+    daily: "water-demand-prediction.resolution.daily",
+    weekly: "water-demand-prediction.resolution.weekly",
+  };
+  choiceResolution?: string;
+
+  /** saves all requested data by resolution */
+  dataPerResolution: Record<string, SingleSmartmeter[]> = {};
+
+  /** saves all predicted values by resolution */
+  predPerResolution: Record<string, PredictionSingleSmartmeter[]> = {};
 
   /**
-   * The chart object, referenced from the html template
+   * The chart object, referenced from the html template.
+   * ViewChildren is a list of charts, because when using ViewChild,
+   * only ever the first chart gets updated at all.
    */
-  @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
+  @ViewChildren(BaseChartDirective) charts:
+    | QueryList<BaseChartDirective>
+    | undefined;
+
+  /**
+   * data skeleton for the line graph
+   */
+  chartDataCurrentValues: ChartData = {
+    labels: [], // X-axis labels
+    datasets: [], // data points
+  };
+
+  /**
+   * data skeleton for the line graph
+   */
+  chartDataPredictedValues: ChartData = {
+    labels: [], // X-axis labels
+    datasets: [], // data points
+  };
 
   /**
    * type of graph to use in chart
    */
-  chartType: ChartType = 'line';
+  chartType: ChartType = "line";
 
   /**
    * options used for the line chart to visualize prediction values
    */
-  chartOptions: ChartConfiguration['options'] = {
+  chartOptions: ChartConfiguration["options"] = {
     responsive: true,
     maintainAspectRatio: false,
+    elements: {
+      line: {
+        tension: 0.4, // Smooth curve
+      },
+    },
     scales: {
       y: {
         stacked: false,
         title: {
           display: true,
-          text: "m^3"
+          text: "m^3",
         },
         grid: {
           display: true, // Show grid lines on the y-axis
-          color: '#000000', // Customize the grid line color '#e0e0e0'
-          lineWidth: 0.2, // Set the width of the grid lines
+          color: "#000000", // Customize the grid line color '#e0e0e0'
+          lineWidth: 0.4, // Set the width of the grid lines
         },
       },
       x: {
         title: {
           display: true,
-          text: "Time"
+          text: "Time",
         },
         grid: {
           display: false, // Show grid lines on the y-axis
-          color: '#000000', // Customize the grid line color
-          lineWidth: 0.2, // Set the width of the grid lines
+          color: "#000000", // Customize the grid line color #000000
+          lineWidth: 0.4, // Set the width of the grid lines
         },
-      }
+      },
     },
   };
 
-   /**
-   * color of the ng2chart
-   */
-   chartColor: string = '#ffffff';
-
-   backgroundPlugin: Plugin<'bar'> = {
-    id: 'custom_canvas_background_color',
-    beforeDraw: (chart) => {
-      const ctx = chart.ctx;
-      ctx.save();
-      ctx.fillStyle = this.chartColor; // Set the background color to white
-      ctx.fillRect(0, 0, chart.width, chart.height);
-      ctx.restore();
-    }
-  };
-
-  chartPlugins = [this.backgroundPlugin];
-
-  /**
-   * standard xAxis labels for prediction values
-   */
-  standardLabels: string[] = ['01:00', '02:00', '03:00',
-    '04:00', '05:00', '06:00', '07:00',
-    '08:00', '09:00', '10:00', '11:00',
-    '12:00', '13:00', '14:00', '15:00',
-    '16:00', '17:00', '18:00', '19:00',
-    '20:00', '21:00', '22:00', '23:00']
-
-  /**
-   * data skeleton for the line graph
-   */
-  chartData: ChartData<'line'> = {
-    labels: this.standardLabels, // X-axis labels
-    datasets: [], // data points
-  };
-
-  constructor(public waterDemandService: WaterDemandPredictionService) { }
+  constructor(public waterDemandService: WaterDemandPredictionService) {}
 
   ngOnInit() {
-      
     this.fetchMeterInformation();
-    this.fetchSingleSmartmeter();
-
   }
 
-/**
- * uses the singleSmartmeter interface and expands the values into separate lists
- * which can be used in a chart
- */
-createGraphFromSmartmeter(): void {
-  let labels: string[] = [];
-  let nums: number[] = [];
-
-  if (this.singleFetchdata) {
-    this.singleFetchdata.dateObserved.forEach((value) => {
-      labels.push(value);
-    });
-    this.singleFetchdata.numValue.forEach((value) => {
-      nums.push(value);
-    })
-
-    this.chartData.labels = labels;
-    this.addGraphToChart(nums, this.singleFetchdata.name)
-  }
-}
-
-/**
-   * Function to add new lines dynamically to the graph
-   * @param label new data label
-   * @param dataPoints the new prediction values
-   * @param borderColor color to use
+  /**
+   * shows all graphs based on the selected resolution
+   * @param resolution choice of hourly, daily, weekly
    */
-addGraphToChart(dataPoints: number[], label: string): void {
+  showGraphs(resolution: string): void {
+    // reset data to begin
+    this.chartDataCurrentValues.labels = [];
+    this.chartDataCurrentValues.datasets = [];
 
-  // Create a new dataset
-  const newDataset: ChartDataset<'line'> = {
-    label: label,
-    data: dataPoints,
-    borderColor: this.generateRandomColor(),
-    fill: false,
-  };
+    this.dataPerResolution[resolution].forEach(entry => {
+      let newDataset = this.createNewDataset(entry.numValue, entry.name, resolution, entry.timeframe, false);
+      this.chartDataCurrentValues.datasets.push(newDataset);
+      this.chartDataCurrentValues.labels = entry.dateObserved;
+    });
 
-  // Add the new dataset to the existing chart data
-  this.chartData.datasets.push(newDataset);
-
-  console.log(this.chartData.datasets[0].label)
-
-  this.chartData.datasets.forEach(() => {
-  })
-
-
-  // Update the chart to reflect the changes
-  if (this.chart) {
-    this.chart.update();
+    this.updateCharts(0);
   }
-}
 
-/**
- * generate a random color from the color wheel
- * @returns random color code as string
+  /**
+   * shows all graphs based on the selected resolution
+   * @param resolution choice of hourly, daily, weekly
+   */
+  showPredictionGraphs(resolution: string): void {
+    // reset data to begin
+    this.chartDataPredictedValues.labels = [];
+    this.chartDataPredictedValues.datasets = [];
+
+    this.predPerResolution[resolution].forEach(entry => {
+      this.chartDataPredictedValues.labels = entry.dateObserved;
+
+      let predData = this.createNewDataset(entry.numValue,entry.name, resolution, entry.timeframe, false);
+      this.chartDataPredictedValues.datasets.push(predData);
+
+      let lower_conf_int = this.createNewDataset(entry.lower_conf_values, "lower_confidence_interval", resolution, entry.timeframe, 0);
+      this.chartDataPredictedValues.datasets.push(lower_conf_int);
+
+      let upper_conf_int = this.createNewDataset(entry.upper_conf_values, "upper_confidence_interval", resolution, entry.timeframe, 0);
+      this.chartDataPredictedValues.datasets.push(upper_conf_int);
+
+    });
+
+    this.updateCharts(1);
+  }
+
+  /**
+   * create a new dataset for chartjs from the given data
+   * @param label label of the chartdata
+   * @param data data points
+   * @param fillOption: false, 0 for confidence interval
+   * @returns new dataset
+   */
+  createNewDataset(data: number[], label: string,  resolution: string, timeframe: string, fillOption: any): ChartDataset {
+    let color = "transparent";
+
+    // to display confidence intervalls 
+    if (fillOption === false) {
+      color = this.stringToColor(label + resolution + timeframe)
+    }
+
+    const newDataset: ChartDataset<"line"> = {
+      label: label,
+      data: data,
+      borderColor: color,
+      fill: fillOption,
+    };
+    return newDataset;
+  }
+
+  /**
+ * Generates deterministically a hex color code from any string.
+ *
+ * This is a modernized version of this
+ * [StackOverflow reply](https://stackoverflow.com/a/16348977/15800714).
+ * @param str A string to generate a hex color for
+ * @param map A color map for predefined strings
+ *
+ * @returns A hex color code in the style of '#abc123'
  */
-generateRandomColor(): string {
-  const r = Math.floor(Math.random() * 256); // Random red value (0-255)
-  const g = Math.floor(Math.random() * 256); // Random green value (0-255)
-  const b = Math.floor(Math.random() * 256); // Random blue value (0-255)
-
-  return `rgb(${r}, ${g}, ${b})`; // Return the color in rgb() format
-}
-
-/**
- * generic method which inputs a function of a service to operate
- * @param extractionMethod the function in the corresponding service to use
- * @param responseField structure of the expected answer
- * @param destinationField name of parameter to extract from response
- */
-extractData(extractionMethod: () => Observable<any>, destinationField: keyof this): void {
-  extractionMethod().subscribe({
-    next: (response) => {
-      // Dynamically assign the response field to the destination field
-      this[destinationField] = response;
-    },
-    error: (error) => {
-      console.log(error);
-    },
-    complete: () => {
-
+  stringToColor(str: string, map?: Record<string, string>): string {
+    if (map && map[str]) {
+      return map[str];
     }
-  });
-}
-
-fetchSingleSmartmeter(): void {
-
-  if(!this.choiceSmartmeter) {
-    console.log("no choice  yet");
-    return
+    let hash = 0;
+    for (let s of str) {
+      hash = s.charCodeAt(0) + ((hash << 5) - hash);
+    }
+    let color = "#";
+    for (let i = 0; i < 3; i++) {
+      let value = (hash >> (i * 8)) & 0xFF;
+      color += ("00" + value.toString(16)).slice(-2);
+    }
+    return color;
   }
 
-  if(!this.choiceTime) {
-    console.log("no timeframe given");
-    return
+  /**
+   * fetches all smartmeter names
+   */
+  fetchMeterInformation(): void {
+    this.waterDemandService.fetchMeterInformation().subscribe({
+      next: response => {
+        this.optionsSmartmeter = response;
+      },
+      error: error => {
+        console.error(error);
+      },
+      complete: () => {},
+    });
   }
 
-  // BUG: Change parameter to be extracted from dropdown!
-  this.waterDemandService.fetchSingleSmartmeter(this.choiceSmartmeter, this.choiceTime, this.startingTime).subscribe({
-    next: (response) => {
-      this.singleFetchdata = response
-    },
-    error: (error) => {
-      console.log(error);
-    },
-    complete: () => {
-      this.createGraphFromSmartmeter();
+  /**
+   * fetches data of a single smartmeter and saves it into the record
+   * checks if any substantial part of the api request is faulty
+   * @returns when any variable is missing.
+   */
+  fetchSingleSmartmeter(): void {
+    if (!this.checkForDefinedRequestParameters()) {
+      return;
     }
-  });
-}
 
-fetchMeterInformation(): void {
-  this.waterDemandService.fetchMeterInformation().subscribe({
-    next: (response: KindOfSmartmeter) => {
-      this.optionsSmartmeter = Object.fromEntries(response.data.map(item => [item, item]))
-    },
-    error: (error) => {
-      console.log(error);
-    },
-    complete: () => {
-
+    if (!this.checkForUniqueData(this.choiceResolution!,
+      this.choiceTime!,
+      this.choiceSmartmeter!,
+      this.dataPerResolution)) {
+      return;
     }
-  });
+
+    this.waterDemandService
+      .fetchSingleSmartmeter(
+        this.choiceSmartmeter!,
+        this.choiceTime!,
+        this.choiceResolution!,
+      )
+      .subscribe({
+        next: (response: SingleSmartmeter) => {
+
+          // create new key of resolution and save smartmeter data to it
+          if (response.resolution in this.dataPerResolution) {
+            this.dataPerResolution[response.resolution].push(response);
+            // use existing key and push smartmeter data in it
+          } else {
+            this.dataPerResolution[response.resolution] = [response];
+          }
+
+        },
+        error: error => {
+          console.log(error);
+        },
+        complete: () => {
+
+        },
+      });
+  }
+
+  fetchPredSingleSmartmeter(): void {
+    if (!this.checkForDefinedRequestParameters()) {
+      return;
+    }
+
+    if (!this.checkForUniqueData(this.choiceResolution!,
+      this.choiceTime!,
+      this.choiceSmartmeter!,
+      this.predPerResolution)) {
+      return;
+    }
+
+    console.log("Start fetching predicted Values. Please wait.")
+
+    this.waterDemandService
+      .fetchSinglePredictionSmartmeter(
+        this.choiceSmartmeter!,
+        this.choiceTime!,
+        this.choiceResolution!,
+      )
+      .subscribe({
+        next: (response: PredictionSingleSmartmeter) => {
+          // create new key of resolution and save smartmeter data to it
+          if (response.resolution in this.predPerResolution) {
+            let color = this.stringToColor(response.name + response.resolution + response.timeframe);
+            // add color and change interface
+            this.predPerResolution[response.resolution].push(response);
+            // use existing key and push smartmeter data in it
+          } else {
+            this.predPerResolution[response.resolution] = [response];
+          }
+        },
+        error: error => {
+          console.log(error);
+        },
+        complete: () => {
+          console.log(this.predPerResolution);
+          console.log("Finalized prediction request.")
+        },
+      });
+  }
+
+  /** check for undefined parameters. True when every parameter is defined, else false*/
+  checkForDefinedRequestParameters(): boolean {
+    if (!this.choiceResolution) {
+      console.error("no resolution chosen");
+      return false;
+    }
+
+    if (!this.choiceTime) {
+      console.error("no timeframe given");
+      return false;
+    }
+
+    if (!this.choiceSmartmeter) {
+      console.error("no smartmeter chosen");
+      return false;
+    }
+
+    return true;
+
+  }
+
+  /** check if the requested dataset would be unique or not. True if unique, else false */
+  checkForUniqueData(resolution: string,
+    timeframe: string,
+    name: string,
+    usedRecord: any): boolean {
+
+    // if neither record or resolution is already present, data request must be unique
+    if (!usedRecord || !usedRecord[resolution]) {
+      return true;
+    }
+
+    // when name of record and timeframe are equal, datasets are the same data. 
+    for (let item of usedRecord[resolution]) {
+      if (name === item.name && timeframe === item.timeframe) {
+        (console.log(name + ": " + timeframe + " already exist in resolution of: " + resolution ))
+        return false;
+      }
+    }
+
+    return true;    
+  }
+
+  /**
+   * update all charts in ViewChildren
+   * update only one chart based on index given, when given one.
+   * @returns if there is no chart
+   */
+  updateCharts(indexOfChart?: number): void {
+    if (!this.charts) {
+      console.log("No chart initialized!");
+      return;
+    }
+
+    // add 1 to update the first graph, add 2 to update the prediction graph only
+    if(indexOfChart) {
+      this.charts.toArray()[indexOfChart].update();
+      return;
+    }
+
+    this.charts.forEach(child => {
+      if (!child.chart) {
+        console.log("No chart in charts!");
+        return;
+      }
+      child.chart.update();
+    });
+  }
+
+  /** Completely erases data from the graph elements */
+  resetChart(): void {
+    this.chartDataCurrentValues.labels = [];
+    this.chartDataCurrentValues.datasets = [];
+
+    this.chartDataPredictedValues.labels = [];
+    this.chartDataPredictedValues.datasets = [];
+    
+    this.dataPerResolution = {};
+    this.predPerResolution = {};
+    this.updateCharts();
+  }
   
-}
 }
