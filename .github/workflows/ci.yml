@@ -38,7 +38,7 @@ jobs:
             command: npx prettier . --check --plugin prettier-plugin-toml
             error: true
           - name: test
-            command: npx ng test --ci
+            command: npm run test
             error: false
 
     steps:
