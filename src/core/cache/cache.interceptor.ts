@@ -4,7 +4,7 @@ import {
   HttpEventType,
 } from "@angular/common/http";
 import {inject} from "@angular/core";
-import {from, mergeAll, of, tap} from "rxjs";
+import {defer, from, of, switchMap, tap} from "rxjs";
 
 import {CacheService} from "./cache.service";
 import {httpContexts} from "../../common/http-contexts";
@@ -13,24 +13,23 @@ export const cacheInterceptor: HttpInterceptorFn = (req, next) => {
   let useCache = req.context.get(httpContexts.cache);
   if (!useCache) return next(req);
 
-  return from(
-    (async () => {
-      let service = inject(CacheService);
+  let nextAndUpdate = defer(() =>
+    next(req).pipe(
+      tap(async event => {
+        if (event.type != HttpEventType.Response) return event;
+        let response = event as HttpResponse<unknown>;
+        await service.set(key, response.body, ttl);
+        return event;
+      }),
+    ),
+  );
 
-      let [key, ttl] = useCache;
-      let cacheEntry = await service.get(key);
-      if (cacheEntry !== null) return of(new HttpResponse({body: cacheEntry}));
-
-      return next(req).pipe(
-        tap(async event => {
-          if (event.type != HttpEventType.Response) return event;
-
-          let response = event as HttpResponse<unknown>;
-          await service.set(key, response.body, ttl);
-
-          return event;
-        }),
-      );
-    })(),
-  ).pipe(mergeAll());
+  let service = inject(CacheService);
+  let [key, ttl] = useCache;
+  return from(service.get(key)).pipe(
+    switchMap(value => {
+      if (value !== null) return of(new HttpResponse({body: value}));
+      return nextAndUpdate;
+    }),
+  );
 };
