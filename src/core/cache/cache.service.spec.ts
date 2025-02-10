@@ -1,8 +1,7 @@
-import { TestBed } from "@angular/core/testing";
-import { CacheService } from "./cache.service";
+import {TestBed} from "@angular/core/testing";
 import dayjs from "dayjs";
-import Dexie from "dexie";
 
+import {CacheService} from "./cache.service";
 
 describe("CacheService", () => {
   let service: CacheService;
@@ -13,11 +12,11 @@ describe("CacheService", () => {
     });
 
     service = TestBed.inject(CacheService);
-    await service.clear(); // Ensure fresh state before each test
+    await service.clear(); // ensure fresh state before each test
   });
 
   afterEach(async () => {
-    await service.clear(); // Cleanup after tests
+    await service.clear(); // cleanup after tests
   });
 
   it("should store and retrieve a value before expiration", async () => {
@@ -40,7 +39,7 @@ describe("CacheService", () => {
 
   it("should delete an entry after expiration", async () => {
     await service.set("tempKey", "tempValue", dayjs.duration(1, "second"));
-    await new Promise((resolve) => setTimeout(resolve, 1100)); // Wait for expiration
+    await new Promise(resolve => setTimeout(resolve, 1100)); // Wait for expiration
     const value = await service.get("tempKey");
 
     expect(value).toBeNull();
@@ -71,7 +70,7 @@ describe("CacheService", () => {
   });
 
   it("should store and retrieve objects", async () => {
-    const obj = { name: "test", value: 42 };
+    const obj = {name: "test", value: 42};
     await service.set("objectKey", obj, dayjs.duration(1, "day"));
 
     const value = await service.get("objectKey");
