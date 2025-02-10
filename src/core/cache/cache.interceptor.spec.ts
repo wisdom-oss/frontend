@@ -67,7 +67,7 @@ describe("cacheInterceptor", () => {
       expect(secondRes.body).toEqual(body);
       expect(httpHandler).toHaveBeenCalledTimes(1);
 
-      await wait(200);
+      await wait(250);
 
       let thirdRes = (await firstValueFrom(
         cacheInterceptor(req, httpHandler),
