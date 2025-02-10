@@ -11,7 +11,7 @@ import Dexie from "dexie";
  * should be stored.
  * This means data must be able to be converted to JSON and then parsed back
  * without issues.
- * This is safe for use in the cache interceptor since all received data is 
+ * This is safe for use in the cache interceptor since all received data is
  * naturally JSON serializable.
  */
 @Injectable({
@@ -52,7 +52,7 @@ export class CacheService extends Dexie {
 
   /**
    * Retrieve a value from the cache by its key.
-   * 
+   *
    * @returns The stored value if it exists and is valid, otherwise null.
    */
   async get(key: string): Promise<any | null> {
