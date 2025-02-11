@@ -1,9 +1,10 @@
 ARG VOLTA_TAG=v2.0.1
 ARG DUFS_VERSION=0.43.0
+ARG RUST_VERSION=1.84.1
 
 
 # build the app via volta to use the correct node version
-FROM rust:latest AS build-app
+FROM rust:${RUST_VERSION}-bookworm AS build-app
 RUN apt update -y && apt upgrade -y
 WORKDIR /app
 
