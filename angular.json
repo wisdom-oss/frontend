@@ -119,9 +119,7 @@
         "test": {
           "builder": "@angular-builders/jest:run",
           "options": {
-            "configPath": "jest.config.ts",
-            "runInBand": true,
-            "ci": true
+            "configPath": "jest.config.ts"
           }
         }
       }

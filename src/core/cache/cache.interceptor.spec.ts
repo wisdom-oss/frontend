@@ -1,6 +1,7 @@
 import {
   HttpContext,
   HttpHandlerFn,
+  HttpInterceptorFn,
   HttpRequest,
   HttpResponse,
 } from "@angular/common/http";
@@ -37,43 +38,45 @@ describe("cacheInterceptor", () => {
     );
   });
 
-  it("should intercept the response once the cache has a value", () => {
-    TestBed.runInInjectionContext(async () => {
-      let firstRes = (await firstValueFrom(
-        cacheInterceptor(req, httpHandler),
-      )) as HttpResponse<string>;
-      expect(firstRes.body).toEqual(body);
-      expect(httpHandler).toHaveBeenCalledTimes(1);
-
-      let secondRes = (await firstValueFrom(
-        cacheInterceptor(req, httpHandler),
-      )) as HttpResponse<string>;
-      expect(secondRes.body).toEqual(body);
-      expect(httpHandler).toHaveBeenCalledTimes(1);
+  const cacheInterceptorInContext: HttpInterceptorFn = (req, next) => {
+    return TestBed.runInInjectionContext(() => {
+      return cacheInterceptor(req, next);
     });
+  };
+
+  it("should intercept the response once the cache has a value", async () => {
+    let firstRes = (await firstValueFrom(
+      cacheInterceptorInContext(req, httpHandler),
+    )) as HttpResponse<string>;
+    expect(firstRes.body).toEqual(body);
+    expect(httpHandler).toHaveBeenCalledTimes(1);
+
+    let secondRes = (await firstValueFrom(
+      cacheInterceptorInContext(req, httpHandler),
+    )) as HttpResponse<string>;
+    expect(secondRes.body).toEqual(body);
+    expect(httpHandler).toHaveBeenCalledTimes(1);
   });
 
-  it("should request again if the cache is old", () => {
-    TestBed.runInInjectionContext(async () => {
-      let firstRes = (await firstValueFrom(
-        cacheInterceptor(req, httpHandler),
-      )) as HttpResponse<string>;
-      expect(firstRes.body).toEqual(body);
-      expect(httpHandler).toHaveBeenCalledTimes(1);
+  it("should request again if the cache is old", async () => {
+    let firstRes = (await firstValueFrom(
+      cacheInterceptorInContext(req, httpHandler),
+    )) as HttpResponse<string>;
+    expect(firstRes.body).toEqual(body);
+    expect(httpHandler).toHaveBeenCalledTimes(1);
 
-      let secondRes = (await firstValueFrom(
-        cacheInterceptor(req, httpHandler),
-      )) as HttpResponse<string>;
-      expect(secondRes.body).toEqual(body);
-      expect(httpHandler).toHaveBeenCalledTimes(1);
+    let secondRes = (await firstValueFrom(
+      cacheInterceptorInContext(req, httpHandler),
+    )) as HttpResponse<string>;
+    expect(secondRes.body).toEqual(body);
+    expect(httpHandler).toHaveBeenCalledTimes(1);
 
-      await wait(250);
+    await wait(250);
 
-      let thirdRes = (await firstValueFrom(
-        cacheInterceptor(req, httpHandler),
-      )) as HttpResponse<string>;
-      expect(thirdRes.body).toEqual(body);
-      expect(httpHandler).toHaveBeenCalledTimes(2);
-    });
+    let thirdRes = (await firstValueFrom(
+      cacheInterceptorInContext(req, httpHandler),
+    )) as HttpResponse<string>;
+    expect(thirdRes.body).toEqual(body);
+    expect(httpHandler).toHaveBeenCalledTimes(2);
   });
 });
