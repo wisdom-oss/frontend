@@ -1,0 +1,31 @@
+[measurement-classification."Höchstwert überschritten"]
+en = "maximum exceeded"
+de = "Höchstwert überschritten"
+
+[measurement-classification."sehr hoch"]
+en = "very high"
+de = "sehr hoch"
+
+[measurement-classification."hoch"]
+en = "high"
+de = "hoch"
+
+[measurement-classification."normal"]
+en = "normal"
+de = "normal"
+
+[measurement-classification."niedrig"]
+en = "low"
+de = "niedrig"
+
+[measurement-classification."sehr niedrig"]
+en = "very low"
+de = "sehr niedrig"
+
+[measurement-classification."Niedrigstwert unterschritten"]
+en = "minimum undershot"
+de = "Niedrigstwert unterschritten"
+
+[measurement-classification.null]
+en = "no current data"
+de = "Keine aktuellen Daten"

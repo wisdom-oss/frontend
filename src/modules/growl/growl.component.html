@@ -57,9 +57,12 @@
             lon: station.geometry.coordinates[0],
           }"
         >
+          @let measurement = measurements()[station.key];
+          @let classification = measurement?.classification || null;
+          @let color = measurementColors[classification || "null"];
           <growl-groundwater-level-station-marker
             [size]="markerSize()"
-            color="red"
+            [color]="color"
           ></growl-groundwater-level-station-marker>
         </mgl-marker>
       }

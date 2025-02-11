@@ -1,5 +1,5 @@
 import {AsyncPipe} from "@angular/common";
-import {signal, Component, OnInit} from "@angular/core";
+import {signal, Component, OnInit, Signal, WritableSignal, viewChild, effect} from "@angular/core";
 import {
   ControlComponent,
   FeatureComponent,
@@ -56,9 +56,12 @@ export class GrowlComponent implements OnInit {
   protected zoom = 7;
   protected markerSize = signal(GrowlComponent.calculateMarkerSize(this.zoom));
   protected style = colorful as any as StyleSpecification;
+  protected measurementColors = LegendControlComponent.legendColors;
+  protected legend = viewChild.required(LegendControlComponent);
 
   readonly groundwaterBodies: Promise<Polygons>;
   readonly groundwaterMeasurementStations: Promise<Points>;
+  readonly measurements: WritableSignal<Record<string, GroundwaterLevelsService.Measurement>> = signal({});
   readonly attribution = signal(`
     <a href="https://www.nlwkn.niedersachsen.de/opendata" target="_blank">
       2024 Niedersächsischer Landesbetrieb für Wasserwirtschaft, Küsten- und Naturschutz (NLWKN)
@@ -80,6 +83,31 @@ export class GrowlComponent implements OnInit {
       .then(
         p => p.filter(({geometry}) => geometry.type === "Polygon") as Polygons,
       );
+
+    this.gl.fetchMeasurementClassifications().then(data => this.measurements.set(data));
+
+    effect(() => {
+      let legend = this.legend();
+      let measurements = this.measurements();
+      
+      const MC = GroundwaterLevelsService.MeasurementClassification;
+      let count = {
+        [MC.MAX_EXCEEDED]: 0,
+        [MC.VERY_HIGH]: 0,
+        [MC.HIGH]: 0,
+        [MC.NORMAL]: 0,
+        [MC.LOW]: 0,
+        [MC.VERY_LOW]: 0,
+        [MC.MIN_UNDERSHOT]: 0,
+        null: 0,
+      };
+
+      for (let {classification} of Object.values(measurements)) {
+        count[classification || "null"]++;
+      }
+
+      legend.count.set(count);
+    });
   }
 
   async ngOnInit() {
