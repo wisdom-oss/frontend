@@ -24,10 +24,7 @@
         <growl-legend-control></growl-legend-control>
       </mgl-control>
       <mgl-geojson-source id="groundwater-bodies-source">
-        @for (
-          body of groundwaterBodies | async;
-          track body.key
-        ) {
+        @for (body of groundwaterBodies | async; track body.key) {
           <mgl-feature [geometry]="body.geometry"></mgl-feature>
         }
       </mgl-geojson-source>

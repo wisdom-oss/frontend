@@ -2,13 +2,13 @@ import {AsyncPipe} from "@angular/common";
 import {signal, Component, OnInit} from "@angular/core";
 import {
   ControlComponent,
-  MapComponent,
-  MarkerComponent,
-  AttributionControlDirective,
-  NavigationControlDirective,
-  GeoJSONSourceComponent,
   FeatureComponent,
   LayerComponent,
+  MapComponent,
+  MarkerComponent,
+  GeoJSONSourceComponent,
+  AttributionControlDirective,
+  NavigationControlDirective,
 } from "@maplibre/ngx-maplibre-gl";
 import {Point, Polygon} from "geojson";
 import {MapLibreEvent, StyleSpecification} from "maplibre-gl";
@@ -77,7 +77,9 @@ export class GrowlComponent implements OnInit {
     this.groundwaterBodies = this.geo
       .fetchLayerContents("groundwater_bodies")
       .then(contents => contents ?? [])
-      .then(p => p.filter(({geometry}) => geometry.type === "Polygon") as Polygons);
+      .then(
+        p => p.filter(({geometry}) => geometry.type === "Polygon") as Polygons,
+      );
   }
 
   async ngOnInit() {

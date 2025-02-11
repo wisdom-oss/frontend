@@ -6,6 +6,7 @@ import {
 } from "@angular/common/http";
 import {Injectable} from "@angular/core";
 import {JTDDataType} from "ajv/dist/core";
+import dayjs from "dayjs";
 import {GeoJSON} from "geojson";
 import {firstValueFrom} from "rxjs";
 
@@ -59,6 +60,7 @@ export class GeoDataService {
     },
   ): Promise<GeoDataService.LayerContents | null> {
     try {
+      let url = `${URL}/content/${layerRef}`;
       if (filter) {
         let queryParams = [];
         for (let [key, value] of Object.entries({
@@ -67,28 +69,15 @@ export class GeoDataService {
           key: filter.key,
         }))
           queryParams.push(`${key}=${value}`);
-
-        let url = `${URL}/content/${layerRef}/filtered?${queryParams.join("&")}`;
-        return await firstValueFrom(
-          this.http.get<GeoDataService.LayerContents>(url, {
-            context: new HttpContext().set(
-              httpContexts.validateSchema,
-              LAYER_CONTENTS,
-            ),
-          }),
-        );
+        url += `/filtered?${queryParams.join("&")}`;
       }
 
+      let context = new HttpContext()
+        .set(httpContexts.validateSchema, LAYER_CONTENTS)
+        .set(httpContexts.cache, [url, dayjs.duration(1, "year")]);
+
       return await firstValueFrom(
-        this.http.get<GeoDataService.LayerContents>(
-          `${URL}/content/${layerRef}`,
-          {
-            context: new HttpContext().set(
-              httpContexts.validateSchema,
-              LAYER_CONTENTS,
-            ),
-          },
-        ),
+        this.http.get<GeoDataService.LayerContents>(url, {context}),
       );
     } catch (error) {
       if (!(error instanceof HttpErrorResponse)) throw error;
