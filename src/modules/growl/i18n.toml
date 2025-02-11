@@ -29,3 +29,7 @@ de = "Niedrigstwert unterschritten"
 [measurement-classification.null]
 en = "no current data"
 de = "Keine aktuellen Daten"
+
+[layer.groundwaterLevelStations]
+en = "NLWKN Groundwater Level Stations"
+de = "NLWKN Grundwasser Messstationen"

@@ -1,4 +1,13 @@
-import {signal, Component, OnInit, Signal, WritableSignal, viewChild, effect, computed} from "@angular/core";
+import {
+  computed,
+  effect,
+  signal,
+  viewChild,
+  Component,
+  OnInit,
+  Signal,
+  WritableSignal,
+} from "@angular/core";
 import {
   ControlComponent,
   FeatureComponent,
@@ -13,13 +22,15 @@ import {Point, Polygon} from "geojson";
 import {MapLibreEvent, StyleSpecification} from "maplibre-gl";
 
 import {GroundwaterLevelStationMarkerComponent} from "./map/groundwater-level-station-marker/groundwater-level-station-marker.component";
+import {LayerSelectionControlComponent} from "./map/layer-selection-control/layer-selection-control.component";
 import {LegendControlComponent} from "./map/legend-control/legend-control.component";
+import {StationInfoControlComponent} from "./map/station-info-control/station-info-control.component";
 import {GeoDataService} from "../../api/geo-data.service";
 import {GroundwaterLevelsService} from "../../api/groundwater-levels.service";
 import colorful from "../../common/map/styles/colorful.json";
 import {typeUtils} from "../../common/type-utils";
 import {ResizeMapOnLoadDirective} from "../../common/directives/resize-map-on-load.directive";
-import { StationInfoControlComponent } from "./map/station-info-control/station-info-control.component";
+import {signals} from "../../common/signals";
 
 type Points = typeUtils.UpdateElements<
   GeoDataService.LayerContents,
@@ -48,22 +59,29 @@ type Polygons = typeUtils.UpdateElements<
     NavigationControlDirective,
     ResizeMapOnLoadDirective,
     StationInfoControlComponent,
+    LayerSelectionControlComponent,
   ],
   templateUrl: "./growl.component.html",
   styles: ``,
 })
-export class GrowlComponent implements OnInit {
+export class GrowlComponent {
   protected zoom = 7;
   protected markerSize = signal(GrowlComponent.calculateMarkerSize(this.zoom));
   protected style = colorful as any as StyleSpecification;
   protected measurementColors = LegendControlComponent.legendColors;
-  protected legend = viewChild.required(LegendControlComponent);
+  protected legend = viewChild(LegendControlComponent);
   protected stationSelected = signal<string | null>(null);
   protected stationInfo = computed(() => this.findStationInfo());
+  protected selectedLayers = {
+    groundwaterLevelStations: signals.toggleable(true),
+    other: signals.toggleable(false),
+  } as const;
 
   readonly groundwaterBodies = signal<Polygons>([]);
   readonly groundwaterMeasurementStations = signal<Points>([]);
-  readonly measurements: WritableSignal<Record<string, GroundwaterLevelsService.Measurement>> = signal({});
+  readonly measurements: WritableSignal<
+    Record<string, GroundwaterLevelsService.Measurement>
+  > = signal({});
   readonly attribution = signal(`
     <a href="https://www.nlwkn.niedersachsen.de/opendata" target="_blank">
       2024 Niedersächsischer Landesbetrieb für Wasserwirtschaft, Küsten- und Naturschutz (NLWKN)
@@ -85,14 +103,18 @@ export class GrowlComponent implements OnInit {
       .then(contents => contents ?? [])
       .then(
         p => p.filter(({geometry}) => geometry.type === "Polygon") as Polygons,
-      ).then(polygons => this.groundwaterBodies.set(polygons))
+      )
+      .then(polygons => this.groundwaterBodies.set(polygons));
 
-    this.gl.fetchMeasurementClassifications().then(data => this.measurements.set(data));
+    this.gl
+      .fetchMeasurementClassifications()
+      .then(data => this.measurements.set(data));
 
     effect(() => {
       let legend = this.legend();
+      if (!legend) return;
       let measurements = this.measurements();
-      
+
       const MC = GroundwaterLevelsService.MeasurementClassification;
       let count = {
         [MC.MAX_EXCEEDED]: 0,
@@ -113,12 +135,6 @@ export class GrowlComponent implements OnInit {
     });
   }
 
-  async ngOnInit() {
-    let locations = await this.gl.fetchRecorderLocations();
-    let location = await this.gl.fetchRecorderLocation(locations[0].websiteID);
-    console.log(location);
-  }
-
   onZoom(event: MapLibreEvent): void {
     let zoom = event.target.getZoom();
     let size = GrowlComponent.calculateMarkerSize(zoom);
@@ -134,7 +150,7 @@ export class GrowlComponent implements OnInit {
     if (!station) return null;
 
     let measurements = this.measurements();
-    let measurement = measurements[selection]; 
+    let measurement = measurements[selection];
     if (!measurement) return null;
 
     return {

@@ -9,6 +9,11 @@
       [attributionControl]="false"
       (zoomEvt)="onZoom($event)"
     >
+      <mgl-control position="top-right">
+        <growl-layer-selection-control
+          [layers]="selectedLayers"
+        ></growl-layer-selection-control>
+      </mgl-control>
       <mgl-control
         mglNavigation
         [showCompass]="false"
@@ -21,12 +26,16 @@
         [customAttribution]="[attribution()]"
       ></mgl-control>
       <mgl-control position="bottom-left">
-        <growl-legend-control></growl-legend-control>
+        @if (selectedLayers.groundwaterLevelStations()) {
+          <growl-legend-control></growl-legend-control>
+        }
       </mgl-control>
       @let stationInfoData = stationInfo() ?? undefined;
       @if (stationInfoData) {
         <mgl-control position="bottom-left">
-          <growl-station-info-control [data]="stationInfoData"></growl-station-info-control>
+          <growl-station-info-control
+            [data]="stationInfoData"
+          ></growl-station-info-control>
         </mgl-control>
       }
       <mgl-geojson-source id="groundwater-bodies-source">
@@ -53,26 +62,25 @@
           'line-width': 3,
         }"
       ></mgl-layer>
-      @for (
-        station of groundwaterMeasurementStations();
-        track station.key
-      ) {
-        <mgl-marker
-          [lngLat]="{
-            lat: station.geometry.coordinates[1],
-            lon: station.geometry.coordinates[0],
-          }"
-        >
-          @let measurement = measurements()[station.key];
-          @let classification = measurement?.classification || null;
-          @let color = measurementColors[classification || "null"];
-          <growl-groundwater-level-station-marker
-            [size]="markerSize()"
-            [color]="color"
-            (mouseenter)="stationSelected.set(station.key)"
-            (mouseleave)="stationSelected.set(null)"
-          ></growl-groundwater-level-station-marker>
-        </mgl-marker>
+      @if (selectedLayers.groundwaterLevelStations()) {
+        @for (station of groundwaterMeasurementStations(); track station.key) {
+          <mgl-marker
+            [lngLat]="{
+              lat: station.geometry.coordinates[1],
+              lon: station.geometry.coordinates[0],
+            }"
+          >
+            @let measurement = measurements()[station.key];
+            @let classification = measurement?.classification || null;
+            @let color = measurementColors[classification || "null"];
+            <growl-groundwater-level-station-marker
+              [size]="markerSize()"
+              [color]="color"
+              (mouseenter)="stationSelected.set(station.key)"
+              (mouseleave)="stationSelected.set(null)"
+            ></growl-groundwater-level-station-marker>
+          </mgl-marker>
+        }
       }
     </mgl-map>
   </div>
