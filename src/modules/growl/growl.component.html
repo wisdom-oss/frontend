@@ -23,8 +23,14 @@
       <mgl-control position="bottom-left">
         <growl-legend-control></growl-legend-control>
       </mgl-control>
+      @let stationInfoData = stationInfo() ?? undefined;
+      @if (stationInfoData) {
+        <mgl-control position="bottom-left">
+          <growl-station-info-control [data]="stationInfoData"></growl-station-info-control>
+        </mgl-control>
+      }
       <mgl-geojson-source id="groundwater-bodies-source">
-        @for (body of groundwaterBodies | async; track body.key) {
+        @for (body of groundwaterBodies(); track body.key) {
           <mgl-feature [geometry]="body.geometry"></mgl-feature>
         }
       </mgl-geojson-source>
@@ -48,7 +54,7 @@
         }"
       ></mgl-layer>
       @for (
-        station of groundwaterMeasurementStations | async;
+        station of groundwaterMeasurementStations();
         track station.key
       ) {
         <mgl-marker
@@ -63,6 +69,8 @@
           <growl-groundwater-level-station-marker
             [size]="markerSize()"
             [color]="color"
+            (mouseenter)="stationSelected.set(station.key)"
+            (mouseleave)="stationSelected.set(null)"
           ></growl-groundwater-level-station-marker>
         </mgl-marker>
       }

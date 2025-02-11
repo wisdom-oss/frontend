@@ -1,5 +1,4 @@
-import {AsyncPipe} from "@angular/common";
-import {signal, Component, OnInit, Signal, WritableSignal, viewChild, effect} from "@angular/core";
+import {signal, Component, OnInit, Signal, WritableSignal, viewChild, effect, computed} from "@angular/core";
 import {
   ControlComponent,
   FeatureComponent,
@@ -20,6 +19,7 @@ import {GroundwaterLevelsService} from "../../api/groundwater-levels.service";
 import colorful from "../../common/map/styles/colorful.json";
 import {typeUtils} from "../../common/type-utils";
 import {ResizeMapOnLoadDirective} from "../../common/directives/resize-map-on-load.directive";
+import { StationInfoControlComponent } from "./map/station-info-control/station-info-control.component";
 
 type Points = typeUtils.UpdateElements<
   GeoDataService.LayerContents,
@@ -36,7 +36,6 @@ type Polygons = typeUtils.UpdateElements<
 @Component({
   selector: "growl",
   imports: [
-    AsyncPipe,
     AttributionControlDirective,
     ControlComponent,
     FeatureComponent,
@@ -48,6 +47,7 @@ type Polygons = typeUtils.UpdateElements<
     MarkerComponent,
     NavigationControlDirective,
     ResizeMapOnLoadDirective,
+    StationInfoControlComponent,
   ],
   templateUrl: "./growl.component.html",
   styles: ``,
@@ -58,9 +58,11 @@ export class GrowlComponent implements OnInit {
   protected style = colorful as any as StyleSpecification;
   protected measurementColors = LegendControlComponent.legendColors;
   protected legend = viewChild.required(LegendControlComponent);
+  protected stationSelected = signal<string | null>(null);
+  protected stationInfo = computed(() => this.findStationInfo());
 
-  readonly groundwaterBodies: Promise<Polygons>;
-  readonly groundwaterMeasurementStations: Promise<Points>;
+  readonly groundwaterBodies = signal<Polygons>([]);
+  readonly groundwaterMeasurementStations = signal<Points>([]);
   readonly measurements: WritableSignal<Record<string, GroundwaterLevelsService.Measurement>> = signal({});
   readonly attribution = signal(`
     <a href="https://www.nlwkn.niedersachsen.de/opendata" target="_blank">
@@ -72,17 +74,18 @@ export class GrowlComponent implements OnInit {
     private geo: GeoDataService,
     private gl: GroundwaterLevelsService,
   ) {
-    this.groundwaterMeasurementStations = this.geo
+    this.geo
       .fetchLayerContents("groundwater_measurement_stations")
       .then(contents => contents ?? [])
-      .then(p => p.filter(({geometry}) => geometry.type === "Point") as Points);
+      .then(p => p.filter(({geometry}) => geometry.type === "Point") as Points)
+      .then(points => this.groundwaterMeasurementStations.set(points));
 
-    this.groundwaterBodies = this.geo
+    this.geo
       .fetchLayerContents("groundwater_bodies")
       .then(contents => contents ?? [])
       .then(
         p => p.filter(({geometry}) => geometry.type === "Polygon") as Polygons,
-      );
+      ).then(polygons => this.groundwaterBodies.set(polygons))
 
     this.gl.fetchMeasurementClassifications().then(data => this.measurements.set(data));
 
@@ -120,6 +123,27 @@ export class GrowlComponent implements OnInit {
     let zoom = event.target.getZoom();
     let size = GrowlComponent.calculateMarkerSize(zoom);
     this.markerSize.set(size);
+  }
+
+  private findStationInfo(): StationInfoControlComponent.Display | null {
+    let selection = this.stationSelected();
+    if (!selection) return null;
+
+    let stations = this.groundwaterMeasurementStations();
+    let station = stations.find(({key}) => selection == key);
+    if (!station) return null;
+
+    let measurements = this.measurements();
+    let measurement = measurements[selection]; 
+    if (!measurement) return null;
+
+    return {
+      name: station.name,
+      station: station.key,
+      date: measurement.date,
+      waterLevelNHN: measurement.waterLevelNHN,
+      waterLevelGOK: measurement.waterLevelGOK,
+    };
   }
 
   protected static calculateMarkerSize(zoom: number): string {
