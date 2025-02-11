@@ -21,6 +21,7 @@ import {
 import {Point, Polygon} from "geojson";
 import {MapLibreEvent, StyleSpecification} from "maplibre-gl";
 
+import {GroundwaterInfoControlComponent} from "./map/groundwater-info-control/groundwater-info-control.component";
 import {GroundwaterLevelStationMarkerComponent} from "./map/groundwater-level-station-marker/groundwater-level-station-marker.component";
 import {LayerSelectionControlComponent} from "./map/layer-selection-control/layer-selection-control.component";
 import {LegendControlComponent} from "./map/legend-control/legend-control.component";
@@ -51,15 +52,16 @@ type Polygons = typeUtils.UpdateElements<
     ControlComponent,
     FeatureComponent,
     GeoJSONSourceComponent,
+    GroundwaterInfoControlComponent,
     GroundwaterLevelStationMarkerComponent,
     LayerComponent,
+    LayerSelectionControlComponent,
     LegendControlComponent,
     MapComponent,
     MarkerComponent,
     NavigationControlDirective,
     ResizeMapOnLoadDirective,
     StationInfoControlComponent,
-    LayerSelectionControlComponent,
   ],
   templateUrl: "./growl.component.html",
   styles: ``,
@@ -72,6 +74,8 @@ export class GrowlComponent {
   protected legend = viewChild(LegendControlComponent);
   protected stationSelected = signal<string | null>(null);
   protected stationInfo = computed(() => this.findStationInfo());
+  protected bodySelected = signal<number | null>(null);
+  protected bodyInfo = computed(() => this.findBodyInfo());
   protected selectedLayers = {
     groundwaterLevelStations: signals.toggleable(true),
     other: signals.toggleable(false),
@@ -135,6 +139,10 @@ export class GrowlComponent {
     });
   }
 
+  onLayerEnter(event: any) {
+    console.log(event);
+  }
+
   onZoom(event: MapLibreEvent): void {
     let zoom = event.target.getZoom();
     let size = GrowlComponent.calculateMarkerSize(zoom);
@@ -159,6 +167,20 @@ export class GrowlComponent {
       date: measurement.date,
       waterLevelNHN: measurement.waterLevelNHN,
       waterLevelGOK: measurement.waterLevelGOK,
+    };
+  }
+
+  private findBodyInfo(): GroundwaterInfoControlComponent.Display | null {
+    let selection = this.bodySelected();
+    if (!selection) return null;
+
+    let bodies = this.groundwaterBodies();
+    let body = bodies.find(({id}) => id == selection);
+    if (!body) return null;
+
+    return {
+      name: body.name,
+      key: body.key,
     };
   }
 

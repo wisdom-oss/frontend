@@ -30,38 +30,51 @@
           <growl-legend-control></growl-legend-control>
         }
       </mgl-control>
+      @let groundwaterInfoData = bodyInfo() ?? undefined;
+      <mgl-control position="bottom-left">
+        @if (groundwaterInfoData) {
+          <growl-groundwater-info-control
+            [data]="groundwaterInfoData"
+          ></growl-groundwater-info-control>
+        }
+      </mgl-control>
       @let stationInfoData = stationInfo() ?? undefined;
-      @if (stationInfoData) {
-        <mgl-control position="bottom-left">
+      <mgl-control position="bottom-left">
+        @if (stationInfoData) {
           <growl-station-info-control
             [data]="stationInfoData"
           ></growl-station-info-control>
-        </mgl-control>
-      }
+        }
+      </mgl-control>
+      @let bodies = groundwaterBodies();
       <mgl-geojson-source id="groundwater-bodies-source">
-        @for (body of groundwaterBodies(); track body.key) {
-          <mgl-feature [geometry]="body.geometry"></mgl-feature>
+        @for (body of bodies; track body.key) {
+          <mgl-feature [geometry]="body.geometry" [id]="body.id"></mgl-feature>
         }
       </mgl-geojson-source>
       <!-- We cannot render fill and line at the same time. -->
-      <mgl-layer
-        id="groundwater-bodies-layer-fill"
-        type="fill"
-        source="groundwater-bodies-source"
-        [paint]="{
-          'fill-color': '#0088aa',
-          'fill-opacity': 0.3,
-        }"
-      ></mgl-layer>
-      <mgl-layer
-        id="groundwater-bodies-layer-line"
-        type="line"
-        source="groundwater-bodies-source"
-        [paint]="{
-          'line-color': '#0088aa',
-          'line-width': 3,
-        }"
-      ></mgl-layer>
+      @if (bodies.length) {
+        <mgl-layer
+          id="groundwater-bodies-layer-fill"
+          type="fill"
+          source="groundwater-bodies-source"
+          [paint]="{
+            'fill-color': '#0088aa',
+            'fill-opacity': 0.3,
+          }"
+          (layerMouseEnter)="bodySelected.set(+$event.features![0]!.id!)"
+          (layerMouseLeave)="bodySelected.set(null)"
+        ></mgl-layer>
+        <mgl-layer
+          id="groundwater-bodies-layer-line"
+          type="line"
+          source="groundwater-bodies-source"
+          [paint]="{
+            'line-color': '#0088aa',
+            'line-width': 3,
+          }"
+        ></mgl-layer>
+      }
       @if (selectedLayers.groundwaterLevelStations()) {
         @for (station of groundwaterMeasurementStations(); track station.key) {
           <mgl-marker
