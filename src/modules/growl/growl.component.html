@@ -31,12 +31,23 @@
           <mgl-feature [geometry]="body.geometry"></mgl-feature>
         }
       </mgl-geojson-source>
+      <!-- We cannot render fill and line at the same time. -->
       <mgl-layer
-        id="groundwater-bodies-layer"
+        id="groundwater-bodies-layer-fill"
         type="fill"
         source="groundwater-bodies-source"
         [paint]="{
-          'fill-outline-color': '#0088aa',
+          'fill-color': '#0088aa',
+          'fill-opacity': 0.3,
+        }"
+      ></mgl-layer>
+      <mgl-layer
+        id="groundwater-bodies-layer-line"
+        type="line"
+        source="groundwater-bodies-source"
+        [paint]="{
+          'line-color': '#0088aa',
+          'line-width': 3,
         }"
       ></mgl-layer>
       @for (
