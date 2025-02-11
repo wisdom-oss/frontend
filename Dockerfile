@@ -29,7 +29,7 @@ RUN volta run npm run build
 
 
 # host the app via the static file server
-FROM sigoden/dufs
+FROM sigoden/dufs:v${DUFS_VERSION}
 WORKDIR /wisdom-oss
 COPY --from=build-app /app/dist/wisdom-oss/frontend/browser /wisdom-oss/app
 EXPOSE 5000
