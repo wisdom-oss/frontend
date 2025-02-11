@@ -10,7 +10,7 @@ import beWaterSmart from "./modules/be-water-smart/i18n.toml";
 // add translations to this record
 const modules: NestedStringRecord = {
   core,
-  "bws": beWaterSmart
+  "be-water-smart": beWaterSmart
 };
 
 export function configureTranslations(service: TranslateService) {

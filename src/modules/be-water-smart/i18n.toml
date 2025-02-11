@@ -1,91 +1,67 @@
-[smart.meter.list]
-en = "Smart Meter List"
-de = "Smart-Meter-Liste"
+[titles.chart]
+en = "Predicted Water Consumption"
+de = "Vorhergesagter Wasserverbrauch"
 
-[virtual.meter.list]
-en = "Virtual Meter List"
-de = "Virtual-Meter-Liste"
+[titles.model_select]
+en = "Model Selection for Prediction"
+de = "Modellauswahl für Vorhersage"
 
-[button.add]
-en = "Add"
-de = "Hinzufügen"
+[titles.model_train]
+en = "Model Training"
+de = "Modell Training"
 
-[button.delete]
-en = "Delete"
-de = "Löschen"
+[titles.smart_meter]
+en = "List of Smartmeters"
+de = "Liste von Smartmetern"
 
-[button.train]
-en = "Train"
-de = "Trainiere"
+[titles.virtual_meter]
+en = "List of virtual Smartmeters"
+de = "Liste von virtuellen Smartmetern"
 
-[button.create.forecast]
+[buttons.forecast]
 en = "Create Forecast"
-de = "Erzeuge Vorhersage"
+de = "Mache Vorhersage"
 
-[input.enter.name]
-en = "Enter Name"
-de = "Namen eingeben"
+[buttons.model_train]
+en = "Train Model"
+de = "Trainiere Modell"
 
-[input.add.comment]
-en = "Add a comment"
-de = "Kommentar einfügen"
-
-[dropdown.option]
-en = "--Please choose an option--"
-de = "--Bitte wähle eine Option aus--"
-
-[table.name]
+[tables.name]
 en = "Name"
 de = "Name"
 
-[table.date]
+[tables.date]
 en = "Date"
 de = "Datum"
 
-[table.country]
-en = "Country"
-de = "Land"
+[tables.locality]
+en = "City"
+de = "Stadt"
 
-[table.locality]
-en = "Locality"
-de = "Ort"
-
-[table.address]
+[tables.address]
 en = "Address"
 de = "Adresse"
 
-[table.description]
-en = "Description"
-de = "Beschreibung"
+[tables.submeters]
+en = "SubMeters"
+de = "SubMeter"
 
-[table.submeter.amount]
-en = "SubMeter Amount"
-de = "SubMeter Anzahl"
+[tables.supermeters]
+en = "SuperMeters"
+de = "SuperMeter"
 
-[table.supermeter.amount]
-en = "SuperMeter Amount"
-de = "SuperMeter Anzahl"
+[model_training.algorithm]
+en = "Algorithm"
+de = "Algorithmus"
 
-[table.used.algorithm]
-en = "Used Algorithm"
-de = "Angewandter Algorithmus"
+[model_training.virtual_meter]
+en = "Virtual Meter"
+de = "Virtuelles Smartmeter"
 
-[table.comment]
+[model_training.comment]
 en = "Comment"
 de = "Kommentar"
 
-[table.virtual.meter.trained]
-en = "Trained Virtual Meter"
-de = "Trainierte Virtual-Meter"
-
-[model.training]
-en = "Model Training"
-de = "Modell-Training"
-
-[model.trained]
-en = "Trained Models"
-de = "Trainierte Modelle"
-
-[water.consumption.predicted]
-en = "Predicted Water Consumption"
-de = "Vorhergesagter Wasserverbrauch"
+[no_data]
+en = "No data available"
+de = "Keine Daten verfügbar"

@@ -1,273 +1,296 @@
 <!-- Bulma is globally available. -->
-  
-<div class="container is-flex is-flex-direction-column" [style]="{ height: '90vh', width: '95%', overflow: 'auto'}">
-  <!-- Physical Meter Field-->
-  <div class="box" [style]="{ height: heightPM }">
-    <h1 class="title has-text-centered is-size-3">{{"bws.smart.meter.list" | translate}}</h1>
-    <div
-      class="table-container"
-      [style]="{ height: heightTable, overflow: pMeters ? 'auto' : 'hidden' }"
-    >
-      <table class="table is-hoverable">
-        <thead>
-          <tr>
-            <th></th>
-            <th>{{"bws.table.name" | translate}}</th>
-            <th>{{"bws.table.date" | translate}}</th>
-            <th>{{"bws.table.country" | translate}}</th>
-            <th>{{"bws.table.locality" | translate}}</th>
-            <th>{{"bws.table.address" | translate}}</th>
-            <th>{{"bws.table.description" | translate}}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of pMeters; let i = index">
-            <td class="is-narrow">
-              <label class="checkbox">
-                <input
-                  type="checkbox"
-                  [checked]="selectedPhysicalMeters.includes(item)"
-                  (change)="toggleSelectedPhysicalMeter(item, $event)"
-                />
-              </label>
-            </td>
-            <td>
-              <abbr title="{{ stripMeterID(item.id) }}">
-                {{ stripMeterID(item.id) }}
-              </abbr>
-            </td>
-            <td>
-              <abbr title="{{ item.date }}">
-                {{ formatDateTime(item.date).slice(0, slice) }}
-              </abbr>
-            </td>
-            <td>
-              <abbr title="{{ item.address.addressCountry }}">
-                {{ item.address.addressCountry.slice(0, slice) }}
-              </abbr>
-            </td>
-            <td>
-              <abbr title="{{ item.address.addressLocality }}">
-                {{ item.address.addressLocality.slice(0, slice) }}
-              </abbr>
-            </td>
-            <td>
-              <abbr title="{{ item.address.streetAddress }}">
-                {{ item.address.streetAddress.slice(0, slice) }}
-              </abbr>
-            </td>
-            <td>
-              <abbr title="{{ item.description }}">
-                {{ item.description.slice(0, slice) }}
-              </abbr>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-  
-  <!-- Virtual Meter Field-->
-  <div class="box" [style]="{ height: heightVM }">
-    <h1 class="title has-text-centered is-size-3">{{"bws.virtual.meter.list" | translate}}</h1>
-    <!--Form Field for adding Virtual Meter-->
-    <div class="field is-grouped">
-      <div class="control">
-        <input
-          class="input"
-          type="text"
-          [(ngModel)]="newVMeterName"
-          placeholder='{{"bws.input.enter.name" | translate}}'
-        />
-      </div>
-      <div class="control">
-        <!--FIXME add the disable function -->
-        <button
-          class="button is-success"
-          (click)="addVMeter()"
-          [disabled]="!selectedPhysicalMeters.length"
-        >
-          <abbr title="Tick a Physical Meter to continue">{{"bws.button.add" | translate}}</abbr>
-        </button>
-      </div>
-    </div>
-    <!-- Table to show all VirtualMeters -->
-    <div
-      class="table-container"
-      [style]="{
-        height: heightTable,
-        overflow: vMeters ? 'auto' : 'hidden'
-      }"
-    >
-      <table class="table is-hoverable">
-        <thead>
-          <tr>
-            <th></th>
-            <th>{{"bws.table.name" | translate}}</th>
-            <th>{{"bws.table.date" | translate}}</th>
-            <th>{{"bws.table.submeter.amount" | translate}}</th>
-            <th>{{"bws.table.supermeter.amount" | translate}}</th>
-            <th>{{"bws.table.description" | translate}}</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of vMeters; let i = index">
-            <td class="is-narrow">
-              <label class="checkbox">
-                <input
-                  type="checkbox"
-                  [checked]="selectedVirtualMeter === item"
-                  [disabled]="
-                    selectedVirtualMeter && selectedVirtualMeter !== item
-                  "
-                  (change)="toggleSelectedVirtualMeter(item)"
-                />
-              </label>
-            </td>
-            <td>
-              <abbr title="{{ stripMeterID(item.id) }}">
-                {{ stripMeterID(item.id).slice(0, slice) }}
-              </abbr>
-            </td>
-            <td>
-              <abbr title="{{ formatDateTime(item.dateCreated) }}">
-                {{ formatDateTime(item.dateCreated).slice(0, slice) }}
-              </abbr>
-            </td>
-            <td>
-              <abbr title="{{ item.submeterIds }}">
-                {{ item.submeterIds.length }}
-              </abbr>
-            </td>
-            <td>
-              <abbr title="{{ item.supermeterIds }}">
-                {{ item.supermeterIds.length }}
-              </abbr>
-            </td>
-            <td>
-              <abbr title="{{ item.description }}">
-                {{ item.description.slice(0, slice) }}
-              </abbr>
-            </td>
-            <td class="is-narrow">
-              <button
-                class="button is-danger"
-                (click)="deleteVMeterById(item.id, i)"
-              >
-              {{"bws.button.delete" | translate}}
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <!-- Field for training a model -->
-    <h1 class="title has-text-centered is-size-4">{{"bws.model.training" | translate}}</h1>
-    <div class="field is-grouped is-justify-content-center">
-      <div class="control">
-        <!-- Add the input field for comments here -->
-        <input
-          type="text"
-          class="input"
-          placeholder='{{"bws.input.add.comment" | translate}}'
-          [(ngModel)]="modelComment"
-        />
-      </div>
-      <div class="control">
-        <div class="select is-fullwidth">
-          <select name="selectedAlgorithm" [(ngModel)]="selectedAlgorithm">
-            <option value="">{{"bws.dropdown.option" | translate}}</option>
-            <option
-              *ngFor="let item of algorithms; let i = index"
-              [ngValue]="item"
-              [title]="item.description"
-            >
-              {{ item.name }}
-            </option>
-          </select>
+<div class="container is-flex is-flex-direction-column" [style]="{ height: '90vh', width: '100%', overflow: 'auto'}">
+    <div class="columns is-flex is-flex-direction-row my-1" [style]="{ width: '100%' }">
+        <!--Graph Field-->
+        <div class="column is-two-fifths">
+            <div class="box is-flex is-flex-direction-column mx-1" [style]="{ height: heightMC }">
+                <h1 class="title has-text-centered is-size-3">{{ "be-water-smart.titles.chart" | translate }}</h1>
+
+                <canvas baseChart [data]="chartData" [options]="chartOptions" [type]="chartType" [plugins]="chartPlugins"></canvas>
+                <!-- dummy div to grow the box-->
+                <div class="is-flex-grow-1"></div>
+                <div class="has-text-centered">
+                    <button class="button is-primary" (click)="getForecast()">
+                        {{ "be-water-smart.buttons.forecast" | translate }}
+                    </button>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="control">
-        <button
-          title="Choose an algorithm to train"
-          type="submit"
-          class="button is-info"
-          [disabled]="!selectedVirtualMeter"
-          (click)="trainModel()"
-        >
-         {{"bws.button.train" | translate}}
-        </button>
-      </div>
+
+        <!-- Model Field-->
+        <div class="column is-three-fifths">
+            <div class="box mx-1" [style]="{ height: heightMC, 'overflow-y': 'auto' }">
+                <h1 class="title has-text-centered is-size-3">{{ "be-water-smart.titles.model_select" | translate }}</h1>
+                
+                <div class="table-container" [style]="{ overflow: models ? 'auto' : 'hidden' }">
+                    <table class="table is-hoverable is-fullwidth">
+                        <thead class="has-background-dark">
+                            <tr>
+                                <th class="has-text-centered has-text-white"></th>
+                                <th class="has-text-centered has-text-white">{{ "be-water-smart.model_training.algorithm" | translate }}</th>
+                                <th class="has-text-centered has-text-white">{{ "be-water-smart.model_training.virtual_meter" | translate }}</th>
+                                <th class="has-text-centered has-text-white">{{ "be-water-smart.model_training.comment" | translate }}</th>
+                                <th class="has-text-centered has-text-white">MAPE</th>
+                                <th class="has-text-centered has-text-white">MSE</th>
+                                <th class="has-text-centered has-text-white">RMSE</th>
+                                <th class="has-text-centered has-text-white">SMAPE</th>
+                                <th class="has-text-centered has-text-white"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngIf="models.length === 0">
+                                <td colspan="9" class="has-text-centered">{{ "be-water-smart.no_data.a" | translate }}</td>
+                            </tr>
+                            <tr *ngFor="let item of models; let i = index">
+                                <td class="is-narrow">
+                                    <label class="checkbox">
+                                        <input
+                                            type="checkbox"
+                                            [checked]="selectedModel === item"
+                                            [disabled]="selectedModel && selectedModel !== item"
+                                            (change)="toggleSelectedModel(item)"
+                                        />
+                                    </label>
+                                </td>
+                                <td class="is-narrow has-text-centered">
+                                    <abbr title="{{ item.algorithm }}">
+                                        {{ item.algorithm.slice(0, 7) }}
+                                    </abbr>
+                                </td>
+                                <td class="has-text-centered">
+                                    <abbr title="{{ item.refMeter }}">
+                                        {{ (item.refMeter | transformString : prefixes[0]).slice(0, slice) }}
+                                    </abbr>
+                                </td>
+                                <td class="has-text-centered">
+                                    <abbr title="{{ item.comment }}">
+                                        {{ item.comment.slice(0, slice) }}
+                                    </abbr>
+                                </td>
+                                <td class="has-text-centered">
+                                    <abbr title="{{ item.evaluation.metrics.mape }}">
+                                        {{ item.evaluation.metrics.mape | number : "1.2-2" }}
+                                    </abbr>
+                                </td>
+                                <td class="has-text-centered">
+                                    <abbr title="{{ item.evaluation.metrics.mse }}">
+                                        {{ item.evaluation.metrics.mse | number : "1.4-4" }}
+                                    </abbr>
+                                </td>
+                                <td class="has-text-centered">
+                                    <abbr title="{{ item.evaluation.metrics.rmse }}">
+                                        {{ item.evaluation.metrics.rmse | number : "1.4-4" }}
+                                    </abbr>
+                                </td>
+                                <td class="has-text-centered">
+                                    <abbr title="{{ item.evaluation.metrics.smape }}">
+                                        {{ item.evaluation.metrics.smape | number : "1.2-2" }}
+                                    </abbr>
+                                </td>
+                                <td class="is-narrow has-text-centered">
+                                    <button class="button is-danger is-small" (click)="deleteModel(item.refMeter, item.algorithm, i)"> 
+                                        <ng-icon name="ionTrashOutline" size="16px"></ng-icon>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-  
-  <!-- Model Field-->
-  <div class="box">
-    <h1 class="title has-text-centered is-size-3">{{"bws.model.trained" | translate}}</h1>
-    <div
-      class="table-container"
-      [style]="{
-        height: heightTable,
-        overflow: models ? 'auto' : 'hidden'
-      }"
-    >
-      <table class="table is-hoverable">
-        <thead>
-          <tr>
-            <th></th>
-            <th>{{"bws.table.used.algorithm" | translate}}</th>
-            <th>{{"bws.table.comment" | translate}}</th>
-            <th>{{"bws.table.virtual.meter.trained" | translate}}</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of models; let i = index">
-            <td class="is-narrow">
-              <label class="checkbox">
-                <input
-                  type="checkbox"
-                  [checked]="selectedModel === item"
-                  [disabled]="selectedModel && selectedModel !== item"
-                  (change)="toggleSelectedModel(item)"
-                />
-              </label>
-            </td>
-            <td class="is-narrow">
-              <abbr title="{{ item.algorithm }}">
-                {{ item.algorithm.slice(0, slice) }}
-              </abbr>
-            </td>
-            <td>
-              <abbr title="{{ item.comment }}">
-                {{ item.comment.slice(0, 80) }}
-              </abbr>
-            </td>
-            <td>
-              {{ item.refMeter }}
-            </td>
-            <td>
-              <button
-                class="button is-danger"
-                (click)="deleteModel(item.refMeter, item.algorithm, i)"
-              >
-              {{"bws.button.delete" | translate}}
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+
+    <div class="columns my-1" [style]="{ width: '100%' }">
+        <!-- Train Model Field -->
+        <div class="column is-full">
+            <div class="box is-flex is-flex-direction-column has-text-centered mx-1" [style]="{ height: heightMF }">
+                <h1 class="title is-size-3">{{ "be-water-smart.titles.model_train" | translate }}</h1>
+    
+                <div class="field is-grouped is-justify-content-center">
+                    <!-- Choose Algorithm -->
+                    <div class="control" [style]="{ width: '15%' }">
+                        <label class="label" for="algorithmSelect">{{ "be-water-smart.model_training.algorithm" | translate }}</label>
+                        <div class="select is-fullwidth">
+                            <select id="algorithmSelect" [(ngModel)]="selectedAlgorithm">
+                                <option *ngFor="let item of algorithms" [ngValue]="item" [title]="item.description">
+                                    {{ item.name }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Choose Virtual Meter -->
+                    <div class="control" [style]="{ width: '15%' }">
+                        <label class="label" for="virtualMeterSelect">{{ "be-water-smart.model_training.virtual_meter" | translate }}</label>
+                        <div class="select is-fullwidth">
+                            <select id="virtualMeterSelect" [(ngModel)]="selectedVirtualMeter">
+                                <option *ngFor="let item of vMeters" [ngValue]="item" [title]="item.description">
+                                    {{ (item.id | transformString : prefixes[0]).slice(0, 20) }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Create a Comment -->
+                    <div class="control" [style]="{ width: '15%' }">
+                        <label class="label" for="commentSelect">{{ "be-water-smart.model_training.comment" | translate }}</label>
+                        <input type="text" class="input is-fullwidth" id="commentSelect" placeholder="Add a comment" [(ngModel)]="modelComment"/>
+                    </div>
+                </div>
+        
+                <!-- dummy div to grow the box-->
+                <div class="is-flex-grow-1"></div>
+        
+                <!-- Training Button -->
+                <div>
+                    <button class="button is-primary" (click)="trainModel()">
+                        {{ "be-water-smart.buttons.model_train" | translate }}
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-  <!-- ForeCast Creation -->
-  <div class="box" [style]="{ height: heightForecast }">
-    <h1 class="title has-text-centered is-size-3">{{"bws.water.consumption.predicted" | translate}}</h1>
-    <button class="button is-info" (click)="getForecast()">
-      {{"bws.button.create.forecast" | translate}}
-    </button>
-    <div style="display: block" [style]="{ height: heightForecastGraph }">
-      <canvas id="lineChart"></canvas>
-    </div>
-  </div>
+
+    <div class="columns my-1" [style]="{ width: '100%' }">
+        <!-- Physical Meter Field-->
+        <div class="column is-half">
+            <div class="box mx-1" [style]="{ height: heightLS }">
+                <h1 class="title is-size-3 has-text-centered">{{ "be-water-smart.titles.smart_meter" | translate }}</h1>
+
+                <div class="table-container" [style]="{ height: heightTable, overflow: pMeters ? 'auto' : 'hidden'}">
+                    <table class="table is-hoverable is-fullwidth">
+                        <thead class="has-background-dark">
+                            <tr>
+                                <th class="has-text-centered has-text-white"></th>
+                                <th class="has-text-centered has-text-white">{{ "be-water-smart.tables.name" | translate }}</th>
+                                <th class="has-text-centered has-text-white">{{ "be-water-smart.tables.date" | translate }}</th>
+                                <th class="has-text-centered has-text-white">{{ "be-water-smart.tables.locality" | translate }}</th>
+                                <th class="has-text-centered has-text-white">{{ "be-water-smart.tables.address" | translate }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngIf="pMeters.length === 0">
+                                <td colspan="5" class="has-text-centered">{{ "be-water-smart.no_data.a" | translate }}</td>
+                            </tr>
+                            <tr *ngFor="let item of pMeters; let i = index">
+                                <td class="is-narrow">
+                                    <label class="checkbox">
+                                        <input type="checkbox" [checked]="selectedPhysicalMeters.includes(item)" 
+                                               (change)="toggleSelectedMeter(item, $event, this.selectedPhysicalMeters)"/>
+                                    </label>
+                                </td>
+                                <td class="is-narrow has-text-centered">
+                                    <abbr title="{{ item.id }}">
+                                        {{ (item.id | transformString : prefixes[1]).slice(0, slice) }}
+                                    </abbr>
+                                </td>
+                                <td class="is-narrow has-text-centered">
+                                    <abbr title="{{ item.date }}">
+                                        {{ item.date | date : "dd.MM.yyyy hh:mm:ss" }}
+                                    </abbr>
+                                </td>
+                                <td class="is-narrow has-text-centered">
+                                    <abbr title="{{ item.address.addressLocality }}">
+                                        {{ item.address.addressLocality.slice(0, slice) }}
+                                    </abbr>
+                                </td>
+                                <td class="is-narrow has-text-centered">
+                                    <abbr title="{{ item.address.streetAddress }}">
+                                        {{ item.address.streetAddress.slice(0, slice) }}
+                                    </abbr>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!--Form Field for adding Virtual Meter-->
+                <div class="field is-grouped is-grouped-centered">
+                    <div class="control">
+                        <input class="input" type="text" [(ngModel)]="newVMeterName" placeholder="Enter Virtual Meter Name" />
+                    </div>
+                    <div class="control">
+                        <button class="button is-primary" [disabled]="!selectedPhysicalMeters.length" 
+                                (click)="addVMeter(this.selectedPhysicalMeters, this.newVMeterName)">
+                                <ng-icon name="ionAddOutline" size="24px"></ng-icon>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Virtual Meter Field-->
+        <div class="column is-half">
+            <div class="box mx-1" [style]="{ height: heightLS }">
+                <h1 class="title has-text-centered is-size-3">{{ "be-water-smart.titles.virtual_meter" | translate }}</h1>
+
+                <!-- Table to show all VirtualMeters -->
+                <div class="table-container" [style]="{ height: heightTable, overflow: vMeters ? 'auto' : 'hidden' }">
+                    <table class="table is-hoverable is-fullwidth">
+                        <thead class="has-background-dark">
+                            <tr>
+                                <th class="has-text-centered has-text-white"></th>
+                                <th class="has-text-centered has-text-white">{{ "be-water-smart.tables.name" | translate }}</th>
+                                <th class="has-text-centered has-text-white">{{ "be-water-smart.tables.date" | translate }}</th>
+                                <th class="has-text-centered has-text-white">{{ "be-water-smart.tables.submeters" | translate }}</th>
+                                <th class="has-text-centered has-text-white">{{ "be-water-smart.tables.supermeters" | translate }}</th>
+                                <th class="has-text-centered has-text-white"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngIf="vMeters.length === 0">
+                                <td colspan="6" class="has-text-centered">{{ "be-water-smart.no_data.a" | translate }}</td>
+                            </tr>
+                            <tr *ngFor="let item of vMeters; let i = index">
+                                <td class="is-narrow">
+                                    <label class="checkbox">
+                                        <input type="checkbox" [checked]="selectedVirtualMeters.includes(item)"
+                                               (change)="toggleSelectedMeter(item, $event, this.selectedVirtualMeters)"/>
+                                    </label>
+                                </td>
+                                <td class="is-narrow has-text-centered">
+                                    <abbr title="{{ item.id }}">
+                                        {{ (item.id | transformString : prefixes[0]).slice(0, slice) }}
+                                    </abbr>
+                                </td>
+                                <td class="is-narrow has-text-centered">
+                                    <abbr title="{{ item.dateCreated }}">
+                                        {{ item.dateCreated | date : "dd.MM.yyyy hh:mm:ss" }}
+                                    </abbr>
+                                </td>
+                                <td class="is-narrow has-text-centered">
+                                    <abbr title="{{ item.submeterIds }}">
+                                        {{ item.submeterIds.length }}
+                                    </abbr>
+                                </td>
+                                <td class="is-narrow has-text-centered">
+                                    <abbr title="{{ item.supermeterIds }}">
+                                        {{ item.supermeterIds.length }}
+                                    </abbr>
+                                </td>
+                                <td class="is-narrow has-text-centered">
+                                    <button class="button is-danger is-small" (click)="deleteVMeterById(item.id, i)">
+                                        <ng-icon name="ionTrashOutline" size="16px"></ng-icon>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!--Form Field for adding Virtual Meter-->
+                <div class="field is-grouped is-grouped-centered">
+                    <div class="control">
+                        <input class="input" type="text" [(ngModel)]="newSuperMeterName" placeholder="Enter Super Meter Name"/>
+                    </div>
+                    <div class="control">
+                        <button class="button is-primary" [disabled]="!selectedVirtualMeters.length" 
+                                (click)="addVMeter(this.selectedVirtualMeters, this.newSuperMeterName)">
+                            <ng-icon name="ionAddOutline" size="24px"></ng-icon>
+                        </button>
+                    </div>
+                </div>     
+            </div>
+        </div>
+     </div>      
 </div>

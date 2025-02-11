@@ -1,59 +1,125 @@
-import { Component, OnInit } from "@angular/core";
-import Chart from "chart.js/auto";
+import { Component, OnInit, ViewChild } from "@angular/core";
+import { DatePipe } from "@angular/common";
+import { TranslateService } from "@ngx-translate/core";
+
+import { ChartType, ChartConfiguration, ChartDataset, ChartData, Plugin } from "chart.js";
+import { BaseChartDirective } from "ng2-charts";
+import { Observable } from "rxjs";
 
 import { BeWaterSmartService } from "../../api/be-water-smart.service";
-import {
-  Algorithm,
-  PhysicalMeter,
-  VirtualMeter,
-  MLModel
-} from "./bsw-interfaces";
+import { Algorithm, PhysicalMeter, VirtualMeter, MLModel } from "./bws-interfaces";
 import { CommonModule, NgFor } from "@angular/common";
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from "@ngx-translate/core";
+import { TransformStringPipe } from "../../common/pipes/transform-string.pipe";
+import { NgIcon, provideIcons } from "@ng-icons/core";
+import { ionAddOutline, ionTrashOutline } from "@ng-icons/ionicons"
 
 @Component({
   selector: 'be-water-smart',
   templateUrl: "be-water-smart.component.html",
-  imports: [NgFor, CommonModule, FormsModule, TranslatePipe],
-  styleUrls: ['be-water-smart.css'],
-  
+  imports: [NgFor, CommonModule, FormsModule, TranslatePipe, TransformStringPipe, DatePipe, BaseChartDirective, NgIcon],
+  providers: [provideIcons({ ionAddOutline, ionTrashOutline })],
+  styleUrls: ['be-water-smart.css']
 })
 export class BeWaterSmartComponent implements OnInit {
 
+  // ---------- StringFormatting ----------
+
+  /**
+   * array of prefixes to remove from id-strings of smart meters
+   */
+  prefixes: string[] = ["urn:ngsi-ld:virtualMeter:", "urn:ngsi-ld:Device:"];
+
   // ---------- Layout Parameters ---------- 
 
-  /**
-   * max number of characters per column
-   */
   slice: number = 20;
-
-  /**
-   * table height
-   */
+  heightMC: string = "500px";
+  heightMF: string = "250px";
+  heightLS: string = "500px";
   heightTable: string = "300px";
 
-  /**
-   * box height physical meter display
-   */
-  heightPM: string = "400px";
+// ------------------------------ Chart Parameters --------------------------------------------
 
   /**
-   * box height virtual meter display
+   * The chart object, referenced from the html template
    */
-  heightVM: string = "600px";
+  @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
 
   /**
-   * box height model meter display, 
+   * type of graph to use in chart
    */
-  heightModel: string = "400px";
+  chartType: ChartType = 'line';
 
   /**
-   * box height forecast graph, height forecast graph
+   * options used for the line chart to visualize prediction values
    */
-  heightForecast: string = "900px";
-  heightForecastGraph: string = "800px";
+  chartOptions: ChartConfiguration['options'] = {
+    responsive: true,
+    scales: {
+      y: {
+        stacked: false,
+        title: {
+          display: true,
+          text: "m^3"
+        },
+        grid: {
+          display: true, // Show grid lines on the y-axis
+          color: '#e0e0e0', // Customize the grid line color
+          lineWidth: 0.2, // Set the width of the grid lines
+        },
+      },
+      x: {
+        title: {
+          display: true,
+          text: "Time"
+        },
+        grid: {
+          display: false, // Show grid lines on the y-axis
+          color: '#e0e0e0', // Customize the grid line color
+          lineWidth: 0.2, // Set the width of the grid lines
+        },
+      }
+    },
 
+  };
+
+  /**
+   * standard xAxis labels for prediction values
+   */
+  standardLabels: string[] = ['01:00', '02:00', '03:00',
+    '04:00', '05:00', '06:00', '07:00',
+    '08:00', '09:00', '10:00', '11:00',
+    '12:00', '13:00', '14:00', '15:00',
+    '16:00', '17:00', '18:00', '19:00',
+    '20:00', '21:00', '22:00', '23:00']
+
+  /**
+   * color of the ng2chart
+   */
+  chartColor: string = '#000000';
+
+  /**
+   * data skeleton for the line graph
+   */
+  chartData: ChartData<'line'> = {
+    labels: this.standardLabels, // X-axis labels
+    datasets: [], // data points
+  };
+
+  backgroundPlugin: Plugin<'bar'> = {
+    id: 'custom_canvas_background_color',
+    beforeDraw: (chart) => {
+      const ctx = chart.ctx;
+      ctx.save();
+      ctx.fillStyle = this.chartColor; // Set the background color to white
+      ctx.fillRect(0, 0, chart.width, chart.height);
+      ctx.restore();
+    }
+  };
+
+
+  chartPlugins = [this.backgroundPlugin];
 
   // ---------- Physical Meter Parameters ----------
 
@@ -75,6 +141,11 @@ export class BeWaterSmartComponent implements OnInit {
   vMeters: VirtualMeter[] = [];
 
   /**
+   * a list of selectedVirtualMeters to create a Super Meter
+   */
+  selectedVirtualMeters: VirtualMeter[] = [];
+
+  /**
    * selected virtual meter to train a model
    */
   selectedVirtualMeter: VirtualMeter | undefined;
@@ -83,6 +154,11 @@ export class BeWaterSmartComponent implements OnInit {
    * name of potential new virtual meter
    */
   newVMeterName: string = "";
+
+  /**
+   * name of potential new virtual meter created from other virtual meters
+   */
+  newSuperMeterName: string = "";
 
   // ---------- Algorithm Parameters ----------
 
@@ -111,126 +187,96 @@ export class BeWaterSmartComponent implements OnInit {
    */
   modelComment: string | undefined;
 
-  // ---------- Forecast Parameters ----------
-
   /**
-   * chart variable holding a chart.js
+   * flags if a delete operation is in progress
+   * @param isDeleting: boolean flag 
    */
-  chart: any;
+  isDeleting: boolean = false;
 
-  /**
-   * variable determining if chart gets displayed
-   */
-  dataAvailable: boolean = false;
-
-
-  constructor(public bwsService: BeWaterSmartService) { }
+  constructor(public bwsService: BeWaterSmartService, private translate: TranslateService) { }
 
   ngOnInit(): void {
     // initialize all displays when rendering web page
-    this.extractPMeters();
+    this.extractPMeters()
     this.extractVMeters();
     this.extractAlgorithms();
     this.extractModels();
-    this.createForecastGraph();
+
   }
 
   // ---------- Extracting Functions ----------
 
   /**
-   * calls bws service to retrieve all physical meter information
+   * Generic Extraction Method for B-Water-Smart
+   * @param extractionMethod the function to use for the api call
+   * @param responseField the field of the response to read
+   * @param destinationField the parameter to save data to
    */
-  extractPMeters(): void {
-    this.bwsService.getPhysicalMeters().subscribe({
+  extractData(extractionMethod: () => Observable<any>, responseField: string, destinationField: keyof this): void {
+    extractionMethod().subscribe({
       next: (response) => {
-        // extracts the meters content immediately, 
-        // so you dont have to do it all the time
-        this.pMeters = response.meters;
+        // Dynamically assign the response field to the destination field
+        this[destinationField] = response[responseField];
       },
       error: (error) => {
         console.log(error);
       },
-    })
+    });
+  }
+
+  /**
+   * calls bws service to retrieve all physical meter information
+   */
+  extractPMeters(): void {
+    this.extractData(
+      () => this.bwsService.getPhysicalMeters(),
+      'meters',
+      'pMeters'
+    );
   }
 
   /**
    * calls bws service to retrieve all virtual meter information
    */
   extractVMeters(): void {
-    this.bwsService.getVirtualMeters().subscribe({
-      next: (response) => {
-        // extracts the meters content immediately, 
-        // so you dont have to do it all the time
-        this.vMeters = response.virtualMeters;
-      },
-      error: (error) => {
-        console.log(error);
-      },
-    })
+    this.extractData(() => this.bwsService.getVirtualMeters(),
+      'virtualMeters', 'vMeters')
   }
 
   /**
    * calls bws service to retrieve all algorithms
    */
   extractAlgorithms(): void {
-    this.bwsService.getAlgorithms().subscribe({
-      next: (response) => {
-        // extracts the meters content immediately, 
-        // so you dont have to do it all the time
-        this.algorithms = response.algorithms;
-      },
-      error: (error) => {
-        console.log(error);
-      },
-    })
+    this.extractData(
+      () => this.bwsService.getAlgorithms(),
+      'algorithms',
+      'algorithms'
+    )
   }
 
   /**
    * calls bws service to retrieve all trained models
    */
   extractModels(): void {
-    this.bwsService.getModels().subscribe({
-      next: (response) => {
-        this.models = response.MLModels;
-      },
-      error: (error) => {
-        console.log(error);
-      },
-    })
+    this.extractData(
+      () => this.bwsService.getModels(),
+      'MLModels',
+      'models'
+    )
   }
 
   // ---------- Checkbox Functions ----------
 
-
-  /**
- * Check if a physicalMeter is selected for creation of a virtual meter
- * @param item the physicalMeter to be checked
- * @param event the event from checkbox
- */
-  toggleSelectedPhysicalMeter(item: PhysicalMeter, event: Event) {
-
-    // FIXME Necessary to have all this code? Other functions work without it aswell
+  toggleSelectedMeter(item: any, event: Event, selectedMeters: any): void {
     const isChecked = (event.target as HTMLInputElement).checked;
 
     if (isChecked) {
-      this.selectedPhysicalMeters.push(item);
+      selectedMeters.push(item)
     } else {
-      const index = this.selectedPhysicalMeters.findIndex(meter => meter.id === item.id);
-      if (index !== -1) {
-        this.selectedPhysicalMeters.splice(index, 1);
+      const index = selectedMeters.findIndex((meter: { id: any; }) => meter.id === item.id)
+      if (index > -1) {
+        selectedMeters.splice(index, 1); // Remove the item if unchecked
       }
-    }
-  }
-
-  /**
-  * toggle if checkboxes are available or not
-  * @param item the meter currently selected
-  */
-  toggleSelectedVirtualMeter(item: any) {
-    if (this.selectedVirtualMeter === item) {
-      this.selectedVirtualMeter = undefined; // Untick the selected item
-    } else {
-      this.selectedVirtualMeter = item; // Tick the selected item
     }
   }
 
@@ -246,37 +292,28 @@ export class BeWaterSmartComponent implements OnInit {
     }
   }
 
-  /**
-   * save selected algorithm information to variable
-   * @param input algorithm selected to use
-   */
-  chooseAlgorithm(input: Algorithm): void {
-    this.selectedAlgorithm = input;
-  }
-
   // ---------- VirtualMeterList Functions ----------
 
   /**
    * creates a new VMeter with an @input name and the id-list of the selected physical meters.
    * If successful, user gets informed and all global variables get set back.
-   * If failed, user gets informed 
+   * If failed, user gets informed
    */
-  addVMeter(): void {
+  addVMeter(selectedMeters: any, selectedMeter: string): void {
 
-    let id_list: string[] = [];
+    if (!selectedMeter) {
+      alert("No Name for Virtual Meter!");
+      return;
+    }
 
-    this.selectedPhysicalMeters.forEach((item) => {
-      id_list.push(item.id);
-    });
-
-    let jsonBody = { submeterIds: id_list };
-
-    this.bwsService.addVirtualMeterWithId(this.newVMeterName, jsonBody).subscribe({
+    this.bwsService.addVirtualMeterWithId(selectedMeter, this.createSubMeterList(selectedMeters)).subscribe({
       next: (response) => {
         if (response.hasOwnProperty("virtualMeterId")) {
-          this.selectedPhysicalMeters = [];
-          this.newVMeterName = "";
           this.extractVMeters();
+          this.selectedPhysicalMeters = [];
+          this.selectedVirtualMeters = [];
+          this.newVMeterName = "";
+          this.newSuperMeterName = "";
         }
       },
       error: (error) => {
@@ -286,24 +323,50 @@ export class BeWaterSmartComponent implements OnInit {
   }
 
   /**
+   * help function for addVMeter()
+   * @returns a list of all ids which are inside the virtual meter
+   */
+  createSubMeterList(selectedMeters: any): Object {
+
+    let id_list: string[] = [];
+
+    selectedMeters.forEach((item: { id: string; }) => {
+      id_list.push(item.id);
+    });
+
+    return { submeterIds: id_list }
+  }
+
+  /**
    * delete a virtual meter
    * @param id  name of virtual meter, which functions as it's id
    * @param index index of meter in arr, to hotreload page
    */
   deleteVMeterById(id: string, index: number): void {
+    if (this.isDeleting) {
+      return;
+    }
+
+    // flag true aslong as deletion is processed)
+    this.isDeleting = true;
+
+    let tmp = this.vMeters.splice(index, 1);
+
+    console.log(tmp);
+
     this.bwsService.delVirtualMeterById(id).subscribe({
       next: (response) => {
         if (response && response.hasOwnProperty('msg')) {
-          alert("Virtual Meter with Name " + id + " not found!");
-        } else {
-          alert("Virtual Meter with Name: " + id + " deleted!")
-          this.vMeters.splice(index, 1);
-          this.selectedVirtualMeter = undefined;
+          this.vMeters.push(tmp[0]);
+          alert("Virtual Meter with Name " + id + " not found and can not be deleted!");
         }
       },
       error: (error) => {
         console.log(error);
       },
+      complete: () => {
+        this.isDeleting = false;
+      }
     })
   }
 
@@ -331,14 +394,10 @@ export class BeWaterSmartComponent implements OnInit {
 
     this.bwsService.putTrainModel(this.selectedVirtualMeter, this.selectedAlgorithm, this.modelComment).subscribe({
       next: (response) => {
-
         this.extractModels();
-
-        this.toggleSelectedVirtualMeter;
         this.selectedAlgorithm = undefined;
-        this.modelComment = '';
-
-        console.log(response);
+        this.selectedVirtualMeter = undefined;
+        this.modelComment = undefined;
       },
       error: (error) => {
         console.log(error);
@@ -353,19 +412,27 @@ export class BeWaterSmartComponent implements OnInit {
    * @param index place in list to correctly remove model afterwards
    */
   deleteModel(vMeterId: string, algId: string, index: number): void {
+    if (this.isDeleting) {
+      return;
+    }
+
+    this.isDeleting = true;
+
+    let tmp = this.models.splice(index, 1);
 
     this.bwsService.delModel(vMeterId, algId).subscribe({
       next: (response) => {
         if (response && response.hasOwnProperty('message')) {
-          alert("Model to delete not found");
-        } else {
-          this.models.splice(index, 1);
-          alert("Model deleted!");
+          this.models.push(tmp[0]);
+          alert("Model not found");
         }
       },
       error: (error) => {
         console.log(error);
       },
+      complete: () => {
+        this.isDeleting = false;
+      }
     })
   }
 
@@ -391,182 +458,85 @@ export class BeWaterSmartComponent implements OnInit {
           console.log(response);
         } else {
 
-          let timestamps = this.formatDateTimeGraph(response.map((item) => item.datePredicted));
           let predValues = response.map((item) => item.numValue);
 
-          let date = this.stripDate(response[0].datePredicted);
+          let date = response[0].datePredicted;
 
-          this.dataAvailable = true;
+          let label = this.transformString(vMeterId, this.prefixes[0]) + " " + algId + " " + this.transformDate(date)
 
-          this.createForecastGraph(timestamps, predValues, date);
-
-          //this.toggleSelectedVirtualMeter;
-          this.toggleSelectedModel;
-
+          this.addGraphToChart(predValues, label)
         }
       },
       error: (error) => {
         console.log(error);
       },
+      complete: () => {
+        this.selectedModel = undefined;
+      }
     })
   }
 
   /**
-   * creates a graph from api
-   * @param xAxis timestamps out of json body
-   * @param yAxis predicted values out of json body
-   * @param date of the day displayed
+   * Function to add new lines dynamically to the graph
+   * @param label new data label
+   * @param dataPoints the new prediction values
+   * @param borderColor color to use
    */
-  createForecastGraph(xAxis?: string[], yAxis?: number[], date?: string): void {
+  addGraphToChart(dataPoints: number[], label: string): void {
+    // Create a new dataset
+    const newDataset: ChartDataset<'line'> = {
+      label: label,
+      data: dataPoints,
+      borderColor: this.generateRandomColor(),
+      fill: false,
+    };
 
+    // Add the new dataset to the existing chart data
+    this.chartData.datasets.push(newDataset);
+
+    // Update the chart to reflect the changes
     if (this.chart) {
-      this.chart.destroy();
+      this.chart.update();
     }
+  }
 
-    let standardTimes: string[] = ['01:00:00', '02:00:00', '03:00:00',
-      '04:00:00', '05:00:00', '06:00:00', '07:00:00',
-      '08:00:00', '09:00:00', '10:00:00', '11:00:00',
-      '12:00:00', '13:00:00', '14:00:00', '15:00:00',
-      '16:00:00', '17:00:00', '18:00:00', '19:00:00',
-      '20:00:00', '21:00:00', '22:00:00', '23:00:00']
+  /**
+   * generate a random color from the color wheel
+   * @returns random color code as string
+   */
+  generateRandomColor(): string {
+    const r = Math.floor(Math.random() * 256); // Random red value (0-255)
+    const g = Math.floor(Math.random() * 256); // Random green value (0-255)
+    const b = Math.floor(Math.random() * 256); // Random blue value (0-255)
 
-    const ctx = document.getElementById('lineChart') as HTMLCanvasElement;
-    this.chart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: this.dataAvailable ? xAxis : standardTimes,
-        datasets: [
-          {
-            label: date,
-            data: this.dataAvailable ? yAxis : [],
-            borderColor: 'blue',
-            backgroundColor: 'rgba(0,0,255,0.2)',
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            title: {
-              display: true,
-              text: 'm^3'
-            }
-          },
-          x: {
-            title: {
-              display: true,
-              text: 'time'
-            }
-          }
-        }
-      },
-    });
+    return `rgb(${r}, ${g}, ${b})`; // Return the color in rgb() format
   }
 
   // ---------- Utility Functions ----------
 
   /**
-   * successful request -> reachable api
+   * pipe implementation to clean the ids from the smart meters
+   * @param value the whole string to change
+   * @param removable the string to remove
+   * @returns the tidied up string
    */
-  getDebugMessage(): void {
-    let a = this.bwsService.getDebugMessage();
-    a.subscribe({
-      next: (response) => {
-        console.log(response);
-      },
-      error: (response) => {
-        console.error(response);
-      }
-    })
-
+  transformString(value: string, removable: string): string {
+    let t = new TransformStringPipe();
+    return t.transform(value, removable)
   }
 
   /**
-   * strip value for better clarification
-   * @param value name of the meter
-   * @returns final name string
+   * pipe implementation to clean a date to readable format
+   * @param date initial date
+   * @param format format to use
+   * @returns the new date as a string
    */
-  stripMeterID(value: string): string {
-    //BUG: called way too often. -> Table is-hoverable
-    if (value.includes('urn:ngsi-ld:Device:')) {
-      return value.replace('urn:ngsi-ld:Device:', '')
-    }
+  transformDate(date: string): string {
 
-    if (value.includes('urn:ngsi-ld:virtualMeter:')) {
-      return value.replace('urn:ngsi-ld:virtualMeter:', '')
-    }
+    const datePipe = new DatePipe('en-US');
 
-    return 'String not found';
+    const formattedDate = datePipe.transform(date, 'dd.MM.yyyy');
+
+    return formattedDate || date;
   }
-
-  /**
-   * revamps the data format in order to improve readability
-   * @param input the old date format
-   * @returns the easier to read output
-   */
-  formatDateTime(input: string): string {
-    //BUG: called way too often. -> Table is-hoverable
-    //NOTE remember that this can be slow
-    const date = new Date(input);
-    const day = ('0' + date.getDate()).slice(-2);
-    const month = ('0' + (date.getMonth() + 1)).slice(-2);
-    const year = date.getFullYear();
-    const hours = ('0' + date.getHours()).slice(-2);
-    const minutes = ('0' + date.getMinutes()).slice(-2);
-    const seconds = ('0' + date.getSeconds()).slice(-2);
-
-    return `${day}.${month}.${year} ${hours}:${minutes}:${seconds}`;
-  }
-
-  /**
-   * format the array to only contain timestamps and no datetime
-   * @param input string array with the contained datetime
-   * @returns string array without the date
-   */
-  formatDateTimeGraph(input: string[]): string[] {
-
-    let newTimes: string[] = [];
-
-    input.forEach(item => {
-      const date = new Date(item);
-      const hours = ('0' + date.getHours()).slice(-2);
-      const minutes = ('0' + date.getMinutes()).slice(-2);
-      const seconds = ('0' + date.getSeconds()).slice(-2);
-
-      let finalTime = `${hours}:${minutes}:${seconds}`;
-
-      newTimes.push(finalTime);
-    });
-
-    return newTimes
-  }
-
-  /**
-   * takes date string as input and transforms it into day.month.year format
-   * @param input string to be transformed
-   * @returns string in correct format
-   */
-  stripDate(input: string): string {
-    const date = new Date(input);
-    const day = ('0' + date.getDate()).slice(-2);
-    const month = ('0' + (date.getMonth() + 1)).slice(-2);
-    const year = date.getFullYear();
-
-    return `${day}.${month}.${year}`
-
-  }
-
-  /**
-   * calculates the table height dependend on the box height 
-   * @param input the height of the box
-   * @param share percentage of the table height
-   * @returns the new table height parameter
-   */
-  calcRelBoxHeight(input: string, share: number): string {
-    let x = parseInt(input);
-    let y = x * share;
-    return y.toString() + "vh";
-  }
-
 }

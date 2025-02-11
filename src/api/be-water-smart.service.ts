@@ -10,12 +10,18 @@ import {
   AllPhysicalMeters,
   AllVirtualMeters,
   AllModels
-} from "../modules/be-water-smart/bsw-interfaces";
+} from "../modules/be-water-smart/bws-interfaces";
 
 /**
  * constant holding the api prefix to reach the bws api
  */
 const API_PREFIX = "/api/bws";
+
+/**
+ * constant holding the dev prefix to reach
+ * the bws api locally in python (localhost:5000)
+ */
+const DEV_PREFIX = "localpy"
 
 @Injectable({
   providedIn: 'root'
@@ -28,21 +34,27 @@ export class BeWaterSmartService {
    * generalized request method for bws api
    * @param method to use for request
    * @param url string as api endpoint
-   * @param ctx additional information about request
    * @param requestBody bonus information in post and put requests
    * @returns an Observable with the set interface
    */
   sendRequest<T>(method: 'get' | 'post' | 'put' | 'delete', url: string, requestBody?: any) {
 
-    // FIXME continue here
-    let finalUrl = this.router.parseUrl(API_PREFIX + url);
+    /**
+     * dev prefix to reach python local api
+     */
+    const localUrl = this.router.parseUrl(DEV_PREFIX + '/' + API_PREFIX + url).toString();
+
+    /**
+     * normal URL for server
+     */
+    const normalURL = this.router.parseUrl(API_PREFIX + url).toString();
 
     let requestOptions: any = {
       responseType: 'json',
       body: requestBody
     };
 
-    return this.http.request<T>(method, finalUrl.toString(), requestOptions) as Observable<T>;
+    return this.http.request<T>(method, normalURL, requestOptions) as Observable<T>;
   }
 
   /**
