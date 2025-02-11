@@ -3,11 +3,12 @@ import {
   HttpHandlerFn,
   HttpInterceptorFn,
   HttpRequest,
+  HttpErrorResponse,
   HttpResponse,
 } from "@angular/common/http";
 import {TestBed} from "@angular/core/testing";
 import dayjs from "dayjs";
-import {firstValueFrom, of} from "rxjs";
+import {firstValueFrom, of, throwError} from "rxjs";
 
 import {cacheInterceptor} from "./cache.interceptor";
 import {CacheService} from "./cache.service";
@@ -78,5 +79,44 @@ describe("cacheInterceptor", () => {
     )) as HttpResponse<string>;
     expect(thirdRes.body).toEqual(body);
     expect(httpHandler).toHaveBeenCalledTimes(2);
+  });
+
+  it("should not cache unsuccessful responses", async () => {
+    // Simulate an unsuccessful response (e.g., status 400).
+    let httpErrorHandler = jest.fn(() =>
+      throwError(
+        () =>
+          new HttpErrorResponse({
+            status: 400,
+            statusText: "Bad Request",
+            error: "error",
+          }),
+      ),
+    );
+
+    try {
+      await firstValueFrom(cacheInterceptorInContext(req, httpErrorHandler));
+      fail("Expected an error, but got a response");
+    } catch (e) {
+      let error = e as HttpErrorResponse;
+      expect(error).toBeInstanceOf(HttpErrorResponse);
+      expect(error.status).toEqual(400);
+      expect(error.error).toEqual("error");
+    }
+
+    expect(httpErrorHandler).toHaveBeenCalledTimes(1);
+
+    // The second call should not hit the cache and call the handler again.
+    try {
+      await firstValueFrom(cacheInterceptorInContext(req, httpErrorHandler));
+      fail("Expected an error, but got a response");
+    } catch (e) {
+      let error = e as HttpErrorResponse;
+      expect(error).toBeInstanceOf(HttpErrorResponse);
+      expect(error.status).toEqual(400);
+      expect(error.error).toEqual("error");
+    }
+
+    expect(httpErrorHandler).toHaveBeenCalledTimes(2);
   });
 });
