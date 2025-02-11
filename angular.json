@@ -70,7 +70,7 @@
             ],
             "styles": ["src/styles.scss"],
             "scripts": [],
-            "allowedCommonJsDependencies": ["ajv", "maplibre-gl"],
+            "allowedCommonJsDependencies": ["ajv", "dayjs", "maplibre-gl"],
             "stylePreprocessorOptions": {
               "sass": {
                 "silenceDeprecations": ["global-builtin"]
@@ -114,6 +114,12 @@
           "defaultConfiguration": "development",
           "options": {
             "proxyConfig": "src/proxy.conf.json"
+          }
+        },
+        "test": {
+          "builder": "@angular-builders/jest:run",
+          "options": {
+            "configPath": "jest.config.ts"
           }
         }
       }

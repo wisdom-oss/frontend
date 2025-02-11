@@ -5,7 +5,7 @@
       [style]="style"
       [zoom]="[zoom]"
       [center]="{lat: 53.1434501, lon: 8.2145521}"
-      [preserveDrawingBuffer]="true"
+      [canvasContextAttributes]="{preserveDrawingBuffer: true}"
       [attributionControl]="false"
       (zoomEvt)="onZoom($event)"
     >

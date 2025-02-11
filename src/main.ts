@@ -2,6 +2,8 @@ import {Component} from "@angular/core";
 import {bootstrapApplication} from "@angular/platform-browser";
 import {RouterOutlet} from "@angular/router";
 import {TranslateService} from "@ngx-translate/core";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
 
 import {wisdomAppConfig} from "./config";
 import {configureTranslations} from "./i18n";
@@ -13,6 +15,7 @@ import {configureTranslations} from "./i18n";
 })
 class AppComponent {
   constructor(private translate: TranslateService) {
+    dayjs.extend(duration);
     configureTranslations(translate);
   }
 }
