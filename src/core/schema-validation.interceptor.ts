@@ -38,6 +38,7 @@ export class SchemaValidationInterceptor implements HttpInterceptor {
           console.error(
             "expected response type is invalid",
             req,
+            response,
             validate.errors,
           );
           throw new this.Error(
