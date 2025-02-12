@@ -8,7 +8,6 @@ import {
 } from "@angular/core";
 import {
   ControlComponent,
-  FeatureComponent,
   LayerComponent,
   MapComponent,
   MarkerComponent,
@@ -16,7 +15,14 @@ import {
   AttributionControlDirective,
   NavigationControlDirective,
 } from "@maplibre/ngx-maplibre-gl";
-import {Point, MultiPolygon, Polygon} from "geojson";
+import {
+  FeatureCollection,
+  Feature,
+  Geometry,
+  Point,
+  MultiPolygon,
+  Polygon,
+} from "geojson";
 import {MapLibreEvent, StyleSpecification} from "maplibre-gl";
 
 import {DisplayInfoControlComponent} from "./map/display-info-control/display-info-control.component";
@@ -25,35 +31,29 @@ import {LayerSelectionControlComponent} from "./map/layer-selection-control/laye
 import {LegendControlComponent} from "./map/legend-control/legend-control.component";
 import {GeoDataService} from "../../api/geo-data.service";
 import {GroundwaterLevelsService} from "../../api/groundwater-levels.service";
-import colorful from "../../common/map/styles/colorful.json";
-import {typeUtils} from "../../common/type-utils";
 import {ResizeMapOnLoadDirective} from "../../common/directives/resize-map-on-load.directive";
+import colorful from "../../common/map/styles/colorful.json";
 import {signals} from "../../common/signals";
 
-type Points = typeUtils.UpdateElements<
-  GeoDataService.LayerContents,
-  "geometry",
-  {geometry: Point}
->;
-
-type Polygons = typeUtils.UpdateElements<
-  GeoDataService.LayerContents,
-  "geometry",
-  {geometry: Polygon}
->;
-
-type MultiPolygons = typeUtils.UpdateElements<
-  GeoDataService.LayerContents,
-  "geometry",
-  {geometry: MultiPolygon}
->;
+type GeoProperties = {name?: string | null; key: string; [key: string]: any};
+type Points = FeatureCollection<Point, GeoProperties>;
+type Polygons = FeatureCollection<Polygon, GeoProperties>;
+type MultiPolygons = FeatureCollection<MultiPolygon, GeoProperties>;
+function emptyFeatures<G extends Geometry>(): FeatureCollection<
+  G,
+  GeoProperties
+> {
+  return {
+    type: "FeatureCollection",
+    features: [],
+  };
+}
 
 @Component({
   selector: "growl",
   imports: [
     AttributionControlDirective,
     ControlComponent,
-    FeatureComponent,
     GeoJSONSourceComponent,
     GroundwaterLevelStationMarkerComponent,
     LayerComponent,
@@ -89,11 +89,11 @@ export class GrowlComponent {
     groundwaterBodies: signals.toggleable(true),
   } as const;
 
-  readonly groundwaterBodies = signal<Polygons>([]);
-  readonly groundwaterMeasurementStations = signal<Points>([]);
-  readonly ndsMunicipals = signal<MultiPolygons>([]);
-  readonly waterRightUsageLocations = signal<Points>([]);
-  readonly oldWaterRightUsageLocations = signal<Points>([]);
+  readonly groundwaterBodies = signal<Polygons>(emptyFeatures());
+  readonly groundwaterMeasurementStations = signal<Points>(emptyFeatures());
+  readonly ndsMunicipals = signal<MultiPolygons>(emptyFeatures());
+  readonly waterRightUsageLocations = signal<Points>(emptyFeatures());
+  readonly oldWaterRightUsageLocations = signal<Points>(emptyFeatures());
   readonly measurements: WritableSignal<
     Record<string, GroundwaterLevelsService.Measurement>
   > = signal({});
@@ -134,6 +134,10 @@ export class GrowlComponent {
       .then(data => this.measurements.set(data));
 
     effect(() => {
+      console.log(this.waterRightUsageLocations());
+    });
+
+    effect(() => {
       let legend = this.legend();
       if (!legend) return;
       let measurements = this.measurements();
@@ -168,16 +172,30 @@ export class GrowlComponent {
     this.markerSize.set(size);
   }
 
-  private fetchGeoData<T extends string, R extends {geometry: {type: T}}>(
+  private async fetchGeoData<G extends Geometry>(
     layerName: string,
-    type: T,
-    setter: (data: R[]) => void,
+    type: G["type"],
+    setter: (data: FeatureCollection<G, GeoProperties>) => void,
   ) {
-    this.geo
-      .fetchLayerContents(layerName)
-      .then(contents => contents ?? [])
-      .then(p => p.filter(({geometry}) => geometry.type == type) as R[])
-      .then(setter);
+    let contents = (await this.geo.fetchLayerContents(layerName)) ?? [];
+    let elements = contents.filter(({geometry}) => geometry.type == type);
+    let features: Feature<G, GeoProperties>[] = elements.map(element => ({
+      type: "Feature",
+      geometry: element.geometry as G,
+      id: element.id,
+      properties: {
+        name: element.name,
+        key: element.key,
+        ...element.additionalProperties,
+      },
+    }));
+
+    let featureCollection: FeatureCollection<G, GeoProperties> = {
+      type: "FeatureCollection",
+      features,
+    };
+
+    setter(featureCollection);
   }
 
   private findStationInfo(): DisplayInfoControlComponent.Data | null {
@@ -185,7 +203,7 @@ export class GrowlComponent {
     if (!selection) return null;
 
     let stations = this.groundwaterMeasurementStations();
-    let station = stations.find(({key}) => selection == key);
+    let station = stations.features.find(({id}) => selection == id);
     if (!station) return null;
 
     let measurements = this.measurements();
@@ -193,9 +211,9 @@ export class GrowlComponent {
     if (!measurement) return null;
 
     return {
-      title: station.name,
+      title: station.properties.name,
       table: {
-        station: station.key,
+        station: station.properties.key,
         date: measurement.date,
         waterLevelNHN: measurement.waterLevelNHN,
         waterLevelGOK: measurement.waterLevelGOK,
@@ -208,12 +226,12 @@ export class GrowlComponent {
     if (!selection) return null;
 
     let bodies = this.groundwaterBodies();
-    let body = bodies.find(({id}) => id == selection);
+    let body = bodies.features.find(({id}) => id == selection);
     if (!body) return null;
 
     return {
-      title: body.name,
-      subtitle: body.key,
+      title: body.properties.name,
+      subtitle: body.properties.key,
     };
   }
 
@@ -222,12 +240,12 @@ export class GrowlComponent {
     if (!selection) return null;
 
     let municipals = this.ndsMunicipals();
-    let municipal = municipals.find(({id}) => id == selection);
+    let municipal = municipals.features.find(({id}) => id == selection);
     if (!municipal) return null;
 
     return {
-      title: municipal.name,
-      subtitle: municipal.key,
+      title: municipal.properties.name,
+      subtitle: municipal.properties.key,
     };
   }
 

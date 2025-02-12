@@ -70,42 +70,26 @@
         </ng-container>
       </ng-container>
       <ng-container sources>
-        <mgl-geojson-source id="groundwater-bodies-source">
-          @for (body of bodies; track body.key) {
-            <mgl-feature
-              [geometry]="body.geometry"
-              [id]="body.id"
-            ></mgl-feature>
-          }
+        <mgl-geojson-source
+          id="groundwater-bodies-source"
+          [data]="bodies"
+        ></mgl-geojson-source>
+        <mgl-geojson-source id="nds-municipals-source" [data]="municipals">
         </mgl-geojson-source>
-        <mgl-geojson-source id="nds-municipals-source">
-          @for (municipal of municipals; track municipal.key) {
-            <mgl-feature
-              [geometry]="municipal.geometry"
-              [id]="municipal.id"
-            ></mgl-feature>
-          }
+        <mgl-geojson-source
+          id="water-right-usage-locations-source"
+          [data]="usageLocations"
+        >
         </mgl-geojson-source>
-        <mgl-geojson-source id="water-right-usage-locations-source">
-          @for (usageLocation of usageLocations; track usageLocation.key) {
-            <mgl-feature
-              [geometry]="usageLocation.geometry"
-              [id]="usageLocation.id"
-            ></mgl-feature>
-          }
-        </mgl-geojson-source>
-        <mgl-geojson-source id="old-water-right-usage-locations-source">
-          @for (usageLocation of oldUsageLocations; track usageLocation.key) {
-            <mgl-feature
-              [geometry]="usageLocation.geometry"
-              [id]="usageLocation.id"
-            ></mgl-feature>
-          }
+        <mgl-geojson-source
+          id="old-water-right-usage-locations-source"
+          [data]="oldUsageLocations"
+        >
         </mgl-geojson-source>
       </ng-container>
       <ng-container layers>
         <!-- We cannot render fill and line at the same time. -->
-        @if (bodies.length && selectedLayers.groundwaterBodies()) {
+        @if (bodies.features.length && selectedLayers.groundwaterBodies()) {
           <mgl-layer
             id="groundwater-bodies-layer-fill"
             type="fill"
@@ -127,7 +111,7 @@
             }"
           ></mgl-layer>
         }
-        @if (municipals.length && selectedLayers.ndsMunicipals()) {
+        @if (municipals.features.length && selectedLayers.ndsMunicipals()) {
           <mgl-layer
             id="nds-municipals-layer-fill"
             type="fill"
@@ -148,8 +132,8 @@
         }
         @if (selectedLayers.groundwaterLevelStations()) {
           @for (
-            station of groundwaterMeasurementStations();
-            track station.key
+            station of groundwaterMeasurementStations().features;
+            track station.properties.key
           ) {
             <mgl-marker
               [lngLat]="{
@@ -157,26 +141,32 @@
                 lon: station.geometry.coordinates[0],
               }"
             >
-              @let measurement = measurements()[station.key];
+              @let measurement = measurements()[station.properties.key];
               @let classification = measurement?.classification || null;
               @let color = measurementColors[classification || "null"];
               <growl-groundwater-level-station-marker
                 [size]="markerSize()"
                 [color]="color"
-                (mouseenter)="stationSelected.set(station.key)"
+                (mouseenter)="stationSelected.set(station.properties.key)"
                 (mouseleave)="stationSelected.set(null)"
               ></growl-groundwater-level-station-marker>
             </mgl-marker>
           }
         }
-        @if (usageLocations.length && selectedLayers.waterRightUsageLocations()) {
+        @if (
+          usageLocations.features.length &&
+          selectedLayers.waterRightUsageLocations()
+        ) {
           <mgl-layer
             id="water-right-usage-locations-layer-symbol"
             type="symbol"
             source="water-right-usage-locations-source"
           ></mgl-layer>
         }
-        @if (oldUsageLocations.length && selectedLayers.oldWaterRightUsageLocations()) {
+        @if (
+          oldUsageLocations.features.length &&
+          selectedLayers.oldWaterRightUsageLocations()
+        ) {
           <mgl-layer
             id="old-water-right-usage-locations-layer-symbol"
             type="symbol"
