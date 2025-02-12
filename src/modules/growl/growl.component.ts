@@ -78,11 +78,13 @@ export class GrowlComponent {
   protected stationInfo = computed(() => this.findStationInfo());
   protected bodySelected = signal<number | null>(null);
   protected bodyInfo = computed(() => this.findBodyInfo());
+  protected municipalSelected = signal<number | null>(null);
+  protected municipalInfo = computed(() => this.findMunicipalInfo());
 
   protected selectedLayers = {
-    groundwaterBodies: signals.toggleable(true),
     groundwaterLevelStations: signals.toggleable(true),
     ndsMunicipals: signals.toggleable(false),
+    groundwaterBodies: signals.toggleable(true),
   } as const;
 
   readonly groundwaterBodies = signal<Polygons>([]);
@@ -200,6 +202,20 @@ export class GrowlComponent {
       title: body.name,
       subtitle: body.key,
     };
+  }
+
+  private findMunicipalInfo(): DisplayInfoControlComponent.Data | null {
+    let selection = this.municipalSelected();
+    if (!selection) return null;
+
+    let municipals = this.ndsMunicipals();
+    let municipal = municipals.find(({id}) => id == selection);
+    if (!municipal) return null;
+
+    return {
+      title: municipal.name,
+      subtitle: municipal.key,
+    }
   }
 
   protected static calculateMarkerSize(zoom: number): string {

@@ -30,7 +30,7 @@
           <growl-legend-control></growl-legend-control>
         }
       </mgl-control>
-      @let groundwaterInfoData = bodyInfo() ?? undefined;
+      @let groundwaterInfoData = bodyInfo();
       <mgl-control position="bottom-left">
         @if (groundwaterInfoData) {
           <growl-display-info-control
@@ -38,7 +38,13 @@
           ></growl-display-info-control>
         }
       </mgl-control>
-      @let stationInfoData = stationInfo() ?? undefined;
+      @let municipalInfoData = municipalInfo();
+      <mgl-control position="bottom-left">
+        @if (municipalInfoData) {
+          <growl-display-info-control [data]="municipalInfoData"></growl-display-info-control>
+        }
+      </mgl-control>
+      @let stationInfoData = stationInfo();
       <mgl-control position="bottom-left">
         @if (stationInfoData) {
           <growl-display-info-control
@@ -71,7 +77,7 @@
             'fill-color': '#0088aa',
             'fill-opacity': 0.3,
           }"
-          (layerMouseEnter)="bodySelected.set(+$event.features![0]!.id!)"
+          (layerMouseMove)="bodySelected.set(+$event.features![0]!.id!)"
           (layerMouseLeave)="bodySelected.set(null)"
         ></mgl-layer>
         <mgl-layer
@@ -85,6 +91,14 @@
         ></mgl-layer>
       }
       @if (municipals.length && selectedLayers.ndsMunicipals()) {
+        <mgl-layer
+          id="nds-municipals-layer-fill"
+          type="fill"
+          source="nds-municipals-source"
+          [paint]="{'fill-opacity': 0}"
+          (layerMouseMove)="municipalSelected.set(+$event.features![0]!.id!)"
+          (layerMouseLeave)="municipalSelected.set(null)"
+        ></mgl-layer>
         <mgl-layer
           id="nds-municipals-layer-line"
           type="line"

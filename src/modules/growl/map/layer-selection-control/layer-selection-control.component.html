@@ -9,18 +9,18 @@
     </span>
   } @else {
     <table>
-      @for (layer of layers() | keyvalue; track layer) {
+      @for (layer of layerIter(); track layer[0]) {
         <tr>
           <th class="has-text-dark">
             <input
-              [id]="layer.key"
+              [id]="layer[0]"
               type="checkbox"
               class="switch is-thin"
-              (click)="layer.value.toggle()"
-              [checked]="layer.value()"
+              (click)="layer[1].toggle()"
+              [checked]="layer[1]()"
             />
-            <label [for]="layer.key" class="is-size-7" style="height: 1.5em">{{
-              "growl.layer." + layer.key | translate
+            <label [for]="layer[0]" class="is-size-7" style="height: 1.5em">{{
+              "growl.layer." + layer[0] | translate
             }}</label>
           </th>
         </tr>
