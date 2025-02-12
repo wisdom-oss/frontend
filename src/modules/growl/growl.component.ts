@@ -31,6 +31,7 @@ import {LayerSelectionControlComponent} from "./map/layer-selection-control/laye
 import {LegendControlComponent} from "./map/legend-control/legend-control.component";
 import {GeoDataService} from "../../api/geo-data.service";
 import {GroundwaterLevelsService} from "../../api/groundwater-levels.service";
+import nlwknMeasurementClassificationColors from "../../assets/nlwkn-measurement-classification-colors.toml";
 import {ResizeMapOnLoadDirective} from "../../common/directives/resize-map-on-load.directive";
 import colorful from "../../common/map/styles/colorful.json";
 import {signals} from "../../common/signals";
@@ -72,7 +73,7 @@ export class GrowlComponent {
   protected zoom = 6.8;
   protected markerSize = signal(GrowlComponent.calculateMarkerSize(this.zoom));
   protected style = colorful as any as StyleSpecification;
-  protected measurementColors = LegendControlComponent.legendColors;
+  protected measurementColors = nlwknMeasurementClassificationColors;
   protected legend = viewChild(LegendControlComponent);
   protected stationSelected = signal<string | null>(null);
   protected stationInfo = computed(() => this.findStationInfo());

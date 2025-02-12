@@ -2,6 +2,7 @@ import {signal, Component} from "@angular/core";
 import {TranslatePipe} from "@ngx-translate/core";
 
 import {GroundwaterLevelsService} from "../../../../api/groundwater-levels.service";
+import nlwknMeasurementClassificationColors from "../../../../assets/nlwkn-measurement-classification-colors.toml";
 
 // alias the enum here to ease the use of it
 type MC = GroundwaterLevelsService.MeasurementClassification;
@@ -14,19 +15,8 @@ const MC = GroundwaterLevelsService.MeasurementClassification;
   styles: ``,
 })
 export class LegendControlComponent {
-  // expose the class itself to the template
-  protected This = LegendControlComponent;
-
-  static readonly legendColors: Record<MC | "null", string> = {
-    [MC.MAX_EXCEEDED]: "#00008B",
-    [MC.VERY_HIGH]: "#104E8B",
-    [MC.HIGH]: "#1E90FF",
-    [MC.NORMAL]: "#00FF00",
-    [MC.LOW]: "#FFFF00",
-    [MC.VERY_LOW]: "#CD6839",
-    [MC.MIN_UNDERSHOT]: "#FF0000",
-    null: "#888888",
-  } as const;
+  protected legendColors: Record<MC | "null", string> =
+    nlwknMeasurementClassificationColors;
 
   protected legendItemsIter = [...Object.values(MC), "null"] as Iterable<
     MC | "null"

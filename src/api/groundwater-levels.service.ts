@@ -104,7 +104,7 @@ export namespace GroundwaterLevelsService {
   > & {classification: MeasurementClassification | null; date: Dayjs};
 
   /**
-   * Measurement classifications accordings to NLWKN.
+   * Measurement classifications according to NLWKN.
    *
    * @link https://www.grundwasserstandonline.nlwkn.niedersachsen.de/Hinweis#einstufungGrundwasserstandsklassen
    */
