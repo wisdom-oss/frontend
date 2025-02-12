@@ -82,6 +82,8 @@ export class GrowlComponent {
   protected municipalInfo = computed(() => this.findMunicipalInfo());
 
   protected selectedLayers = {
+    waterRightUsageLocations: signals.toggleable(false),
+    oldWaterRightUsageLocations: signals.toggleable(false),
     groundwaterLevelStations: signals.toggleable(true),
     ndsMunicipals: signals.toggleable(false),
     groundwaterBodies: signals.toggleable(true),
@@ -120,6 +122,11 @@ export class GrowlComponent {
       "water_right_usage_locations",
       "Point",
       this.waterRightUsageLocations.set,
+    );
+    this.fetchGeoData(
+      "old_water_right_usage_locations",
+      "Point",
+      this.oldWaterRightUsageLocations.set,
     );
 
     this.gl

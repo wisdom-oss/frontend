@@ -58,8 +58,8 @@ export class DisplayInfoControlComponent {
 
 export namespace DisplayInfoControlComponent {
   export interface Data {
-    title: string;
-    subtitle?: string;
-    table?: Record<string, any>;
+    title?: string | null;
+    subtitle?: string | null;
+    table?: Record<string, any> | null;
   }
 }

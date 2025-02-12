@@ -9,137 +9,181 @@
       [attributionControl]="false"
       (zoomEvt)="onZoom($event)"
     >
-      <mgl-control position="top-right">
-        <growl-layer-selection-control
-          [layers]="selectedLayers"
-        ></growl-layer-selection-control>
-      </mgl-control>
-      <mgl-control
-        mglNavigation
-        [showCompass]="false"
-        position="top-left"
-      ></mgl-control>
-      <mgl-control
-        mglAttribution
-        position="bottom-right"
-        [compact]="true"
-        [customAttribution]="[attribution()]"
-      ></mgl-control>
-      <!-- using ng-containers we can ensure this ordering -->
-      <ng-container>
-        @if (selectedLayers.groundwaterLevelStations()) {
-          <mgl-control position="bottom-left">
-            <growl-legend-control></growl-legend-control>
-          </mgl-control>
-        }
-      </ng-container>
       @let groundwaterInfoData = bodyInfo();
-      <ng-container>
-        @if (groundwaterInfoData) {
-          <mgl-control position="bottom-left">
-            <growl-display-info-control
-              [data]="groundwaterInfoData"
-            ></growl-display-info-control>
-          </mgl-control>
-        }
-      </ng-container>
       @let municipalInfoData = municipalInfo();
-      <ng-container>
-        @if (municipalInfoData) {
-          <mgl-control position="bottom-left">
-            <growl-display-info-control
-              [data]="municipalInfoData"
-            ></growl-display-info-control>
-          </mgl-control>
-        }
-      </ng-container>
       @let stationInfoData = stationInfo();
-      <ng-container>
-        @if (stationInfoData) {
-          <mgl-control position="bottom-left">
-            <growl-display-info-control
-              [data]="stationInfoData"
-            ></growl-display-info-control>
-          </mgl-control>
+      @let bodies = groundwaterBodies();
+      @let municipals = ndsMunicipals();
+      @let usageLocations = waterRightUsageLocations();
+      @let oldUsageLocations = oldWaterRightUsageLocations();
+      <ng-container controls>
+        <mgl-control position="top-right">
+          <growl-layer-selection-control
+            [layers]="selectedLayers"
+          ></growl-layer-selection-control>
+        </mgl-control>
+        <mgl-control
+          mglNavigation
+          [showCompass]="false"
+          position="top-left"
+        ></mgl-control>
+        <mgl-control
+          mglAttribution
+          position="bottom-right"
+          [compact]="true"
+          [customAttribution]="[attribution()]"
+        ></mgl-control>
+        <!-- using ng-containers we can ensure this ordering -->
+        <ng-container>
+          @if (selectedLayers.groundwaterLevelStations()) {
+            <mgl-control position="bottom-left">
+              <growl-legend-control></growl-legend-control>
+            </mgl-control>
+          }
+        </ng-container>
+        <ng-container>
+          @if (groundwaterInfoData) {
+            <mgl-control position="bottom-left">
+              <growl-display-info-control
+                [data]="groundwaterInfoData"
+              ></growl-display-info-control>
+            </mgl-control>
+          }
+        </ng-container>
+        <ng-container>
+          @if (municipalInfoData) {
+            <mgl-control position="bottom-left">
+              <growl-display-info-control
+                [data]="municipalInfoData"
+              ></growl-display-info-control>
+            </mgl-control>
+          }
+        </ng-container>
+        <ng-container>
+          @if (stationInfoData) {
+            <mgl-control position="bottom-left">
+              <growl-display-info-control
+                [data]="stationInfoData"
+              ></growl-display-info-control>
+            </mgl-control>
+          }
+        </ng-container>
+      </ng-container>
+      <ng-container sources>
+        <mgl-geojson-source id="groundwater-bodies-source">
+          @for (body of bodies; track body.key) {
+            <mgl-feature
+              [geometry]="body.geometry"
+              [id]="body.id"
+            ></mgl-feature>
+          }
+        </mgl-geojson-source>
+        <mgl-geojson-source id="nds-municipals-source">
+          @for (municipal of municipals; track municipal.key) {
+            <mgl-feature
+              [geometry]="municipal.geometry"
+              [id]="municipal.id"
+            ></mgl-feature>
+          }
+        </mgl-geojson-source>
+        <mgl-geojson-source id="water-right-usage-locations-source">
+          @for (usageLocation of usageLocations; track usageLocation.key) {
+            <mgl-feature
+              [geometry]="usageLocation.geometry"
+              [id]="usageLocation.id"
+            ></mgl-feature>
+          }
+        </mgl-geojson-source>
+        <mgl-geojson-source id="old-water-right-usage-locations-source">
+          @for (usageLocation of oldUsageLocations; track usageLocation.key) {
+            <mgl-feature
+              [geometry]="usageLocation.geometry"
+              [id]="usageLocation.id"
+            ></mgl-feature>
+          }
+        </mgl-geojson-source>
+      </ng-container>
+      <ng-container layers>
+        <!-- We cannot render fill and line at the same time. -->
+        @if (bodies.length && selectedLayers.groundwaterBodies()) {
+          <mgl-layer
+            id="groundwater-bodies-layer-fill"
+            type="fill"
+            source="groundwater-bodies-source"
+            [paint]="{
+              'fill-color': '#0088aa',
+              'fill-opacity': 0.3,
+            }"
+            (layerMouseMove)="bodySelected.set(+$event.features![0]!.id!)"
+            (layerMouseLeave)="bodySelected.set(null)"
+          ></mgl-layer>
+          <mgl-layer
+            id="groundwater-bodies-layer-line"
+            type="line"
+            source="groundwater-bodies-source"
+            [paint]="{
+              'line-color': '#0088aa',
+              'line-width': 3,
+            }"
+          ></mgl-layer>
+        }
+        @if (municipals.length && selectedLayers.ndsMunicipals()) {
+          <mgl-layer
+            id="nds-municipals-layer-fill"
+            type="fill"
+            source="nds-municipals-source"
+            [paint]="{'fill-opacity': 0}"
+            (layerMouseMove)="municipalSelected.set(+$event.features![0]!.id!)"
+            (layerMouseLeave)="municipalSelected.set(null)"
+          ></mgl-layer>
+          <mgl-layer
+            id="nds-municipals-layer-line"
+            type="line"
+            source="nds-municipals-source"
+            [paint]="{
+              'line-color': 'black',
+              'line-width': 2,
+            }"
+          ></mgl-layer>
+        }
+        @if (selectedLayers.groundwaterLevelStations()) {
+          @for (
+            station of groundwaterMeasurementStations();
+            track station.key
+          ) {
+            <mgl-marker
+              [lngLat]="{
+                lat: station.geometry.coordinates[1],
+                lon: station.geometry.coordinates[0],
+              }"
+            >
+              @let measurement = measurements()[station.key];
+              @let classification = measurement?.classification || null;
+              @let color = measurementColors[classification || "null"];
+              <growl-groundwater-level-station-marker
+                [size]="markerSize()"
+                [color]="color"
+                (mouseenter)="stationSelected.set(station.key)"
+                (mouseleave)="stationSelected.set(null)"
+              ></growl-groundwater-level-station-marker>
+            </mgl-marker>
+          }
+        }
+        @if (usageLocations.length && selectedLayers.waterRightUsageLocations()) {
+          <mgl-layer
+            id="water-right-usage-locations-layer-symbol"
+            type="symbol"
+            source="water-right-usage-locations-source"
+          ></mgl-layer>
+        }
+        @if (oldUsageLocations.length && selectedLayers.oldWaterRightUsageLocations()) {
+          <mgl-layer
+            id="old-water-right-usage-locations-layer-symbol"
+            type="symbol"
+            source="old-water-right-usage-locations-source"
+          ></mgl-layer>
         }
       </ng-container>
-      @let bodies = groundwaterBodies();
-      <mgl-geojson-source id="groundwater-bodies-source">
-        @for (body of bodies; track body.key) {
-          <mgl-feature [geometry]="body.geometry" [id]="body.id"></mgl-feature>
-        }
-      </mgl-geojson-source>
-      @let municipals = ndsMunicipals();
-      <mgl-geojson-source id="nds-municipals-source">
-        @for (municipal of municipals; track municipal.key) {
-          <mgl-feature
-            [geometry]="municipal.geometry"
-            [id]="municipal.id"
-          ></mgl-feature>
-        }
-      </mgl-geojson-source>
-      <!-- We cannot render fill and line at the same time. -->
-      @if (bodies.length && selectedLayers.groundwaterBodies()) {
-        <mgl-layer
-          id="groundwater-bodies-layer-fill"
-          type="fill"
-          source="groundwater-bodies-source"
-          [paint]="{
-            'fill-color': '#0088aa',
-            'fill-opacity': 0.3,
-          }"
-          (layerMouseMove)="bodySelected.set(+$event.features![0]!.id!)"
-          (layerMouseLeave)="bodySelected.set(null)"
-        ></mgl-layer>
-        <mgl-layer
-          id="groundwater-bodies-layer-line"
-          type="line"
-          source="groundwater-bodies-source"
-          [paint]="{
-            'line-color': '#0088aa',
-            'line-width': 3,
-          }"
-        ></mgl-layer>
-      }
-      @if (municipals.length && selectedLayers.ndsMunicipals()) {
-        <mgl-layer
-          id="nds-municipals-layer-fill"
-          type="fill"
-          source="nds-municipals-source"
-          [paint]="{'fill-opacity': 0}"
-          (layerMouseMove)="municipalSelected.set(+$event.features![0]!.id!)"
-          (layerMouseLeave)="municipalSelected.set(null)"
-        ></mgl-layer>
-        <mgl-layer
-          id="nds-municipals-layer-line"
-          type="line"
-          source="nds-municipals-source"
-          [paint]="{
-            'line-color': 'black',
-            'line-width': 2,
-          }"
-        ></mgl-layer>
-      }
-      @if (selectedLayers.groundwaterLevelStations()) {
-        @for (station of groundwaterMeasurementStations(); track station.key) {
-          <mgl-marker
-            [lngLat]="{
-              lat: station.geometry.coordinates[1],
-              lon: station.geometry.coordinates[0],
-            }"
-          >
-            @let measurement = measurements()[station.key];
-            @let classification = measurement?.classification || null;
-            @let color = measurementColors[classification || "null"];
-            <growl-groundwater-level-station-marker
-              [size]="markerSize()"
-              [color]="color"
-              (mouseenter)="stationSelected.set(station.key)"
-              (mouseleave)="stationSelected.set(null)"
-            ></growl-groundwater-level-station-marker>
-          </mgl-marker>
-        }
-      }
     </mgl-map>
   </div>
   <div class="card-content">stuff here</div>

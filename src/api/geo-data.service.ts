@@ -132,7 +132,6 @@ const AVAILABLE_LAYERS_SCHEMA = {
 const LAYER_CONTENT = {
   properties: {
     id: {type: "uint32"},
-    name: {type: "string"},
     key: {type: "string"},
     geometry: {
       optionalProperties: {},
@@ -140,6 +139,7 @@ const LAYER_CONTENT = {
     },
   },
   optionalProperties: {
+    name: {type: "string", nullable: true},
     additionalProperties: {
       optionalProperties: {},
       additionalProperties: true,
