@@ -35,7 +35,11 @@ export class SchemaValidationInterceptor implements HttpInterceptor {
         if (!validate(response.body)) {
           // this casting is given in the example for ajv
           // see: https://ajv.js.org/guide/typescript.html#type-safe-error-handling
-          console.error(validate.errors);
+          console.error(
+            "expected response type is invalid",
+            req,
+            validate.errors,
+          );
           throw new this.Error(
             response.body,
             validate.errors as DefinedError[],
