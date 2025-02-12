@@ -160,8 +160,8 @@ const MEASUREMENT_CLASSIFICATIONS_RESPONSE = {
               },
             },
             optionalProperties: {
-              waterLevelNHN: {type: "float64"},
-              waterLevelGOK: {type: "float64"},
+              waterLevelNHN: {type: "float64", nullable: true},
+              waterLevelGOK: {type: "float64", nullable: true},
             },
           },
         },
