@@ -67,7 +67,7 @@ type Polygons = typeUtils.UpdateElements<
   styles: ``,
 })
 export class GrowlComponent {
-  protected zoom = 7;
+  protected zoom = 6.8;
   protected markerSize = signal(GrowlComponent.calculateMarkerSize(this.zoom));
   protected style = colorful as any as StyleSpecification;
   protected measurementColors = LegendControlComponent.legendColors;
