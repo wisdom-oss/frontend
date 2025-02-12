@@ -1,3 +1,6 @@
+import {registerLocaleData} from "@angular/common";
+import localeDe from "@angular/common/locales/de";
+import localeDeExtra from "@angular/common/locales/extra/de";
 import {Component} from "@angular/core";
 import {bootstrapApplication} from "@angular/platform-browser";
 import {RouterOutlet} from "@angular/router";
@@ -17,6 +20,7 @@ class AppComponent {
   constructor(private translate: TranslateService) {
     dayjs.extend(duration);
     configureTranslations(translate);
+    registerLocaleData(localeDe, "de", localeDeExtra);
   }
 }
 
