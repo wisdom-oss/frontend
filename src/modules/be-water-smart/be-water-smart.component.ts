@@ -7,18 +7,19 @@ import { BaseChartDirective } from "ng2-charts";
 import { Observable } from "rxjs";
 
 import { BeWaterSmartService } from "../../api/be-water-smart.service";
-import { Algorithm, PhysicalMeter, VirtualMeter, MLModel } from "./bws-interfaces";
+import { Algorithm, PhysicalMeter, VirtualMeter, MLModel, AllAlgorithms, AllVirtualMeters } from "./bws-interfaces";
 import { CommonModule, NgFor } from "@angular/common";
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from "@ngx-translate/core";
 import { TransformStringPipe } from "../../common/pipes/transform-string.pipe";
 import { NgIcon, provideIcons } from "@ng-icons/core";
 import { ionAddOutline, ionTrashOutline } from "@ng-icons/ionicons"
+import { DropdownComponent } from "../../common/components/dropdown/dropdown.component";
 
 @Component({
   selector: 'be-water-smart',
   templateUrl: "be-water-smart.component.html",
-  imports: [NgFor, CommonModule, FormsModule, TranslatePipe, TransformStringPipe, DatePipe, BaseChartDirective, NgIcon],
+  imports: [NgFor, CommonModule, FormsModule, TranslatePipe, TransformStringPipe, DatePipe, BaseChartDirective, NgIcon, DropdownComponent],
   providers: [provideIcons({ ionAddOutline, ionTrashOutline })],
   styleUrls: ['be-water-smart.css']
 })
@@ -38,6 +39,16 @@ export class BeWaterSmartComponent implements OnInit {
   heightMF: string = "250px";
   heightLS: string = "500px";
   heightTable: string = "300px";
+
+  // ---------- Dropdowns ---------- 
+
+  menuAlgorithm: string = "Select Algorithm";
+  optionsAlgorithm: Record<string, string> = {};
+  choiceAlgorithm?: string;
+
+  menuVirtualMeter: string = "Select Virtual Meter";
+  optionsVirtualMeter: Record<string, string> = {};
+  choiceVirtualMeter?: string;
 
 // ------------------------------ Chart Parameters --------------------------------------------
 
@@ -197,11 +208,10 @@ export class BeWaterSmartComponent implements OnInit {
 
   ngOnInit(): void {
     // initialize all displays when rendering web page
-    this.extractPMeters()
+    this.extractPMeters();
     this.extractVMeters();
     this.extractAlgorithms();
     this.extractModels();
-
   }
 
   // ---------- Extracting Functions ----------
@@ -225,6 +235,47 @@ export class BeWaterSmartComponent implements OnInit {
   }
 
   /**
+   * Extraction Method for Algorithms
+   * @param extractionMethod the function to use for the api call
+   */
+  extractAlgorithmsInRecord(extractionMethod: () => Observable<AllAlgorithms>): void {
+    extractionMethod().subscribe({
+      next: (response) => {
+        var algorithms: Record<string, string> = {};
+        response.algorithms.forEach(algorithm => {
+          algorithms[algorithm.name] = algorithm.name; 
+        })
+        this["optionsAlgorithm"] = algorithms;
+        this["algorithms"] = response.algorithms;
+      },
+      error: (error) => {
+        console.log(error);
+      },
+    });
+  }
+
+  /**
+   * Extraction Method for VirtualMeters
+   * @param extractionMethod the function to use for the api call
+   */
+  extractVirtualMetersInRecord(extractionMethod: () => Observable<AllVirtualMeters>): void {
+    extractionMethod().subscribe({
+      next: (response) => {
+        var virtualMeters: Record<string, string> = {};
+        response.virtualMeters.forEach(virtualMeter => {
+          var ids = virtualMeter.id.split(':');
+          virtualMeters[virtualMeter.id] = ids[ids.length-1];
+        })
+        this["optionsVirtualMeter"] = virtualMeters;
+        this["vMeters"] = response.virtualMeters;
+      },
+      error: (error) => {
+        console.log(error);
+      },
+    });
+  }
+
+  /**
    * calls bws service to retrieve all physical meter information
    */
   extractPMeters(): void {
@@ -239,19 +290,42 @@ export class BeWaterSmartComponent implements OnInit {
    * calls bws service to retrieve all virtual meter information
    */
   extractVMeters(): void {
-    this.extractData(() => this.bwsService.getVirtualMeters(),
-      'virtualMeters', 'vMeters')
+    this.extractVirtualMetersInRecord(() => this.bwsService.getVirtualMeters());
+  }
+
+   /**
+   * returns an VirtualMeter based on the given id
+   */
+   getVirtualMeter(virtualMeterId: string): VirtualMeter | undefined {
+    var vMeter = this.vMeters.filter((vMeter) => (vMeter.id === virtualMeterId));
+
+    console.log(vMeter);
+
+    if (vMeter.length === 1) {
+      return vMeter[0];
+    }
+
+    return undefined;
   }
 
   /**
    * calls bws service to retrieve all algorithms
    */
   extractAlgorithms(): void {
-    this.extractData(
-      () => this.bwsService.getAlgorithms(),
-      'algorithms',
-      'algorithms'
-    )
+    this.extractAlgorithmsInRecord(() => this.bwsService.getAlgorithms());
+  }
+
+  /**
+   * returns an algorithm based on the given name
+   */
+  getAlgorithm(algorithmName: string): Algorithm | undefined {
+    var algorithm = this.algorithms.filter((algorithm) => (algorithm.name === algorithmName));
+
+    if (algorithm.length === 1) {
+      return algorithm[0];
+    }
+
+    return undefined;
   }
 
   /**
@@ -376,10 +450,17 @@ export class BeWaterSmartComponent implements OnInit {
    * train one of the Models and retrieve the training data
    */
   trainModel(): void {
+    if (this.choiceVirtualMeter) {
+      this.selectedVirtualMeter = this.getVirtualMeter(this.choiceVirtualMeter);
+    }
 
     if (!this.selectedVirtualMeter) {
       console.log("No Virtual Meter detected!");
       return;
+    }
+
+    if (this.choiceAlgorithm) {
+      this.selectedAlgorithm = this.getAlgorithm(this.choiceAlgorithm);
     }
 
     if (!this.selectedAlgorithm) {
@@ -395,6 +476,7 @@ export class BeWaterSmartComponent implements OnInit {
     this.bwsService.putTrainModel(this.selectedVirtualMeter, this.selectedAlgorithm, this.modelComment).subscribe({
       next: (response) => {
         this.extractModels();
+        this.choiceAlgorithm = undefined;
         this.selectedAlgorithm = undefined;
         this.selectedVirtualMeter = undefined;
         this.modelComment = undefined;
@@ -532,11 +614,8 @@ export class BeWaterSmartComponent implements OnInit {
    * @returns the new date as a string
    */
   transformDate(date: string): string {
-
     const datePipe = new DatePipe('en-US');
-
     const formattedDate = datePipe.transform(date, 'dd.MM.yyyy');
-
     return formattedDate || date;
   }
 }

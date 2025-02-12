@@ -108,31 +108,31 @@
     
                 <div class="field is-grouped is-justify-content-center">
                     <!-- Choose Algorithm -->
-                    <div class="control" [style]="{ width: '15%' }">
+                    <div class="control " [style]="{ width: '20%' }">
                         <label class="label" for="algorithmSelect">{{ "be-water-smart.model_training.algorithm" | translate }}</label>
-                        <div class="select is-fullwidth">
-                            <select id="algorithmSelect" [(ngModel)]="selectedAlgorithm">
-                                <option *ngFor="let item of algorithms" [ngValue]="item" [title]="item.description">
-                                    {{ item.name }}
-                                </option>
-                            </select>
-                        </div>
+                        <dropdown 
+                          [menuName]="menuAlgorithm"
+                          [options]="optionsAlgorithm"
+                          [changeMenuName]="true"
+                          kind="hover"
+                          (choice)="choiceAlgorithm = $event"
+                        ></dropdown>
                     </div>
 
                     <!-- Choose Virtual Meter -->
-                    <div class="control" [style]="{ width: '15%' }">
+                    <div class="control" [style]="{ width: '20%' }">
                         <label class="label" for="virtualMeterSelect">{{ "be-water-smart.model_training.virtual_meter" | translate }}</label>
-                        <div class="select is-fullwidth">
-                            <select id="virtualMeterSelect" [(ngModel)]="selectedVirtualMeter">
-                                <option *ngFor="let item of vMeters" [ngValue]="item" [title]="item.description">
-                                    {{ (item.id | transformString : prefixes[0]).slice(0, 20) }}
-                                </option>
-                            </select>
-                        </div>
+                        <dropdown 
+                          [menuName]="menuVirtualMeter"
+                          [options]="optionsVirtualMeter"
+                          [changeMenuName]="true"
+                          kind="hover"
+                          (choice)="choiceVirtualMeter = $event"
+                        ></dropdown>
                     </div>
 
                     <!-- Create a Comment -->
-                    <div class="control" [style]="{ width: '15%' }">
+                    <div class="control" [style]="{ width: '20%' }">
                         <label class="label" for="commentSelect">{{ "be-water-smart.model_training.comment" | translate }}</label>
                         <input type="text" class="input is-fullwidth" id="commentSelect" placeholder="Add a comment" [(ngModel)]="modelComment"/>
                     </div>
