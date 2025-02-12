@@ -1,15 +1,8 @@
-import {formatDate, DatePipe, KeyValuePipe} from "@angular/common";
-import {
-  computed,
-  input,
-  signal,
-  Component,
-  Signal,
-  WritableSignal,
-} from "@angular/core";
-import {outputFromObservable, toSignal} from "@angular/core/rxjs-interop";
+import {formatDate, KeyValuePipe} from "@angular/common";
+import {computed, input, Component, Signal} from "@angular/core";
+import {toSignal} from "@angular/core/rxjs-interop";
 import {TranslatePipe, TranslateService} from "@ngx-translate/core";
-import dayjs, {Dayjs} from "dayjs";
+import dayjs from "dayjs";
 import {map} from "rxjs";
 
 @Component({

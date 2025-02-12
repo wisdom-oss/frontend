@@ -1,7 +1,6 @@
 import {signal, Component} from "@angular/core";
 import {TranslatePipe} from "@ngx-translate/core";
 
-import {GeoDataService} from "../../../../api/geo-data.service";
 import {GroundwaterLevelsService} from "../../../../api/groundwater-levels.service";
 
 // alias the enum here to ease the use of it

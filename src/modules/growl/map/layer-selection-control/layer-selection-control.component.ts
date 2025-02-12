@@ -1,13 +1,5 @@
 import {KeyValuePipe} from "@angular/common";
-import {
-  computed,
-  input,
-  signal,
-  Component,
-  ModelSignal,
-  Signal,
-  WritableSignal,
-} from "@angular/core";
+import {input, signal, Component, WritableSignal} from "@angular/core";
 import {provideIcons, NgIcon} from "@ng-icons/core";
 import {remixStackFill} from "@ng-icons/remixicon";
 import {TranslatePipe} from "@ngx-translate/core";

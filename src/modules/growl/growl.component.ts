@@ -4,8 +4,6 @@ import {
   signal,
   viewChild,
   Component,
-  OnInit,
-  Signal,
   WritableSignal,
 } from "@angular/core";
 import {
