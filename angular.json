@@ -44,6 +44,10 @@
               {
                 "path": "node_modules/esbuild-plugin-toml/index.js",
                 "options": {}
+              },
+              {
+                "path": "scripts/esbuild/prebuild.cjs",
+                "options": {}
               }
             ],
             "outputPath": "dist/wisdom-oss/frontend",
