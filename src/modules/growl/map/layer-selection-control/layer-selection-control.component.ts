@@ -1,4 +1,10 @@
-import {input, signal, Component, WritableSignal, computed} from "@angular/core";
+import {
+  computed,
+  input,
+  signal,
+  Component,
+  WritableSignal,
+} from "@angular/core";
 import {provideIcons, NgIcon} from "@ng-icons/core";
 import {remixStackFill} from "@ng-icons/remixicon";
 import {TranslatePipe} from "@ngx-translate/core";

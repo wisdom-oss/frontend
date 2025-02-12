@@ -41,7 +41,9 @@
       @let municipalInfoData = municipalInfo();
       <mgl-control position="bottom-left">
         @if (municipalInfoData) {
-          <growl-display-info-control [data]="municipalInfoData"></growl-display-info-control>
+          <growl-display-info-control
+            [data]="municipalInfoData"
+          ></growl-display-info-control>
         }
       </mgl-control>
       @let stationInfoData = stationInfo();

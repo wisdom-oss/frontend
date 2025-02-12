@@ -215,7 +215,7 @@ export class GrowlComponent {
     return {
       title: municipal.name,
       subtitle: municipal.key,
-    }
+    };
   }
 
   protected static calculateMarkerSize(zoom: number): string {
