@@ -27,8 +27,6 @@ export class GroundwaterLevelStationMarkerComponent implements AfterViewInit {
     private host: ElementRef,
     private renderer: Renderer2,
   ) {
-    console.log("a new one");
-
     effect(() => {
       let svg = this.svg();
       if (!svg) return;
