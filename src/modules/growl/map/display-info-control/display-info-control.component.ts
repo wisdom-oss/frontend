@@ -52,7 +52,7 @@ export class DisplayInfoControlComponent {
       return formatDate(value.toDate(), "longDate", lang)!;
     }
 
-    return value.toString();
+    return value?.toString();
   }
 }
 

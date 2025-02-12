@@ -25,35 +25,44 @@
         [compact]="true"
         [customAttribution]="[attribution()]"
       ></mgl-control>
-      <mgl-control position="bottom-left">
+      <!-- using ng-containers we can ensure this ordering -->
+      <ng-container>
         @if (selectedLayers.groundwaterLevelStations()) {
-          <growl-legend-control></growl-legend-control>
+          <mgl-control position="bottom-left">
+            <growl-legend-control></growl-legend-control>
+          </mgl-control>
         }
-      </mgl-control>
+      </ng-container>
       @let groundwaterInfoData = bodyInfo();
-      <mgl-control position="bottom-left">
+      <ng-container>
         @if (groundwaterInfoData) {
-          <growl-display-info-control
-            [data]="groundwaterInfoData"
-          ></growl-display-info-control>
+          <mgl-control position="bottom-left">
+            <growl-display-info-control
+              [data]="groundwaterInfoData"
+            ></growl-display-info-control>
+          </mgl-control>
         }
-      </mgl-control>
+      </ng-container>
       @let municipalInfoData = municipalInfo();
-      <mgl-control position="bottom-left">
+      <ng-container>
         @if (municipalInfoData) {
-          <growl-display-info-control
-            [data]="municipalInfoData"
-          ></growl-display-info-control>
+          <mgl-control position="bottom-left">
+            <growl-display-info-control
+              [data]="municipalInfoData"
+            ></growl-display-info-control>
+          </mgl-control>
         }
-      </mgl-control>
+      </ng-container>
       @let stationInfoData = stationInfo();
-      <mgl-control position="bottom-left">
+      <ng-container>
         @if (stationInfoData) {
-          <growl-display-info-control
-            [data]="stationInfoData"
-          ></growl-display-info-control>
+          <mgl-control position="bottom-left">
+            <growl-display-info-control
+              [data]="stationInfoData"
+            ></growl-display-info-control>
+          </mgl-control>
         }
-      </mgl-control>
+      </ng-container>
       @let bodies = groundwaterBodies();
       <mgl-geojson-source id="groundwater-bodies-source">
         @for (body of bodies; track body.key) {
