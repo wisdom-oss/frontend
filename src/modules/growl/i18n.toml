@@ -30,6 +30,22 @@ de = "Niedrigstwert unterschritten"
 en = "no current data"
 de = "Keine aktuellen Daten"
 
+[display.station]
+en = "Station"
+de = "Messstation"
+
+[display.date]
+en = "Date"
+de = "Datum"
+
+[display.waterLevelNHN]
+en = "Water Level NHN"
+de = "Wasserstand NHN"
+
+[display.waterLevelGOK]
+en = "Water Level GOK"
+de = "Wasserstand GOK"
+
 [layer.groundwaterBodies]
 en = "NLWKN Groundwater Bodies"
 de = "NLWKN Grundwasserkörper"
@@ -37,3 +53,7 @@ de = "NLWKN Grundwasserkörper"
 [layer.groundwaterLevelStations]
 en = "NLWKN Groundwater Level Stations"
 de = "NLWKN Grundwasser Messstationen"
+
+[layer.ndsMunicipals]
+en = "Lower Saxony Municipals"
+de = "Niedersachen Kommunen"

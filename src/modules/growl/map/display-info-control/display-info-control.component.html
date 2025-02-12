@@ -12,9 +12,9 @@
         @for (tableData of display.table | keyvalue; track tableData.key) {
           <tr>
             <th class="has-text-weight-bold has-text-dark">
-              {{ tableData.key | translate }}:
+              {{ "growl.display." + tableData.key | translate }}:
             </th>
-            <td>{{ tableData.value | translate }}</td>
+            <td>{{ tableData.value }}</td>
           </tr>
         }
       </table>
