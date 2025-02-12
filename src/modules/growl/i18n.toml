@@ -30,6 +30,10 @@ de = "Niedrigstwert unterschritten"
 en = "no current data"
 de = "Keine aktuellen Daten"
 
+[layer.groundwaterBodies]
+en = "NLWKN Groundwater Bodies"
+de = "NLWKN Grundwasserkörper"
+
 [layer.groundwaterLevelStations]
 en = "NLWKN Groundwater Level Stations"
 de = "NLWKN Grundwasser Messstationen"

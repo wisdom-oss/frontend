@@ -33,17 +33,17 @@
       @let groundwaterInfoData = bodyInfo() ?? undefined;
       <mgl-control position="bottom-left">
         @if (groundwaterInfoData) {
-          <growl-groundwater-info-control
+          <growl-display-info-control
             [data]="groundwaterInfoData"
-          ></growl-groundwater-info-control>
+          ></growl-display-info-control>
         }
       </mgl-control>
       @let stationInfoData = stationInfo() ?? undefined;
       <mgl-control position="bottom-left">
         @if (stationInfoData) {
-          <growl-station-info-control
+          <growl-display-info-control
             [data]="stationInfoData"
-          ></growl-station-info-control>
+          ></growl-display-info-control>
         }
       </mgl-control>
       @let bodies = groundwaterBodies();
@@ -52,8 +52,17 @@
           <mgl-feature [geometry]="body.geometry" [id]="body.id"></mgl-feature>
         }
       </mgl-geojson-source>
+      @let municipals = ndsMunicipals();
+      <mgl-geojson-source id="nds-municipals-source">
+        @for (municipal of municipals; track municipal.key) {
+          <mgl-feature
+            [geometry]="municipal.geometry"
+            [id]="municipal.id"
+          ></mgl-feature>
+        }
+      </mgl-geojson-source>
       <!-- We cannot render fill and line at the same time. -->
-      @if (bodies.length) {
+      @if (bodies.length && selectedLayers.groundwaterBodies()) {
         <mgl-layer
           id="groundwater-bodies-layer-fill"
           type="fill"
@@ -72,6 +81,17 @@
           [paint]="{
             'line-color': '#0088aa',
             'line-width': 3,
+          }"
+        ></mgl-layer>
+      }
+      @if (municipals.length && selectedLayers.ndsMunicipals()) {
+        <mgl-layer
+          id="nds-municipals-layer-line"
+          type="line"
+          source="nds-municipals-source"
+          [paint]="{
+            'line-color': 'black',
+            'line-width': 2,
           }"
         ></mgl-layer>
       }

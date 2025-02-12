@@ -18,14 +18,13 @@ import {
   AttributionControlDirective,
   NavigationControlDirective,
 } from "@maplibre/ngx-maplibre-gl";
-import {Point, Polygon} from "geojson";
+import {Point, MultiPolygon, Polygon} from "geojson";
 import {MapLibreEvent, StyleSpecification} from "maplibre-gl";
 
-import {GroundwaterInfoControlComponent} from "./map/groundwater-info-control/groundwater-info-control.component";
+import {DisplayInfoControlComponent} from "./map/display-info-control/display-info-control.component";
 import {GroundwaterLevelStationMarkerComponent} from "./map/groundwater-level-station-marker/groundwater-level-station-marker.component";
 import {LayerSelectionControlComponent} from "./map/layer-selection-control/layer-selection-control.component";
 import {LegendControlComponent} from "./map/legend-control/legend-control.component";
-import {StationInfoControlComponent} from "./map/station-info-control/station-info-control.component";
 import {GeoDataService} from "../../api/geo-data.service";
 import {GroundwaterLevelsService} from "../../api/groundwater-levels.service";
 import colorful from "../../common/map/styles/colorful.json";
@@ -45,6 +44,12 @@ type Polygons = typeUtils.UpdateElements<
   {geometry: Polygon}
 >;
 
+type MultiPolygons = typeUtils.UpdateElements<
+  GeoDataService.LayerContents,
+  "geometry",
+  {geometry: MultiPolygon}
+>;
+
 @Component({
   selector: "growl",
   imports: [
@@ -52,7 +57,6 @@ type Polygons = typeUtils.UpdateElements<
     ControlComponent,
     FeatureComponent,
     GeoJSONSourceComponent,
-    GroundwaterInfoControlComponent,
     GroundwaterLevelStationMarkerComponent,
     LayerComponent,
     LayerSelectionControlComponent,
@@ -61,7 +65,7 @@ type Polygons = typeUtils.UpdateElements<
     MarkerComponent,
     NavigationControlDirective,
     ResizeMapOnLoadDirective,
-    StationInfoControlComponent,
+    DisplayInfoControlComponent,
   ],
   templateUrl: "./growl.component.html",
   styles: ``,
@@ -76,13 +80,16 @@ export class GrowlComponent {
   protected stationInfo = computed(() => this.findStationInfo());
   protected bodySelected = signal<number | null>(null);
   protected bodyInfo = computed(() => this.findBodyInfo());
+
   protected selectedLayers = {
+    groundwaterBodies: signals.toggleable(true),
     groundwaterLevelStations: signals.toggleable(true),
-    other: signals.toggleable(false),
+    ndsMunicipals: signals.toggleable(false),
   } as const;
 
   readonly groundwaterBodies = signal<Polygons>([]);
   readonly groundwaterMeasurementStations = signal<Points>([]);
+  readonly ndsMunicipals = signal<MultiPolygons>([]);
   readonly measurements: WritableSignal<
     Record<string, GroundwaterLevelsService.Measurement>
   > = signal({});
@@ -109,6 +116,17 @@ export class GrowlComponent {
         p => p.filter(({geometry}) => geometry.type === "Polygon") as Polygons,
       )
       .then(polygons => this.groundwaterBodies.set(polygons));
+
+    this.geo
+      .fetchLayerContents("nds_municipals")
+      .then(contents => contents ?? [])
+      .then(
+        p =>
+          p.filter(
+            ({geometry}) => geometry.type === "MultiPolygon",
+          ) as MultiPolygons,
+      )
+      .then(multiPolygons => this.ndsMunicipals.set(multiPolygons));
 
     this.gl
       .fetchMeasurementClassifications()
@@ -149,7 +167,7 @@ export class GrowlComponent {
     this.markerSize.set(size);
   }
 
-  private findStationInfo(): StationInfoControlComponent.Display | null {
+  private findStationInfo(): DisplayInfoControlComponent.Data | null {
     let selection = this.stationSelected();
     if (!selection) return null;
 
@@ -162,15 +180,17 @@ export class GrowlComponent {
     if (!measurement) return null;
 
     return {
-      name: station.name,
-      station: station.key,
-      date: measurement.date,
-      waterLevelNHN: measurement.waterLevelNHN,
-      waterLevelGOK: measurement.waterLevelGOK,
+      title: station.name,
+      table: {
+        station: station.key,
+        date: measurement.date,
+        waterLevelNHN: measurement.waterLevelNHN,
+        waterLevelGOK: measurement.waterLevelGOK,
+      },
     };
   }
 
-  private findBodyInfo(): GroundwaterInfoControlComponent.Display | null {
+  private findBodyInfo(): DisplayInfoControlComponent.Data | null {
     let selection = this.bodySelected();
     if (!selection) return null;
 
@@ -179,8 +199,8 @@ export class GrowlComponent {
     if (!body) return null;
 
     return {
-      name: body.name,
-      key: body.key,
+      title: body.name,
+      subtitle: body.key,
     };
   }
 
