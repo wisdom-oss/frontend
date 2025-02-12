@@ -90,6 +90,8 @@ export class GrowlComponent {
   readonly groundwaterBodies = signal<Polygons>([]);
   readonly groundwaterMeasurementStations = signal<Points>([]);
   readonly ndsMunicipals = signal<MultiPolygons>([]);
+  readonly waterRightUsageLocations = signal<Points>([]);
+  readonly oldWaterRightUsageLocations = signal<Points>([]);
   readonly measurements: WritableSignal<
     Record<string, GroundwaterLevelsService.Measurement>
   > = signal({});
@@ -103,30 +105,22 @@ export class GrowlComponent {
     private geo: GeoDataService,
     private gl: GroundwaterLevelsService,
   ) {
-    this.geo
-      .fetchLayerContents("groundwater_measurement_stations")
-      .then(contents => contents ?? [])
-      .then(p => p.filter(({geometry}) => geometry.type === "Point") as Points)
-      .then(points => this.groundwaterMeasurementStations.set(points));
-
-    this.geo
-      .fetchLayerContents("groundwater_bodies")
-      .then(contents => contents ?? [])
-      .then(
-        p => p.filter(({geometry}) => geometry.type === "Polygon") as Polygons,
-      )
-      .then(polygons => this.groundwaterBodies.set(polygons));
-
-    this.geo
-      .fetchLayerContents("nds_municipals")
-      .then(contents => contents ?? [])
-      .then(
-        p =>
-          p.filter(
-            ({geometry}) => geometry.type === "MultiPolygon",
-          ) as MultiPolygons,
-      )
-      .then(multiPolygons => this.ndsMunicipals.set(multiPolygons));
+    this.fetchGeoData(
+      "groundwater_measurement_stations",
+      "Point",
+      this.groundwaterMeasurementStations.set,
+    );
+    this.fetchGeoData(
+      "groundwater_bodies",
+      "Polygon",
+      this.groundwaterBodies.set,
+    );
+    this.fetchGeoData("nds_municipals", "MultiPolygon", this.ndsMunicipals.set);
+    this.fetchGeoData(
+      "water_right_usage_locations",
+      "Point",
+      this.waterRightUsageLocations.set,
+    );
 
     this.gl
       .fetchMeasurementClassifications()
@@ -165,6 +159,18 @@ export class GrowlComponent {
     let zoom = event.target.getZoom();
     let size = GrowlComponent.calculateMarkerSize(zoom);
     this.markerSize.set(size);
+  }
+
+  private fetchGeoData<T extends string, R extends {geometry: {type: T}}>(
+    layerName: string,
+    type: T,
+    setter: (data: R[]) => void,
+  ) {
+    this.geo
+      .fetchLayerContents(layerName)
+      .then(contents => contents ?? [])
+      .then(p => p.filter(({geometry}) => geometry.type == type) as R[])
+      .then(setter);
   }
 
   private findStationInfo(): DisplayInfoControlComponent.Data | null {
