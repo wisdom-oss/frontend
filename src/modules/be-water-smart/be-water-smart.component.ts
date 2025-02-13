@@ -42,11 +42,11 @@ export class BeWaterSmartComponent implements OnInit {
 
   // ---------- Dropdowns ---------- 
 
-  menuAlgorithm: string = "Select Algorithm";
+  menuAlgorithm: string = "be-water-smart.hints.algorithm";
   optionsAlgorithm: Record<string, string> = {};
   choiceAlgorithm?: string;
 
-  menuVirtualMeter: string = "Select Virtual Meter";
+  menuVirtualMeter: string = "be-water-smart.hints.virtual_meter";
   optionsVirtualMeter: Record<string, string> = {};
   choiceVirtualMeter?: string;
 
@@ -108,7 +108,7 @@ export class BeWaterSmartComponent implements OnInit {
   /**
    * color of the ng2chart
    */
-  chartColor: string = '#000000';
+  chartColor: string = '#FFFFFF';
 
   /**
    * data skeleton for the line graph

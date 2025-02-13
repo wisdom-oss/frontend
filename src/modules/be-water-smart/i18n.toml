@@ -15,8 +15,8 @@ en = "List of Smartmeters"
 de = "Liste von Smartmetern"
 
 [titles.virtual_meter]
-en = "List of virtual Smartmeters"
-de = "Liste von virtuellen Smartmetern"
+en = "List of Virtual Meters"
+de = "Liste von Virtual Metern"
 
 [buttons.forecast]
 en = "Create Forecast"
@@ -43,12 +43,12 @@ en = "Address"
 de = "Adresse"
 
 [tables.submeters]
-en = "SubMeters"
-de = "SubMeter"
+en = "Submeters"
+de = "Submeter"
 
 [tables.supermeters]
-en = "SuperMeters"
-de = "SuperMeter"
+en = "Supermeters"
+de = "Supermeter"
 
 [model_training.algorithm]
 en = "Algorithm"
@@ -56,11 +56,31 @@ de = "Algorithmus"
 
 [model_training.virtual_meter]
 en = "Virtual Meter"
-de = "Virtuelles Smartmeter"
+de = "Virtual Meter"
 
 [model_training.comment]
 en = "Comment"
 de = "Kommentar"
+
+[hints.algorithm]
+en = "Select Algorithm"
+de = "Algorithmus auswählen"
+
+[hints.virtual_meter]
+en = "Select Virtual Meter"
+de = "Virtual Meter auswählen"
+
+[hints.virtual_meter_name]
+en = "Enter Virtual Meter Name"
+de = "Virtual Meter Namen eingeben"
+
+[hints.supermeter_name]
+en = "Enter Supermeter Name"
+de = "Supermeter Namen eingeben"
+
+[hints.comment]
+en = "Add a comment"
+de = "Kommentar hinzufügen"
 
 [no_data]
 en = "No data available"
