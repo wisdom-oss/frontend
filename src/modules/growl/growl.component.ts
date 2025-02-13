@@ -34,7 +34,6 @@ import {
 } from "maplibre-gl";
 
 import {DisplayInfoControlComponent} from "./map/display-info-control/display-info-control.component";
-import {GroundwaterLevelStationMarkerComponent} from "./map/groundwater-level-station-marker/groundwater-level-station-marker.component";
 import {LayerSelectionControlComponent} from "./map/layer-selection-control/layer-selection-control.component";
 import {LegendControlComponent} from "./map/legend-control/legend-control.component";
 import {GeoDataService} from "../../api/geo-data.service";
@@ -66,7 +65,6 @@ function emptyFeatures<G extends Geometry, P>(): FeatureCollection<
     AttributionControlDirective,
     ControlComponent,
     GeoJSONSourceComponent,
-    GroundwaterLevelStationMarkerComponent,
     LayerComponent,
     LayerSelectionControlComponent,
     LegendControlComponent,

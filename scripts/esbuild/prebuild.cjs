@@ -41,7 +41,7 @@ async function buildNlwknMeasurementClassificationColorSvgs() {
   let colors = toml.parse(tomlContent);
 
   let svgContent = await readFile(
-    "src/modules/growl/map/groundwater-level-station-marker/groundwater-level-station-marker.component.svg",
+    "src/assets/growl/groundwater-level-station-marker/groundwater-level-station-marker.svg",
     "utf-8",
   );
   let svgParser = new xml.XMLParser({
