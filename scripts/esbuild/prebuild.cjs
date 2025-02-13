@@ -2,6 +2,7 @@ const {Plugin, PluginBuild} = require("esbuild");
 const {readFile, writeFile, mkdir} = require("fs/promises");
 const toml = require("smol-toml");
 const xml = require("fast-xml-parser");
+const sharp = require("sharp");
 
 /**
  * An esbuild plugin that executes prebuild operations.
@@ -63,16 +64,15 @@ async function buildNlwknMeasurementClassificationColorSvgs() {
     suppressEmptyNode: false,
   });
 
-  await mkdir("src/generated/groundwater-level-station-marker", {
+  await mkdir("public/generated/groundwater-level-station-marker", {
     recursive: true,
   });
   for (let [classification, color] of Object.entries(colors)) {
     let thisSvg = structuredClone(svg);
     thisSvg[0].svg[1][":@"].style = `fill:${color}`;
-    let writeSvg = svgBuilder.build(thisSvg);
-    await writeFile(
-      `src/generated/groundwater-level-station-marker/${classification}.svg`,
-      writeSvg,
-    );
+    let newSvg = svgBuilder.build(thisSvg);
+    let svgBuffer = Buffer.from(newSvg, "utf-8");
+    let path = `public/generated/groundwater-level-station-marker/${classification}.png`;
+    await sharp(svgBuffer).resize(64).png().toFile(path);
   }
 }

@@ -7,15 +7,27 @@
       [center]="{lat: 52.8, lon: 9.2}"
       [canvasContextAttributes]="{preserveDrawingBuffer: true}"
       [attributionControl]="false"
-      (zoomEvt)="onZoom($event)"
     >
-      @let groundwaterInfoData = bodyInfo();
-      @let municipalInfoData = municipalInfo();
-      @let stationInfoData = stationInfo();
+      @let measurementStations = measurementStationsWithData();
       @let bodies = groundwaterBodies();
       @let municipals = ndsMunicipals();
       @let usageLocations = waterRightUsageLocations();
       @let oldUsageLocations = oldWaterRightUsageLocations();
+      @let groundwaterInfoData = bodyInfo();
+      @let municipalInfoData = municipalInfo();
+      @let stationInfoData = stationInfo();
+      <ng-container images>
+        @for (color of measurementColors | keyvalue; track color.key) {
+          <mgl-image
+            [id]="'measurement-classification-' + color.key + '-image'"
+            [url]="
+              '/public/generated/groundwater-level-station-marker/' +
+              color.key +
+              '.png'
+            "
+          ></mgl-image>
+        }
+      </ng-container>
       <ng-container controls>
         <mgl-control position="top-right">
           <growl-layer-selection-control
@@ -77,6 +89,10 @@
         <mgl-geojson-source id="nds-municipals-source" [data]="municipals">
         </mgl-geojson-source>
         <mgl-geojson-source
+          id="groundwater-measurement-stations-source"
+          [data]="measurementStations"
+        ></mgl-geojson-source>
+        <mgl-geojson-source
           id="water-right-usage-locations-source"
           [data]="usageLocations"
         >
@@ -87,92 +103,108 @@
         >
         </mgl-geojson-source>
       </ng-container>
-      <ng-container layers>
-        <!-- We cannot render fill and line at the same time. -->
-        @if (bodies.features.length && selectedLayers.groundwaterBodies()) {
-          <mgl-layer
-            id="groundwater-bodies-layer-fill"
-            type="fill"
-            source="groundwater-bodies-source"
-            [paint]="{
-              'fill-color': '#0088aa',
-              'fill-opacity': 0.3,
-            }"
-            (layerMouseMove)="bodySelected.set(+$event.features![0]!.id!)"
-            (layerMouseLeave)="bodySelected.set(null)"
-          ></mgl-layer>
-          <mgl-layer
-            id="groundwater-bodies-layer-line"
-            type="line"
-            source="groundwater-bodies-source"
-            [paint]="{
-              'line-color': '#0088aa',
-              'line-width': 3,
-            }"
-          ></mgl-layer>
-        }
-        @if (municipals.features.length && selectedLayers.ndsMunicipals()) {
-          <mgl-layer
-            id="nds-municipals-layer-fill"
-            type="fill"
-            source="nds-municipals-source"
-            [paint]="{'fill-opacity': 0}"
-            (layerMouseMove)="municipalSelected.set(+$event.features![0]!.id!)"
-            (layerMouseLeave)="municipalSelected.set(null)"
-          ></mgl-layer>
-          <mgl-layer
-            id="nds-municipals-layer-line"
-            type="line"
-            source="nds-municipals-source"
-            [paint]="{
-              'line-color': 'black',
-              'line-width': 2,
-            }"
-          ></mgl-layer>
-        }
-        @if (selectedLayers.groundwaterLevelStations()) {
-          @for (
-            station of groundwaterMeasurementStations().features;
-            track station.properties.key
-          ) {
-            <mgl-marker
-              [lngLat]="{
-                lat: station.geometry.coordinates[1],
-                lon: station.geometry.coordinates[0],
+      <ng-container layers *ngIf="selectedLayersUpdate()">
+        <ng-container groundwater-bodies>
+          @if (bodies.features.length && selectedLayers.groundwaterBodies()) {
+            <mgl-layer
+              id="groundwater-bodies-layer-fill"
+              type="fill"
+              source="groundwater-bodies-source"
+              [paint]="{
+                'fill-color': '#0088aa',
+                'fill-opacity': 0.3,
               }"
-            >
-              @let measurement = measurements()[station.properties.key];
-              @let classification = measurement?.classification || null;
-              @let color = measurementColors[classification || "null"];
-              <growl-groundwater-level-station-marker
-                [size]="markerSize()"
-                [color]="color"
-                (mouseenter)="stationSelected.set(station.properties.key)"
-                (mouseleave)="stationSelected.set(null)"
-              ></growl-groundwater-level-station-marker>
-            </mgl-marker>
+              (layerMouseMove)="bodySelected.set(+$event.features![0]!.id!)"
+              (layerMouseLeave)="bodySelected.set(null)"
+            ></mgl-layer>
+            <mgl-layer
+              id="groundwater-bodies-layer-line"
+              type="line"
+              source="groundwater-bodies-source"
+              [paint]="{
+                'line-color': '#0088aa',
+                'line-width': 3,
+              }"
+            ></mgl-layer>
           }
-        }
-        @if (
-          usageLocations.features.length &&
-          selectedLayers.waterRightUsageLocations()
-        ) {
-          <mgl-layer
-            id="water-right-usage-locations-layer-symbol"
-            type="symbol"
-            source="water-right-usage-locations-source"
-          ></mgl-layer>
-        }
-        @if (
-          oldUsageLocations.features.length &&
-          selectedLayers.oldWaterRightUsageLocations()
-        ) {
-          <mgl-layer
-            id="old-water-right-usage-locations-layer-symbol"
-            type="symbol"
-            source="old-water-right-usage-locations-source"
-          ></mgl-layer>
-        }
+        </ng-container>
+        <ng-container nds-municipals>
+          @if (municipals.features.length && selectedLayers.ndsMunicipals()) {
+            <mgl-layer
+              id="nds-municipals-layer-fill"
+              type="fill"
+              source="nds-municipals-source"
+              [paint]="{'fill-opacity': 0}"
+              (layerMouseMove)="
+                municipalSelected.set(+$event.features![0]!.id!)
+              "
+              (layerMouseLeave)="municipalSelected.set(null)"
+            ></mgl-layer>
+            <mgl-layer
+              id="nds-municipals-layer-line"
+              type="line"
+              source="nds-municipals-source"
+              [paint]="{
+                'line-color': 'black',
+                'line-width': 2,
+              }"
+            ></mgl-layer>
+          }
+        </ng-container>
+        <ng-container groundwater-measurement-stations>
+          @if (
+            measurementStations.features.length &&
+            selectedLayers.groundwaterLevelStations()
+          ) {
+            @for (color of measurementColors | keyvalue; track color.key) {
+              <mgl-layer
+                [id]="
+                  'groundwater-measurement-stations-layer-' +
+                  color.key +
+                  '-symbol'
+                "
+                type="symbol"
+                source="groundwater-measurement-stations-source"
+                [layout]="{
+                  'icon-image':
+                    'measurement-classification-' + color.key + '-image',
+                  'icon-size': markerSize,
+                  'icon-ignore-placement': true,
+                  'symbol-z-order': 'source',
+                }"
+                [filter]="['==', ['get', 'classification'], '' + color.key]"
+                (layerMouseMove)="
+                  stationSelected.set($event.features![0]!.properties['key'])
+                "
+                (layerMouseLeave)="stationSelected.set(null)"
+              ></mgl-layer>
+            }
+          }
+        </ng-container>
+        <ng-container water-right-usage-locations>
+          @if (
+            usageLocations.features.length &&
+            selectedLayers.waterRightUsageLocations()
+          ) {
+            <mgl-layer
+              id="water-right-usage-locations-layer-symbol"
+              type="symbol"
+              source="water-right-usage-locations-source"
+            ></mgl-layer>
+          }
+        </ng-container>
+        <ng-container old-water-right-usage-locations>
+          @if (
+            oldUsageLocations.features.length &&
+            selectedLayers.oldWaterRightUsageLocations()
+          ) {
+            <mgl-layer
+              id="old-water-right-usage-locations-layer-symbol"
+              type="symbol"
+              source="old-water-right-usage-locations-source"
+            ></mgl-layer>
+          }
+        </ng-container>
       </ng-container>
     </mgl-map>
   </div>

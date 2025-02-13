@@ -1,3 +1,4 @@
+import {NgIf, AsyncPipe, KeyValuePipe} from "@angular/common";
 import {
   computed,
   effect,
@@ -8,6 +9,7 @@ import {
 } from "@angular/core";
 import {
   ControlComponent,
+  ImageComponent,
   LayerComponent,
   MapComponent,
   MarkerComponent,
@@ -23,7 +25,13 @@ import {
   MultiPolygon,
   Polygon,
 } from "geojson";
-import {MapLibreEvent, StyleSpecification} from "maplibre-gl";
+import {
+  MapLibreEvent,
+  ExpressionSpecification,
+  CameraFunctionSpecification,
+  CompositeFunctionSpecification,
+  StyleSpecification,
+} from "maplibre-gl";
 
 import {DisplayInfoControlComponent} from "./map/display-info-control/display-info-control.component";
 import {GroundwaterLevelStationMarkerComponent} from "./map/groundwater-level-station-marker/groundwater-level-station-marker.component";
@@ -36,13 +44,15 @@ import {ResizeMapOnLoadDirective} from "../../common/directives/resize-map-on-lo
 import colorful from "../../common/map/styles/colorful.json";
 import {signals} from "../../common/signals";
 
-type GeoProperties = {name?: string | null; key: string; [key: string]: any};
-type Points = FeatureCollection<Point, GeoProperties>;
+type Measurement = GroundwaterLevelsService.Measurement;
+
+type GeoProperties<P = {}> = {name?: string | null; key: string} & P;
+type Points<P = {}> = FeatureCollection<Point, GeoProperties<P>>;
 type Polygons = FeatureCollection<Polygon, GeoProperties>;
 type MultiPolygons = FeatureCollection<MultiPolygon, GeoProperties>;
-function emptyFeatures<G extends Geometry>(): FeatureCollection<
+function emptyFeatures<G extends Geometry, P>(): FeatureCollection<
   G,
-  GeoProperties
+  GeoProperties<P>
 > {
   return {
     type: "FeatureCollection",
@@ -60,18 +70,23 @@ function emptyFeatures<G extends Geometry>(): FeatureCollection<
     LayerComponent,
     LayerSelectionControlComponent,
     LegendControlComponent,
+    KeyValuePipe,
     MapComponent,
     MarkerComponent,
     NavigationControlDirective,
     ResizeMapOnLoadDirective,
     DisplayInfoControlComponent,
+    ImageComponent,
+    AsyncPipe,
+    NgIf,
   ],
   templateUrl: "./growl.component.html",
   styles: ``,
 })
 export class GrowlComponent {
   protected zoom = 6.8;
-  protected markerSize = signal(GrowlComponent.calculateMarkerSize(this.zoom));
+  // prettier-ignore
+  protected markerSize: ExpressionSpecification = ['interpolate', ['linear'], ['zoom'], 5, 0.1, 12, 1];
   protected style = colorful as any as StyleSpecification;
   protected measurementColors = nlwknMeasurementClassificationColors;
   protected legend = viewChild(LegendControlComponent);
@@ -89,20 +104,28 @@ export class GrowlComponent {
     ndsMunicipals: signals.toggleable(false),
     groundwaterBodies: signals.toggleable(true),
   } as const;
+  protected selectedLayersUpdate = signal(false);
+
+  // TODO: add a new derived signal that merges measurements into groundwater measurement stations
 
   readonly groundwaterBodies = signal<Polygons>(emptyFeatures());
   readonly groundwaterMeasurementStations = signal<Points>(emptyFeatures());
   readonly ndsMunicipals = signal<MultiPolygons>(emptyFeatures());
   readonly waterRightUsageLocations = signal<Points>(emptyFeatures());
   readonly oldWaterRightUsageLocations = signal<Points>(emptyFeatures());
-  readonly measurements: WritableSignal<
-    Record<string, GroundwaterLevelsService.Measurement>
-  > = signal({});
+  readonly measurements: WritableSignal<Record<string, Measurement>> = signal(
+    {},
+  );
+  readonly measurementStationsWithData = computed(() =>
+    this.applyMeasurementDataToStations(),
+  );
   readonly attribution = signal(`
     <a href="https://www.nlwkn.niedersachsen.de/opendata" target="_blank">
       2024 Niedersächsischer Landesbetrieb für Wasserwirtschaft, Küsten- und Naturschutz (NLWKN)
     </a>
   `);
+
+  protected log = console.log;
 
   constructor(
     private geo: GeoDataService,
@@ -130,13 +153,18 @@ export class GrowlComponent {
       this.oldWaterRightUsageLocations.set,
     );
 
+    effect(() => {
+      // force layer order by redrawing them on every update
+      this.groundwaterMeasurementStations();
+      this.groundwaterBodies();
+      for (let s of Object.values(this.selectedLayers)) s();
+      this.selectedLayersUpdate.set(false);
+      setTimeout(() => this.selectedLayersUpdate.set(true));
+    });
+
     this.gl
       .fetchMeasurementClassifications()
       .then(data => this.measurements.set(data));
-
-    effect(() => {
-      console.log(this.waterRightUsageLocations());
-    });
 
     effect(() => {
       let legend = this.legend();
@@ -161,16 +189,6 @@ export class GrowlComponent {
 
       legend.count.set(count);
     });
-  }
-
-  onLayerEnter(event: any) {
-    console.log(event);
-  }
-
-  onZoom(event: MapLibreEvent): void {
-    let zoom = event.target.getZoom();
-    let size = GrowlComponent.calculateMarkerSize(zoom);
-    this.markerSize.set(size);
   }
 
   private async fetchGeoData<G extends Geometry>(
@@ -250,17 +268,24 @@ export class GrowlComponent {
     };
   }
 
-  protected static calculateMarkerSize(zoom: number): string {
-    const fp = [
-      // fix points
-      // zoom -> size
-      [4, 15],
-      [14, 50],
-    ] as const;
+  private applyMeasurementDataToStations(): Points<Measurement | {}> {
+    let stations = this.groundwaterMeasurementStations();
+    let measurements = this.measurements();
 
-    let a = (fp[1][1] - fp[0][1]) / (fp[1][0] - fp[0][0]);
-    let b = fp[0][1] - a * fp[0][0];
-
-    return a * zoom + b + "px";
+    return {
+      type: "FeatureCollection",
+      features: stations.features.map(station => {
+        let measurement = measurements[station.properties.key] ?? {};
+        return {
+          type: "Feature" as const,
+          geometry: station.geometry,
+          properties: {
+            ...station.properties,
+            ...measurement,
+            classification: measurement.classification ?? "null",
+          },
+        };
+      }),
+    };
   }
 }
