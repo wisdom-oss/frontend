@@ -1,4 +1,4 @@
-import {NgIf, AsyncPipe, KeyValuePipe} from "@angular/common";
+import {NgIf, KeyValuePipe} from "@angular/common";
 import {
   computed,
   effect,
@@ -12,7 +12,6 @@ import {
   ImageComponent,
   LayerComponent,
   MapComponent,
-  MarkerComponent,
   GeoJSONSourceComponent,
   AttributionControlDirective,
   NavigationControlDirective,
@@ -25,13 +24,7 @@ import {
   MultiPolygon,
   Polygon,
 } from "geojson";
-import {
-  MapLibreEvent,
-  ExpressionSpecification,
-  CameraFunctionSpecification,
-  CompositeFunctionSpecification,
-  StyleSpecification,
-} from "maplibre-gl";
+import {ExpressionSpecification, StyleSpecification} from "maplibre-gl";
 
 import {DisplayInfoControlComponent} from "./map/display-info-control/display-info-control.component";
 import {LayerSelectionControlComponent} from "./map/layer-selection-control/layer-selection-control.component";
@@ -64,19 +57,17 @@ function emptyFeatures<G extends Geometry, P>(): FeatureCollection<
   imports: [
     AttributionControlDirective,
     ControlComponent,
+    DisplayInfoControlComponent,
     GeoJSONSourceComponent,
+    ImageComponent,
+    KeyValuePipe,
     LayerComponent,
     LayerSelectionControlComponent,
     LegendControlComponent,
-    KeyValuePipe,
     MapComponent,
-    MarkerComponent,
     NavigationControlDirective,
-    ResizeMapOnLoadDirective,
-    DisplayInfoControlComponent,
-    ImageComponent,
-    AsyncPipe,
     NgIf,
+    ResizeMapOnLoadDirective,
   ],
   templateUrl: "./growl.component.html",
   styles: ``,

@@ -1,5 +1,6 @@
+// eslint-disable-next-line no-unused-vars
 const {Plugin, PluginBuild} = require("esbuild");
-const {readFile, writeFile, mkdir} = require("fs/promises");
+const {readFile, mkdir} = require("fs/promises");
 const toml = require("smol-toml");
 const xml = require("fast-xml-parser");
 const sharp = require("sharp");
@@ -7,19 +8,19 @@ const sharp = require("sharp");
 /**
  * An esbuild plugin that executes prebuild operations.
  *
- * @param {object} options Plugin options (currently unused, reserved for future extensions).
+ * @param {object} _options Plugin options (currently unused, reserved for future extensions).
  * @returns {Plugin} The configured esbuild plugin.
  */
-function prebuildPlugin(options = {}) {
+function prebuildPlugin(_options = {}) {
   return {
     name: "prebuild-plugin",
 
     /**
      * Sets up the plugin to run the prebuild operations.
      *
-     * @param {PluginBuild} build The esbuild plugin build context.
+     * @param {PluginBuild} _build The esbuild plugin build context.
      */
-    async setup(build) {
+    async setup(_build) {
       await buildNlwknMeasurementClassificationColorSvgs();
     },
   };
