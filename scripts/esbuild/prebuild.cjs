@@ -1,6 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 const {Plugin, PluginBuild} = require("esbuild");
-const {readFile, mkdir} = require("fs/promises");
+const {readFile, writeFile, mkdir} = require("fs/promises");
 const toml = require("smol-toml");
 const xml = require("fast-xml-parser");
 const sharp = require("sharp");
@@ -21,12 +21,19 @@ function prebuildPlugin(_options = {}) {
      * @param {PluginBuild} _build The esbuild plugin build context.
      */
     async setup(_build) {
-      await buildNlwknMeasurementClassificationColorSvgs();
+      await Promise.all([
+        buildNlwknMeasurementClassificationColorSvgs(),
+        extractRemixicons(),
+      ]);
     },
   };
 }
 
 module.exports = prebuildPlugin;
+
+// ------------------------------------
+// Prebuild Subroutines
+// ------------------------------------
 
 /**
  * Reads classification colors from a TOML file and applies them to an SVG template.
@@ -76,4 +83,35 @@ async function buildNlwknMeasurementClassificationColorSvgs() {
     let path = `public/generated/groundwater-level-station-marker/${classification}.png`;
     await sharp(svgBuffer).resize(64).png().toFile(path);
   }
+}
+
+/**
+ * Extracts Remix Icons from npm package and saves them in 
+ * `src/assets/generated/remixicon/`.
+ */
+async function extractRemixicons() {
+  const remixicon = await import("@ng-icons/remixicon");
+  await mkdir("src/assets/generated/remixicon", {recursive: true});
+  for (let [key, svg] of Object.entries(remixicon)) {
+    let name = toKebabCase(key.slice("remix".length));
+    let path = `src/assets/generated/remixicon/${name}.svg`;
+    await writeFile(path, svg);
+  }
+}
+
+// ------------------------------------
+// Helper Functions
+// ------------------------------------
+
+/**
+ * Converts a camelCase or PascalCase string into kebab-case.
+ *
+ * @param {string} str The input string.
+ * @returns {string} The kebab-case version of the string.
+ */
+function toKebabCase(str) {
+  return str
+      .replace(/([a-z])([A-Z0-9])/g, '$1-$2') // insert dash between lowercase and uppercase/number
+      .replace(/([0-9])([A-Za-z])/g, '$1-$2') // insert dash between number and letter
+      .toLowerCase();
 }

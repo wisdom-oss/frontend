@@ -17,16 +17,16 @@
       @let municipalInfoData = municipalInfo();
       @let stationInfoData = stationInfo();
       <ng-container images>
-        @for (color of measurementColors | keyvalue; track color.key) {
-          <mgl-image
-            [id]="'measurement-classification-' + color.key + '-image'"
-            [url]="
-              '/public/generated/groundwater-level-station-marker/' +
-              color.key +
-              '.png'
-            "
-          ></mgl-image>
-        }
+          @for (color of measurementColors | keyvalue; track color.key) {
+            <mgl-image
+              [id]="'measurement-classification-' + color.key + '-image'"
+              [url]="
+                '/public/generated/groundwater-level-station-marker/' +
+                color.key +
+                '.png'
+              "
+            ></mgl-image>
+          }
       </ng-container>
       <ng-container controls>
         <mgl-control position="top-right">
@@ -95,6 +95,7 @@
         <mgl-geojson-source
           id="water-right-usage-locations-source"
           [data]="usageLocations"
+          [cluster]="true"
         >
         </mgl-geojson-source>
         <mgl-geojson-source
@@ -190,6 +191,14 @@
               id="water-right-usage-locations-layer-symbol"
               type="symbol"
               source="water-right-usage-locations-source"
+              [layout]="{
+                'icon-image': 'remixicon:map-pin-2-fill',
+                'icon-anchor': 'bottom',
+                'icon-size': markerSize,
+              }"
+              [paint]="{
+                'icon-color': 'blue'
+              }"
             ></mgl-layer>
           }
         </ng-container>

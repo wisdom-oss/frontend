@@ -28,6 +28,7 @@
     "@angular/platform-browser": "^19.1.5",
     "@angular/platform-browser-dynamic": "^19.1.5",
     "@angular/router": "^19.1.5",
+    "@cptpiepmatz/esbuild-plugin-spreet": "npm:@jsr/cptpiepmatz__esbuild-plugin-spreet@^0.1.0-dev.1",
     "@cptpiepmatz/tag-uri": "npm:@jsr/cptpiepmatz__tag-uri@^0.1.2",
     "@creativebulma/bulma-tooltip": "github:deather/bulma-tooltip",
     "@maplibre/ngx-maplibre-gl": "^18.2.0",

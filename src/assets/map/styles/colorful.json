@@ -6,7 +6,16 @@
     "license": "https://creativecommons.org/publicdomain/zero/1.0/"
   },
   "glyphs": "https://wisdom02.vlba.uni-oldenburg.de/assets/fonts/{fontstack}/{range}.pbf",
-  "sprite": "https://wisdom02.vlba.uni-oldenburg.de/assets/sprites/sprites",
+  "sprite": [
+    {
+      "id": "default",
+      "url": "https://wisdom02.vlba.uni-oldenburg.de/assets/sprites/sprites"
+    },
+    {
+      "id": "remixicon",
+      "url": "http://localhost:4200/public/generated/remixicon"
+    }
+  ],
   "sources": {
     "versatiles-shortbread": {
       "tilejson": "3.0.0",
