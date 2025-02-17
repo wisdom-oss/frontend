@@ -32,8 +32,8 @@ import {LegendControlComponent} from "./map/legend-control/legend-control.compon
 import {GeoDataService} from "../../api/geo-data.service";
 import {GroundwaterLevelsService} from "../../api/groundwater-levels.service";
 import nlwknMeasurementClassificationColors from "../../assets/nlwkn-measurement-classification-colors.toml";
-import {ResizeMapOnLoadDirective} from "../../common/directives/resize-map-on-load.directive";
 import colorful from "../../assets/map/styles/colorful.json";
+import {ResizeMapOnLoadDirective} from "../../common/directives/resize-map-on-load.directive";
 import {signals} from "../../common/signals";
 
 type Measurement = GroundwaterLevelsService.Measurement;

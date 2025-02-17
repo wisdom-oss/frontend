@@ -86,7 +86,7 @@ async function buildNlwknMeasurementClassificationColorSvgs() {
 }
 
 /**
- * Extracts Remix Icons from npm package and saves them in 
+ * Extracts Remix Icons from npm package and saves them in
  * `src/assets/generated/remixicon/`.
  */
 async function extractRemixicons() {
@@ -111,7 +111,7 @@ async function extractRemixicons() {
  */
 function toKebabCase(str) {
   return str
-      .replace(/([a-z])([A-Z0-9])/g, '$1-$2') // insert dash between lowercase and uppercase/number
-      .replace(/([0-9])([A-Za-z])/g, '$1-$2') // insert dash between number and letter
-      .toLowerCase();
+    .replace(/([a-z])([A-Z0-9])/g, "$1-$2") // insert dash between lowercase and uppercase/number
+    .replace(/([0-9])([A-Za-z])/g, "$1-$2") // insert dash between number and letter
+    .toLowerCase();
 }
