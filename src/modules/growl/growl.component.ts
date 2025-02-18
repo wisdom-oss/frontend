@@ -1,5 +1,5 @@
 import {NgIf, DatePipe, KeyValuePipe} from "@angular/common";
-import {computed, effect, signal, Component} from "@angular/core";
+import {computed, effect, signal, Component, Signal} from "@angular/core";
 import {
   ControlComponent,
   ImageComponent,
@@ -16,6 +16,8 @@ import {DisplayInfoControlComponent} from "./map/display-info-control/display-in
 import {LayerSelectionControlComponent} from "./map/layer-selection-control/layer-selection-control.component";
 import {LegendControlComponent} from "./map/legend-control/legend-control.component";
 import {GrowlService} from "./growl.service";
+import {WithdrawalInfoControlComponent} from "./map/withdrawal-info-control/withdrawal-info-control.component";
+import {WaterRightsServiceService} from "../../api/water-rights-service.service";
 import nlwknMeasurementClassificationColors from "../../assets/nlwkn-measurement-classification-colors.toml";
 import colorful from "../../assets/map/styles/colorful.json";
 import {ResizeMapOnLoadDirective} from "../../common/directives/resize-map-on-load.directive";
@@ -38,6 +40,7 @@ import {signals} from "../../common/signals";
     NavigationControlDirective,
     NgIf,
     ResizeMapOnLoadDirective,
+    WithdrawalInfoControlComponent,
   ],
   templateUrl: "./growl.component.html",
   styles: ``,
@@ -54,9 +57,7 @@ export class GrowlComponent {
 
   // prettier-ignore
   protected hoveredFeatures = {
-    groundwaterMeasurementStation: signal<
-      GroundwaterMeasurementStationFeature | null
-    >(null),
+    groundwaterMeasurementStation: signal<GroundwaterMeasurementStationFeature | null>(null),
     groundwaterBody: signal<GroundwaterBodyFeature | null>(null),
     ndsMunicipal: signal<NdsMunicipalFeature | null>(null),
   };
@@ -70,8 +71,13 @@ export class GrowlComponent {
   } as const;
   protected selectedLayersUpdate = signal(false);
 
-  protected lang = signals.lang();
+  protected averageWithdrawals = signal<{
+    name: string;
+    key: string;
+    withdrawals: Signal<WaterRightsServiceService.AverageWithdrawals | null>;
+  } | null>(null);
 
+  protected lang = signals.lang();
   private initialLoad = computed(() => {
     return (
       !!this.service.data.groundwaterMeasurementStations().features.length &&
@@ -79,7 +85,10 @@ export class GrowlComponent {
     );
   });
 
-  constructor(protected service: GrowlService) {
+  constructor(
+    protected service: GrowlService,
+    private waterRightsService: WaterRightsServiceService,
+  ) {
     effect(() => {
       // force layer order by redrawing them on every update
       this.initialLoad();
@@ -127,6 +136,30 @@ export class GrowlComponent {
 
   protected selectMeasurementDay(value: 0 | 1 | 2 | 3 | 4 | 5 | 6) {
     this.service.selectMeasurementsDay.set(value);
+  }
+
+  protected updateAverageWithdrawals(
+    groundwaterBody: GroundwaterBodyFeature | null,
+  ) {
+    for (let body of this.service.data.groundwaterBodies().features) {
+      if (groundwaterBody?.id == body.id) {
+        let withdrawalData = {
+          name: body.properties.name ?? body.properties.key,
+          key: body.properties.key,
+          withdrawals:
+            signal<WaterRightsServiceService.AverageWithdrawals | null>(null),
+        };
+
+        this.waterRightsService
+          .fetchAverageWithdrawals(body.geometry)
+          .then(data => withdrawalData.withdrawals.set(data));
+
+        this.averageWithdrawals.set(withdrawalData);
+        return;
+      }
+    }
+
+    return this.averageWithdrawals.set(null);
   }
 }
 

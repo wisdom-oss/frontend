@@ -46,7 +46,6 @@ export class GroundwaterLevelsService {
   async fetchMeasurementClassifications(
     date: Dayjs = dayjs(),
   ): Promise<Record<string, GroundwaterLevelsService.Measurement>> {
-    console.log(date);
     let url = `${URL}/graphql`;
     let query = `{
       measurements(

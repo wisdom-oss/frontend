@@ -7,6 +7,7 @@
       [center]="{lat: 52.8, lon: 9.2}"
       [canvasContextAttributes]="{preserveDrawingBuffer: true}"
       [attributionControl]="false"
+      (click)="updateAverageWithdrawals(hoveredFeatures.groundwaterBody())"
     >
       @let groundwaterMeasurementStations =
         service.data.groundwaterMeasurementStations();
@@ -90,6 +91,16 @@
             </mgl-control>
           }
         </ng-container>
+        <ng-container>
+          @let withdrawals = averageWithdrawals();
+          @if (withdrawals) {
+            <mgl-control position="bottom-right">
+              <growl-withdrawal-info-control
+                [in]="withdrawals"
+              ></growl-withdrawal-info-control>
+            </mgl-control>
+          }
+        </ng-container>
       </ng-container>
       <ng-container sources>
         <mgl-geojson-source
@@ -142,6 +153,16 @@
                 'line-color': '#0088aa',
                 'line-width': 3,
               }"
+            ></mgl-layer>
+            <mgl-layer
+              id="groundwater-bodies-layer-line-bold"
+              type="line"
+              source="groundwater-bodies-source"
+              [paint]="{
+                'line-color': '#0088aa',
+                'line-width': 10,
+              }"
+              [filter]="['==', ['get', 'key'], '' + averageWithdrawals()?.key]"
             ></mgl-layer>
           }
         </ng-container>
