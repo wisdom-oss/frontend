@@ -263,5 +263,14 @@
       </ng-container>
     </mgl-map>
   </div>
-  <div class="card-content">stuff here</div>
+  <div class="card-content">
+    @for (i of [1, 2, 3]; track i) {
+      <button
+        class="button mr-2"
+        (click)="service.selectMeasurementsDay.set($any(i))"
+      >
+        {{ i }}
+      </button>
+    }
+  </div>
 </div>

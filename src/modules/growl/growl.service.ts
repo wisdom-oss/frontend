@@ -1,10 +1,13 @@
 import {
   computed,
+  effect,
   signal,
   Injectable,
   Signal,
   WritableSignal,
 } from "@angular/core";
+import dayjs, {Dayjs} from "dayjs";
+import {Duration} from "dayjs/plugin/duration";
 import {
   FeatureCollection,
   Feature,
@@ -17,15 +20,19 @@ import {
 import {GroundwaterLevelsService} from "../../api/groundwater-levels.service";
 import {GeoDataService} from "../../api/geo-data.service";
 import nlwknMeasurementClassificationColors from "../../assets/nlwkn-measurement-classification-colors.toml";
-import { Duration } from "dayjs/plugin/duration";
-import dayjs from "dayjs";
+import {utils} from "../../common/utils";
 
 export namespace GrowlService {
   // geo data
   export type GroundwaterBodies = Polygons;
-  export type GroundwaterMeasurementStations = Points<Partial<Measurement>>;
+  export type GroundwaterMeasurementStations = Points<
+    Partial<LenientMeasurement>
+  >;
   export type NdsMunicipals = MultiPolygons;
   export type WaterRightUsageLocations = Points;
+
+  // gl data
+  export type MeasurementClassifications = Record<string, Measurement>;
 
   // derive data
   export type MeasurementClassificationCount = Record<
@@ -40,6 +47,8 @@ type GroundwaterMeasurementStations =
 type NdsMunicipals = GrowlService.NdsMunicipals;
 type WaterRightUsageLocations = GrowlService.WaterRightUsageLocations;
 
+type MeasurementClassifications = GrowlService.MeasurementClassifications;
+
 type MeasurementClassificationCount =
   GrowlService.MeasurementClassificationCount;
 
@@ -47,6 +56,8 @@ type MeasurementClassificationCount =
   providedIn: "root",
 })
 export class GrowlService {
+  readonly selectMeasurementsDay = signal<0 | 1 | 2 | 3 | 4 | 5 | 6>(0);
+
   // prettier-ignore
   readonly data = {
     groundwaterBodies: computed(() => this.geo.groundwaterBodies())                           as Signal<GroundwaterBodies>,
@@ -56,6 +67,7 @@ export class GrowlService {
     oldWaterRightUsageLocations: computed(() => this.geo.oldWaterRightUsageLocations())       as Signal<WaterRightUsageLocations>,
 
     measurementClassificationCount: computed(() => this.calcMeasurementClassificationCount()) as Signal<MeasurementClassificationCount>,
+    measurementsDate: computed(() => this.gl.lastWeek[this.selectMeasurementsDay()][0])       as Signal<Dayjs>,
   };
 
   private geo: {
@@ -69,12 +81,28 @@ export class GrowlService {
 
   private gl: {
     service: GroundwaterLevelsService;
-    measurementClassifications: WritableSignal<Record<string, Measurement>>;
+    measurementClassifications: WritableSignal<MeasurementClassifications>;
+    lastWeek: {
+      // today minus <index> days
+      0: [Dayjs, WritableSignal<MeasurementClassifications>];
+      1: [Dayjs, WritableSignal<MeasurementClassifications>];
+      2: [Dayjs, WritableSignal<MeasurementClassifications>];
+      3: [Dayjs, WritableSignal<MeasurementClassifications>];
+      4: [Dayjs, WritableSignal<MeasurementClassifications>];
+      5: [Dayjs, WritableSignal<MeasurementClassifications>];
+      6: [Dayjs, WritableSignal<MeasurementClassifications>];
+    };
   };
 
   constructor(geo: GeoDataService, gl: GroundwaterLevelsService) {
     this.geo = GrowlService.constructGeoDataSignals(geo);
     this.gl = GrowlService.constructGlDataSignals(gl);
+
+    effect(() => {
+      let selectedDay = this.selectMeasurementsDay();
+      let data = this.gl.lastWeek[selectedDay][1]();
+      this.gl.measurementClassifications.set(data);
+    });
   }
 
   private static constructGeoDataSignals(
@@ -119,7 +147,7 @@ export class GrowlService {
     service: GeoDataService,
     layerName: string,
     type: G["type"],
-    cacheTtl: Duration
+    cacheTtl: Duration,
   ): Signal<FeatureCollection<G, GeoProperties>> {
     let geoSignal: WritableSignal<FeatureCollection<G, GeoProperties>> = signal(
       {
@@ -129,7 +157,9 @@ export class GrowlService {
     );
 
     (async () => {
-      let contents = (await service.fetchLayerContents(layerName, undefined, cacheTtl)) ?? [];
+      let contents =
+        (await service.fetchLayerContents(layerName, undefined, cacheTtl)) ??
+        [];
 
       let features: Feature<G, GeoProperties>[] = [];
       for (let content of contents) {
@@ -163,14 +193,29 @@ export class GrowlService {
   private static constructGlDataSignals(
     service: GroundwaterLevelsService,
   ): GrowlService["gl"] {
-    let measurementClassifications = signal({});
-    service
-      .fetchMeasurementClassifications()
-      .then(data => measurementClassifications.set(data));
+    function dateMeasurements(
+      day: Dayjs,
+    ): WritableSignal<Record<string, Measurement>> {
+      let measurementsSignal = signal({});
+      service
+        .fetchMeasurementClassifications(day)
+        .then(data => measurementsSignal.set(data));
+      return measurementsSignal;
+    }
+
+    let today = dayjs().startOf("day");
+    let week = utils.range(7);
+    let measurements = Object.fromEntries(
+      week.map(i => {
+        let day = today.subtract(dayjs.duration(i, "day"));
+        return [i, [day, dateMeasurements(day)]];
+      }),
+    ) as GrowlService["gl"]["lastWeek"];
 
     return {
       service,
-      measurementClassifications,
+      measurementClassifications: measurements[0][1],
+      lastWeek: measurements,
     };
   }
 
@@ -210,7 +255,7 @@ export class GrowlService {
           properties: {
             ...station.properties,
             ...measurement,
-            classification: measurement.classification,
+            classification: measurement.classification ?? "null",
           },
         };
       }),
@@ -219,6 +264,9 @@ export class GrowlService {
 }
 
 type Measurement = GroundwaterLevelsService.Measurement;
+type LenientMeasurement = Omit<Measurement, "classification"> & {
+  classification: GroundwaterLevelsService.MeasurementClassification | "null";
+};
 
 type GeoProperties<P = {}> = {name?: string | null; key: string} & P;
 type Points<P = {}> = FeatureCollection<Point, GeoProperties<P>>;
