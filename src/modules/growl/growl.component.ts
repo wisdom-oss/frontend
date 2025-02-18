@@ -1,5 +1,5 @@
-import {NgIf, KeyValuePipe} from "@angular/common";
-import {effect, signal, Component} from "@angular/core";
+import {NgIf, DatePipe, KeyValuePipe} from "@angular/common";
+import {computed, effect, signal, Component} from "@angular/core";
 import {
   ControlComponent,
   ImageComponent,
@@ -26,6 +26,7 @@ import {signals} from "../../common/signals";
   imports: [
     AttributionControlDirective,
     ControlComponent,
+    DatePipe,
     DisplayInfoControlComponent,
     GeoJSONSourceComponent,
     ImageComponent,
@@ -47,10 +48,12 @@ export class GrowlComponent {
 
   // prettier-ignore
   protected hoveredFeatures = {
-    groundwaterMeasurementStation: signal<GroundwaterMeasurementStationFeature | null>(null),
+    groundwaterMeasurementStation: signal<
+      GroundwaterMeasurementStationFeature | null
+    >(null),
     groundwaterBody: signal<GroundwaterBodyFeature | null>(null),
     ndsMunicipal: signal<NdsMunicipalFeature | null>(null),
-  }
+  };
 
   protected selectedLayers = {
     waterRightUsageLocations: signals.toggleable(false),
@@ -67,10 +70,17 @@ export class GrowlComponent {
     </a>
   `);
 
+  private initialLoad = computed(() => {
+    return (
+      !!this.service.data.groundwaterMeasurementStations().features.length &&
+      !!this.service.data.groundwaterBodies().features.length
+    );
+  });
+
   constructor(protected service: GrowlService) {
     effect(() => {
       // force layer order by redrawing them on every update
-      for (let s of Object.values(service.data)) s();
+      this.initialLoad();
       for (let s of Object.values(this.selectedLayers)) s();
       this.selectedLayersUpdate.set(false);
       setTimeout(() => this.selectedLayersUpdate.set(true));
@@ -111,6 +121,10 @@ export class GrowlComponent {
       title: feature.properties.name,
       subtitle: feature.properties.key,
     };
+  }
+
+  protected selectMeasurementDay(value: 0 | 1 | 2 | 3 | 4 | 5 | 6) {
+    this.service.selectMeasurementsDay.set(value);
   }
 }
 
