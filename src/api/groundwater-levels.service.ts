@@ -46,12 +46,12 @@ export class GroundwaterLevelsService {
   async fetchMeasurementClassifications(
     date: Dayjs = dayjs(),
   ): Promise<Record<string, GroundwaterLevelsService.Measurement>> {
-    let day = date.startOf("day");
+    console.log(date);
     let url = `${URL}/graphql`;
     let query = `{
       measurements(
-        from: "${day.toISOString()}"
-        until: "${day.toISOString()}"
+        from: "${date.toISOString()}"
+        until: "${date.toISOString()}"
       ) {
         station
         date

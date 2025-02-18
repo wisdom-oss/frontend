@@ -203,7 +203,7 @@ export class GrowlService {
       return measurementsSignal;
     }
 
-    let today = dayjs().startOf("day");
+    let today = dayjs();
     let week = utils.range(7);
     let measurements = Object.fromEntries(
       week.map(i => {
