@@ -264,18 +264,24 @@
     </mgl-map>
   </div>
   <div class="card-content">
-    {{
-      service.data.measurementsDate().toDate()
-        | date: "longDate" : undefined : "de"
-    }}
-    <input
-      class="slider is-fullwidth is-primary"
-      step="1"
-      min="0"
-      max="6"
-      value="6"
-      type="range"
-      (input)="selectMeasurementDay($any(6 - +$any($event.target).value))"
-    />
+    <div class="columns level">
+      <div class="column level-item">
+        <input
+          class="slider is-fullwidth is-primary m-0"
+          step="1"
+          min="0"
+          max="6"
+          value="6"
+          type="range"
+          (input)="selectMeasurementDay($any(6 - +$any($event.target).value))"
+        />
+      </div>
+      <div class="column level-item is-narrow">
+        {{
+          service.data.measurementsDate().toDate()
+            | date: "longDate" : undefined : lang()
+        }}
+      </div>
+    </div>
   </div>
 </div>

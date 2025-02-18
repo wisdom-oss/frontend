@@ -46,6 +46,12 @@ export class GrowlComponent {
   protected style = colorful as any as StyleSpecification;
   protected measurementColors = nlwknMeasurementClassificationColors;
 
+  readonly attribution = signal(`
+    <a href="https://www.nlwkn.niedersachsen.de/opendata" target="_blank">
+      2024 Niedersächsischer Landesbetrieb für Wasserwirtschaft, Küsten- und Naturschutz (NLWKN)
+    </a>
+  `);
+
   // prettier-ignore
   protected hoveredFeatures = {
     groundwaterMeasurementStation: signal<
@@ -64,11 +70,7 @@ export class GrowlComponent {
   } as const;
   protected selectedLayersUpdate = signal(false);
 
-  readonly attribution = signal(`
-    <a href="https://www.nlwkn.niedersachsen.de/opendata" target="_blank">
-      2024 Niedersächsischer Landesbetrieb für Wasserwirtschaft, Küsten- und Naturschutz (NLWKN)
-    </a>
-  `);
+  protected lang = signals.lang();
 
   private initialLoad = computed(() => {
     return (
