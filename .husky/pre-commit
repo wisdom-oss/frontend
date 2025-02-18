@@ -1,2 +1,4 @@
 npm run fmt
+git add .
 npm run lint
+git add .
