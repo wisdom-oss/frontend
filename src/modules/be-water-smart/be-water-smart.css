@@ -1,17 +1,17 @@
 /* Custom CSS to remove underlining and dotted lines from <abbr> tags */
 .box abbr {
-    text-decoration: none; /* Remove underlining */
-  }
-  
-  /* makes table head sticky for formaating */
-  .table-container thead {
-    position: sticky;
-    top: 0;
-    background-color: white; /* Set background color you want for header */
-    z-index: 1; /* Ensure header stays above content during scrolling */
-  }
-  
-  /* choose algorithm button */
-  .button-fixed-width {
-    width: 250px;
-  }
+  text-decoration: none; /* Remove underlining */
+}
+
+/* makes table head sticky for formaating */
+.table-container thead {
+  position: sticky;
+  top: 0;
+  background-color: white; /* Set background color you want for header */
+  z-index: 1; /* Ensure header stays above content during scrolling */
+}
+
+/* choose algorithm button */
+.button-fixed-width {
+  width: 250px;
+}

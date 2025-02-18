@@ -9,7 +9,7 @@ import {
   VirtualMeter,
   AllPhysicalMeters,
   AllVirtualMeters,
-  AllModels
+  AllModels,
 } from "../modules/be-water-smart/bws-interfaces";
 
 /**
@@ -21,14 +21,16 @@ const API_PREFIX = "/api/bws";
  * constant holding the dev prefix to reach
  * the bws api locally in python (localhost:5000)
  */
-const DEV_PREFIX = "localpy"
+const DEV_PREFIX = "localpy";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class BeWaterSmartService {
-
-  constructor(private http: HttpClient, private router: Router) { }
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+  ) {}
 
   /**
    * generalized request method for bws api
@@ -37,12 +39,17 @@ export class BeWaterSmartService {
    * @param requestBody bonus information in post and put requests
    * @returns an Observable with the set interface
    */
-  sendRequest<T>(method: 'get' | 'post' | 'put' | 'delete', url: string, requestBody?: any) {
-
+  sendRequest<T>(
+    method: "get" | "post" | "put" | "delete",
+    url: string,
+    requestBody?: any,
+  ) {
     /**
      * dev prefix to reach python local api
      */
-    const localUrl = this.router.parseUrl(DEV_PREFIX + '/' + API_PREFIX + url).toString();
+    const _localUrl = this.router
+      .parseUrl(DEV_PREFIX + "/" + API_PREFIX + url)
+      .toString();
 
     /**
      * normal URL for server
@@ -50,11 +57,15 @@ export class BeWaterSmartService {
     const normalURL = this.router.parseUrl(API_PREFIX + url).toString();
 
     let requestOptions: any = {
-      responseType: 'json',
-      body: requestBody
+      responseType: "json",
+      body: requestBody,
     };
 
-    return this.http.request<T>(method, normalURL, requestOptions) as Observable<T>;
+    return this.http.request<T>(
+      method,
+      normalURL,
+      requestOptions,
+    ) as Observable<T>;
   }
 
   /**
@@ -62,7 +73,7 @@ export class BeWaterSmartService {
    * @returns success message or http error
    */
   getDebugMessage() {
-    return this.sendRequest("get", "/debug")
+    return this.sendRequest("get", "/debug");
   }
 
   /**
@@ -70,7 +81,7 @@ export class BeWaterSmartService {
    * @returns observable containing list of all pm information
    */
   getPhysicalMeters() {
-    return this.sendRequest<AllPhysicalMeters>("get", "/physical-meters")
+    return this.sendRequest<AllPhysicalMeters>("get", "/physical-meters");
   }
 
   /**
@@ -78,7 +89,7 @@ export class BeWaterSmartService {
    * @returns observable containing list of all vm information
    */
   getVirtualMeters() {
-    return this.sendRequest<AllVirtualMeters>("get", "/virtual-meters")
+    return this.sendRequest<AllVirtualMeters>("get", "/virtual-meters");
   }
 
   /**
@@ -104,7 +115,7 @@ export class BeWaterSmartService {
    * @returns observable containing all measuring points for the next day
    */
   getCreateForecast(meterId: string, alg: string): Observable<ForeCast[]> {
-    let url = "/meters/" + meterId + "/forecast" + "?algorithm=" + alg
+    let url = "/meters/" + meterId + "/forecast" + "?algorithm=" + alg;
 
     return this.sendRequest<ForeCast[]>("get", url);
   }
@@ -127,7 +138,7 @@ export class BeWaterSmartService {
    * @returns observable containing success or http error msg
    */
   delVirtualMeterById(input: string) {
-    let url = "/virtual-meters/" + input
+    let url = "/virtual-meters/" + input;
 
     return this.sendRequest("delete", url);
   }
@@ -157,18 +168,15 @@ export class BeWaterSmartService {
 
   /**
    * delete request for the bws api.
-   * as requested by the api itself, you cant reference a model directly, but rather have to type in the 
+   * as requested by the api itself, you cant reference a model directly, but rather have to type in the
    * virtual meter and algorithm used and the api tracks down, which model it could be. Don't know why.
    * @param meter name of the virtual meter which got used to train the model
    * @param alg algorithm trained in the model
    * @returns observable containing success or http error msg
    */
   delModel(meter: string, alg: string) {
-
     let url = "/models/" + meter + ":MLModel:" + alg;
 
     return this.sendRequest("delete", url);
   }
-
-
 }

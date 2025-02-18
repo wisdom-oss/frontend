@@ -1,30 +1,51 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
-import { DatePipe } from "@angular/common";
-import { TranslateService } from "@ngx-translate/core";
+import {DatePipe} from "@angular/common";
+import {NgFor, CommonModule} from "@angular/common";
+import {ViewChild, Component, OnInit} from "@angular/core";
+import {FormsModule} from "@angular/forms";
+import {provideIcons, NgIcon} from "@ng-icons/core";
+import {ionAddOutline, ionTrashOutline} from "@ng-icons/ionicons";
+import {TranslateService} from "@ngx-translate/core";
+import {TranslatePipe} from "@ngx-translate/core";
+import {
+  ChartConfiguration,
+  ChartData,
+  ChartDataset,
+  Plugin,
+  ChartType,
+} from "chart.js";
+import {BaseChartDirective} from "ng2-charts";
+import {Observable} from "rxjs";
 
-import { ChartType, ChartConfiguration, ChartDataset, ChartData, Plugin } from "chart.js";
-import { BaseChartDirective } from "ng2-charts";
-import { Observable } from "rxjs";
-
-import { BeWaterSmartService } from "../../api/be-water-smart.service";
-import { Algorithm, PhysicalMeter, VirtualMeter, MLModel, AllAlgorithms, AllVirtualMeters } from "./bws-interfaces";
-import { CommonModule, NgFor } from "@angular/common";
-import { FormsModule } from '@angular/forms';
-import { TranslatePipe } from "@ngx-translate/core";
-import { TransformStringPipe } from "../../common/pipes/transform-string.pipe";
-import { NgIcon, provideIcons } from "@ng-icons/core";
-import { ionAddOutline, ionTrashOutline } from "@ng-icons/ionicons"
-import { DropdownComponent } from "../../common/components/dropdown/dropdown.component";
+import {
+  Algorithm,
+  AllAlgorithms,
+  PhysicalMeter,
+  VirtualMeter,
+  AllVirtualMeters,
+  MLModel,
+} from "./bws-interfaces";
+import {BeWaterSmartService} from "../../api/be-water-smart.service";
+import {DropdownComponent} from "../../common/components/dropdown/dropdown.component";
+import {TransformStringPipe} from "../../common/pipes/transform-string.pipe";
 
 @Component({
-  selector: 'be-water-smart',
+  selector: "be-water-smart",
   templateUrl: "be-water-smart.component.html",
-  imports: [NgFor, CommonModule, FormsModule, TranslatePipe, TransformStringPipe, DatePipe, BaseChartDirective, NgIcon, DropdownComponent],
-  providers: [provideIcons({ ionAddOutline, ionTrashOutline })],
-  styleUrls: ['be-water-smart.css']
+  imports: [
+    NgFor,
+    CommonModule,
+    FormsModule,
+    TranslatePipe,
+    TransformStringPipe,
+    DatePipe,
+    BaseChartDirective,
+    NgIcon,
+    DropdownComponent,
+  ],
+  providers: [provideIcons({ionAddOutline, ionTrashOutline})],
+  styleUrls: ["be-water-smart.css"],
 })
 export class BeWaterSmartComponent implements OnInit {
-
   // ---------- StringFormatting ----------
 
   /**
@@ -32,7 +53,7 @@ export class BeWaterSmartComponent implements OnInit {
    */
   prefixes: string[] = ["urn:ngsi-ld:virtualMeter:", "urn:ngsi-ld:Device:"];
 
-  // ---------- Layout Parameters ---------- 
+  // ---------- Layout Parameters ----------
 
   slice: number = 20;
   heightMC: string = "500px";
@@ -40,7 +61,7 @@ export class BeWaterSmartComponent implements OnInit {
   heightLS: string = "500px";
   heightTable: string = "300px";
 
-  // ---------- Dropdowns ---------- 
+  // ---------- Dropdowns ----------
 
   menuAlgorithm: string = "be-water-smart.hints.algorithm";
   optionsAlgorithm: Record<string, string> = {};
@@ -50,7 +71,7 @@ export class BeWaterSmartComponent implements OnInit {
   optionsVirtualMeter: Record<string, string> = {};
   choiceVirtualMeter?: string;
 
-// ------------------------------ Chart Parameters --------------------------------------------
+  // ------------------------------ Chart Parameters --------------------------------------------
 
   /**
    * The chart object, referenced from the html template
@@ -60,75 +81,92 @@ export class BeWaterSmartComponent implements OnInit {
   /**
    * type of graph to use in chart
    */
-  chartType: ChartType = 'line';
+  chartType: ChartType = "line";
 
   /**
    * options used for the line chart to visualize prediction values
    */
-  chartOptions: ChartConfiguration['options'] = {
+  chartOptions: ChartConfiguration["options"] = {
     responsive: true,
     scales: {
       y: {
         stacked: false,
         title: {
           display: true,
-          text: "m^3"
+          text: "m^3",
         },
         grid: {
           display: true, // Show grid lines on the y-axis
-          color: '#e0e0e0', // Customize the grid line color
+          color: "#e0e0e0", // Customize the grid line color
           lineWidth: 0.2, // Set the width of the grid lines
         },
       },
       x: {
         title: {
           display: true,
-          text: "Time"
+          text: "Time",
         },
         grid: {
           display: false, // Show grid lines on the y-axis
-          color: '#e0e0e0', // Customize the grid line color
+          color: "#e0e0e0", // Customize the grid line color
           lineWidth: 0.2, // Set the width of the grid lines
         },
-      }
+      },
     },
-
   };
 
   /**
    * standard xAxis labels for prediction values
    */
-  standardLabels: string[] = ['01:00', '02:00', '03:00',
-    '04:00', '05:00', '06:00', '07:00',
-    '08:00', '09:00', '10:00', '11:00',
-    '12:00', '13:00', '14:00', '15:00',
-    '16:00', '17:00', '18:00', '19:00',
-    '20:00', '21:00', '22:00', '23:00']
+  standardLabels: string[] = [
+    "01:00",
+    "02:00",
+    "03:00",
+    "04:00",
+    "05:00",
+    "06:00",
+    "07:00",
+    "08:00",
+    "09:00",
+    "10:00",
+    "11:00",
+    "12:00",
+    "13:00",
+    "14:00",
+    "15:00",
+    "16:00",
+    "17:00",
+    "18:00",
+    "19:00",
+    "20:00",
+    "21:00",
+    "22:00",
+    "23:00",
+  ];
 
   /**
    * color of the ng2chart
    */
-  chartColor: string = '#FFFFFF';
+  chartColor: string = "#FFFFFF";
 
   /**
    * data skeleton for the line graph
    */
-  chartData: ChartData<'line'> = {
+  chartData: ChartData<"line"> = {
     labels: this.standardLabels, // X-axis labels
     datasets: [], // data points
   };
 
-  backgroundPlugin: Plugin<'bar'> = {
-    id: 'custom_canvas_background_color',
-    beforeDraw: (chart) => {
+  backgroundPlugin: Plugin<"bar"> = {
+    id: "custom_canvas_background_color",
+    beforeDraw: chart => {
       const ctx = chart.ctx;
       ctx.save();
       ctx.fillStyle = this.chartColor; // Set the background color to white
       ctx.fillRect(0, 0, chart.width, chart.height);
       ctx.restore();
-    }
+    },
   };
-
 
   chartPlugins = [this.backgroundPlugin];
 
@@ -200,11 +238,14 @@ export class BeWaterSmartComponent implements OnInit {
 
   /**
    * flags if a delete operation is in progress
-   * @param isDeleting: boolean flag 
+   * @param isDeleting: boolean flag
    */
   isDeleting: boolean = false;
 
-  constructor(public bwsService: BeWaterSmartService, private translate: TranslateService) { }
+  constructor(
+    public bwsService: BeWaterSmartService,
+    private translate: TranslateService,
+  ) {}
 
   ngOnInit(): void {
     // initialize all displays when rendering web page
@@ -222,13 +263,17 @@ export class BeWaterSmartComponent implements OnInit {
    * @param responseField the field of the response to read
    * @param destinationField the parameter to save data to
    */
-  extractData(extractionMethod: () => Observable<any>, responseField: string, destinationField: keyof this): void {
+  extractData(
+    extractionMethod: () => Observable<any>,
+    responseField: string,
+    destinationField: keyof this,
+  ): void {
     extractionMethod().subscribe({
-      next: (response) => {
+      next: response => {
         // Dynamically assign the response field to the destination field
         this[destinationField] = response[responseField];
       },
-      error: (error) => {
+      error: error => {
         console.log(error);
       },
     });
@@ -238,17 +283,19 @@ export class BeWaterSmartComponent implements OnInit {
    * Extraction Method for Algorithms
    * @param extractionMethod the function to use for the api call
    */
-  extractAlgorithmsInRecord(extractionMethod: () => Observable<AllAlgorithms>): void {
+  extractAlgorithmsInRecord(
+    extractionMethod: () => Observable<AllAlgorithms>,
+  ): void {
     extractionMethod().subscribe({
-      next: (response) => {
+      next: response => {
         var algorithms: Record<string, string> = {};
         response.algorithms.forEach(algorithm => {
-          algorithms[algorithm.name] = algorithm.name; 
-        })
+          algorithms[algorithm.name] = algorithm.name;
+        });
         this["optionsAlgorithm"] = algorithms;
         this["algorithms"] = response.algorithms;
       },
-      error: (error) => {
+      error: error => {
         console.log(error);
       },
     });
@@ -258,18 +305,20 @@ export class BeWaterSmartComponent implements OnInit {
    * Extraction Method for VirtualMeters
    * @param extractionMethod the function to use for the api call
    */
-  extractVirtualMetersInRecord(extractionMethod: () => Observable<AllVirtualMeters>): void {
+  extractVirtualMetersInRecord(
+    extractionMethod: () => Observable<AllVirtualMeters>,
+  ): void {
     extractionMethod().subscribe({
-      next: (response) => {
+      next: response => {
         var virtualMeters: Record<string, string> = {};
         response.virtualMeters.forEach(virtualMeter => {
-          var ids = virtualMeter.id.split(':');
-          virtualMeters[virtualMeter.id] = ids[ids.length-1];
-        })
+          var ids = virtualMeter.id.split(":");
+          virtualMeters[virtualMeter.id] = ids[ids.length - 1];
+        });
         this["optionsVirtualMeter"] = virtualMeters;
         this["vMeters"] = response.virtualMeters;
       },
-      error: (error) => {
+      error: error => {
         console.log(error);
       },
     });
@@ -281,8 +330,8 @@ export class BeWaterSmartComponent implements OnInit {
   extractPMeters(): void {
     this.extractData(
       () => this.bwsService.getPhysicalMeters(),
-      'meters',
-      'pMeters'
+      "meters",
+      "pMeters",
     );
   }
 
@@ -293,11 +342,11 @@ export class BeWaterSmartComponent implements OnInit {
     this.extractVirtualMetersInRecord(() => this.bwsService.getVirtualMeters());
   }
 
-   /**
+  /**
    * returns an VirtualMeter based on the given id
    */
-   getVirtualMeter(virtualMeterId: string): VirtualMeter | undefined {
-    var vMeter = this.vMeters.filter((vMeter) => (vMeter.id === virtualMeterId));
+  getVirtualMeter(virtualMeterId: string): VirtualMeter | undefined {
+    var vMeter = this.vMeters.filter(vMeter => vMeter.id === virtualMeterId);
 
     console.log(vMeter);
 
@@ -319,7 +368,9 @@ export class BeWaterSmartComponent implements OnInit {
    * returns an algorithm based on the given name
    */
   getAlgorithm(algorithmName: string): Algorithm | undefined {
-    var algorithm = this.algorithms.filter((algorithm) => (algorithm.name === algorithmName));
+    var algorithm = this.algorithms.filter(
+      algorithm => algorithm.name === algorithmName,
+    );
 
     if (algorithm.length === 1) {
       return algorithm[0];
@@ -332,11 +383,7 @@ export class BeWaterSmartComponent implements OnInit {
    * calls bws service to retrieve all trained models
    */
   extractModels(): void {
-    this.extractData(
-      () => this.bwsService.getModels(),
-      'MLModels',
-      'models'
-    )
+    this.extractData(() => this.bwsService.getModels(), "MLModels", "models");
   }
 
   // ---------- Checkbox Functions ----------
@@ -345,9 +392,11 @@ export class BeWaterSmartComponent implements OnInit {
     const isChecked = (event.target as HTMLInputElement).checked;
 
     if (isChecked) {
-      selectedMeters.push(item)
+      selectedMeters.push(item);
     } else {
-      const index = selectedMeters.findIndex((meter: { id: any; }) => meter.id === item.id)
+      const index = selectedMeters.findIndex(
+        (meter: {id: any}) => meter.id === item.id,
+      );
       if (index > -1) {
         selectedMeters.splice(index, 1); // Remove the item if unchecked
       }
@@ -374,41 +423,44 @@ export class BeWaterSmartComponent implements OnInit {
    * If failed, user gets informed
    */
   addVMeter(selectedMeters: any, selectedMeter: string): void {
-
     if (!selectedMeter) {
       alert("No Name for Virtual Meter!");
       return;
     }
 
-    this.bwsService.addVirtualMeterWithId(selectedMeter, this.createSubMeterList(selectedMeters)).subscribe({
-      next: (response) => {
-        if (response.hasOwnProperty("virtualMeterId")) {
-          this.extractVMeters();
-          this.selectedPhysicalMeters = [];
-          this.selectedVirtualMeters = [];
-          this.newVMeterName = "";
-          this.newSuperMeterName = "";
-        }
-      },
-      error: (error) => {
-        console.log(error);
-      },
-    })
+    this.bwsService
+      .addVirtualMeterWithId(
+        selectedMeter,
+        this.createSubMeterList(selectedMeters),
+      )
+      .subscribe({
+        next: response => {
+          if (response.hasOwnProperty("virtualMeterId")) {
+            this.extractVMeters();
+            this.selectedPhysicalMeters = [];
+            this.selectedVirtualMeters = [];
+            this.newVMeterName = "";
+            this.newSuperMeterName = "";
+          }
+        },
+        error: error => {
+          console.log(error);
+        },
+      });
   }
 
   /**
    * help function for addVMeter()
    * @returns a list of all ids which are inside the virtual meter
    */
-  createSubMeterList(selectedMeters: any): Object {
-
+  createSubMeterList(selectedMeters: any): object {
     let id_list: string[] = [];
 
-    selectedMeters.forEach((item: { id: string; }) => {
+    selectedMeters.forEach((item: {id: string}) => {
       id_list.push(item.id);
     });
 
-    return { submeterIds: id_list }
+    return {submeterIds: id_list};
   }
 
   /**
@@ -429,19 +481,23 @@ export class BeWaterSmartComponent implements OnInit {
     console.log(tmp);
 
     this.bwsService.delVirtualMeterById(id).subscribe({
-      next: (response) => {
-        if (response && response.hasOwnProperty('msg')) {
+      next: response => {
+        if (response && response.hasOwnProperty("msg")) {
           this.vMeters.push(tmp[0]);
-          alert("Virtual Meter with Name " + id + " not found and can not be deleted!");
+          alert(
+            "Virtual Meter with Name " +
+              id +
+              " not found and can not be deleted!",
+          );
         }
       },
-      error: (error) => {
+      error: error => {
         console.log(error);
       },
       complete: () => {
         this.isDeleting = false;
-      }
-    })
+      },
+    });
   }
 
   // ---------- Algorithm Functions ----------
@@ -473,18 +529,24 @@ export class BeWaterSmartComponent implements OnInit {
       return;
     }
 
-    this.bwsService.putTrainModel(this.selectedVirtualMeter, this.selectedAlgorithm, this.modelComment).subscribe({
-      next: (response) => {
-        this.extractModels();
-        this.choiceAlgorithm = undefined;
-        this.selectedAlgorithm = undefined;
-        this.selectedVirtualMeter = undefined;
-        this.modelComment = undefined;
-      },
-      error: (error) => {
-        console.log(error);
-      },
-    })
+    this.bwsService
+      .putTrainModel(
+        this.selectedVirtualMeter,
+        this.selectedAlgorithm,
+        this.modelComment,
+      )
+      .subscribe({
+        next: () => {
+          this.extractModels();
+          this.choiceAlgorithm = undefined;
+          this.selectedAlgorithm = undefined;
+          this.selectedVirtualMeter = undefined;
+          this.modelComment = undefined;
+        },
+        error: error => {
+          console.log(error);
+        },
+      });
   }
 
   /**
@@ -503,19 +565,19 @@ export class BeWaterSmartComponent implements OnInit {
     let tmp = this.models.splice(index, 1);
 
     this.bwsService.delModel(vMeterId, algId).subscribe({
-      next: (response) => {
-        if (response && response.hasOwnProperty('message')) {
+      next: response => {
+        if (response && response.hasOwnProperty("message")) {
           this.models.push(tmp[0]);
           alert("Model not found");
         }
       },
-      error: (error) => {
+      error: error => {
         console.log(error);
       },
       complete: () => {
         this.isDeleting = false;
-      }
-    })
+      },
+    });
   }
 
   // ---------- Forecast Creation -----------
@@ -525,7 +587,6 @@ export class BeWaterSmartComponent implements OnInit {
    * @returns if a value for the api request is missing
    */
   getForecast(): void {
-
     if (!this.selectedModel) {
       alert("No model chosen");
       return;
@@ -535,27 +596,31 @@ export class BeWaterSmartComponent implements OnInit {
     let algId = this.selectedModel.algorithm;
 
     this.bwsService.getCreateForecast(vMeterId, algId).subscribe({
-      next: (response) => {
-        if (response.hasOwnProperty('msg')) {
+      next: response => {
+        if (response.hasOwnProperty("msg")) {
           console.log(response);
         } else {
-
-          let predValues = response.map((item) => item.numValue);
+          let predValues = response.map(item => item.numValue);
 
           let date = response[0].datePredicted;
 
-          let label = this.transformString(vMeterId, this.prefixes[0]) + " " + algId + " " + this.transformDate(date)
+          let label =
+            this.transformString(vMeterId, this.prefixes[0]) +
+            " " +
+            algId +
+            " " +
+            this.transformDate(date);
 
-          this.addGraphToChart(predValues, label)
+          this.addGraphToChart(predValues, label);
         }
       },
-      error: (error) => {
+      error: error => {
         console.log(error);
       },
       complete: () => {
         this.selectedModel = undefined;
-      }
-    })
+      },
+    });
   }
 
   /**
@@ -566,7 +631,7 @@ export class BeWaterSmartComponent implements OnInit {
    */
   addGraphToChart(dataPoints: number[], label: string): void {
     // Create a new dataset
-    const newDataset: ChartDataset<'line'> = {
+    const newDataset: ChartDataset<"line"> = {
       label: label,
       data: dataPoints,
       borderColor: this.generateRandomColor(),
@@ -604,7 +669,7 @@ export class BeWaterSmartComponent implements OnInit {
    */
   transformString(value: string, removable: string): string {
     let t = new TransformStringPipe();
-    return t.transform(value, removable)
+    return t.transform(value, removable);
   }
 
   /**
@@ -614,8 +679,8 @@ export class BeWaterSmartComponent implements OnInit {
    * @returns the new date as a string
    */
   transformDate(date: string): string {
-    const datePipe = new DatePipe('en-US');
-    const formattedDate = datePipe.transform(date, 'dd.MM.yyyy');
+    const datePipe = new DatePipe("en-US");
+    const formattedDate = datePipe.transform(date, "dd.MM.yyyy");
     return formattedDate || date;
   }
 }

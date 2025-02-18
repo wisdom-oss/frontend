@@ -1,7 +1,12 @@
 import {ViewChildren, Component, AfterViewInit, QueryList} from "@angular/core";
 import {NavigationEnd, RouterLink, Router} from "@angular/router";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
-import {remixBookLine, remixBookShelfLine, remixRfidLine, remixLineChartLine} from "@ng-icons/remixicon";
+import {
+  remixBookLine,
+  remixBookShelfLine,
+  remixLineChartLine,
+  remixRfidLine,
+} from "@ng-icons/remixicon";
 import {filter} from "rxjs";
 
 import {SidebarLinkDirective} from "./sidebar-link.directive";
