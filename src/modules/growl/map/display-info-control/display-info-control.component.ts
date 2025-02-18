@@ -1,9 +1,9 @@
 import {formatDate, KeyValuePipe} from "@angular/common";
-import {computed, input, Component, Signal} from "@angular/core";
-import {toSignal} from "@angular/core/rxjs-interop";
-import {TranslatePipe, TranslateService} from "@ngx-translate/core";
+import {computed, input, Component} from "@angular/core";
+import {TranslatePipe} from "@ngx-translate/core";
 import dayjs from "dayjs";
-import {map} from "rxjs";
+
+import {signals} from "../../../../common/signals";
 
 @Component({
   selector: "growl-display-info-control",
@@ -21,7 +21,7 @@ import {map} from "rxjs";
 export class DisplayInfoControlComponent {
   readonly data = input<DisplayInfoControlComponent.Data | null>();
 
-  protected lang: Signal<string>;
+  protected lang = signals.lang();
   protected displayData = computed<
     (DisplayInfoControlComponent.Data & {table: Record<string, string>}) | null
   >(() => {
@@ -39,13 +39,6 @@ export class DisplayInfoControlComponent {
       ),
     };
   });
-
-  constructor(private translate: TranslateService) {
-    this.lang = toSignal(
-      this.translate.onLangChange.pipe(map(event => event.lang)),
-      {initialValue: translate.currentLang},
-    );
-  }
 
   protected toDisplay(value: any, lang: string): string {
     if (dayjs.isDayjs(value)) {

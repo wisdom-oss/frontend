@@ -1,4 +1,6 @@
-import {signal, WritableSignal} from "@angular/core";
+import {inject, signal, WritableSignal} from "@angular/core";
+
+import {injections} from "./injections";
 
 /**
  * Custom signal extensions.
@@ -73,4 +75,23 @@ export namespace signals {
       },
     });
   }
+
+  /**
+   * Retrieves the active language signal.
+   *
+   * This function returns the signal representing the currently selected
+   * language as a language code (`"en"` or `"de"`).
+   * It is useful for localization-related tasks, such as formatting dates
+   * using Angular pipes.
+   *
+   * @example
+   * const langSignal = signals.lang();
+   * console.log(langSignal()); // "en" or "de"
+   *
+   * @attention This function requires an injection context.
+   * Ensure it is called within an environment where Angular's dependency
+   * injection is available, such as inside a component, directive, or
+   * service constructor.
+   */
+  export const lang = () => inject(injections.LANG_SIGNAL);
 }
