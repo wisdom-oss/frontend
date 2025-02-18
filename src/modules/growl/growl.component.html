@@ -3,7 +3,7 @@
     <mgl-map
       class="is-fullheight"
       [style]="style"
-      [zoom]="[zoom]"
+      [zoom]="[6.8]"
       [center]="{lat: 52.8, lon: 9.2}"
       [canvasContextAttributes]="{preserveDrawingBuffer: true}"
       [attributionControl]="false"
@@ -176,18 +176,14 @@
             selectedLayers.groundwaterLevelStations()
           ) {
             @for (color of measurementColors | keyvalue; track color.key) {
+              <!-- prettier-ignore -->
               <mgl-layer
-                [id]="
-                  'groundwater-measurement-stations-layer-' +
-                  color.key +
-                  '-symbol'
-                "
+                [id]="'groundwater-measurement-stations-layer-' + color.key + '-symbol'"
                 type="symbol"
                 source="groundwater-measurement-stations-source"
                 [layout]="{
-                  'icon-image':
-                    'measurement-classification-' + color.key + '-image',
-                  'icon-size': markerSize,
+                  'icon-image': 'measurement-classification-' + color.key + '-image',
+                  'icon-size': ['interpolate', ['linear'], ['zoom'], 5, 0.1, 12, 1],
                   'icon-ignore-placement': true,
                   'symbol-z-order': 'source',
                 }"
@@ -217,7 +213,7 @@
               [layout]="{
                 'icon-image': 'remixicon:map-pin-2-fill',
                 'icon-anchor': 'bottom',
-                'icon-size': markerSize,
+                'icon-size': 1.2,
               }"
               [paint]="{
                 'icon-color': 'blue',
@@ -231,7 +227,7 @@
               [layout]="{
                 'icon-image': 'remixicon:checkbox-multiple-blank-line',
                 'icon-anchor': 'center',
-                'icon-size': markerSize,
+                'icon-size': 1.2,
                 'icon-offset': [0, -20],
                 'text-field': ['get', 'point_count_abbreviated'],
                 'text-font': ['noto_sans_regular'],
@@ -256,7 +252,7 @@
               [layout]="{
                 'icon-image': 'remixicon:map-pin-2-fill',
                 'icon-anchor': 'bottom',
-                'icon-size': markerSize,
+                'icon-size': 1.2,
               }"
               [paint]="{
                 'icon-color': 'red',

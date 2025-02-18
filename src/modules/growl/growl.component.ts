@@ -9,7 +9,7 @@ import {
   AttributionControlDirective,
   NavigationControlDirective,
 } from "@maplibre/ngx-maplibre-gl";
-import {ExpressionSpecification, StyleSpecification} from "maplibre-gl";
+import {StyleSpecification} from "maplibre-gl";
 
 import {DisplayInfoControlComponent} from "./map/display-info-control/display-info-control.component";
 import {LayerSelectionControlComponent} from "./map/layer-selection-control/layer-selection-control.component";
@@ -41,9 +41,6 @@ import {signals} from "../../common/signals";
   styles: ``,
 })
 export class GrowlComponent {
-  protected zoom = 6.8;
-  // prettier-ignore
-  protected markerSize: ExpressionSpecification = ['interpolate', ['linear'], ['zoom'], 5, 0.1, 12, 1];
   protected style = colorful as any as StyleSpecification;
   protected measurementColors = nlwknMeasurementClassificationColors;
 
