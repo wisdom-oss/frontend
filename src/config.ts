@@ -14,6 +14,7 @@ import {SchemaValidationInterceptor} from "./core/schema-validation.interceptor"
 import {apiInterceptor} from "./core/api.interceptor";
 import {authInterceptor} from "./core/auth/auth.interceptor";
 import {errorInterceptor} from "./core/error.interceptor";
+import {cacheInterceptor} from "./core/cache/cache.interceptor";
 
 export const wisdomAppConfig: ApplicationConfig = {
   providers: [
@@ -22,7 +23,7 @@ export const wisdomAppConfig: ApplicationConfig = {
     provideCharts(withDefaultRegisterables()),
     provideTranslateService(),
     provideHttpClient(
-      withInterceptors([apiInterceptor, authInterceptor]),
+      withInterceptors([cacheInterceptor, apiInterceptor, authInterceptor]),
       withInterceptorsFromDi(),
       withInterceptors([errorInterceptor]),
     ),
