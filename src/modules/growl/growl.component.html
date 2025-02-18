@@ -101,6 +101,7 @@
         <mgl-geojson-source
           id="old-water-right-usage-locations-source"
           [data]="oldUsageLocations"
+          [cluster]="true"
         >
         </mgl-geojson-source>
       </ng-container>
@@ -191,10 +192,30 @@
               id="water-right-usage-locations-layer-symbol"
               type="symbol"
               source="water-right-usage-locations-source"
+              [filter]="['!=', ['get', 'cluster'], true]"
               [layout]="{
                 'icon-image': 'remixicon:map-pin-2-fill',
                 'icon-anchor': 'bottom',
                 'icon-size': markerSize,
+              }"
+              [paint]="{
+                'icon-color': 'blue',
+              }"
+            ></mgl-layer>
+            <mgl-layer
+              id="water-right-usage-locations-layer-symbol-cluster"
+              type="symbol"
+              source="water-right-usage-locations-source"
+              [filter]="['==', ['get', 'cluster'], true]"
+              [layout]="{
+                'icon-image': 'remixicon:checkbox-multiple-blank-line',
+                'icon-anchor': 'center',
+                'icon-size': markerSize,
+                'icon-offset': [0, -20],
+                'text-field': ['get', 'point_count_abbreviated'],
+                'text-font': ['noto_sans_regular'],
+                'text-size': 20,
+                'text-offset': [0, .1],
               }"
               [paint]="{
                 'icon-color': 'blue',
@@ -211,6 +232,14 @@
               id="old-water-right-usage-locations-layer-symbol"
               type="symbol"
               source="old-water-right-usage-locations-source"
+              [layout]="{
+                'icon-image': 'remixicon:map-pin-2-fill',
+                'icon-anchor': 'bottom',
+                'icon-size': markerSize,
+              }"
+              [paint]="{
+                'icon-color': 'red',
+              }"
             ></mgl-layer>
           }
         </ng-container>

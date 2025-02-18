@@ -57,3 +57,11 @@ de = "NLWKN Grundwasser Messstationen"
 [layer.ndsMunicipals]
 en = "Lower-Saxony Municipals"
 de = "Niedersachen Kommunen"
+
+[layer.waterRightUsageLocations]
+en = "NLWKN Water Right Usage Locations"
+de = "NLWKN Nutzungsorte der Wasserrecht"
+
+[layer.oldWaterRightUsageLocations]
+en = "NLWKN Water Right Usage Locations (old)"
+de = "NLWKN Nutzungsorte der Wasserrecht (alt)"
