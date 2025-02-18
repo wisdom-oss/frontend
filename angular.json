@@ -95,7 +95,7 @@
             "allowedCommonJsDependencies": ["ajv", "dayjs", "maplibre-gl"],
             "stylePreprocessorOptions": {
               "sass": {
-                "silenceDeprecations": ["global-builtin"]
+                "silenceDeprecations": ["global-builtin", "import"]
               }
             }
           },
