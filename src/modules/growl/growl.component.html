@@ -8,14 +8,13 @@
       [canvasContextAttributes]="{preserveDrawingBuffer: true}"
       [attributionControl]="false"
     >
-      @let measurementStations = measurementStationsWithData();
-      @let bodies = groundwaterBodies();
-      @let municipals = ndsMunicipals();
-      @let usageLocations = waterRightUsageLocations();
-      @let oldUsageLocations = oldWaterRightUsageLocations();
-      @let groundwaterInfoData = bodyInfo();
-      @let municipalInfoData = municipalInfo();
-      @let stationInfoData = stationInfo();
+      @let groundwaterMeasurementStations =
+        service.data.groundwaterMeasurementStations();
+      @let groundwaterBodies = service.data.groundwaterBodies();
+      @let ndsMunicipals = service.data.ndsMunicipals();
+      @let waterRightUsageLocations = service.data.waterRightUsageLocations();
+      @let oldWaterRightUsageLocations =
+        service.data.oldWaterRightUsageLocations();
       <ng-container images>
         @for (color of measurementColors | keyvalue; track color.key) {
           <mgl-image
@@ -49,33 +48,44 @@
         <ng-container>
           @if (selectedLayers.groundwaterLevelStations()) {
             <mgl-control position="bottom-left">
-              <growl-legend-control></growl-legend-control>
+              <!-- the type structure is too complex for Angular here -->
+              <growl-legend-control
+                [count]="$any(service.data.measurementClassificationCount())"
+              ></growl-legend-control>
             </mgl-control>
           }
         </ng-container>
         <ng-container>
-          @if (groundwaterInfoData) {
+          @let groundwaterBody = hoveredFeatures.groundwaterBody();
+          @if (groundwaterBody) {
             <mgl-control position="bottom-left">
               <growl-display-info-control
-                [data]="groundwaterInfoData"
+                [data]="displayGroundwaterBody(groundwaterBody)"
               ></growl-display-info-control>
             </mgl-control>
           }
         </ng-container>
         <ng-container>
-          @if (municipalInfoData) {
+          @let ndsMunicipal = hoveredFeatures.ndsMunicipal();
+          @if (ndsMunicipal) {
             <mgl-control position="bottom-left">
               <growl-display-info-control
-                [data]="municipalInfoData"
+                [data]="displayNdsMunicipal(ndsMunicipal)"
               ></growl-display-info-control>
             </mgl-control>
           }
         </ng-container>
         <ng-container>
-          @if (stationInfoData) {
+          @let groundwaterMeasurementStation =
+            hoveredFeatures.groundwaterMeasurementStation();
+          @if (groundwaterMeasurementStation) {
             <mgl-control position="bottom-left">
               <growl-display-info-control
-                [data]="stationInfoData"
+                [data]="
+                  displayGroundwaterMeasurementStation(
+                    groundwaterMeasurementStation
+                  )
+                "
               ></growl-display-info-control>
             </mgl-control>
           }
@@ -84,30 +94,33 @@
       <ng-container sources>
         <mgl-geojson-source
           id="groundwater-bodies-source"
-          [data]="bodies"
+          [data]="groundwaterBodies"
         ></mgl-geojson-source>
-        <mgl-geojson-source id="nds-municipals-source" [data]="municipals">
+        <mgl-geojson-source id="nds-municipals-source" [data]="ndsMunicipals">
         </mgl-geojson-source>
         <mgl-geojson-source
           id="groundwater-measurement-stations-source"
-          [data]="measurementStations"
+          [data]="groundwaterMeasurementStations"
         ></mgl-geojson-source>
         <mgl-geojson-source
           id="water-right-usage-locations-source"
-          [data]="usageLocations"
+          [data]="waterRightUsageLocations"
           [cluster]="true"
         >
         </mgl-geojson-source>
         <mgl-geojson-source
           id="old-water-right-usage-locations-source"
-          [data]="oldUsageLocations"
+          [data]="oldWaterRightUsageLocations"
           [cluster]="true"
         >
         </mgl-geojson-source>
       </ng-container>
       <ng-container layers *ngIf="selectedLayersUpdate()">
         <ng-container groundwater-bodies>
-          @if (bodies.features.length && selectedLayers.groundwaterBodies()) {
+          @if (
+            groundwaterBodies.features.length &&
+            selectedLayers.groundwaterBodies()
+          ) {
             <mgl-layer
               id="groundwater-bodies-layer-fill"
               type="fill"
@@ -116,8 +129,10 @@
                 'fill-color': '#0088aa',
                 'fill-opacity': 0.3,
               }"
-              (layerMouseMove)="bodySelected.set(+$event.features![0]!.id!)"
-              (layerMouseLeave)="bodySelected.set(null)"
+              (layerMouseMove)="
+                hoveredFeatures.groundwaterBody.set($any($event.features![0]!))
+              "
+              (layerMouseLeave)="hoveredFeatures.groundwaterBody.set(null)"
             ></mgl-layer>
             <mgl-layer
               id="groundwater-bodies-layer-line"
@@ -131,16 +146,18 @@
           }
         </ng-container>
         <ng-container nds-municipals>
-          @if (municipals.features.length && selectedLayers.ndsMunicipals()) {
+          @if (
+            ndsMunicipals.features.length && selectedLayers.ndsMunicipals()
+          ) {
             <mgl-layer
               id="nds-municipals-layer-fill"
               type="fill"
               source="nds-municipals-source"
               [paint]="{'fill-opacity': 0}"
               (layerMouseMove)="
-                municipalSelected.set(+$event.features![0]!.id!)
+                hoveredFeatures.ndsMunicipal.set($any($event.features![0]!))
               "
-              (layerMouseLeave)="municipalSelected.set(null)"
+              (layerMouseLeave)="hoveredFeatures.ndsMunicipal.set(null)"
             ></mgl-layer>
             <mgl-layer
               id="nds-municipals-layer-line"
@@ -155,7 +172,7 @@
         </ng-container>
         <ng-container groundwater-measurement-stations>
           @if (
-            measurementStations.features.length &&
+            groundwaterMeasurementStations.features.length &&
             selectedLayers.groundwaterLevelStations()
           ) {
             @for (color of measurementColors | keyvalue; track color.key) {
@@ -176,16 +193,20 @@
                 }"
                 [filter]="['==', ['get', 'classification'], '' + color.key]"
                 (layerMouseMove)="
-                  stationSelected.set($event.features![0]!.properties['key'])
+                  hoveredFeatures.groundwaterMeasurementStation.set(
+                    $any($event.features![0]!)
+                  )
                 "
-                (layerMouseLeave)="stationSelected.set(null)"
+                (layerMouseLeave)="
+                  hoveredFeatures.groundwaterMeasurementStation.set(null)
+                "
               ></mgl-layer>
             }
           }
         </ng-container>
         <ng-container water-right-usage-locations>
           @if (
-            usageLocations.features.length &&
+            waterRightUsageLocations.features.length &&
             selectedLayers.waterRightUsageLocations()
           ) {
             <mgl-layer
@@ -215,7 +236,7 @@
                 'text-field': ['get', 'point_count_abbreviated'],
                 'text-font': ['noto_sans_regular'],
                 'text-size': 20,
-                'text-offset': [0, .1],
+                'text-offset': [0, 0.1],
               }"
               [paint]="{
                 'icon-color': 'blue',
@@ -225,7 +246,7 @@
         </ng-container>
         <ng-container old-water-right-usage-locations>
           @if (
-            oldUsageLocations.features.length &&
+            oldWaterRightUsageLocations.features.length &&
             selectedLayers.oldWaterRightUsageLocations()
           ) {
             <mgl-layer

@@ -1,4 +1,4 @@
-import {signal, Component} from "@angular/core";
+import {input, Component} from "@angular/core";
 import {TranslatePipe} from "@ngx-translate/core";
 
 import {GroundwaterLevelsService} from "../../../../api/groundwater-levels.service";
@@ -22,7 +22,7 @@ export class LegendControlComponent {
     MC | "null"
   >;
 
-  readonly count = signal<Record<MC | "null", number>>({
+  readonly count = input<Record<MC | "null", number>>({
     [MC.MAX_EXCEEDED]: 0,
     [MC.VERY_HIGH]: 0,
     [MC.HIGH]: 0,
