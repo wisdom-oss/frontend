@@ -6,6 +6,19 @@
   (mouseleave)="kind() == 'hover' && isActive.set(false)"
 >
   <div class="dropdown-trigger">
+
+
+
+
+
+
+
+
+
+
+
+
+    
     <button
       class="button is-rounded"
       (click)="kind() == 'click' && isActive.set(!isActive())"
@@ -13,7 +26,7 @@
       <span>{{
         changeMenuName() ? choiceName() : (menuName() | translate)
       }}</span>
-      <span class="icon is-small">
+      <span class="icon is-big">
         <ng-icon *ngIf(!isActive()) name="remixArrowUpSLine"></ng-icon>
         <ng-icon *ngIf(isActive()) name="remixArrowDownSLine"></ng-icon>
       </span>
