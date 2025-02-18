@@ -16,7 +16,8 @@
     "compodoc:serve": "compodoc -s",
     "docker:build": "docker build -t wisdom-oss/frontend .",
     "docker:start": "npm run docker:run",
-    "docker:run": "docker run --rm -p 5000:5000 wisdom-oss/frontend"
+    "docker:run": "docker run --rm -p 5000:5000 wisdom-oss/frontend",
+    "prepare": "husky"
   },
   "private": true,
   "dependencies": {
