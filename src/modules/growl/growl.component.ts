@@ -19,6 +19,7 @@ import nlwknMeasurementClassificationColors from "../../assets/nlwkn-measurement
 import colorful from "../../assets/map/styles/colorful.json";
 import {ResizeMapOnLoadDirective} from "../../common/directives/resize-map-on-load.directive";
 import {signals} from "../../common/signals";
+import dayjs from "dayjs";
 
 @Component({
   selector: "growl",
@@ -80,11 +81,12 @@ export class GrowlComponent {
     feature: GroundwaterMeasurementStationFeature | null,
   ): DisplayInfoControlComponent.Data | null {
     if (!feature) return null;
+    let date = feature.properties.date;
     return {
       title: feature.properties.name,
       table: {
         station: feature.properties.station,
-        date: feature.properties.date,
+        date: date ? dayjs(date) : undefined,
         waterLevelNHN: feature.properties.waterLevelNHN,
         waterLevelGOK: feature.properties.waterLevelGOK,
       },
