@@ -17,6 +17,8 @@ import {
 import {GroundwaterLevelsService} from "../../api/groundwater-levels.service";
 import {GeoDataService} from "../../api/geo-data.service";
 import nlwknMeasurementClassificationColors from "../../assets/nlwkn-measurement-classification-colors.toml";
+import { Duration } from "dayjs/plugin/duration";
+import dayjs from "dayjs";
 
 export namespace GrowlService {
   // geo data
@@ -84,26 +86,31 @@ export class GrowlService {
         service,
         "groundwater_measurement_stations",
         "Point",
+        dayjs.duration(1, "week"),
       ),
       groundwaterBodies: GrowlService.geoDataSignal(
         service,
         "groundwater_bodies",
         "Polygon",
+        dayjs.duration(1, "year"),
       ),
       ndsMunicipals: GrowlService.geoDataSignal(
         service,
         "nds_municipals",
         "MultiPolygon",
+        dayjs.duration(1, "year"),
       ),
       waterRightUsageLocations: GrowlService.geoDataSignal(
         service,
         "water_right_usage_locations",
         "Point",
+        dayjs.duration(1, "week"),
       ),
       oldWaterRightUsageLocations: GrowlService.geoDataSignal(
         service,
         "old_water_right_usage_locations",
         "Point",
+        dayjs.duration(1, "week"),
       ),
     };
   }
@@ -112,6 +119,7 @@ export class GrowlService {
     service: GeoDataService,
     layerName: string,
     type: G["type"],
+    cacheTtl: Duration
   ): Signal<FeatureCollection<G, GeoProperties>> {
     let geoSignal: WritableSignal<FeatureCollection<G, GeoProperties>> = signal(
       {
@@ -121,7 +129,7 @@ export class GrowlService {
     );
 
     (async () => {
-      let contents = (await service.fetchLayerContents(layerName)) ?? [];
+      let contents = (await service.fetchLayerContents(layerName, undefined, cacheTtl)) ?? [];
 
       let features: Feature<G, GeoProperties>[] = [];
       for (let content of contents) {

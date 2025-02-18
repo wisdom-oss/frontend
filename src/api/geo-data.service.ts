@@ -58,6 +58,7 @@ export class GeoDataService {
       otherLayer: string;
       key: string[];
     },
+    cacheTtl = dayjs.duration(1, "week"),
   ): Promise<GeoDataService.LayerContents | null> {
     try {
       let url = `${URL}/content/${layerRef}`;
@@ -74,7 +75,7 @@ export class GeoDataService {
 
       let context = new HttpContext()
         .set(httpContexts.validateSchema, LAYER_CONTENTS)
-        .set(httpContexts.cache, [url, dayjs.duration(1, "year")]);
+        .set(httpContexts.cache, [url, cacheTtl]);
 
       return await firstValueFrom(
         this.http.get<GeoDataService.LayerContents>(url, {context}),

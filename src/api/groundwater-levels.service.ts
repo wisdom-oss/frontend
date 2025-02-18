@@ -46,30 +46,29 @@ export class GroundwaterLevelsService {
   async fetchMeasurementClassifications(
     date: Dayjs = dayjs(),
   ): Promise<Record<string, GroundwaterLevelsService.Measurement>> {
+    let day = date.startOf("day");
     let url = `${URL}/graphql`;
-    let gqlBody = {
-      query: `{
-        measurements(
-          from: "${date.toISOString()}"
-          until: "${date.toISOString()}"
-        ) {
-          station
-          date
-          classification
-          waterLevelNHN
-          waterLevelGOK
-        }
-      }`,
-    };
+    let query = `{
+      measurements(
+        from: "${day.toISOString()}"
+        until: "${day.toISOString()}"
+      ) {
+        station
+        date
+        classification
+        waterLevelNHN
+        waterLevelGOK
+      }
+    }`;
 
     let context = new HttpContext()
       .set(httpContexts.validateSchema, MEASUREMENT_CLASSIFICATIONS_RESPONSE)
-      .set(httpContexts.cache, [`${url}:${gqlBody}`, dayjs.duration(1, "day")]);
+      .set(httpContexts.cache, [`${url}:${query}`, dayjs.duration(8, "hours")]);
 
     let response = await firstValueFrom(
       this.http.post<JTDDataType<typeof MEASUREMENT_CLASSIFICATIONS_RESPONSE>>(
         url,
-        gqlBody,
+        {query},
         {context},
       ),
     );
