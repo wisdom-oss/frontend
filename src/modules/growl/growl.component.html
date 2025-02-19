@@ -117,6 +117,7 @@
           id="water-right-usage-locations-source"
           [data]="waterRightUsageLocations"
           [cluster]="true"
+          #waterRightUsageLocationsSource
         >
         </mgl-geojson-source>
         <mgl-geojson-source
@@ -125,6 +126,15 @@
           [cluster]="true"
         >
         </mgl-geojson-source>
+        <mgl-geojson-source
+          id="hover-cluster-polygon-source"
+          [data]="
+            hoverClusterPolygon.value() ?? {
+              type: 'FeatureCollection',
+              features: [],
+            }
+          "
+        ></mgl-geojson-source>
       </ng-container>
       <ng-container layers *ngIf="selectedLayersUpdate()">
         <ng-container groundwater-bodies>
@@ -221,6 +231,28 @@
             }
           }
         </ng-container>
+        <ng-container hover-cluster-polygon>
+          @if (hoverClusterPolygon.hasValue()) {
+            <mgl-layer
+            id="hover-cluster-polygon-fill"
+            type="fill"
+            source="hover-cluster-polygon-source"
+            [paint]="{
+              'fill-color': 'blue',
+              'fill-opacity': 0.1,
+            }"
+          ></mgl-layer>
+          <mgl-layer
+            id="hover-cluster-polygon-line"
+            type="line"
+            source="hover-cluster-polygon-source"
+            [paint]="{
+              'line-color': 'blue',
+              'line-width': 3,
+            }"
+          ></mgl-layer>
+          }
+        </ng-container>
         <ng-container water-right-usage-locations>
           @if (
             waterRightUsageLocations.features.length &&
@@ -258,6 +290,14 @@
               [paint]="{
                 'icon-color': 'blue',
               }"
+              (layerMouseMove)="
+                hoveredFeatures.waterRightUsageLocationCluster.set(
+                  $any($event.features![0]!)
+                )
+              "
+              (layerMouseLeave)="
+                hoveredFeatures.waterRightUsageLocationCluster.set(null)
+              "
             ></mgl-layer>
           }
         </ng-container>

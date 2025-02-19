@@ -35,6 +35,7 @@
     "@ng-icons/core": "^29.10.0",
     "@ng-icons/remixicon": "^29.10.0",
     "@ngx-translate/core": "^16.0.3",
+    "@turf/turf": "^7.2.0",
     "@twemoji/svg": "^15.0.0",
     "@wisdom-oss/brand": "github:wisdom-oss/brand",
     "ajv": "^8.17.1",

@@ -1,5 +1,15 @@
 import {NgIf, DatePipe, KeyValuePipe} from "@angular/common";
-import {computed, effect, signal, Component, Signal} from "@angular/core";
+import {
+  computed,
+  effect,
+  resource,
+  signal,
+  viewChild,
+  Component,
+  ResourceLoaderParams,
+  Resource,
+  Signal,
+} from "@angular/core";
 import {
   ControlComponent,
   ImageComponent,
@@ -10,7 +20,10 @@ import {
   NavigationControlDirective,
 } from "@maplibre/ngx-maplibre-gl";
 import dayjs from "dayjs";
+import {Feature, Point, Polygon} from "geojson";
 import {StyleSpecification} from "maplibre-gl";
+
+import * as turf from "@turf/turf";
 
 import {DisplayInfoControlComponent} from "./map/display-info-control/display-info-control.component";
 import {LayerSelectionControlComponent} from "./map/layer-selection-control/layer-selection-control.component";
@@ -60,6 +73,9 @@ export class GrowlComponent {
     groundwaterMeasurementStation: signal<GroundwaterMeasurementStationFeature | null>(null),
     groundwaterBody: signal<GroundwaterBodyFeature | null>(null),
     ndsMunicipal: signal<NdsMunicipalFeature | null>(null),
+    waterRightUsageLocationCluster: signal<ClusterFeature | null>(
+      null, {equal: (a, b) => a?.id == b?.id}
+    ),
   };
 
   protected selectedLayers = {
@@ -70,6 +86,10 @@ export class GrowlComponent {
     groundwaterBodies: signals.toggleable(true),
   } as const;
   protected selectedLayersUpdate = signal(false);
+
+  protected waterRightUsageLocationsSource: Signal<GeoJSONSourceComponent> =
+    viewChild.required("waterRightUsageLocationsSource");
+  protected hoverClusterPolygon;
 
   protected averageWithdrawals = signal<{
     name: string;
@@ -96,6 +116,9 @@ export class GrowlComponent {
       this.selectedLayersUpdate.set(false);
       setTimeout(() => this.selectedLayersUpdate.set(true));
     });
+
+    this.hoverClusterPolygon = this.hoverClusterPolygonResource();
+    effect(() => console.log(this.hoverClusterPolygon.value()));
   }
 
   protected displayGroundwaterMeasurementStation(
@@ -141,6 +164,8 @@ export class GrowlComponent {
   protected updateAverageWithdrawals(
     groundwaterBody: GroundwaterBodyFeature | null,
   ) {
+    if (this.hoverClusterPolygon.hasValue()) return;
+
     for (let body of this.service.data.groundwaterBodies().features) {
       if (groundwaterBody?.id == body.id) {
         let withdrawalData = {
@@ -161,9 +186,69 @@ export class GrowlComponent {
 
     return this.averageWithdrawals.set(null);
   }
+
+  private hoverClusterPolygonResource() {
+    return resource({
+      request: () => {
+        let cluster = this.hoveredFeatures.waterRightUsageLocationCluster();
+        if (!cluster) return null;
+
+        let source = this.waterRightUsageLocationsSource();
+        if (!source) return null;
+
+        return [source, cluster] as [GeoJSONSourceComponent, ClusterFeature];
+      },
+      loader: async (
+        param: ResourceLoaderParams<
+          [GeoJSONSourceComponent, ClusterFeature] | null
+        >,
+      ): Promise<Feature<Polygon> | undefined> => {
+        if (!param.request) return undefined;
+        let [source, cluster] = param.request;
+        let points = await this.getClusterChildrenRecursive(source, cluster.id! as number, 3);
+        let featureCollection = {
+          type: "FeatureCollection",
+          features: points,
+        } as const;
+        let polygon = turf.convex(featureCollection);
+        return polygon ?? undefined;
+      },
+    });
+  }
+
+  private async getClusterChildrenRecursive(
+    source: GeoJSONSourceComponent, 
+    clusterId: number, 
+    depthLimit: number
+  ): Promise<Feature[]> {
+    // TODO: implement a depth limit
+    let points = [];
+    let children = await source.getClusterChildren(clusterId);
+    for (let child of children) {
+      if ((child.properties ?? {})["cluster"] && depthLimit) {
+        points.push(...await this.getClusterChildrenRecursive(source, child.id! as number, depthLimit - 1));
+        continue;
+      }
+
+      points.push(child);
+    }
+
+    return points;
+  } 
 }
 
 type GroundwaterMeasurementStationFeature =
   GrowlService.GroundwaterMeasurementStations["features"][0];
 type GroundwaterBodyFeature = GrowlService.GroundwaterBodies["features"][0];
 type NdsMunicipalFeature = GrowlService.NdsMunicipals["features"][0];
+type WaterRightUsageLocationFeature =
+  GrowlService.WaterRightUsageLocations["features"][0];
+type ClusterFeature = Feature<
+  Point,
+  {
+    cluster: true;
+    cluster_id: number;
+    point_count: number;
+    point_count_abbreviated: number | string;
+  }
+>;
