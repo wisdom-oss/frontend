@@ -13,7 +13,7 @@
     },
     {
       "id": "remixicon",
-      "url": "http://localhost:4200/public/generated/remixicon"
+      "url": "origin://public/generated/remixicon"
     }
   ],
   "sources": {
