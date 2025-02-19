@@ -1,4 +1,5 @@
 import {ViewChildren, Component, OnInit, QueryList} from "@angular/core";
+import {TranslatePipe} from "@ngx-translate/core";
 import {ChartConfiguration, ChartData, ChartDataset, ChartType} from "chart.js";
 import {BaseChartDirective} from "ng2-charts";
 
@@ -11,7 +12,7 @@ import {DropdownComponent} from "../../common/components/dropdown/dropdown.compo
 
 @Component({
   selector: "water-demand-prediction",
-  imports: [BaseChartDirective, DropdownComponent],
+  imports: [BaseChartDirective, DropdownComponent, TranslatePipe],
   templateUrl: "./water-demand-prediction.component.html",
   styles: ``,
 })
@@ -39,6 +40,9 @@ export class WaterDemandPredictionComponent implements OnInit {
     weekly: "water-demand-prediction.resolution.weekly",
   };
   choiceResolution?: string;
+
+  /** the displayed resolution in the charts of real data */
+  displayedResolution: string = this.optionsResolution["hourly"];
 
   /** saves all requested data by resolution */
   dataPerResolution: Record<string, SingleSmartmeter[]> = {};
@@ -142,6 +146,12 @@ export class WaterDemandPredictionComponent implements OnInit {
     });
 
     this.updateCharts(0);
+  }
+
+  setDisplayedResolution(resolution: string): void {
+    this.displayedResolution = resolution;
+
+    this.showGraphs(resolution);
   }
 
   /**
@@ -298,7 +308,11 @@ export class WaterDemandPredictionComponent implements OnInit {
         error: error => {
           console.log(error);
         },
-        complete: () => {},
+        complete: () => {
+          this.showGraphs(
+            this.choiceResolution ? this.choiceResolution : "hourly",
+          );
+        },
       });
   }
 
