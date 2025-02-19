@@ -1,7 +1,11 @@
 import {ViewChildren, Component, OnInit, QueryList} from "@angular/core";
 import {ChartConfiguration, ChartData, ChartDataset, ChartType} from "chart.js";
 import {BaseChartDirective} from "ng2-charts";
-import {SingleSmartmeter, PredictionSingleSmartmeter} from "./water-demand-prediction.interface";
+
+import {
+  PredictionSingleSmartmeter,
+  SingleSmartmeter,
+} from "./water-demand-prediction.interface";
 import {WaterDemandPredictionService} from "../../api/water-demand-prediction.service";
 import {DropdownComponent} from "../../common/components/dropdown/dropdown.component";
 
@@ -24,7 +28,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     "three months": "water-demand-prediction.timeframe.three-months",
     "six months": "water-demand-prediction.timeframe.six-months",
     "one year": "water-demand-prediction.timeframe.one-year",
-    "all": "water-demand-prediction.timeframe.all",
+    all: "water-demand-prediction.timeframe.all",
   };
   choiceTime?: string;
 
@@ -126,7 +130,13 @@ export class WaterDemandPredictionComponent implements OnInit {
     this.chartDataCurrentValues.datasets = [];
 
     this.dataPerResolution[resolution].forEach(entry => {
-      let newDataset = this.createNewDataset(entry.numValue, entry.name, resolution, entry.timeframe, false);
+      let newDataset = this.createNewDataset(
+        entry.numValue,
+        entry.name,
+        resolution,
+        entry.timeframe,
+        false,
+      );
       this.chartDataCurrentValues.datasets.push(newDataset);
       this.chartDataCurrentValues.labels = entry.dateObserved;
     });
@@ -146,15 +156,32 @@ export class WaterDemandPredictionComponent implements OnInit {
     this.predPerResolution[resolution].forEach(entry => {
       this.chartDataPredictedValues.labels = entry.dateObserved;
 
-      let predData = this.createNewDataset(entry.numValue,entry.name, resolution, entry.timeframe, false);
+      let predData = this.createNewDataset(
+        entry.numValue,
+        entry.name,
+        resolution,
+        entry.timeframe,
+        false,
+      );
       this.chartDataPredictedValues.datasets.push(predData);
 
-      let lower_conf_int = this.createNewDataset(entry.lower_conf_values, "lower_confidence_interval", resolution, entry.timeframe, 0);
+      let lower_conf_int = this.createNewDataset(
+        entry.lower_conf_values,
+        "lower_confidence_interval",
+        resolution,
+        entry.timeframe,
+        0,
+      );
       this.chartDataPredictedValues.datasets.push(lower_conf_int);
 
-      let upper_conf_int = this.createNewDataset(entry.upper_conf_values, "upper_confidence_interval", resolution, entry.timeframe, 0);
+      let upper_conf_int = this.createNewDataset(
+        entry.upper_conf_values,
+        "upper_confidence_interval",
+        resolution,
+        entry.timeframe,
+        0,
+      );
       this.chartDataPredictedValues.datasets.push(upper_conf_int);
-
     });
 
     this.updateCharts(1);
@@ -167,12 +194,18 @@ export class WaterDemandPredictionComponent implements OnInit {
    * @param fillOption: false, 0 for confidence interval
    * @returns new dataset
    */
-  createNewDataset(data: number[], label: string,  resolution: string, timeframe: string, fillOption: any): ChartDataset {
+  createNewDataset(
+    data: number[],
+    label: string,
+    resolution: string,
+    timeframe: string,
+    fillOption: any,
+  ): ChartDataset {
     let color = "transparent";
 
-    // to display confidence intervalls 
+    // to display confidence intervalls
     if (fillOption === false) {
-      color = this.stringToColor(label + resolution + timeframe)
+      color = this.stringToColor(label + resolution + timeframe);
     }
 
     const newDataset: ChartDataset<"line"> = {
@@ -185,15 +218,15 @@ export class WaterDemandPredictionComponent implements OnInit {
   }
 
   /**
- * Generates deterministically a hex color code from any string.
- *
- * This is a modernized version of this
- * [StackOverflow reply](https://stackoverflow.com/a/16348977/15800714).
- * @param str A string to generate a hex color for
- * @param map A color map for predefined strings
- *
- * @returns A hex color code in the style of '#abc123'
- */
+   * Generates deterministically a hex color code from any string.
+   *
+   * This is a modernized version of this
+   * [StackOverflow reply](https://stackoverflow.com/a/16348977/15800714).
+   * @param str A string to generate a hex color for
+   * @param map A color map for predefined strings
+   *
+   * @returns A hex color code in the style of '#abc123'
+   */
   stringToColor(str: string, map?: Record<string, string>): string {
     if (map && map[str]) {
       return map[str];
@@ -204,7 +237,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     }
     let color = "#";
     for (let i = 0; i < 3; i++) {
-      let value = (hash >> (i * 8)) & 0xFF;
+      let value = (hash >> (i * 8)) & 0xff;
       color += ("00" + value.toString(16)).slice(-2);
     }
     return color;
@@ -235,10 +268,14 @@ export class WaterDemandPredictionComponent implements OnInit {
       return;
     }
 
-    if (!this.checkForUniqueData(this.choiceResolution!,
-      this.choiceTime!,
-      this.choiceSmartmeter!,
-      this.dataPerResolution)) {
+    if (
+      !this.checkForUniqueData(
+        this.choiceResolution!,
+        this.choiceTime!,
+        this.choiceSmartmeter!,
+        this.dataPerResolution,
+      )
+    ) {
       return;
     }
 
@@ -250,7 +287,6 @@ export class WaterDemandPredictionComponent implements OnInit {
       )
       .subscribe({
         next: (response: SingleSmartmeter) => {
-
           // create new key of resolution and save smartmeter data to it
           if (response.resolution in this.dataPerResolution) {
             this.dataPerResolution[response.resolution].push(response);
@@ -258,14 +294,11 @@ export class WaterDemandPredictionComponent implements OnInit {
           } else {
             this.dataPerResolution[response.resolution] = [response];
           }
-
         },
         error: error => {
           console.log(error);
         },
-        complete: () => {
-
-        },
+        complete: () => {},
       });
   }
 
@@ -274,14 +307,18 @@ export class WaterDemandPredictionComponent implements OnInit {
       return;
     }
 
-    if (!this.checkForUniqueData(this.choiceResolution!,
-      this.choiceTime!,
-      this.choiceSmartmeter!,
-      this.predPerResolution)) {
+    if (
+      !this.checkForUniqueData(
+        this.choiceResolution!,
+        this.choiceTime!,
+        this.choiceSmartmeter!,
+        this.predPerResolution,
+      )
+    ) {
       return;
     }
 
-    console.log("Start fetching predicted Values. Please wait.")
+    console.log("Start fetching predicted Values. Please wait.");
 
     this.waterDemandService
       .fetchSinglePredictionSmartmeter(
@@ -293,7 +330,9 @@ export class WaterDemandPredictionComponent implements OnInit {
         next: (response: PredictionSingleSmartmeter) => {
           // create new key of resolution and save smartmeter data to it
           if (response.resolution in this.predPerResolution) {
-            let color = this.stringToColor(response.name + response.resolution + response.timeframe);
+            let color = this.stringToColor(
+              response.name + response.resolution + response.timeframe,
+            );
             // add color and change interface
             this.predPerResolution[response.resolution].push(response);
             // use existing key and push smartmeter data in it
@@ -306,7 +345,7 @@ export class WaterDemandPredictionComponent implements OnInit {
         },
         complete: () => {
           console.log(this.predPerResolution);
-          console.log("Finalized prediction request.")
+          console.log("Finalized prediction request.");
         },
       });
   }
@@ -329,29 +368,35 @@ export class WaterDemandPredictionComponent implements OnInit {
     }
 
     return true;
-
   }
 
   /** check if the requested dataset would be unique or not. True if unique, else false */
-  checkForUniqueData(resolution: string,
+  checkForUniqueData(
+    resolution: string,
     timeframe: string,
     name: string,
-    usedRecord: any): boolean {
-
+    usedRecord: any,
+  ): boolean {
     // if neither record or resolution is already present, data request must be unique
     if (!usedRecord || !usedRecord[resolution]) {
       return true;
     }
 
-    // when name of record and timeframe are equal, datasets are the same data. 
+    // when name of record and timeframe are equal, datasets are the same data.
     for (let item of usedRecord[resolution]) {
       if (name === item.name && timeframe === item.timeframe) {
-        (console.log(name + ": " + timeframe + " already exist in resolution of: " + resolution ))
+        console.log(
+          name +
+            ": " +
+            timeframe +
+            " already exist in resolution of: " +
+            resolution,
+        );
         return false;
       }
     }
 
-    return true;    
+    return true;
   }
 
   /**
@@ -366,7 +411,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     }
 
     // add 1 to update the first graph, add 2 to update the prediction graph only
-    if(indexOfChart) {
+    if (indexOfChart) {
       this.charts.toArray()[indexOfChart].update();
       return;
     }
@@ -387,10 +432,9 @@ export class WaterDemandPredictionComponent implements OnInit {
 
     this.chartDataPredictedValues.labels = [];
     this.chartDataPredictedValues.datasets = [];
-    
+
     this.dataPerResolution = {};
     this.predPerResolution = {};
     this.updateCharts();
   }
-  
 }

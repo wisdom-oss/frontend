@@ -61,21 +61,21 @@
         <div>
           <!-- menus for prediction values -->
           <button
-          class="button is-primary is-rounded"
-          (click)="fetchPredSingleSmartmeter()"
-        >
-          Request Prediction
-        </button>
-        <button
-          class="button is-primary is-rounded"
-          (click)="
-            showPredictionGraphs(
-              this.choiceResolution ? this.choiceResolution : 'hourly'
-            )
-          "
-        >
-          Display Prediction Values
-        </button>
+            class="button is-primary is-rounded"
+            (click)="fetchPredSingleSmartmeter()"
+          >
+            Request Prediction
+          </button>
+          <button
+            class="button is-primary is-rounded"
+            (click)="
+              showPredictionGraphs(
+                this.choiceResolution ? this.choiceResolution : 'hourly'
+              )
+            "
+          >
+            Display Prediction Values
+          </button>
         </div>
       </div>
     </div>
