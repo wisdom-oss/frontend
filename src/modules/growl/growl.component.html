@@ -234,23 +234,23 @@
         <ng-container hover-cluster-polygon>
           @if (hoverClusterPolygon.hasValue()) {
             <mgl-layer
-            id="hover-cluster-polygon-fill"
-            type="fill"
-            source="hover-cluster-polygon-source"
-            [paint]="{
-              'fill-color': 'blue',
-              'fill-opacity': 0.1,
-            }"
-          ></mgl-layer>
-          <mgl-layer
-            id="hover-cluster-polygon-line"
-            type="line"
-            source="hover-cluster-polygon-source"
-            [paint]="{
-              'line-color': 'blue',
-              'line-width': 3,
-            }"
-          ></mgl-layer>
+              id="hover-cluster-polygon-fill"
+              type="fill"
+              source="hover-cluster-polygon-source"
+              [paint]="{
+                'fill-color': 'blue',
+                'fill-opacity': 0.1,
+              }"
+            ></mgl-layer>
+            <mgl-layer
+              id="hover-cluster-polygon-line"
+              type="line"
+              source="hover-cluster-polygon-source"
+              [paint]="{
+                'line-color': 'blue',
+                'line-width': 3,
+              }"
+            ></mgl-layer>
           }
         </ng-container>
         <ng-container water-right-usage-locations>

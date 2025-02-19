@@ -7,7 +7,6 @@ import {
   viewChild,
   Component,
   ResourceLoaderParams,
-  Resource,
   Signal,
 } from "@angular/core";
 import {
@@ -205,7 +204,11 @@ export class GrowlComponent {
       ): Promise<Feature<Polygon> | undefined> => {
         if (!param.request) return undefined;
         let [source, cluster] = param.request;
-        let points = await this.getClusterChildrenRecursive(source, cluster.id! as number, 3);
+        let points = await this.getClusterChildrenRecursive(
+          source,
+          cluster.id! as number,
+          3,
+        );
         let featureCollection = {
           type: "FeatureCollection",
           features: points,
@@ -217,16 +220,22 @@ export class GrowlComponent {
   }
 
   private async getClusterChildrenRecursive(
-    source: GeoJSONSourceComponent, 
-    clusterId: number, 
-    depthLimit: number
+    source: GeoJSONSourceComponent,
+    clusterId: number,
+    depthLimit: number,
   ): Promise<Feature[]> {
     // TODO: implement a depth limit
     let points = [];
     let children = await source.getClusterChildren(clusterId);
     for (let child of children) {
       if ((child.properties ?? {})["cluster"] && depthLimit) {
-        points.push(...await this.getClusterChildrenRecursive(source, child.id! as number, depthLimit - 1));
+        points.push(
+          ...(await this.getClusterChildrenRecursive(
+            source,
+            child.id! as number,
+            depthLimit - 1,
+          )),
+        );
         continue;
       }
 
@@ -234,15 +243,13 @@ export class GrowlComponent {
     }
 
     return points;
-  } 
+  }
 }
 
 type GroundwaterMeasurementStationFeature =
   GrowlService.GroundwaterMeasurementStations["features"][0];
 type GroundwaterBodyFeature = GrowlService.GroundwaterBodies["features"][0];
 type NdsMunicipalFeature = GrowlService.NdsMunicipals["features"][0];
-type WaterRightUsageLocationFeature =
-  GrowlService.WaterRightUsageLocations["features"][0];
 type ClusterFeature = Feature<
   Point,
   {
