@@ -68,6 +68,25 @@ Key scripts include:
 Ensure you run `lint` and `fmt` before pushing.
 The [CI](https://github.com/wisdom-oss/frontend/actions) enforces this.
 
+## Git Pre-Commit Hooks
+
+In order to automatically format and lint the codebase,
+you can use husky (https://typicode.github.io/husky/get-started.html)
+install via
+
+```sh
+npm install --global husky
+```
+
+and make sure npm still functions with repeating
+
+```sh
+npm install
+```
+
+Then, whenever you commit anything via git or GitHub Desktop, both scripts get executed
+before the commit happens and you don't have to do so manually
+
 ## Code Organization
 
 ### File and Directories
@@ -156,7 +175,7 @@ Most **MIT** and **Apache**-licensed packages are fine.
 
 Before submitting a PR:
 
-- Run `npm run lint` and `npm run fmt` to pass CI checks.
+- Run `npm run lint` and `npm run fmt` to pass CI checks. (see ## Git Pre-Commit Hooks above)
 - Ensure your module aligns with the project's structure and standards.
 - Familiarize yourself with `src/common` — it might already contain what you need.
 
