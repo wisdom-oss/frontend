@@ -4,6 +4,8 @@ import {ChartConfiguration, ChartData, ChartDataset, ChartType} from "chart.js";
 import {BaseChartDirective} from "ng2-charts";
 
 import {
+  SmartmeterDataset,
+  DatasetSmartmeter,
   PredictionSingleSmartmeter,
   SingleSmartmeter,
 } from "./water-demand-prediction.interface";
@@ -41,11 +43,12 @@ export class WaterDemandPredictionComponent implements OnInit {
   };
   choiceResolution?: string;
 
+  currentSmartmeterData?: SingleSmartmeter;
+
+  savedDatasets: Record<string, SmartmeterDataset[]> = {};
+
   /** the displayed resolution in the charts of real data */
   displayedResolution: string = this.optionsResolution["hourly"];
-
-  /** saves all requested data by resolution */
-  dataPerResolution: Record<string, SingleSmartmeter[]> = {};
 
   /** saves all predicted values by resolution */
   predPerResolution: Record<string, PredictionSingleSmartmeter[]> = {};
@@ -128,36 +131,6 @@ export class WaterDemandPredictionComponent implements OnInit {
    * shows all graphs based on the selected resolution
    * @param resolution choice of hourly, daily, weekly
    */
-  showGraphs(resolution: string): void {
-    // reset data to begin
-    this.chartDataCurrentValues.labels = [];
-    this.chartDataCurrentValues.datasets = [];
-
-    this.dataPerResolution[resolution].forEach(entry => {
-      let newDataset = this.createNewDataset(
-        entry.numValue,
-        entry.name,
-        resolution,
-        entry.timeframe,
-        false,
-      );
-      this.chartDataCurrentValues.datasets.push(newDataset);
-      this.chartDataCurrentValues.labels = entry.dateObserved;
-    });
-
-    this.updateCharts(0);
-  }
-
-  setDisplayedResolution(resolution: string): void {
-    this.displayedResolution = resolution;
-
-    this.showGraphs(resolution);
-  }
-
-  /**
-   * shows all graphs based on the selected resolution
-   * @param resolution choice of hourly, daily, weekly
-   */
   showPredictionGraphs(resolution: string): void {
     // reset data to begin
     this.chartDataPredictedValues.labels = [];
@@ -198,62 +171,6 @@ export class WaterDemandPredictionComponent implements OnInit {
   }
 
   /**
-   * create a new dataset for chartjs from the given data
-   * @param label label of the chartdata
-   * @param data data points
-   * @param fillOption: false, 0 for confidence interval
-   * @returns new dataset
-   */
-  createNewDataset(
-    data: number[],
-    label: string,
-    resolution: string,
-    timeframe: string,
-    fillOption: any,
-  ): ChartDataset {
-    let color = "transparent";
-
-    // to display confidence intervalls
-    if (fillOption === false) {
-      color = this.stringToColor(label + resolution + timeframe);
-    }
-
-    const newDataset: ChartDataset<"line"> = {
-      label: label,
-      data: data,
-      borderColor: color,
-      fill: fillOption,
-    };
-    return newDataset;
-  }
-
-  /**
-   * Generates deterministically a hex color code from any string.
-   *
-   * This is a modernized version of this
-   * [StackOverflow reply](https://stackoverflow.com/a/16348977/15800714).
-   * @param str A string to generate a hex color for
-   * @param map A color map for predefined strings
-   *
-   * @returns A hex color code in the style of '#abc123'
-   */
-  stringToColor(str: string, map?: Record<string, string>): string {
-    if (map && map[str]) {
-      return map[str];
-    }
-    let hash = 0;
-    for (let s of str) {
-      hash = s.charCodeAt(0) + ((hash << 5) - hash);
-    }
-    let color = "#";
-    for (let i = 0; i < 3; i++) {
-      let value = (hash >> (i * 8)) & 0xff;
-      color += ("00" + value.toString(16)).slice(-2);
-    }
-    return color;
-  }
-
-  /**
    * fetches all smartmeter names
    */
   fetchMeterInformation(): void {
@@ -268,67 +185,9 @@ export class WaterDemandPredictionComponent implements OnInit {
     });
   }
 
-  /**
-   * fetches data of a single smartmeter and saves it into the record
-   * checks if any substantial part of the api request is faulty
-   * @returns when any variable is missing.
-   */
-  fetchSingleSmartmeter(): void {
-    if (!this.checkForDefinedRequestParameters()) {
-      return;
-    }
-
-    if (
-      !this.checkForUniqueData(
-        this.choiceResolution!,
-        this.choiceTime!,
-        this.choiceSmartmeter!,
-        this.dataPerResolution,
-      )
-    ) {
-      return;
-    }
-
-    this.waterDemandService
-      .fetchSingleSmartmeter(
-        this.choiceSmartmeter!,
-        this.choiceTime!,
-        this.choiceResolution!,
-      )
-      .subscribe({
-        next: (response: SingleSmartmeter) => {
-          // create new key of resolution and save smartmeter data to it
-          if (response.resolution in this.dataPerResolution) {
-            this.dataPerResolution[response.resolution].push(response);
-            // use existing key and push smartmeter data in it
-          } else {
-            this.dataPerResolution[response.resolution] = [response];
-          }
-        },
-        error: error => {
-          console.log(error);
-        },
-        complete: () => {
-          this.showGraphs(
-            this.choiceResolution ? this.choiceResolution : "hourly",
-          );
-        },
-      });
-  }
-
+  /** CONTINUE HERE TO CHANGE */
   fetchPredSingleSmartmeter(): void {
     if (!this.checkForDefinedRequestParameters()) {
-      return;
-    }
-
-    if (
-      !this.checkForUniqueData(
-        this.choiceResolution!,
-        this.choiceTime!,
-        this.choiceSmartmeter!,
-        this.predPerResolution,
-      )
-    ) {
       return;
     }
 
@@ -384,35 +243,6 @@ export class WaterDemandPredictionComponent implements OnInit {
     return true;
   }
 
-  /** check if the requested dataset would be unique or not. True if unique, else false */
-  checkForUniqueData(
-    resolution: string,
-    timeframe: string,
-    name: string,
-    usedRecord: any,
-  ): boolean {
-    // if neither record or resolution is already present, data request must be unique
-    if (!usedRecord || !usedRecord[resolution]) {
-      return true;
-    }
-
-    // when name of record and timeframe are equal, datasets are the same data.
-    for (let item of usedRecord[resolution]) {
-      if (name === item.name && timeframe === item.timeframe) {
-        console.log(
-          name +
-            ": " +
-            timeframe +
-            " already exist in resolution of: " +
-            resolution,
-        );
-        return false;
-      }
-    }
-
-    return true;
-  }
-
   /**
    * update all charts in ViewChildren
    * update only one chart based on index given, when given one.
@@ -444,11 +274,199 @@ export class WaterDemandPredictionComponent implements OnInit {
     this.chartDataCurrentValues.labels = [];
     this.chartDataCurrentValues.datasets = [];
 
+    this.savedDatasets = {};
+
     this.chartDataPredictedValues.labels = [];
     this.chartDataPredictedValues.datasets = [];
 
-    this.dataPerResolution = {};
     this.predPerResolution = {};
     this.updateCharts();
+  }
+
+  /** show datasets based on the resolution chosen */
+  showDatasets(resolution: string): void {
+    // reset data to begin
+    this.chartDataCurrentValues.labels = [];
+    this.chartDataCurrentValues.datasets = [];
+
+    /** add relevant datasets based on resolution to chartData */
+    this.savedDatasets[resolution].forEach(entry => {
+      this.chartDataCurrentValues.datasets.push(entry.dataset);
+      this.chartDataCurrentValues.labels = entry.labels;
+    });
+
+    /** update charts to display information */
+    this.updateCharts(0);
+  }
+
+  /** set the displayed resolution and update the chart to mirror that */
+  setDisplayedResolution(resolution: string): void {
+    this.displayedResolution = resolution;
+
+    this.showDatasets(resolution);
+  }
+
+  /**
+   * create a new dataset for chartjs from the given data
+   * @param label label of the chartdata
+   * @param data data points
+   * @param fillOption: false, 0 for confidence interval
+   * @returns new dataset
+   */
+  createNewDataset(
+    data: number[],
+    label: string,
+    resolution: string,
+    timeframe: string,
+    fillOption: any,
+  ): ChartDataset {
+    let color = "transparent";
+
+    // to display confidence intervalls
+    if (fillOption === false) {
+      color = this.createColorFromParameter(label, resolution, timeframe);
+    }
+
+    const newDataset: ChartDataset<"line"> = {
+      label: label,
+      data: data,
+      borderColor: color,
+      fill: fillOption,
+    };
+    return newDataset;
+  }
+
+  /** helper function to create a color from values */
+  createColorFromParameter(
+    label: string,
+    resolution: string,
+    timeframe: string,
+  ): string {
+    return this.stringToColor(label + resolution + timeframe);
+  }
+
+  /**
+   * Generates deterministically a hex color code from any string.
+   *
+   * This is a modernized version of this
+   * [StackOverflow reply](https://stackoverflow.com/a/16348977/15800714).
+   * @param str A string to generate a hex color for
+   * @param map A color map for predefined strings
+   *
+   * @returns A hex color code in the style of '#abc123'
+   */
+  stringToColor(str: string, map?: Record<string, string>): string {
+    if (map && map[str]) {
+      return map[str];
+    }
+    let hash = 0;
+    for (let s of str) {
+      hash = s.charCodeAt(0) + ((hash << 5) - hash);
+    }
+    let color = "#";
+    for (let i = 0; i < 3; i++) {
+      let value = (hash >> (i * 8)) & 0xff;
+      color += ("00" + value.toString(16)).slice(-2);
+    }
+    return color;
+  }
+
+  /** true if choices are already present, false if unique */
+  checkDoubleParameters(
+    nameSmartmeter: string,
+    timeframe: string,
+    resolution: string,
+  ): boolean {
+    if (!this.savedDatasets[resolution]) {
+      return true;
+    }
+
+    /** the color is based on 3 unique parameters, thus, when color is equal, the set is already present */
+    let colorToCheck = this.createColorFromParameter(
+      nameSmartmeter,
+      resolution,
+      timeframe,
+    );
+
+    for (let entry of this.savedDatasets[resolution]) {
+      console.log(colorToCheck);
+      console.log(entry.dataset.borderColor);
+      if (entry.dataset.borderColor === colorToCheck) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * function to fetch data by parameters provided
+   * doesnt request data when data is already requested before
+   * creates new ChartDatasets and activates the display function
+   * @returns nothing
+   */
+  fetchDataSmartmeter(): void {
+    /** check if any selection is missing for request */
+    if (!this.checkForDefinedRequestParameters()) {
+      return;
+    }
+
+    /** checks if parameters are already requested and prevents request if so. */
+    if (
+      !this.checkDoubleParameters(
+        this.choiceSmartmeter!,
+        this.choiceTime!,
+        this.choiceResolution!,
+      )
+    ) {
+      console.log(
+        "combination of" +
+          this.choiceSmartmeter +
+          " " +
+          this.choiceTime +
+          " \n " +
+          this.choiceResolution +
+          " already requested",
+      );
+      return;
+    }
+
+    this.waterDemandService
+      .fetchSingleSmartmeter(
+        this.choiceSmartmeter!,
+        this.choiceTime!,
+        this.choiceResolution!,
+      )
+      .subscribe({
+        next: (response: SingleSmartmeter) => {
+          this.currentSmartmeterData = response;
+        },
+        error: error => {
+          console.log(error);
+        },
+        complete: () => {
+          let newDataset = this.createNewDataset(
+            this.currentSmartmeterData?.numValue!,
+            this.currentSmartmeterData?.name!,
+            this.currentSmartmeterData?.resolution!,
+            this.currentSmartmeterData?.timeframe!,
+            false,
+          );
+          let smartmeterdata: SmartmeterDataset = {
+            dataset: newDataset,
+            labels: this.currentSmartmeterData?.dateObserved!,
+          };
+
+          if (!this.savedDatasets[this.currentSmartmeterData?.resolution!]) {
+            this.savedDatasets[this.currentSmartmeterData?.resolution!] = [];
+          }
+
+          this.savedDatasets[this.currentSmartmeterData?.resolution!].push(
+            smartmeterdata,
+          );
+          this.showDatasets(this.currentSmartmeterData?.resolution!);
+          this.currentSmartmeterData = undefined;
+        },
+      });
   }
 }

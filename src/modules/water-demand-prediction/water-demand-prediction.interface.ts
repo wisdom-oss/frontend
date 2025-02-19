@@ -1,3 +1,5 @@
+import {ChartDataset} from "chart.js";
+
 /**
  * interface for the response to the single smartmeter data values
  */
@@ -5,8 +7,13 @@ export interface SingleSmartmeter {
   name: string;
   resolution: string;
   timeframe: string;
-  numValue: [];
-  dateObserved: [];
+  numValue: number[];
+  dateObserved: string[];
+}
+
+export interface SmartmeterDataset {
+  dataset: ChartDataset;
+  labels: string[];
 }
 
 export interface DatasetSmartmeter extends SingleSmartmeter {
