@@ -124,6 +124,8 @@
           id="water-right-usage-locations-source"
           [data]="waterRightUsageLocations"
           [cluster]="true"
+          [clusterMinPoints]="10"
+          [clusterRadius]="60"
           #waterRightUsageLocationsSource
         >
         </mgl-geojson-source>
@@ -131,6 +133,9 @@
           id="old-water-right-usage-locations-source"
           [data]="oldWaterRightUsageLocations"
           [cluster]="true"
+          [clusterMinPoints]="10"
+          [clusterRadius]="60"
+          #oldWaterRightUsageLocationsSource
         >
         </mgl-geojson-source>
         <mgl-geojson-source
@@ -224,6 +229,7 @@
                   'icon-size': ['interpolate', ['linear'], ['zoom'], 5, 0.1, 12, 1],
                   'icon-ignore-placement': true,
                   'symbol-z-order': 'source',
+                  'icon-overlap': 'always',
                 }"
                 [filter]="['==', ['get', 'classification'], '' + color.key]"
                 (layerMouseMove)="
@@ -238,94 +244,86 @@
             }
           }
         </ng-container>
-        <ng-container hover-cluster-polygon>
-          @if (hoverClusterPolygonDelay()) {
-            <mgl-layer
-              id="hover-cluster-polygon-fill"
-              type="fill"
-              source="hover-cluster-polygon-source"
-              [paint]="{
-                'fill-color': 'blue',
-                'fill-opacity': 0.1,
-              }"
-            ></mgl-layer>
-            <mgl-layer
-              id="hover-cluster-polygon-line"
-              type="line"
-              source="hover-cluster-polygon-source"
-              [paint]="{
-                'line-color': 'blue',
-                'line-width': 3,
-              }"
-            ></mgl-layer>
-          }
-        </ng-container>
-        <ng-container water-right-usage-locations>
-          @if (
-            waterRightUsageLocations.features.length &&
-            selectedLayers.waterRightUsageLocations()
-          ) {
-            <mgl-layer
-              id="water-right-usage-locations-layer-symbol"
-              type="symbol"
-              source="water-right-usage-locations-source"
-              [filter]="['!=', ['get', 'cluster'], true]"
-              [layout]="{
-                'icon-image': 'remixicon:map-pin-2-fill',
-                'icon-anchor': 'bottom',
-                'icon-size': 1.2,
-              }"
-              [paint]="{
-                'icon-color': 'blue',
-              }"
-            ></mgl-layer>
-            <mgl-layer
-              id="water-right-usage-locations-layer-symbol-cluster"
-              type="symbol"
-              source="water-right-usage-locations-source"
-              [filter]="['==', ['get', 'cluster'], true]"
-              [layout]="{
-                'icon-image': 'remixicon:checkbox-multiple-blank-line',
-                'icon-anchor': 'center',
-                'icon-size': 1.2,
-                'icon-offset': [0, -20],
-                'text-field': ['get', 'point_count_abbreviated'],
-                'text-font': ['noto_sans_regular'],
-                'text-size': 20,
-                'text-offset': [0, 0.1],
-              }"
-              [paint]="{
-                'icon-color': 'blue',
-              }"
-              (layerMouseMove)="
-                hoveredFeatures.waterRightUsageLocationCluster.set(
-                  $any($event.features![0]!)
-                )
-              "
-              (layerMouseLeave)="
-                hoveredFeatures.waterRightUsageLocationCluster.set(null)
-              "
-            ></mgl-layer>
-          }
-        </ng-container>
-        <ng-container old-water-right-usage-locations>
-          @if (
-            oldWaterRightUsageLocations.features.length &&
-            selectedLayers.oldWaterRightUsageLocations()
-          ) {
-            <mgl-layer
-              id="old-water-right-usage-locations-layer-symbol"
-              type="symbol"
-              source="old-water-right-usage-locations-source"
-              [layout]="{
-                'icon-image': 'remixicon:map-pin-2-fill',
-                'icon-anchor': 'bottom',
-                'icon-size': 1.2,
-              }"
-              [paint]="{
-                'icon-color': 'red',
-              }"
-            ></mgl-layer>
+        <ng-container water-right-usage-locations-group>
+          @let color = "#5B7289";
+          <ng-container hover-cluster-polygon>
+            @if (hoverClusterPolygonDelay()) {
+              <mgl-layer
+                id="hover-cluster-polygon-fill"
+                type="fill"
+                source="hover-cluster-polygon-source"
+                [paint]="{
+                  'fill-color': color,
+                  'fill-opacity': 0.1,
+                }"
+              ></mgl-layer>
+              <mgl-layer
+                id="hover-cluster-polygon-line"
+                type="line"
+                source="hover-cluster-polygon-source"
+                [paint]="{
+                  'line-color': color,
+                  'line-width': 3,
+                }"
+              ></mgl-layer>
+            }
+          </ng-container>
+          @for (current of [true, false]; track current) {
+            @let locations =
+              current ? waterRightUsageLocations : oldWaterRightUsageLocations;
+            @let selected =
+              current
+                ? selectedLayers.waterRightUsageLocations
+                : selectedLayers.oldWaterRightUsageLocations;
+            @let prefix = current ? "" : "old-";
+            <ng-container water-right-usage-locations>
+              @if (locations.features.length && selected()) {
+                <mgl-layer
+                  [id]="prefix + 'water-right-usage-locations-layer-symbol'"
+                  type="symbol"
+                  [source]="prefix + 'water-right-usage-locations-source'"
+                  [filter]="['!=', ['get', 'cluster'], true]"
+                  [layout]="{
+                    'icon-image': 'remixicon:map-pin-2-fill',
+                    'icon-anchor': 'bottom',
+                    'icon-size': 1.2,
+                    'icon-ignore-placement': true,
+                  }"
+                  [paint]="{
+                    'icon-color': color,
+                  }"
+                ></mgl-layer>
+                <mgl-layer
+                  [id]="
+                    prefix + 'water-right-usage-locations-layer-symbol-cluster'
+                  "
+                  type="symbol"
+                  [source]="prefix + 'water-right-usage-locations-source'"
+                  [filter]="['==', ['get', 'cluster'], true]"
+                  [layout]="{
+                    'icon-image': 'remixicon:checkbox-multiple-blank-line',
+                    'icon-anchor': 'center',
+                    'icon-size': 1.2,
+                    'icon-offset': [0, -20],
+                    'text-field': ['get', 'point_count_abbreviated'],
+                    'text-font': ['noto_sans_regular'],
+                    'text-size': 20,
+                    'text-offset': [0, 0.1],
+                  }"
+                  [paint]="{
+                    'icon-color': color,
+                  }"
+                  (layerMouseMove)="
+                    hoveredFeatures.waterRightUsageLocationCluster.set(
+                      $any($event.features![0]!)
+                    )
+                  "
+                  (layerMouseLeave)="
+                    hoveredFeatures.waterRightUsageLocationCluster.set(null)
+                  "
+                ></mgl-layer>
+              }
+            </ng-container>
           }
         </ng-container>
       </ng-container>

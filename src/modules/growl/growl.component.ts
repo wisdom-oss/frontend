@@ -19,7 +19,7 @@ import {
   NavigationControlDirective,
 } from "@maplibre/ngx-maplibre-gl";
 import dayjs from "dayjs";
-import {Feature, Point, Polygon, BBox} from "geojson";
+import {BBox, Feature, Point, Polygon} from "geojson";
 import {StyleSpecification} from "maplibre-gl";
 
 import * as turf from "@turf/turf";
@@ -90,8 +90,10 @@ export class GrowlComponent {
 
   protected waterRightUsageLocationsSource: Signal<GeoJSONSourceComponent> =
     viewChild.required("waterRightUsageLocationsSource");
+  protected oldWaterRightUsageLocationsSource: Signal<GeoJSONSourceComponent> =
+    viewChild.required("oldWaterRightUsageLocationsSource");
   protected hoverClusterPolygon;
-  // additional delay to fix angular error for outputting event data of destroyed component 
+  // additional delay to fix angular error for outputting event data of destroyed component
   protected hoverClusterPolygonDelay;
 
   protected averageWithdrawals = signal<{
@@ -121,8 +123,14 @@ export class GrowlComponent {
     });
 
     this.hoverClusterPolygon = this.hoverClusterPolygonResource();
-    this.hoverClusterPolygonDelay = signals.delay(this.hoverClusterPolygon.value);
-    effect(() => console.log(this.hoverClusterPolygonDelay()));
+    this.hoverClusterPolygonDelay = signals.delay(
+      this.hoverClusterPolygon.value,
+    );
+    effect(() => {
+      // when zooming in, remove that visual box
+      this.fitBounds();
+      this.hoverClusterPolygon.set(undefined);
+    });
   }
 
   protected displayGroundwaterMeasurementStation(
@@ -200,20 +208,36 @@ export class GrowlComponent {
         let source = this.waterRightUsageLocationsSource();
         if (!source) return null;
 
-        return [source, cluster] as [GeoJSONSourceComponent, ClusterFeature];
+        let oldSource = this.oldWaterRightUsageLocationsSource();
+        if (!oldSource) return null;
+
+        return [[source, oldSource], cluster] as [
+          [GeoJSONSourceComponent, GeoJSONSourceComponent],
+          ClusterFeature,
+        ];
       },
       loader: async (
         param: ResourceLoaderParams<
-          [GeoJSONSourceComponent, ClusterFeature] | null
+          | [[GeoJSONSourceComponent, GeoJSONSourceComponent], ClusterFeature]
+          | null
         >,
       ): Promise<Feature<Polygon> | undefined> => {
         if (!param.request) return undefined;
-        let [source, cluster] = param.request;
-        let points = await this.getClusterChildrenRecursive(
-          source,
-          cluster.id! as number,
-          3,
-        );
+        let [[source, oldSource], cluster] = param.request;
+        let points;
+        try {
+          points = await this.getClusterChildrenRecursive(
+            source,
+            cluster.id! as number,
+            3,
+          );
+        } catch {
+          points = await this.getClusterChildrenRecursive(
+            oldSource,
+            cluster.id! as number,
+            3,
+          );
+        }
         let featureCollection = {
           type: "FeatureCollection",
           features: points,

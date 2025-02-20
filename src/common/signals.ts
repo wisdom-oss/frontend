@@ -1,7 +1,7 @@
-import {computed, effect, inject, Signal, signal, WritableSignal} from "@angular/core";
+import {effect, inject, signal, Signal, WritableSignal} from "@angular/core";
+import {Duration} from "dayjs/plugin/duration";
 
 import {injections} from "./injections";
-import { Duration } from "dayjs/plugin/duration";
 
 /**
  * Custom signal extensions.
@@ -98,10 +98,10 @@ export namespace signals {
 
   /**
    * Delays the signal's updates by a specified duration.
-   * 
-   * This can be useful for resolving Angular lifecycle conflicts, as the signal 
+   *
+   * This can be useful for resolving Angular lifecycle conflicts, as the signal
    * will not update immediately.
-   * Setting no delay still delays by one update cycle, which can resolve issues 
+   * Setting no delay still delays by one update cycle, which can resolve issues
    * caused by update races.
    *
    * @example
