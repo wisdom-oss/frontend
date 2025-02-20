@@ -30,7 +30,7 @@ export class WaterDemandPredictionComponent implements OnInit {
   /** variables name dropdown */
   menuSmartmeter = "Select Smartmeter";
   optionsSmartmeter: Record<string, string> = {};
-  choiceSmartmeter?: string;
+  choiceSmartmeter?: string = "urn:ngsi-ld:Device:atypical-household";
 
   /** variables timeframe dropdown */
   menuTime = "Select Timeframe";
@@ -43,7 +43,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     "one year": "water-demand-prediction.timeframe.one-year",
     all: "water-demand-prediction.timeframe.all",
   };
-  choiceTime?: string;
+  choiceTime?: string = "one week";
 
   /** variables resolution dropdown */
   menuResolution = "Select Resolution";
@@ -52,7 +52,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     daily: "water-demand-prediction.resolution.daily",
     weekly: "water-demand-prediction.resolution.weekly",
   };
-  choiceResolution?: string;
+  choiceResolution?: string = "hourly";
 
   /** data object of current requested Smartmeterdata */
   currentSmartmeterData?: SingleSmartmeter;
@@ -136,6 +136,7 @@ export class WaterDemandPredictionComponent implements OnInit {
 
   ngOnInit() {
     this.fetchMeterInformation();
+    this.fetchDataSmartmeter();
   }
 
   /** set the displayed resolution and update the chart to mirror that */
