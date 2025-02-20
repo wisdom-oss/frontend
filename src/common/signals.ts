@@ -1,6 +1,7 @@
-import {inject, signal, WritableSignal} from "@angular/core";
+import {computed, effect, inject, Signal, signal, WritableSignal} from "@angular/core";
 
 import {injections} from "./injections";
+import { Duration } from "dayjs/plugin/duration";
 
 /**
  * Custom signal extensions.
@@ -94,4 +95,26 @@ export namespace signals {
    * service constructor.
    */
   export const lang = () => inject(injections.LANG_SIGNAL);
+
+  /**
+   * Delays the signal's updates by a specified duration.
+   * 
+   * This can be useful for resolving Angular lifecycle conflicts, as the signal 
+   * will not update immediately.
+   * Setting no delay still delays by one update cycle, which can resolve issues 
+   * caused by update races.
+   *
+   * @example
+   * const mySignal = signals.signal(1);
+   * const delayedSignal = signals.delay(mySignal, Duration.fromMillis(500));
+   * delayedSignal(); // Updates after a 500ms delay
+   */
+  export function delay<T>(s: Signal<T>, delay?: Duration): Signal<T> {
+    let delayed = signal(s());
+    effect(() => {
+      let value = s();
+      setTimeout(() => delayed.set(value), delay?.asMilliseconds());
+    });
+    return delayed;
+  }
 }

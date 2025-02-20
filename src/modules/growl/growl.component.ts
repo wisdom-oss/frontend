@@ -89,6 +89,8 @@ export class GrowlComponent {
   protected waterRightUsageLocationsSource: Signal<GeoJSONSourceComponent> =
     viewChild.required("waterRightUsageLocationsSource");
   protected hoverClusterPolygon;
+  // additional delay to fix angular error for outputting event data of destroyed component 
+  protected hoverClusterPolygonDelay;
 
   protected averageWithdrawals = signal<{
     name: string;
@@ -117,7 +119,7 @@ export class GrowlComponent {
     });
 
     this.hoverClusterPolygon = this.hoverClusterPolygonResource();
-    effect(() => console.log(this.hoverClusterPolygon.value()));
+    this.hoverClusterPolygonDelay = signals.delay(this.hoverClusterPolygon.value);
   }
 
   protected displayGroundwaterMeasurementStation(

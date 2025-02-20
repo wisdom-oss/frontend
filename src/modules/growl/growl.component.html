@@ -232,7 +232,7 @@
           }
         </ng-container>
         <ng-container hover-cluster-polygon>
-          @if (hoverClusterPolygon.hasValue()) {
+          @if (hoverClusterPolygonDelay()) {
             <mgl-layer
               id="hover-cluster-polygon-fill"
               type="fill"
