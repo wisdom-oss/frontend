@@ -19,7 +19,7 @@ import {
   NavigationControlDirective,
 } from "@maplibre/ngx-maplibre-gl";
 import dayjs from "dayjs";
-import {Feature, Point, Polygon} from "geojson";
+import {Feature, Point, Polygon, BBox} from "geojson";
 import {StyleSpecification} from "maplibre-gl";
 
 import * as turf from "@turf/turf";
@@ -86,6 +86,8 @@ export class GrowlComponent {
   } as const;
   protected selectedLayersUpdate = signal(false);
 
+  protected fitBounds = signal<BBox | undefined>(undefined);
+
   protected waterRightUsageLocationsSource: Signal<GeoJSONSourceComponent> =
     viewChild.required("waterRightUsageLocationsSource");
   protected hoverClusterPolygon;
@@ -120,6 +122,7 @@ export class GrowlComponent {
 
     this.hoverClusterPolygon = this.hoverClusterPolygonResource();
     this.hoverClusterPolygonDelay = signals.delay(this.hoverClusterPolygon.value);
+    effect(() => console.log(this.hoverClusterPolygonDelay()));
   }
 
   protected displayGroundwaterMeasurementStation(
@@ -216,7 +219,9 @@ export class GrowlComponent {
           features: points,
         } as const;
         let polygon = turf.convex(featureCollection);
-        return polygon ?? undefined;
+        if (!polygon) return undefined;
+        polygon.bbox = turf.bbox(polygon);
+        return polygon;
       },
     });
   }

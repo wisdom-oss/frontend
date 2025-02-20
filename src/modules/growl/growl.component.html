@@ -8,6 +8,13 @@
       [canvasContextAttributes]="{preserveDrawingBuffer: true}"
       [attributionControl]="false"
       (click)="updateAverageWithdrawals(hoveredFeatures.groundwaterBody())"
+      (click)="fitBounds.set((hoverClusterPolygonDelay() ?? {}).bbox)"
+      [fitBounds]="$any(fitBounds())"
+      [fitBoundsOptions]="{
+        animate: true,
+        duration: 500,
+        essential: true,
+      }"
     >
       @let groundwaterMeasurementStations =
         service.data.groundwaterMeasurementStations();
