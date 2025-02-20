@@ -24,10 +24,15 @@ import {DropdownComponent} from "../../common/components/dropdown/dropdown.compo
   styles: ``,
 })
 export class WaterDemandPredictionComponent implements OnInit {
+  /** the displayed resolution in the charts of real data */
+  displayedResolution = signal<string>("hourly");
+
+  /** variables name dropdown */
   menuSmartmeter = "Select Smartmeter";
   optionsSmartmeter: Record<string, string> = {};
   choiceSmartmeter?: string;
 
+  /** variables timeframe dropdown */
   menuTime = "Select Timeframe";
   optionsTime: Record<string, string> = {
     "one day": "water-demand-prediction.timeframe.one-day",
@@ -40,6 +45,7 @@ export class WaterDemandPredictionComponent implements OnInit {
   };
   choiceTime?: string;
 
+  /** variables resolution dropdown */
   menuResolution = "Select Resolution";
   optionsResolution: Record<string, string> = {
     hourly: "water-demand-prediction.resolution.hourly",
@@ -48,24 +54,14 @@ export class WaterDemandPredictionComponent implements OnInit {
   };
   choiceResolution?: string;
 
+  /** data object of current requested Smartmeterdata */
   currentSmartmeterData?: SingleSmartmeter;
 
+  /** Record to hold all saved ChartDatasets */
   savedDatasets: Record<string, SmartmeterDataset[]> = {};
-
-  /** the displayed resolution in the charts of real data */
-  displayedResolution = signal<string>("hourly");
 
   /** saves all predicted values by resolution */
   predPerResolution: Record<string, PredictionSingleSmartmeter[]> = {};
-
-  /**
-   * The chart object, referenced from the html template.
-   * ViewChildren is a list of charts, because when using ViewChild,
-   * only ever the first chart gets updated at all.
-   */
-  @ViewChildren(BaseChartDirective) charts:
-    | QueryList<BaseChartDirective>
-    | undefined;
 
   /**
    * data skeleton for the line graph
@@ -85,8 +81,9 @@ export class WaterDemandPredictionComponent implements OnInit {
 
   /**
    * type of graph to use in chart
+   * as a signal to change it via template
    */
-  chartType: ChartType = "line";
+  chartType = signal<ChartType>("bar");
 
   /**
    * options used for the line chart to visualize prediction values
@@ -126,6 +123,15 @@ export class WaterDemandPredictionComponent implements OnInit {
     },
   };
 
+  /**
+   * The chart object, referenced from the html template.
+   * ViewChildren is a list of charts, because when using ViewChild,
+   * only ever the first chart gets updated at all.
+   */
+  @ViewChildren(BaseChartDirective) charts:
+    | QueryList<BaseChartDirective>
+    | undefined;
+
   constructor(public waterDemandService: WaterDemandPredictionService) {}
 
   ngOnInit() {
@@ -137,6 +143,15 @@ export class WaterDemandPredictionComponent implements OnInit {
     this.displayedResolution.set(resolution);
 
     this.showDatasets(resolution);
+  }
+
+  /** set the displayed chartType to change from line to bar and back */
+  switchDisplayedChartType(): void {
+    if (this.chartType() === "line") {
+      this.chartType.set("bar");
+    } else {
+      this.chartType.set("line");
+    }
   }
 
   /**
@@ -211,6 +226,7 @@ export class WaterDemandPredictionComponent implements OnInit {
       let value = (hash >> (i * 8)) & 0xff;
       color += ("00" + value.toString(16)).slice(-2);
     }
+    console.log(color);
     return color;
   }
 
@@ -273,6 +289,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     resolution: string,
     timeframe: string,
     fillOption: any,
+    type: string,
   ): ChartDataset {
     let color = "transparent";
 
@@ -285,6 +302,7 @@ export class WaterDemandPredictionComponent implements OnInit {
       label: label,
       data: data,
       borderColor: color,
+      backgroundColor: color,
       fill: fillOption,
     };
     return newDataset;
@@ -357,6 +375,7 @@ export class WaterDemandPredictionComponent implements OnInit {
             this.currentSmartmeterData?.resolution!,
             this.currentSmartmeterData?.timeframe!,
             false,
+            this.chartType(),
           );
           let smartmeterdata: SmartmeterDataset = {
             dataset: newDataset,
@@ -372,7 +391,6 @@ export class WaterDemandPredictionComponent implements OnInit {
           );
 
           this.setDisplayedResolution(this.currentSmartmeterData?.resolution!);
-          this.showDatasets(this.currentSmartmeterData?.resolution!);
           this.currentSmartmeterData = undefined;
         },
       });
@@ -451,6 +469,7 @@ export class WaterDemandPredictionComponent implements OnInit {
         resolution,
         entry.timeframe,
         false,
+        this.chartType(),
       );
       this.chartDataPredictedValues.datasets.push(predData);
 
@@ -460,6 +479,7 @@ export class WaterDemandPredictionComponent implements OnInit {
         resolution,
         entry.timeframe,
         0,
+        this.chartType(),
       );
       this.chartDataPredictedValues.datasets.push(lower_conf_int);
 
@@ -469,6 +489,7 @@ export class WaterDemandPredictionComponent implements OnInit {
         resolution,
         entry.timeframe,
         0,
+        this.chartType(),
       );
       this.chartDataPredictedValues.datasets.push(upper_conf_int);
     });

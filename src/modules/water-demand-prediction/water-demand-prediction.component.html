@@ -25,6 +25,13 @@
         >
           {{ optionsResolution["weekly"] | translate }}
         </button>
+        <button
+          class="button"
+          [class.is-active]="chartType() === 'line'"
+          (click)="switchDisplayedChartType()"
+        >
+          {{ chartType() + "-chart" }}
+        </button>
       </div>
       <div class="is-flex is-flex-direction-column is-align-items-center">
         <!-- graph real data container box -->
@@ -33,7 +40,7 @@
             baseChart
             [data]="chartDataCurrentValues"
             [options]="chartOptions"
-            [type]="chartType"
+            [type]="chartType()"
           ></canvas>
         </div>
         <!--buttons for real graph data-->
@@ -101,7 +108,7 @@
           baseChart
           [data]="chartDataPredictedValues"
           [options]="chartOptions"
-          [type]="chartType"
+          [type]="chartType()"
         ></canvas>
       </div>
     </div>
