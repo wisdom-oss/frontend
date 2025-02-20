@@ -30,7 +30,7 @@ export class WaterDemandPredictionComponent implements OnInit {
   /** variables name dropdown */
   menuSmartmeter = "Select Smartmeter";
   optionsSmartmeter: Record<string, string> = {};
-  choiceSmartmeter?: string = "urn:ngsi-ld:Device:atypical-household";
+  choiceSmartmeter = signal<string>("urn:ngsi-ld:Device:atypical-household");
 
   /** variables timeframe dropdown */
   menuTime = "Select Timeframe";
@@ -43,7 +43,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     "one year": "water-demand-prediction.timeframe.one-year",
     all: "water-demand-prediction.timeframe.all",
   };
-  choiceTime?: string = "one week";
+  choiceTime = signal<string>("one week");
 
   /** variables resolution dropdown */
   menuResolution = "Select Resolution";
@@ -52,7 +52,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     daily: "water-demand-prediction.resolution.daily",
     weekly: "water-demand-prediction.resolution.weekly",
   };
-  choiceResolution?: string = "hourly";
+  choiceResolution = signal<string>("hourly");
 
   /** data object of current requested Smartmeterdata */
   currentSmartmeterData?: SingleSmartmeter;
@@ -181,13 +181,17 @@ export class WaterDemandPredictionComponent implements OnInit {
     });
   }
 
-  /** Completely erases data from the graph elements */
+  /** Completely erases data from the real data graph element */
   resetChart(): void {
     this.chartDataCurrentValues.labels = [];
     this.chartDataCurrentValues.datasets = [];
 
     this.savedDatasets = {};
+    this.updateCharts();
+  }
 
+  /** Completely erases data from predicted graph element */
+  resetPredictionChart(): void {
     this.chartDataPredictedValues.labels = [];
     this.chartDataPredictedValues.datasets = [];
 
@@ -339,9 +343,9 @@ export class WaterDemandPredictionComponent implements OnInit {
     /** checks if parameters are already requested and prevents request if so. */
     if (
       !this.checkDoubleParameters(
-        this.choiceSmartmeter!,
-        this.choiceTime!,
-        this.choiceResolution!,
+        this.choiceSmartmeter(),
+        this.choiceTime(),
+        this.choiceResolution(),
       )
     ) {
       console.log(
@@ -358,9 +362,9 @@ export class WaterDemandPredictionComponent implements OnInit {
 
     this.waterDemandService
       .fetchSingleSmartmeter(
-        this.choiceSmartmeter!,
-        this.choiceTime!,
-        this.choiceResolution!,
+        this.choiceSmartmeter(),
+        this.choiceTime(),
+        this.choiceResolution(),
       )
       .subscribe({
         next: (response: SingleSmartmeter) => {
@@ -408,9 +412,9 @@ export class WaterDemandPredictionComponent implements OnInit {
 
     this.waterDemandService
       .fetchSinglePredictionSmartmeter(
-        this.choiceSmartmeter!,
-        this.choiceTime!,
-        this.choiceResolution!,
+        this.choiceSmartmeter(),
+        this.choiceTime(),
+        this.choiceResolution(),
       )
       .subscribe({
         next: (response: PredictionSingleSmartmeter) => {

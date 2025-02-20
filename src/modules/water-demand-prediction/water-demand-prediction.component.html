@@ -1,41 +1,55 @@
-<div class="is-fullheight is-fullwidth">
+<div
+  class="is-fullheight is-fullwidth"
+  style="overflow-y: visible; overflow-x: hidden"
+>
   <div class="columns">
     <!--Real Data Graph and Buttons-->
     <div class="column">
-      <!-- Resolution Switches -->
-      <div class="buttons has-addons is-justify-content-end">
-        <button
-          class="button"
-          [class.is-active]="displayedResolution() === 'hourly'"
-          (click)="setDisplayedResolution('hourly')"
-        >
-          {{ optionsResolution["hourly"] | translate }}
-        </button>
-        <button
-          class="button"
-          [class.is-active]="displayedResolution() === 'daily'"
-          (click)="setDisplayedResolution('daily')"
-        >
-          {{ optionsResolution["daily"] | translate }}
-        </button>
-        <button
-          class="button"
-          [class.is-active]="displayedResolution() === 'weekly'"
-          (click)="setDisplayedResolution('weekly')"
-        >
-          {{ optionsResolution["weekly"] | translate }}
-        </button>
-        <button
-          class="button"
-          [class.is-active]="chartType() === 'line'"
-          (click)="switchDisplayedChartType()"
-        >
-          {{ chartType() + "-chart" }}
-        </button>
+      <div class="level">
+        <div class="level-left">
+          <div class="buttons has-addons is-justify-content-start">
+            <button class="button is-primary is-rounded" (click)="resetChart()">
+              Reset Chart
+            </button>
+            <button
+              class="button is-rounded"
+              [class.is-active]="chartType() === 'line'"
+              (click)="switchDisplayedChartType()"
+            >
+              {{ chartType() + "-chart" }}
+            </button>
+          </div>
+        </div>
+        <div class="level-right">
+          <!-- Resolution Switches -->
+          <div class="buttons has-addons is-justify-content-end">
+            <button
+              class="button"
+              [class.is-active]="displayedResolution() === 'hourly'"
+              (click)="setDisplayedResolution('hourly')"
+            >
+              {{ optionsResolution["hourly"] | translate }}
+            </button>
+            <button
+              class="button"
+              [class.is-active]="displayedResolution() === 'daily'"
+              (click)="setDisplayedResolution('daily')"
+            >
+              {{ optionsResolution["daily"] | translate }}
+            </button>
+            <button
+              class="button"
+              [class.is-active]="displayedResolution() === 'weekly'"
+              (click)="setDisplayedResolution('weekly')"
+            >
+              {{ optionsResolution["weekly"] | translate }}
+            </button>
+          </div>
+        </div>
       </div>
       <div class="is-flex is-flex-direction-column is-align-items-center">
         <!-- graph real data container box -->
-        <div class="box is-fullwidth" style="height: 65vh">
+        <div class="box is-fullwidth" style="height: 60vh">
           <canvas
             baseChart
             [data]="chartDataCurrentValues"
@@ -43,47 +57,59 @@
             [type]="chartType()"
           ></canvas>
         </div>
-        <!--buttons for real graph data-->
-        <div class="is-fullwidth is-justify-content-start">
-          <button class="button is-primary is-rounded" (click)="resetChart()">
-            Reset Chart
-          </button>
-        </div>
         <!--dropdown buttons for selection -->
-        <div class="is-fullwidth is-justify-content-space-between">
-          <dropdown
-            [menuName]="menuResolution"
-            [options]="optionsResolution"
-            [changeMenuName]="true"
-            kind="hover"
-            (choice)="choiceResolution = $event"
-          ></dropdown>
-          <dropdown
-            [menuName]="menuTime"
-            [options]="optionsTime"
-            [changeMenuName]="true"
-            kind="hover"
-            (choice)="choiceTime = $event"
-          ></dropdown>
-          <dropdown
-            [menuName]="menuSmartmeter"
-            [options]="optionsSmartmeter"
-            [changeMenuName]="true"
-            kind="hover"
-            (choice)="choiceSmartmeter = $event"
-          ></dropdown>
-          <button
-            class="button is-primary is-rounded"
-            (click)="fetchDataSmartmeter()"
-          >
-            Request and Display
-          </button>
+        <div class="is-fullwidth">
+          <div class="">
+            <dropdown
+              [menuName]="menuResolution"
+              [options]="optionsResolution"
+              [changeMenuName]="true"
+              kind="hover"
+              (choice)="choiceResolution.set($event)"
+            ></dropdown>
+            <dropdown
+              [menuName]="menuTime"
+              [options]="optionsTime"
+              [changeMenuName]="true"
+              kind="hover"
+              (choice)="choiceTime.set($event)"
+            ></dropdown>
+            <dropdown
+              [menuName]="menuSmartmeter"
+              [options]="optionsSmartmeter"
+              [changeMenuName]="true"
+              kind="hover"
+              (choice)="choiceSmartmeter.set($event)"
+            ></dropdown>
+            <button
+              class="button is-primary is-rounded"
+              (click)="fetchDataSmartmeter()"
+            >
+              Request and Display
+            </button>
+          </div>
         </div>
       </div>
     </div>
     <!--Predicted Data Graph and Buttons-->
     <div class="column">
-      <div class="buttons is-justify-content-end">
+      <div class="buttons has-addons is-justify-content-start">
+        <button
+          class="button is-primary is-rounded"
+          (click)="resetPredictionChart()"
+        >
+          Reset Prediction Chart
+        </button>
+      </div>
+      <div class="box is-fullwidth" style="height: 60vh">
+        <canvas
+          baseChart
+          [data]="chartDataPredictedValues"
+          [options]="chartOptions"
+          [type]="chartType()"
+        ></canvas>
+      </div>
+      <div class="buttons is-justify-content-space-around">
         <!-- menus for prediction values -->
         <button
           class="button is-primary is-rounded"
@@ -93,23 +119,10 @@
         </button>
         <button
           class="button is-primary is-rounded"
-          (click)="
-            showPredictionGraphs(
-              this.choiceResolution ? this.choiceResolution : 'hourly'
-            )
-          "
+          (click)="showPredictionGraphs(this.choiceResolution())"
         >
           Display Prediction Values
         </button>
-      </div>
-
-      <div class="box is-fullwidth" style="height: 65vh">
-        <canvas
-          baseChart
-          [data]="chartDataPredictedValues"
-          [options]="chartOptions"
-          [type]="chartType()"
-        ></canvas>
       </div>
     </div>
   </div>
