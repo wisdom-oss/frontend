@@ -6,21 +6,21 @@
       <div class="buttons has-addons is-justify-content-end">
         <button
           class="button"
-          [class.is-active]="displayedResolution === 'hourly'"
+          [class.is-active]="displayedResolution() === 'hourly'"
           (click)="setDisplayedResolution('hourly')"
         >
           {{ optionsResolution["hourly"] | translate }}
         </button>
         <button
           class="button"
-          [class.is-active]="displayedResolution === 'daily'"
+          [class.is-active]="displayedResolution() === 'daily'"
           (click)="setDisplayedResolution('daily')"
         >
           {{ optionsResolution["daily"] | translate }}
         </button>
         <button
           class="button"
-          [class.is-active]="displayedResolution === 'weekly'"
+          [class.is-active]="displayedResolution() === 'weekly'"
           (click)="setDisplayedResolution('weekly')"
         >
           {{ optionsResolution["weekly"] | translate }}
