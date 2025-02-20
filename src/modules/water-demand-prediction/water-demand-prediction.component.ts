@@ -10,6 +10,7 @@ import {ChartConfiguration, ChartData, ChartDataset, ChartType} from "chart.js";
 import {BaseChartDirective} from "ng2-charts";
 
 import {
+  PredictedSmartmeterDataset,
   SmartmeterDataset,
   PredictionSingleSmartmeter,
   SingleSmartmeter,
@@ -57,11 +58,14 @@ export class WaterDemandPredictionComponent implements OnInit {
   /** data object of current requested Smartmeterdata */
   currentSmartmeterData?: SingleSmartmeter;
 
+  /** data object of current requested Smartmeterdata */
+  currentPredictedSmartmeterData?: PredictionSingleSmartmeter;
+
   /** Record to hold all saved ChartDatasets */
   savedDatasets: Record<string, SmartmeterDataset[]> = {};
 
-  /** saves all predicted values by resolution */
-  predPerResolution: Record<string, PredictionSingleSmartmeter[]> = {};
+  /** Record to hold all saved predicted ChartDatasets */
+  predictedDatasets: Record<string, PredictedSmartmeterDataset[]> = {};
 
   /**
    * data skeleton for the line graph
@@ -142,8 +146,6 @@ export class WaterDemandPredictionComponent implements OnInit {
   /** set the displayed resolution and update the chart to mirror that */
   setDisplayedResolution(resolution: string): void {
     this.displayedResolution.set(resolution);
-
-    this.showDatasets(resolution);
   }
 
   /** set the displayed chartType to change from line to bar and back */
@@ -195,7 +197,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     this.chartDataPredictedValues.labels = [];
     this.chartDataPredictedValues.datasets = [];
 
-    this.predPerResolution = {};
+    this.predictedDatasets = {};
     this.updateCharts();
   }
 
@@ -281,6 +283,31 @@ export class WaterDemandPredictionComponent implements OnInit {
     return true;
   }
 
+  checkDoublePredictedParameters(
+    nameSmartmeter: string,
+    timeframe: string,
+    resolution: string,
+  ): boolean {
+    if (!this.predictedDatasets[resolution]) {
+      return true;
+    }
+
+    /** the color is based on 3 unique parameters, thus, when color is equal, the set is already present */
+    let colorToCheck = this.createColorFromParameter(
+      nameSmartmeter,
+      resolution,
+      timeframe,
+    );
+
+    for (let entry of this.predictedDatasets[resolution]) {
+      if (entry.dataset.borderColor === colorToCheck) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   /**
    * create a new dataset for chartjs from the given data
    * @param label label of the chartdata
@@ -296,7 +323,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     fillOption: any,
     type: string,
   ): ChartDataset {
-    let color = "transparent";
+    let color = "#D3D3D3"; // light grey
 
     // to display confidence intervalls
     if (fillOption === false) {
@@ -396,19 +423,39 @@ export class WaterDemandPredictionComponent implements OnInit {
           );
 
           this.setDisplayedResolution(this.currentSmartmeterData?.resolution!);
+          this.showDatasets(this.currentSmartmeterData?.resolution!);
           this.currentSmartmeterData = undefined;
         },
       });
   }
 
-  /** CONTINUE HERE TO CHANGE */
-  fetchPredSingleSmartmeter(): void {
+  fetchPredDataSmartmeter(): void {
+    /** check if any selection is missing for request */
     if (!this.checkForDefinedRequestParameters()) {
       return;
     }
 
-    alert("Start fetching predicted Values. Please wait.");
-    console.log("Start fetching predicted Values. Please wait.");
+    /** checks if parameters are already requested and prevents request if so. */
+    if (
+      !this.checkDoublePredictedParameters(
+        this.choiceSmartmeter(),
+        this.choiceTime(),
+        this.choiceResolution(),
+      )
+    ) {
+      console.log(
+        "combination of" +
+          this.choiceSmartmeter +
+          " " +
+          this.choiceTime +
+          " \n " +
+          this.choiceResolution +
+          " already requested",
+      );
+      return;
+    }
+
+    alert("Start requesting prediction values. Please wait.");
 
     this.waterDemandService
       .fetchSinglePredictionSmartmeter(
@@ -418,24 +465,71 @@ export class WaterDemandPredictionComponent implements OnInit {
       )
       .subscribe({
         next: (response: PredictionSingleSmartmeter) => {
-          // create new key of resolution and save smartmeter data to it
-          if (response.resolution in this.predPerResolution) {
-            let color = this.stringToColor(
-              response.name + response.resolution + response.timeframe,
-            );
-            // add color and change interface
-            this.predPerResolution[response.resolution].push(response);
-            // use existing key and push smartmeter data in it
-          } else {
-            this.predPerResolution[response.resolution] = [response];
-          }
+          this.currentPredictedSmartmeterData = response;
         },
         error: error => {
           console.log(error);
         },
         complete: () => {
-          console.log("Finalized prediction request.");
-          alert("Finalized prediction request.");
+          alert("Finished requesting prediction values. Please continue.");
+
+          let newDataset = this.createNewDataset(
+            this.currentPredictedSmartmeterData?.numValue!,
+            this.currentPredictedSmartmeterData?.name!,
+            this.currentPredictedSmartmeterData?.resolution!,
+            this.currentPredictedSmartmeterData?.timeframe!,
+            false,
+            this.chartType(),
+          );
+
+          let lower_conf_int = this.createNewDataset(
+            this.currentPredictedSmartmeterData?.lower_conf_values!,
+            "lower_confidence_interval",
+            this.currentPredictedSmartmeterData?.resolution!,
+            this.currentPredictedSmartmeterData?.timeframe!,
+            0,
+            this.chartType(),
+          );
+
+          let upper_conf_int = this.createNewDataset(
+            this.currentPredictedSmartmeterData?.upper_conf_values!,
+            "upper_confidence_interval",
+            this.currentPredictedSmartmeterData?.resolution!,
+            this.currentPredictedSmartmeterData?.timeframe!,
+            0,
+            this.chartType(),
+          );
+
+          let smartmeterdata: PredictedSmartmeterDataset = {
+            upper_conf_interval_dataset: upper_conf_int,
+            dataset: newDataset,
+            lower_conf_interval_dataset: lower_conf_int,
+            labels: this.currentPredictedSmartmeterData?.dateObserved!,
+          };
+
+          console.log(smartmeterdata);
+
+          if (
+            !this.predictedDatasets[
+              this.currentPredictedSmartmeterData?.resolution!
+            ]
+          ) {
+            this.predictedDatasets[
+              this.currentPredictedSmartmeterData?.resolution!
+            ] = [];
+          }
+
+          this.predictedDatasets[
+            this.currentPredictedSmartmeterData?.resolution!
+          ].push(smartmeterdata);
+
+          this.setDisplayedResolution(
+            this.currentPredictedSmartmeterData?.resolution!,
+          );
+          this.showPredictedDatasats(
+            this.currentPredictedSmartmeterData?.resolution!,
+          );
+          this.currentPredictedSmartmeterData = undefined;
         },
       });
   }
@@ -456,49 +550,24 @@ export class WaterDemandPredictionComponent implements OnInit {
     this.updateCharts(0);
   }
 
-  /**
-   * shows all graphs based on the selected resolution
-   * @param resolution choice of hourly, daily, weekly
-   */
-  showPredictionGraphs(resolution: string): void {
+  showPredictedDatasats(resolution: string): void {
     // reset data to begin
     this.chartDataPredictedValues.labels = [];
     this.chartDataPredictedValues.datasets = [];
 
-    this.predPerResolution[resolution].forEach(entry => {
-      this.chartDataPredictedValues.labels = entry.dateObserved;
-
-      let predData = this.createNewDataset(
-        entry.numValue,
-        entry.name,
-        resolution,
-        entry.timeframe,
-        false,
-        this.chartType(),
+    /** add relevant datasets based on resolution to chartData */
+    this.predictedDatasets[resolution].forEach(entry => {
+      this.chartDataPredictedValues.datasets.push(entry.dataset);
+      this.chartDataPredictedValues.datasets.push(
+        entry.lower_conf_interval_dataset,
       );
-      this.chartDataPredictedValues.datasets.push(predData);
-
-      let lower_conf_int = this.createNewDataset(
-        entry.lower_conf_values,
-        "lower_confidence_interval",
-        resolution,
-        entry.timeframe,
-        0,
-        this.chartType(),
+      this.chartDataPredictedValues.datasets.push(
+        entry.upper_conf_interval_dataset,
       );
-      this.chartDataPredictedValues.datasets.push(lower_conf_int);
-
-      let upper_conf_int = this.createNewDataset(
-        entry.upper_conf_values,
-        "upper_confidence_interval",
-        resolution,
-        entry.timeframe,
-        0,
-        this.chartType(),
-      );
-      this.chartDataPredictedValues.datasets.push(upper_conf_int);
+      this.chartDataPredictedValues.labels = entry.labels;
     });
 
-    this.updateCharts(1);
+    /** update charts to display information */
+    this.updateCharts(0);
   }
 }

@@ -26,21 +26,21 @@
             <button
               class="button"
               [class.is-active]="displayedResolution() === 'hourly'"
-              (click)="setDisplayedResolution('hourly')"
+              (click)="setDisplayedResolution('hourly'); showDatasets('hourly')"
             >
               {{ optionsResolution["hourly"] | translate }}
             </button>
             <button
               class="button"
               [class.is-active]="displayedResolution() === 'daily'"
-              (click)="setDisplayedResolution('daily')"
+              (click)="setDisplayedResolution('daily'); showDatasets('daily')"
             >
               {{ optionsResolution["daily"] | translate }}
             </button>
             <button
               class="button"
               [class.is-active]="displayedResolution() === 'weekly'"
-              (click)="setDisplayedResolution('weekly')"
+              (click)="setDisplayedResolution('weekly'); showDatasets('weekly')"
             >
               {{ optionsResolution["weekly"] | translate }}
             </button>
@@ -93,13 +93,51 @@
     </div>
     <!--Predicted Data Graph and Buttons-->
     <div class="column">
-      <div class="buttons has-addons is-justify-content-start">
-        <button
-          class="button is-primary is-rounded"
-          (click)="resetPredictionChart()"
-        >
-          Reset Prediction Chart
-        </button>
+      <div class="level">
+        <div class="level-left">
+          <div class="buttons has-addons is-justify-content-start">
+            <button
+              class="button is-primary is-rounded"
+              (click)="resetPredictionChart()"
+            >
+              Reset predicted Chart
+            </button>
+          </div>
+        </div>
+        <div class="level-right">
+          <!-- Resolution Switches -->
+          <div class="buttons has-addons is-justify-content-end">
+            <button
+              class="button"
+              [class.is-active]="displayedResolution() === 'hourly'"
+              (click)="
+                setDisplayedResolution('hourly');
+                showPredictedDatasats('hourly')
+              "
+            >
+              {{ optionsResolution["hourly"] | translate }}
+            </button>
+            <button
+              class="button"
+              [class.is-active]="displayedResolution() === 'daily'"
+              (click)="
+                setDisplayedResolution('daily'); showPredictedDatasats('daily')
+              "
+            >
+              {{ optionsResolution["daily"] | translate }}
+            </button>
+            <button
+              class="button"
+              [class.is-active]="displayedResolution() === 'weekly'"
+              (click)="
+                setDisplayedResolution('weekly');
+                showPredictedDatasats('weekly')
+              "
+            >
+              {{ optionsResolution["weekly"] | translate }}
+            </button>
+          </div>
+        </div>
       </div>
       <div class="box is-fullwidth" style="height: 60vh">
         <canvas
@@ -113,15 +151,9 @@
         <!-- menus for prediction values -->
         <button
           class="button is-primary is-rounded"
-          (click)="fetchPredSingleSmartmeter()"
+          (click)="fetchPredDataSmartmeter()"
         >
-          Request Prediction
-        </button>
-        <button
-          class="button is-primary is-rounded"
-          (click)="showPredictionGraphs(this.choiceResolution())"
-        >
-          Display Prediction Values
+          Request and Display predicted Values
         </button>
       </div>
     </div>

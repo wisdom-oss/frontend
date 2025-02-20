@@ -16,6 +16,11 @@ export interface SmartmeterDataset {
   labels: string[];
 }
 
+export interface PredictedSmartmeterDataset extends SmartmeterDataset {
+  lower_conf_interval_dataset: ChartDataset;
+  upper_conf_interval_dataset: ChartDataset;
+}
+
 export interface DatasetSmartmeter extends SingleSmartmeter {
   color: string;
 }
