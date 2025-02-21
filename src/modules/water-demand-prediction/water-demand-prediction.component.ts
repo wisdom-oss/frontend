@@ -29,12 +29,12 @@ export class WaterDemandPredictionComponent implements OnInit {
   displayedResolution = signal<string>("hourly");
 
   /** variables name dropdown */
-  menuSmartmeter = "Select Smartmeter";
+  menuSmartmeter = "water-demand-prediction.choice.smartmeter";
   optionsSmartmeter: Record<string, string> = {};
   choiceSmartmeter = signal<string>("urn:ngsi-ld:Device:atypical-household");
 
   /** variables timeframe dropdown */
-  menuTime = "Select Timeframe";
+  menuTime = "water-demand-prediction.choice.timeframe";
   optionsTime: Record<string, string> = {
     "one day": "water-demand-prediction.timeframe.one-day",
     "one week": "water-demand-prediction.timeframe.one-week",
@@ -47,7 +47,7 @@ export class WaterDemandPredictionComponent implements OnInit {
   choiceTime = signal<string>("one week");
 
   /** variables resolution dropdown */
-  menuResolution = "Select Resolution";
+  menuResolution = "water-demand-prediction.choice.resolution";
   optionsResolution: Record<string, string> = {
     hourly: "water-demand-prediction.resolution.hourly",
     daily: "water-demand-prediction.resolution.daily",
@@ -141,9 +141,12 @@ export class WaterDemandPredictionComponent implements OnInit {
   ngOnInit() {
     this.fetchMeterInformation();
     this.fetchDataSmartmeter();
+    this.chartDataPredictedValues.labels = this.chartDataCurrentValues.labels;
   }
 
-  /** set the displayed resolution and update the chart to mirror that */
+  /** set the displayed resolution and update the chart to mirror that
+   * CONTINUE WITH DECIDING IF GRAPHS ARE INDEPENDEND with buttons or not!
+   */
   setDisplayedResolution(resolution: string): void {
     this.displayedResolution.set(resolution);
   }
@@ -185,7 +188,6 @@ export class WaterDemandPredictionComponent implements OnInit {
 
   /** Completely erases data from the real data graph element */
   resetChart(): void {
-    this.chartDataCurrentValues.labels = [];
     this.chartDataCurrentValues.datasets = [];
 
     this.savedDatasets = {};
@@ -194,7 +196,6 @@ export class WaterDemandPredictionComponent implements OnInit {
 
   /** Completely erases data from predicted graph element */
   resetPredictionChart(): void {
-    this.chartDataPredictedValues.labels = [];
     this.chartDataPredictedValues.datasets = [];
 
     this.predictedDatasets = {};
@@ -235,77 +236,6 @@ export class WaterDemandPredictionComponent implements OnInit {
     }
     console.log(color);
     return color;
-  }
-
-  /** check for undefined parameters. True when every parameter is defined, else false*/
-  checkForDefinedRequestParameters(): boolean {
-    if (!this.choiceResolution) {
-      console.error("no resolution chosen");
-      return false;
-    }
-
-    if (!this.choiceTime) {
-      console.error("no timeframe given");
-      return false;
-    }
-
-    if (!this.choiceSmartmeter) {
-      console.error("no smartmeter chosen");
-      return false;
-    }
-
-    return true;
-  }
-
-  /** true if choices are already present, false if unique */
-  checkDoubleParameters(
-    nameSmartmeter: string,
-    timeframe: string,
-    resolution: string,
-  ): boolean {
-    if (!this.savedDatasets[resolution]) {
-      return true;
-    }
-
-    /** the color is based on 3 unique parameters, thus, when color is equal, the set is already present */
-    let colorToCheck = this.createColorFromParameter(
-      nameSmartmeter,
-      resolution,
-      timeframe,
-    );
-
-    for (let entry of this.savedDatasets[resolution]) {
-      if (entry.dataset.borderColor === colorToCheck) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  checkDoublePredictedParameters(
-    nameSmartmeter: string,
-    timeframe: string,
-    resolution: string,
-  ): boolean {
-    if (!this.predictedDatasets[resolution]) {
-      return true;
-    }
-
-    /** the color is based on 3 unique parameters, thus, when color is equal, the set is already present */
-    let colorToCheck = this.createColorFromParameter(
-      nameSmartmeter,
-      resolution,
-      timeframe,
-    );
-
-    for (let entry of this.predictedDatasets[resolution]) {
-      if (entry.dataset.borderColor === colorToCheck) {
-        return false;
-      }
-    }
-
-    return true;
   }
 
   /**
@@ -362,28 +292,8 @@ export class WaterDemandPredictionComponent implements OnInit {
    * @returns nothing
    */
   fetchDataSmartmeter(): void {
-    /** check if any selection is missing for request */
-    if (!this.checkForDefinedRequestParameters()) {
-      return;
-    }
-
-    /** checks if parameters are already requested and prevents request if so. */
-    if (
-      !this.checkDoubleParameters(
-        this.choiceSmartmeter(),
-        this.choiceTime(),
-        this.choiceResolution(),
-      )
-    ) {
-      console.log(
-        "combination of" +
-          this.choiceSmartmeter +
-          " " +
-          this.choiceTime +
-          " \n " +
-          this.choiceResolution +
-          " already requested",
-      );
+    /** if request parameters are not unique, abandon request */
+    if (!this.checkParameters(false)) {
       return;
     }
 
@@ -422,6 +332,11 @@ export class WaterDemandPredictionComponent implements OnInit {
             smartmeterdata,
           );
 
+          // hacky way to initiate the labels of the predicted chart as well
+          if (this.chartDataPredictedValues.labels?.length === 0) {
+            this.chartDataPredictedValues.labels = smartmeterdata.labels;
+          }
+
           this.setDisplayedResolution(this.currentSmartmeterData?.resolution!);
           this.showDatasets(this.currentSmartmeterData?.resolution!);
           this.currentSmartmeterData = undefined;
@@ -433,28 +348,8 @@ export class WaterDemandPredictionComponent implements OnInit {
    * fetches the prediction data of a given set of choices.
    */
   fetchPredDataSmartmeter(): void {
-    /** check if any selection is missing for request */
-    if (!this.checkForDefinedRequestParameters()) {
-      return;
-    }
-
-    /** checks if parameters are already requested and prevents request if so. */
-    if (
-      !this.checkDoublePredictedParameters(
-        this.choiceSmartmeter(),
-        this.choiceTime(),
-        this.choiceResolution(),
-      )
-    ) {
-      console.log(
-        "combination of" +
-          this.choiceSmartmeter +
-          " " +
-          this.choiceTime +
-          " \n " +
-          this.choiceResolution +
-          " already requested",
-      );
+    /** if request parameters are not unique, abandon request */
+    if (!this.checkParameters(true)) {
       return;
     }
 
@@ -537,11 +432,85 @@ export class WaterDemandPredictionComponent implements OnInit {
       });
   }
 
+  /**
+   * checks first if all 3 choices are set and returns false when not.
+   * afterwards check if resolution key is already in datasets, true when not.
+   * last create colorcode from parameters and check if colorcode already present.
+   * when colorcode not present, request is unique and thus true.
+   * @param pred flag im request is for real or predicted data
+   * @returns true if request unique, false else
+   */
+  checkParameters(pred: boolean): boolean {
+    if (
+      !this.choiceSmartmeter() ||
+      !this.choiceResolution() ||
+      !this.choiceTime()
+    ) {
+      alert("Not every parameter for request is set.");
+    }
+
+    /** checks if resolution as key is already present in datasetsrecord.
+     * If not, request must be true and thus unique */
+    if (!pred) {
+      if (!this.savedDatasets[this.choiceResolution()]) {
+        return true;
+      }
+    } else {
+      if (!this.predictedDatasets[this.choiceResolution()]) {
+        return true;
+      }
+    }
+
+    /** the color is based on 3 unique parameters,
+     *  thus, when color is equal, the set is already present */
+    let colorToCheck = this.createColorFromParameter(
+      this.choiceSmartmeter(),
+      this.choiceResolution(),
+      this.choiceTime(),
+    );
+
+    let errormsg: string =
+      "combination already requested \n" +
+      this.choiceResolution() +
+      "\n" +
+      this.choiceSmartmeter() +
+      "\n" +
+      this.choiceTime();
+
+    /** check if given dataset is already containing the colorcode to request */
+    if (!pred) {
+      for (let entry of this.savedDatasets[this.choiceResolution()]) {
+        if (
+          entry.dataset.borderColor === colorToCheck ||
+          entry.dataset.backgroundColor === colorToCheck
+        ) {
+          alert(errormsg);
+          return false;
+        }
+      }
+    } else {
+      for (let entry of this.predictedDatasets[this.choiceResolution()]) {
+        if (
+          entry.dataset.borderColor === colorToCheck ||
+          entry.dataset.backgroundColor === colorToCheck
+        ) {
+          alert(errormsg);
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
   /** show datasets based on the resolution chosen */
   showDatasets(resolution: string): void {
     // reset data to begin
-    this.chartDataCurrentValues.labels = [];
     this.chartDataCurrentValues.datasets = [];
+
+    if (!this.savedDatasets[resolution]) {
+      alert("No suitable chart to show!");
+      return;
+    }
 
     /** add relevant datasets based on resolution to chartData */
     this.savedDatasets[resolution].forEach(entry => {
@@ -553,10 +522,14 @@ export class WaterDemandPredictionComponent implements OnInit {
     this.updateCharts(0);
   }
 
+  /** show predicted datasets based on the resolution chosen */
   showPredictedDatasats(resolution: string): void {
     // reset data to begin
-    this.chartDataPredictedValues.labels = [];
     this.chartDataPredictedValues.datasets = [];
+
+    if (!this.predictedDatasets[resolution]) {
+      return;
+    }
 
     /** add relevant datasets based on resolution to chartData */
     this.predictedDatasets[resolution].forEach(entry => {

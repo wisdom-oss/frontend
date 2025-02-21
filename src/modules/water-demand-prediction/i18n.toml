@@ -53,3 +53,35 @@ de = "Ruhestandshaushalt"
 [smartmeter.single]
 en = "single household"
 de = "Single Haushalt"
+
+[delete]
+en = "Delete Charts"
+de = "Lösche Charts"
+
+[choice.smartmeter]
+en = "Select Smartmeter"
+de = "Wähle Smartmeter"
+
+[choice.timeframe]
+en = "Select Timeframe"
+de = "Wähle Zeitrahmen"
+
+[choice.resolution]
+en = "Select Resolution"
+de = "Wähle Auflösung"
+
+[request.realdata]
+en = "Display Data"
+de = "Zeige Daten an"
+
+[request.preddata]
+en = "Display predicted data"
+de = "Zeige vorhergesagte Daten an"
+
+[graph.mode.line]
+en = "Line Chart"
+de = "Liniendiagramm"
+
+[graph.mode.bar]
+en = "Bar Chart"
+de = "Balkendiagramm"

@@ -5,156 +5,144 @@
   <div class="columns">
     <!--Real Data Graph and Buttons-->
     <div class="column">
-      <div class="level">
-        <div class="level-left">
-          <div class="buttons has-addons is-justify-content-start">
-            <button class="button is-primary is-rounded" (click)="resetChart()">
-              Reset Chart
-            </button>
-            <button
-              class="button is-rounded"
-              [class.is-active]="chartType() === 'line'"
-              (click)="switchDisplayedChartType()"
-            >
-              {{ chartType() + "-chart" }}
-            </button>
+      <div class="box">
+        <div class="level">
+          <div class="level-left">
+            <div class="is-justify-content-start">
+              <button
+                class="button is-primary is-rounded"
+                (click)="resetChart()"
+              >
+                {{ "water-demand-prediction.delete" | translate }}
+              </button>
+            </div>
+          </div>
+          <div class="level-right">
+            <!-- Resolution Switches -->
+            <div class="buttons has-addons is-justify-content-end">
+              <button
+                class="button"
+                [class.is-active]="displayedResolution() === 'hourly'"
+                (click)="
+                  setDisplayedResolution('hourly');
+                  showDatasets('hourly');
+                  showPredictedDatasats('hourly')
+                "
+              >
+                {{ optionsResolution["hourly"] | translate }}
+              </button>
+              <button
+                class="button"
+                [class.is-active]="displayedResolution() === 'daily'"
+                (click)="
+                  setDisplayedResolution('daily');
+                  showDatasets('daily');
+                  showPredictedDatasats('daily')
+                "
+              >
+                {{ optionsResolution["daily"] | translate }}
+              </button>
+              <button
+                class="button"
+                [class.is-active]="displayedResolution() === 'weekly'"
+                (click)="
+                  setDisplayedResolution('weekly');
+                  showDatasets('weekly');
+                  showPredictedDatasats('weekly')
+                "
+              >
+                {{ optionsResolution["weekly"] | translate }}
+              </button>
+              <button
+                class="button is-rounded"
+                [class.is-active]="chartType() === 'line'"
+                (click)="switchDisplayedChartType()"
+              >
+                {{
+                  "water-demand-prediction.graph.mode." + chartType()
+                    | translate
+                }}
+              </button>
+            </div>
           </div>
         </div>
-        <div class="level-right">
-          <!-- Resolution Switches -->
-          <div class="buttons has-addons is-justify-content-end">
-            <button
-              class="button"
-              [class.is-active]="displayedResolution() === 'hourly'"
-              (click)="setDisplayedResolution('hourly'); showDatasets('hourly')"
-            >
-              {{ optionsResolution["hourly"] | translate }}
-            </button>
-            <button
-              class="button"
-              [class.is-active]="displayedResolution() === 'daily'"
-              (click)="setDisplayedResolution('daily'); showDatasets('daily')"
-            >
-              {{ optionsResolution["daily"] | translate }}
-            </button>
-            <button
-              class="button"
-              [class.is-active]="displayedResolution() === 'weekly'"
-              (click)="setDisplayedResolution('weekly'); showDatasets('weekly')"
-            >
-              {{ optionsResolution["weekly"] | translate }}
-            </button>
+        <div class="is-flex is-flex-direction-column is-align-items-center">
+          <!-- graph real data container box -->
+          <div class="is-fullwidth" style="height: 60vh">
+            <canvas
+              baseChart
+              [data]="chartDataCurrentValues"
+              [options]="chartOptions"
+              [type]="chartType()"
+            ></canvas>
           </div>
-        </div>
-      </div>
-      <div class="is-flex is-flex-direction-column is-align-items-center">
-        <!-- graph real data container box -->
-        <div class="box is-fullwidth" style="height: 60vh">
-          <canvas
-            baseChart
-            [data]="chartDataCurrentValues"
-            [options]="chartOptions"
-            [type]="chartType()"
-          ></canvas>
-        </div>
-        <!--dropdown buttons for selection -->
-        <div class="is-fullwidth">
-          <div class="">
-            <dropdown
-              [menuName]="menuResolution"
-              [options]="optionsResolution"
-              [changeMenuName]="true"
-              kind="hover"
-              (choice)="choiceResolution.set($event)"
-            ></dropdown>
-            <dropdown
-              [menuName]="menuTime"
-              [options]="optionsTime"
-              [changeMenuName]="true"
-              kind="hover"
-              (choice)="choiceTime.set($event)"
-            ></dropdown>
-            <dropdown
-              [menuName]="menuSmartmeter"
-              [options]="optionsSmartmeter"
-              [changeMenuName]="true"
-              kind="hover"
-              (choice)="choiceSmartmeter.set($event)"
-            ></dropdown>
-            <button
-              class="button is-primary is-rounded"
-              (click)="fetchDataSmartmeter()"
-            >
-              Request and Display
-            </button>
+          <!--dropdown buttons for selection -->
+          <div class="is-fullwidth">
+            <div class="">
+              <dropdown
+                [menuName]="menuResolution"
+                [options]="optionsResolution"
+                [changeMenuName]="true"
+                kind="hover"
+                (choice)="choiceResolution.set($event)"
+              ></dropdown>
+              <dropdown
+                [menuName]="menuTime"
+                [options]="optionsTime"
+                [changeMenuName]="true"
+                kind="hover"
+                (choice)="choiceTime.set($event)"
+              ></dropdown>
+              <dropdown
+                [menuName]="menuSmartmeter"
+                [options]="optionsSmartmeter"
+                [changeMenuName]="true"
+                kind="hover"
+                (choice)="choiceSmartmeter.set($event)"
+              ></dropdown>
+              <button
+                class="button is-primary is-rounded"
+                (click)="fetchDataSmartmeter()"
+              >
+                {{ "water-demand-prediction.request.realdata" | translate }}
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
     <!--Predicted Data Graph and Buttons-->
     <div class="column">
-      <div class="level">
-        <div class="level-left">
-          <div class="buttons has-addons is-justify-content-start">
-            <button
-              class="button is-primary is-rounded"
-              (click)="resetPredictionChart()"
-            >
-              Reset predicted Chart
-            </button>
+      <div class="box">
+        <div class="level">
+          <div class="level-left">
+            <div class="buttons has-addons is-justify-content-start">
+              <button
+                class="button is-primary is-rounded"
+                (click)="resetPredictionChart()"
+              >
+                {{ "water-demand-prediction.delete" | translate }}
+              </button>
+            </div>
           </div>
         </div>
-        <div class="level-right">
-          <!-- Resolution Switches -->
-          <div class="buttons has-addons is-justify-content-end">
-            <button
-              class="button"
-              [class.is-active]="displayedResolution() === 'hourly'"
-              (click)="
-                setDisplayedResolution('hourly');
-                showPredictedDatasats('hourly')
-              "
-            >
-              {{ optionsResolution["hourly"] | translate }}
-            </button>
-            <button
-              class="button"
-              [class.is-active]="displayedResolution() === 'daily'"
-              (click)="
-                setDisplayedResolution('daily'); showPredictedDatasats('daily')
-              "
-            >
-              {{ optionsResolution["daily"] | translate }}
-            </button>
-            <button
-              class="button"
-              [class.is-active]="displayedResolution() === 'weekly'"
-              (click)="
-                setDisplayedResolution('weekly');
-                showPredictedDatasats('weekly')
-              "
-            >
-              {{ optionsResolution["weekly"] | translate }}
-            </button>
-          </div>
+        <div class="is-fullwidth" style="height: 60vh">
+          <canvas
+            baseChart
+            [data]="chartDataPredictedValues"
+            [options]="chartOptions"
+            [type]="chartType()"
+          ></canvas>
         </div>
-      </div>
-      <div class="box is-fullwidth" style="height: 60vh">
-        <canvas
-          baseChart
-          [data]="chartDataPredictedValues"
-          [options]="chartOptions"
-          [type]="chartType()"
-        ></canvas>
-      </div>
-      <div class="buttons is-justify-content-space-around">
-        <!-- menus for prediction values -->
-        <button
-          class="button is-primary is-rounded"
-          (click)="fetchPredDataSmartmeter()"
-        >
-          Request and Display predicted Values
-        </button>
+        <div class="buttons is-justify-content-space-around">
+          <!-- menus for prediction values -->
+          <button
+            class="button is-primary is-rounded"
+            (click)="fetchPredDataSmartmeter()"
+          >
+            {{ "water-demand-prediction.request.preddata" | translate }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
