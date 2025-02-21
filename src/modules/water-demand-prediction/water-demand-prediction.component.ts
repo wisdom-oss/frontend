@@ -429,6 +429,9 @@ export class WaterDemandPredictionComponent implements OnInit {
       });
   }
 
+  /**
+   * fetches the prediction data of a given set of choices.
+   */
   fetchPredDataSmartmeter(): void {
     /** check if any selection is missing for request */
     if (!this.checkForDefinedRequestParameters()) {
