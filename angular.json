@@ -92,7 +92,17 @@
             ],
             "styles": ["src/styles.scss"],
             "scripts": [],
-            "allowedCommonJsDependencies": ["ajv", "dayjs", "maplibre-gl"],
+            "allowedCommonJsDependencies": [
+              "ajv", 
+              "dayjs", 
+              "maplibre-gl",
+              "@turf/jsts",
+              "rbush",
+              "skmeans",
+              "concaveman",
+              "fast-deep-equal",
+              "earcut"
+            ],
             "stylePreprocessorOptions": {
               "sass": {
                 "silenceDeprecations": ["global-builtin", "import"]
