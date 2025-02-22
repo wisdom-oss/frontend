@@ -1,0 +1,29 @@
+import {DecimalPipe} from "@angular/common";
+import {computed, input, Component, Signal} from "@angular/core";
+
+import {WaterRightsServiceService} from "../../../../api/water-rights-service.service";
+import {signals} from "../../../../common/signals";
+
+@Component({
+  selector: "growl-withdrawal-info-control",
+  imports: [DecimalPipe],
+  templateUrl: "./withdrawal-info-control.component.html",
+  styles: ``,
+})
+export class WithdrawalInfoControlComponent {
+  readonly in = input.required<{
+    name: string;
+    key: string;
+    withdrawals: Signal<WaterRightsServiceService.AverageWithdrawals | null>;
+  }>();
+
+  protected lang = signals.lang();
+
+  protected value = computed(() => {
+    let input = this.in();
+    if (!input) return null;
+    let withdrawal = input.withdrawals();
+    if (!withdrawal) return null;
+    return Math.floor(withdrawal.minimalWithdrawal);
+  });
+}

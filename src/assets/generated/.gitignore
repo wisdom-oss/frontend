@@ -1,0 +1,8 @@
+# This directory is used for generated files during the build process.
+# These files should never be committed to the repository.
+
+# Ignore all files inside this directory
+*
+
+# Allow this .gitignore file to remain so the directory exists in Git
+!.gitignore
