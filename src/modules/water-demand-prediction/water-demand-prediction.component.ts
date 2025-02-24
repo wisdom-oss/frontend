@@ -87,7 +87,7 @@ export class WaterDemandPredictionComponent implements OnInit {
    * type of graph to use in chart
    * as a signal to change it via template
    */
-  chartType = signal<ChartType>("bar");
+  chartType = signal<ChartType>("line");
 
   /**
    * options used for the line chart to visualize prediction values
@@ -97,7 +97,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     maintainAspectRatio: false,
     elements: {
       line: {
-        tension: 0.4, // Smooth curve
+        tension: 0.1, // Smooth curve
       },
     },
     scales: {
