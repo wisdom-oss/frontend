@@ -93,8 +93,8 @@
             "styles": ["src/styles.scss"],
             "scripts": [],
             "allowedCommonJsDependencies": [
-              "ajv", 
-              "dayjs", 
+              "ajv",
+              "dayjs",
               "maplibre-gl",
               "@turf/jsts",
               "rbush",
