@@ -33,4 +33,4 @@ FROM sigoden/dufs:v${DUFS_VERSION}
 WORKDIR /wisdom-oss
 COPY --from=build-app /app/dist/wisdom-oss/frontend/browser /wisdom-oss/app
 EXPOSE 5000
-ENTRYPOINT [ "dufs", "--render-index", "-b0.0.0.0", "-p5000", "app" ]
+ENTRYPOINT [ "dufs", "--render-spa", "-b0.0.0.0", "-p5000", "app" ]
