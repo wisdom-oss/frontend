@@ -3,7 +3,7 @@ ARG DUFS_VERSION=0.43.0
 
 
 # build the app via volta to use the correct node version
-FROM debian:bookworm AS build-app
+FROM --platform=linux/amd64 debian:bookworm AS build-app
 RUN apt update -y && apt upgrade -y
 RUN apt install -y curl
 WORKDIR /app
