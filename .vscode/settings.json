@@ -11,6 +11,9 @@
     "**/.project": true,
     "**/.settings": true
   },
+  "files.associations": {
+    "*.prettierignore": "ignore"
+  },
   "cSpell.language": "en,de-DE",
   "typescript.tsdk": "./node_modules/typescript/lib"
 }
