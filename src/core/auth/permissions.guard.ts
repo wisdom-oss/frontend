@@ -16,6 +16,15 @@ import {UserService} from "../user.service";
  *
  * @param scopes A list of permission scopes in the format `<service>:<level>`,
  *               where `level` can be `read`, `write`, `delete`, or `*`.
+ *
+ * @example
+ * import {Route} from "@angular/router";
+ *
+ * const route: Route = {
+ *   path: "secret-path",
+ *   component: SecretComponent,
+ *   canActivate: [permissionsGuard("service:read")],
+ * };
  */
 export function permissionsGuard(
   ...scopes: permissionsGuard.Scope[]
