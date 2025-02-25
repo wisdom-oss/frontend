@@ -60,8 +60,8 @@ de = "Niedersachen Kommunen"
 
 [layer.waterRightUsageLocations]
 en = "NLWKN Water Right Usage Locations"
-de = "NLWKN Nutzungsorte der Wasserrecht"
+de = "NLWKN Nutzungsorte der Wasserrechte"
 
 [layer.oldWaterRightUsageLocations]
 en = "NLWKN Water Right Usage Locations (old)"
-de = "NLWKN Nutzungsorte der Wasserrecht (alt)"
+de = "NLWKN Nutzungsorte der Wasserrechte (alt)"
