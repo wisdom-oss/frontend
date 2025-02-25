@@ -1,0 +1,10 @@
+# Colors for the measurement classifications according to NLWKN.
+# https://www.grundwasserstandonline.nlwkn.niedersachsen.de/Hinweis#einstufungGrundwasserstandsklassen
+"Höchstwert überschritten" = "#00008B"
+"sehr hoch" = "#104E8B"
+"hoch" = "#1E90FF"
+"normal" = "#00FF00"
+"niedrig" = "#FFFF00"
+"sehr niedrig" = "#CD6839"
+"Niedrigstwert unterschritten" = "#FF0000"
+"null" = "#888888"
