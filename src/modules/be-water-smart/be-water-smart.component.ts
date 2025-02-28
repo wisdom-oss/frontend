@@ -3,7 +3,7 @@ import {NgFor, CommonModule} from "@angular/common";
 import {ViewChild, Component, OnInit} from "@angular/core";
 import {FormsModule} from "@angular/forms";
 import {provideIcons, NgIcon} from "@ng-icons/core";
-import {ionAddOutline, ionTrashOutline} from "@ng-icons/ionicons";
+import {remixAddLine, remixDeleteBin5Line} from "@ng-icons/remixicon";
 import {TranslateService} from "@ngx-translate/core";
 import {TranslatePipe} from "@ngx-translate/core";
 import {
@@ -42,7 +42,7 @@ import {TransformStringPipe} from "../../common/pipes/transform-string.pipe";
     NgIcon,
     DropdownComponent,
   ],
-  providers: [provideIcons({ionAddOutline, ionTrashOutline})],
+  providers: [provideIcons({remixAddLine, remixDeleteBin5Line})],
   styleUrls: ["be-water-smart.css"],
 })
 export class BeWaterSmartComponent implements OnInit {
