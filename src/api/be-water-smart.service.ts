@@ -15,13 +15,7 @@ import {
 /**
  * constant holding the api prefix to reach the bws api
  */
-const API_PREFIX = "/api/bws";
-
-/**
- * constant holding the dev prefix to reach
- * the bws api locally in python (localhost:5000)
- */
-const DEV_PREFIX = "localpy";
+const URL = "/api/bws";
 
 @Injectable({
   providedIn: "root",
@@ -45,16 +39,9 @@ export class BeWaterSmartService {
     requestBody?: any,
   ) {
     /**
-     * dev prefix to reach python local api
-     */
-    const _localUrl = this.router
-      .parseUrl(DEV_PREFIX + "/" + API_PREFIX + url)
-      .toString();
-
-    /**
      * normal URL for server
      */
-    const normalURL = this.router.parseUrl(API_PREFIX + url).toString();
+    const normalURL = this.router.parseUrl(URL + url).toString();
 
     let requestOptions: any = {
       responseType: "json",
