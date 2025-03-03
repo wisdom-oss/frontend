@@ -1,7 +1,8 @@
 import {inject} from "@angular/core";
 import {CanActivateFn} from "@angular/router";
 
-import {UserService} from "../user.service";
+import {Scopes} from "./scopes";
+import {AuthService} from "./auth.service";
 
 /**
  * A route guard that checks if a user has the required permissions to access a
@@ -26,11 +27,10 @@ import {UserService} from "../user.service";
  *   canActivate: [permissionsGuard("service:read")],
  * };
  */
-export function permissionsGuard(
-  ...scopes: UserService.Scope[]
-): CanActivateFn {
+export function permissionsGuard(...scopes: Scopes.Scope[]): CanActivateFn {
   return (_route, _state) => {
-    let userService = inject(UserService);
-    return userService.hasPermissions(...scopes);
+    return inject(AuthService)
+      .scopes()
+      .has(...scopes);
   };
 }

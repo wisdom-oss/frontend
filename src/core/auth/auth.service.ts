@@ -1,12 +1,14 @@
 import {HttpClient, HttpContext, HttpParams} from "@angular/common/http";
-import {computed, signal, Injectable} from "@angular/core";
+import {computed, effect, signal, Injectable} from "@angular/core";
 import {Router} from "@angular/router";
 import {JTDDataType} from "ajv/dist/core";
 import {jwtDecode} from "jwt-decode";
 import {firstValueFrom} from "rxjs";
 
+import {Scopes} from "./scopes";
 import {StorageService} from "../../common/storage.service";
 import {httpContexts} from "../../common/http-contexts";
+import {SchemaValidationService} from "../schema/schema-validation.service";
 
 const API_URL = "/api/auth";
 
@@ -29,14 +31,24 @@ export class AuthService {
   readonly decodedAccessToken = computed(() => {
     let accessToken = this.accessToken();
     if (!accessToken) return null;
-    return jwtDecode(accessToken);
+    let decoded =
+      jwtDecode<JTDDataType<typeof JWT_PAYLOAD_SCHEMA>>(accessToken);
+    return this.schema.validate(JWT_PAYLOAD_SCHEMA, decoded);
+  });
+
+  readonly scopes = computed(() => {
+    let scopes = this.decodedAccessToken()?.["scopes"] ?? [];
+    return new Scopes(scopes as Scopes.Scope[]);
   });
 
   constructor(
     private http: HttpClient,
     private router: Router,
     storage: StorageService,
+    private schema: SchemaValidationService,
   ) {
+    effect(() => console.log(this.decodedAccessToken()));
+
     this.storage = storage.instance(AuthService);
     this.loadTokens();
   }
@@ -178,6 +190,20 @@ const TOKEN_SET_SCHEMA = {
     expires_in: {type: "int32"},
     token_type: {type: "string"},
     refresh_token: {type: "string"},
+  },
+} as const;
+
+const JWT_PAYLOAD_SCHEMA = {
+  properties: {
+    exp: {type: "uint32"},
+    nbf: {type: "uint32"},
+    sub: {type: "string"},
+    aud: {elements: {type: "string"}},
+    iss: {type: "string"},
+    scopes: {elements: {type: "string"}},
+  },
+  optionalProperties: {
+    jti: {type: "string"},
   },
 } as const;
 

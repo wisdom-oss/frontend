@@ -10,7 +10,7 @@ import {provideTranslateService} from "@ngx-translate/core";
 import {provideCharts, withDefaultRegisterables} from "ng2-charts";
 
 import {routes} from "./routes";
-import {SchemaValidationInterceptor} from "./core/schema-validation.interceptor";
+import {SchemaValidationInterceptor} from "./core/schema/schema-validation.interceptor";
 import {apiInterceptor} from "./core/api.interceptor";
 import {authInterceptor} from "./core/auth/auth.interceptor";
 import {errorInterceptor} from "./core/error.interceptor";
