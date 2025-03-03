@@ -286,6 +286,34 @@ export class WaterDemandPredictionComponent implements OnInit {
   }
 
   /**
+   * train a model for prediction, as long as all parameters are unique
+   * @returns nothing, prints answer
+   */
+  trainModel(): void {
+    /** if request parameters are not unique, abandon request */
+    if (!this.checkParameters(true)) {
+      return;
+    }
+
+    this.waterDemandService
+      .trainModelOnSingleSmartmeter(
+        this.choiceSmartmeter(),
+        this.choiceTime(),
+        this.choiceResolution(),
+      )
+      .subscribe({
+        next: response => {
+          console.log(response);
+          alert(response);
+        },
+        error: error => {
+          console.log(error);
+        },
+        complete: () => {},
+      });
+  }
+
+  /**
    * function to fetch data by parameters provided
    * doesnt request data when data is already requested before
    * creates new ChartDatasets and activates the display function
@@ -353,8 +381,6 @@ export class WaterDemandPredictionComponent implements OnInit {
       return;
     }
 
-    alert("Start requesting prediction values. Please wait.");
-
     this.waterDemandService
       .fetchSinglePredictionSmartmeter(
         this.choiceSmartmeter(),
@@ -369,8 +395,6 @@ export class WaterDemandPredictionComponent implements OnInit {
           console.log(error);
         },
         complete: () => {
-          alert("Finished requesting prediction values. Please continue.");
-
           let newDataset = this.createNewDataset(
             this.currentPredictedSmartmeterData?.numValue!,
             this.currentPredictedSmartmeterData?.name!,

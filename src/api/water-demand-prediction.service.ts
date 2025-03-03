@@ -105,7 +105,19 @@ export class WaterDemandPredictionService {
     timeframe: string,
     resolution: string,
   ): Observable<any> {
-    return this.sendRequest("post", "/predSingleSmartmeter", {
+    return this.sendRequest("post", "/loadModelAndPredict", {
+      name: nameOfSmartmeter,
+      timeframe: timeframe,
+      resolution: resolution,
+    });
+  }
+
+  trainModelOnSingleSmartmeter(
+    nameOfSmartmeter: string,
+    timeframe: string,
+    resolution: string,
+  ): Observable<any> {
+    return this.sendRequest("post", "/trainModel", {
       name: nameOfSmartmeter,
       timeframe: timeframe,
       resolution: resolution,
