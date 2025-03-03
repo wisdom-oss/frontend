@@ -44,7 +44,11 @@ export class CallbackComponent implements OnInit {
     if (typeof state != "string") throw new Error("expected state as string");
 
     let redirect = await this.authService.callback(code, state);
-    if (redirect) this.router.navigateByUrl(redirect);
+    if (redirect) {
+      await this.router.navigateByUrl(redirect);
+      return;
+    }
+    
     this.router.navigateByUrl("/");
   }
 }
