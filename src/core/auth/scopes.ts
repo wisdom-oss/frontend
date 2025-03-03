@@ -46,6 +46,7 @@ export class Scopes {
 
     for (let scope of scopes) {
       let [service, level] = Scopes.split(scope);
+      if (!this.scopes[service]) return false;
       if (this.scopes[service]["*"]) continue;
       if (this.scopes[service][level]) continue;
       return false;

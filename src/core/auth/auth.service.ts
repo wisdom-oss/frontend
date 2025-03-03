@@ -1,5 +1,5 @@
 import {HttpClient, HttpContext, HttpParams} from "@angular/common/http";
-import {computed, effect, signal, Injectable} from "@angular/core";
+import {computed, signal, Injectable} from "@angular/core";
 import {Router} from "@angular/router";
 import {JTDDataType} from "ajv/dist/core";
 import {jwtDecode} from "jwt-decode";
@@ -47,8 +47,6 @@ export class AuthService {
     storage: StorageService,
     private schema: SchemaValidationService,
   ) {
-    effect(() => console.log(this.decodedAccessToken()));
-
     this.storage = storage.instance(AuthService);
     this.loadTokens();
   }
@@ -105,6 +103,8 @@ export class AuthService {
 
     this.accessToken.set(null);
     this.refreshToken.set(null);
+
+    this.router.navigateByUrl("/");
   }
 
   async refresh() {
