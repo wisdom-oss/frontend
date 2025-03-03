@@ -42,10 +42,47 @@ export class UserService {
       throw e;
     }
   }
+
+  /**
+   * Checks if the user has all given permission scopes.
+   * 
+   * If a scope says `"*"` for the level, it matches any level. 
+   * If the service is `"*"`, it matches any service. 
+   * A `"*:*"` scope lets the user do everything.
+   *
+   * @param scopes A list of strings like `"service:read"`, `"service:write"`, 
+   *               or `"*:*"`.
+   *
+   * @example
+   * if (userService.hasPermissions("orders:read", "users:write")) {
+   *   // user can read orders and write users
+   * }
+   */
+  hasPermissions(...scopes: UserService.Scope[]): boolean {
+    let userPermissions = this.userDetails()?.permissions ?? {};
+    
+    for (let scope of scopes) {
+      let split = scope.split(":");
+      let level = split.pop()!; // scope type enforces that a level must exist
+      let service = split.join(":");
+
+      let userLevels = userPermissions[service] ?? userPermissions["*"] ?? [];
+      if (userLevels.includes("*")) continue;
+      if (!userLevels.includes(level)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 }
 
 export namespace UserService {
   export type UserDetails = JTDDataType<typeof USER_DETAILS_SCHEMA>;
+
+  export type Service = string;
+  export type Level = "read" | "write" | "delete" | "*";
+  export type Scope = `${Service}:${Level}`;
 }
 
 const USER_DETAILS_SCHEMA = {

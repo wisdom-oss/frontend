@@ -27,30 +27,10 @@ import {UserService} from "../user.service";
  * };
  */
 export function permissionsGuard(
-  ...scopes: permissionsGuard.Scope[]
+  ...scopes: UserService.Scope[]
 ): CanActivateFn {
   return (_route, _state) => {
     let userService = inject(UserService);
-    let userPermissions = userService.userDetails()?.permissions ?? {};
-
-    for (let scope of scopes) {
-      let split = scope.split(":");
-      let level = split.pop()!; // scope type enforces that a level must exist
-      let service = split.join(":");
-
-      let userLevels = userPermissions[service] ?? userPermissions["*"] ?? [];
-      if (userLevels.includes("*")) continue;
-      if (!userLevels.includes(level)) {
-        return false;
-      }
-    }
-
-    return true;
+    return userService.hasPermissions(...scopes);
   };
-}
-
-export namespace permissionsGuard {
-  export type Service = string;
-  export type Level = "read" | "write" | "delete" | "*";
-  export type Scope = `${Service}:${Level}`;
 }
