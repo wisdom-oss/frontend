@@ -45,10 +45,10 @@ export class CallbackComponent implements OnInit {
 
     let redirect = await this.authService.callback(code, state);
     if (redirect) {
-      await this.router.navigateByUrl(redirect);
+      this.router.navigateByUrl(redirect);
       return;
     }
-    
+
     this.router.navigateByUrl("/");
   }
 }
