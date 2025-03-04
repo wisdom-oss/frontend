@@ -117,15 +117,14 @@ async function buildSpritesheets() {
     await spreet(
       "src/assets/generated/remixicon",
       "public/generated/remixicon",
-      {sdf: true}
+      {sdf: true},
     );
     await spreet(
       "src/assets/generated/remixicon",
       "public/generated/remixicon@2x",
-      {sdf: true, retina: true}
+      {sdf: true, retina: true},
     );
-  }
-  catch (e) {
+  } catch (e) {
     // TODO: let it throw when underlying errors becomes real error
     console.error(e);
     throw e;
