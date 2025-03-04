@@ -23,3 +23,12 @@ nav {
     );
   }
 }
+
+.menu-list .unauthorized {
+  a,
+  a:hover {
+    cursor: not-allowed;
+    color: color-mix(in srgb, black 60%, var(--bulma-text));
+    --bulma-menu-item-background-l-delta: -5%;
+  }
+}
