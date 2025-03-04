@@ -117,4 +117,39 @@ export namespace signals {
     });
     return delayed;
   }
+
+  /**
+   * Creates a signal from a promise.
+   *
+   * This function takes a promise and returns a signal that updates with the
+   * resolved value of the promise.
+   * Initially, the signal holds `undefined`.
+   * When the promise resolves, the signal updates with the mapped value.
+   *
+   * This can very useful when working with API services which often return 
+   * promises.
+   * 
+   * @param map A mapping function to transform the resolved value before
+   *            storing it in the signal.
+   *            Defaults to an identity function.
+   *
+   * @example
+   * const mySignal = signals.fromPromise(fetchData());
+   *
+   * effect(() => {
+   *   console.log(mySignal()); // Initially undefined, then updates with resolved value.
+   * });
+   *
+   * @example
+   * // Using a mapping function
+   * const userSignal = signals.fromPromise(fetchUser(), user => user.name);
+   */
+  export function fromPromise<T, U = T>(
+    promise: Promise<T>,
+    map: (value: T) => U = value => value as unknown as U,
+  ): Signal<undefined | U> {
+    let mapped = signal<undefined | U>(undefined);
+    promise.then(value => mapped.set(map(value)));
+    return mapped;
+  }
 }
