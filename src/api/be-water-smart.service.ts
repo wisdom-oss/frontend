@@ -1,7 +1,7 @@
 import {HttpClient} from "@angular/common/http";
 import {Injectable} from "@angular/core";
 import {Router} from "@angular/router";
-import {Observable} from "rxjs";
+import {Observable, firstValueFrom} from "rxjs";
 
 import {
   AllAlgorithms,
@@ -101,10 +101,10 @@ export class BeWaterSmartService {
    * @param alg name of the algorithm being used
    * @returns observable containing all measuring points for the next day
    */
-  getCreateForecast(meterId: string, alg: string): Observable<ForeCast[]> {
+  getCreateForecast(meterId: string, alg: string): Promise<ForeCast[]> {
     let url = "/meters/" + meterId + "/forecast" + "?algorithm=" + alg;
 
-    return this.sendRequest<ForeCast[]>("get", url);
+    return firstValueFrom(this.sendRequest<ForeCast[]>("get", url));
   }
 
   /**
