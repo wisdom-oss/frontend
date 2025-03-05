@@ -1,12 +1,12 @@
-import {effect, Component, Signal} from "@angular/core";
+import {NgIf} from "@angular/common";
+import {effect, signal, Component, Signal} from "@angular/core";
 import {
   ControlComponent,
+  ImageComponent,
+  LayerComponent,
   MapComponent,
   GeoJSONSourceComponent,
-  LayerComponent,
   NavigationControlDirective,
-  ImageSourceComponent,
-  ImageComponent,
 } from "@maplibre/ngx-maplibre-gl";
 import dayjs from "dayjs";
 import {FeatureCollection, Feature, Geometry} from "geojson";
@@ -23,11 +23,12 @@ import {Scopes} from "../../../core/auth/scopes";
   imports: [
     ControlComponent,
     GeoJSONSourceComponent,
+    ImageComponent,
     LayerComponent,
     LayerSelectionControlComponent,
     MapComponent,
     NavigationControlDirective,
-    ImageComponent,
+    NgIf,
   ],
   templateUrl: "./action-map.component.html",
   styles: ``,
@@ -38,15 +39,17 @@ export class OowvActionMapComponent {
   protected style = colorful as any as StyleSpecification;
 
   protected selectedLayers = {
-    infiltration_areas: signals.toggleable(false),
-    trench_register: signals.toggleable(false),
-    heavy_rain_simulation: signals.toggleable(false),
-    emergency_flow_ways: signals.toggleable(false),
-    heavy_rain_flooded_streets: signals.toggleable(false),
+    infiltration_areas: signals.toggleable(true),
+    trench_register: signals.toggleable(true),
+    heavy_rain_simulation: signals.toggleable(true),
+    emergency_flow_ways: signals.toggleable(true),
+    heavy_rain_flooded_streets: signals.toggleable(true),
     greenable_roofs: signals.toggleable(true),
-    heavy_rain_traffic_control: signals.toggleable(false),
-    heavy_rain_flooded_bus_stops: signals.toggleable(false),
+    heavy_rain_traffic_control: signals.toggleable(true),
+    heavy_rain_flooded_bus_stops: signals.toggleable(true),
   } as const;
+  protected initialLoad = signal(false);
+  protected selectedLayersUpdate = signal(false);
 
   protected geoData: Record<
     keyof OowvActionMapComponent["selectedLayers"],
@@ -63,6 +66,21 @@ export class OowvActionMapComponent {
         ),
       ]),
     ) as OowvActionMapComponent["geoData"];
+
+    effect(() => {
+      for (let data of Object.values(this.geoData)) {
+        if (!data()) return;
+      }
+
+      this.initialLoad.set(true);
+    });
+
+    effect(() => {
+      if (!this.initialLoad()) return;
+      for (let selected of Object.values(this.selectedLayers)) selected();
+      this.selectedLayersUpdate.set(false);
+      setTimeout(() => this.selectedLayersUpdate.set(true));
+    });
   }
 
   private intoFeatureCollection<G extends Geometry>(

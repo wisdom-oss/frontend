@@ -18,6 +18,7 @@ import {
   remixMap2Fill,
   remixStackFill,
 } from "@ng-icons/remixicon";
+import {TranslateDirective} from "@ngx-translate/core";
 import {filter} from "rxjs";
 
 import {SidebarLinkDirective} from "./sidebar-link.directive";
@@ -26,7 +27,12 @@ import {AuthService} from "../auth/auth.service";
 
 @Component({
   selector: "sidebar",
-  imports: [NgIconComponent, RouterLink, SidebarLinkDirective],
+  imports: [
+    NgIconComponent,
+    RouterLink,
+    SidebarLinkDirective,
+    TranslateDirective,
+  ],
   templateUrl: "./sidebar.component.html",
   styleUrl: "./sidebar.component.scss",
   providers: [
