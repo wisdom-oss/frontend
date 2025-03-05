@@ -18,17 +18,17 @@
     </ul>
     <p class="menu-label icon-text">
       <span class="icon">
-        <ng-icon name="remixSafe2Line"></ng-icon>
+        <ng-icon name="oowv"></ng-icon>
       </span>
-      <span>Highly Secure</span>
+      <span>OOWV</span>
     </p>
     <ul class="menu-list">
-      <li [class.unauthorized]="!authorized.needsAuth()">
-        <a class="icon-text" routerLink="/needs-auth">
+      <li [class.unauthorized]="!authorized.oowvActionMap()">
+        <a class="icon-text" routerLink="/oowv/action-map">
           <span class="icon">
-            <ng-icon name="remixFileShield2Fill"></ng-icon>
+            <ng-icon name="remixStackFill"></ng-icon>
           </span>
-          <span>Needs Auth!</span>
+          <span>Action Map</span>
         </a>
       </li>
     </ul>
