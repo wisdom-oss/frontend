@@ -12,11 +12,12 @@ import {
   provideIcons,
   provideNgIconLoader,
   NgIconComponent,
+  NgIconStack,
 } from "@ng-icons/core";
 import {
   remixDatabase2Fill,
   remixMap2Fill,
-  remixStackFill,
+  remixMapLine,
 } from "@ng-icons/remixicon";
 import {TranslateDirective} from "@ngx-translate/core";
 import {filter} from "rxjs";
@@ -29,6 +30,7 @@ import {AuthService} from "../auth/auth.service";
   selector: "sidebar",
   imports: [
     NgIconComponent,
+    NgIconStack,
     RouterLink,
     SidebarLinkDirective,
     TranslateDirective,
@@ -39,7 +41,7 @@ import {AuthService} from "../auth/auth.service";
     provideIcons({
       remixMap2Fill,
       remixDatabase2Fill,
-      remixStackFill,
+      remixMapLine,
     }),
     provideNgIconLoader(name => {
       if (name != "oowv") return "";

@@ -26,7 +26,18 @@
       <li [class.unauthorized]="!authorized.oowvActionMap()">
         <a class="icon-text" routerLink="/oowv/action-map">
           <span class="icon">
-            <ng-icon name="remixStackFill"></ng-icon>
+            <ng-icon-stack size="1em">
+              <ng-icon name="remixMapLine"></ng-icon>
+              <span
+                style="
+                  font-size: 0.6em;
+                  font-weight: 700;
+                  position: absolute;
+                  top: -0.3em;
+                "
+                >!</span
+              >
+            </ng-icon-stack>
           </span>
           <span translate>oowv-action-map.display.module</span>
         </a>
