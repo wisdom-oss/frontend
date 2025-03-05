@@ -1,35 +1,54 @@
+import {HttpClient} from "@angular/common/http";
 import {
   computed,
+  inject,
   ViewChildren,
   Component,
   AfterViewInit,
   QueryList,
 } from "@angular/core";
 import {NavigationEnd, RouterLink, Router} from "@angular/router";
-import {provideIcons, NgIconComponent} from "@ng-icons/core";
+import {
+  provideIcons,
+  provideNgIconLoader,
+  NgIconComponent,
+  NgIconStack,
+} from "@ng-icons/core";
 import {
   remixDatabase2Fill,
-  remixFileShield2Fill,
   remixMap2Fill,
-  remixSafe2Line,
+  remixMapLine,
 } from "@ng-icons/remixicon";
+import {TranslateDirective} from "@ngx-translate/core";
 import {filter} from "rxjs";
 
 import {SidebarLinkDirective} from "./sidebar-link.directive";
-import {NeedsAuthComponent} from "../../modules/needs-auth/needs-auth.component";
+import {OowvActionMapComponent} from "../../modules/oowv/action-map/action-map.component";
 import {AuthService} from "../auth/auth.service";
 
 @Component({
   selector: "sidebar",
-  imports: [NgIconComponent, RouterLink, SidebarLinkDirective],
+  imports: [
+    NgIconComponent,
+    NgIconStack,
+    RouterLink,
+    SidebarLinkDirective,
+    TranslateDirective,
+  ],
   templateUrl: "./sidebar.component.html",
   styleUrl: "./sidebar.component.scss",
   providers: [
     provideIcons({
       remixMap2Fill,
       remixDatabase2Fill,
-      remixSafe2Line,
-      remixFileShield2Fill,
+      remixMapLine,
+    }),
+    provideNgIconLoader(name => {
+      if (name != "oowv") return "";
+      const http = inject(HttpClient);
+      return http.get("https://www.oowv.de/favicons/favicon.svg", {
+        responseType: "text",
+      });
     }),
   ],
 })
@@ -38,8 +57,8 @@ export class SidebarComponent implements AfterViewInit {
   routerLinks?: QueryList<SidebarLinkDirective>;
 
   protected authorized = {
-    needsAuth: computed(() =>
-      this.auth.scopes().has(...NeedsAuthComponent.SCOPES),
+    oowvActionMap: computed(() =>
+      this.auth.scopes().has(...OowvActionMapComponent.SCOPES),
     ),
   };
 
