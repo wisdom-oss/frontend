@@ -1,6 +1,6 @@
 import {DatePipe} from "@angular/common";
-import {NgFor, CommonModule} from "@angular/common";
-import {Component, OnInit, viewChild} from "@angular/core";
+import {CommonModule} from "@angular/common";
+import {Component, OnInit, viewChild, signal, WritableSignal, Signal} from "@angular/core";
 import {FormsModule} from "@angular/forms";
 import {provideIcons, NgIcon} from "@ng-icons/core";
 import {remixAddLine, remixDeleteBin5Line} from "@ng-icons/remixicon";
@@ -32,7 +32,6 @@ import {TransformStringPipe} from "../../common/pipes/transform-string.pipe";
   selector: "be-water-smart",
   templateUrl: "be-water-smart.component.html",
   imports: [
-    NgFor,
     CommonModule,
     FormsModule,
     TranslatePipe,
@@ -63,34 +62,34 @@ export class BeWaterSmartComponent implements OnInit {
 
   // ---------- Dropdowns ----------
 
-  menuAlgorithm: string = "be-water-smart.hints.algorithm";
-  optionsAlgorithm: Record<string, string> = {};
-  choiceAlgorithm?: string;
+  menuAlgorithm: Signal<string> = signal("be-water-smart.hints.algorithm");
+  optionsAlgorithm: WritableSignal<Record<string, string>> = signal({});
+  choiceAlgorithm: WritableSignal<string | undefined> = signal(undefined);
 
-  menuVirtualMeter: string = "be-water-smart.hints.virtual_meter";
-  optionsVirtualMeter: Record<string, string> = {};
-  choiceVirtualMeter?: string;
+  menuVirtualMeter: Signal<string> = signal("be-water-smart.hints.virtual_meter");
+  optionsVirtualMeter: WritableSignal<Record<string, string>> = signal({});
+  choiceVirtualMeter: WritableSignal<string | undefined> = signal(undefined);
 
   // ---------- Physical Meter Parameters ----------
 
-  pMeters: PhysicalMeter[] = []; // list of physical meters | jsonobjects
-  selectedPhysicalMeters: PhysicalMeter[] = []; // list of selected physical meters for virtual meter creation
+  pMeters: WritableSignal<PhysicalMeter[]> = signal([]); // list of physical meters | jsonobjects
+  selectedPhysicalMeters: WritableSignal<PhysicalMeter[]> = signal([]); // list of selected physical meters for virtual meter creation
 
   // ---------- Virtual Meter Parameters ----------
 
-  vMeters: VirtualMeter[] = []; // list of virtual meters | jsonobjects
-  selectedVirtualMeters: VirtualMeter[] = []; // a list of selectedVirtualMeters to create a Super Meter
-  selectedVirtualMeter: VirtualMeter | undefined; // selected virtual meter to train a model
-  newVMeterName: string = ""; // name of potential new virtual meter
-  newSuperMeterName: string = ""; // name of potential new virtual meter created from other virtual meters
+  vMeters: WritableSignal<VirtualMeter[]> = signal([]); // list of virtual meters | jsonobjects
+  selectedVirtualMeters: WritableSignal<VirtualMeter[]> = signal([]); // a list of selectedVirtualMeters to create a Super Meter
+  selectedVirtualMeter: WritableSignal<VirtualMeter | undefined> = signal(undefined); // selected virtual meter to train a model
+  newVMeterName: WritableSignal<string> = signal(""); // name of potential new virtual meter
+  newSuperMeterName: WritableSignal<string> = signal(""); // name of potential new virtual meter created from other virtual meters
 
   // ---------- Algorithm Parameters ----------
   
-  algorithms: Algorithm[] = []; // list of all Algorithm
-  selectedAlgorithm: Algorithm | undefined; // algorithm to train with a virtual meter
-  models: MLModel[] = []; // all trained models
-  selectedModel: MLModel | undefined; // selected model for consumption forecast
-  modelComment: string | undefined; // comment to reidentify a model
+  algorithms: WritableSignal<Algorithm[]> = signal([]); // list of all Algorithm
+  selectedAlgorithm: WritableSignal<Algorithm | undefined> = signal(undefined); // algorithm to train with a virtual meter
+  models: WritableSignal<MLModel[]> = signal([]); // all trained models
+  selectedModel: WritableSignal<MLModel | undefined> = signal(undefined); // selected model for consumption forecast
+  modelComment: WritableSignal<string | undefined> = signal(undefined); // comment to reidentify a model
 
   // ------------------------------ Chart Parameters --------------------------------------------
 
@@ -200,7 +199,7 @@ export class BeWaterSmartComponent implements OnInit {
     extractionMethod().subscribe({
       next: response => {
         // Dynamically assign the response field to the destination field
-        this[destinationField] = response[responseField];
+        (this[destinationField] as any).set(response[responseField]); // Use 'as any' to call set()
       },
       error: error => {
         console.log(error);
@@ -221,8 +220,8 @@ export class BeWaterSmartComponent implements OnInit {
         response.algorithms.forEach(algorithm => {
           algorithms[algorithm.name] = algorithm.name;
         });
-        this["optionsAlgorithm"] = algorithms;
-        this["algorithms"] = response.algorithms;
+        this.optionsAlgorithm.set(algorithms);
+        this.algorithms.set(response.algorithms);
       },
       error: error => {
         console.log(error);
@@ -244,8 +243,8 @@ export class BeWaterSmartComponent implements OnInit {
           const ids = virtualMeter.id.split(":");
           virtualMeters[virtualMeter.id] = ids[ids.length - 1];
         });
-        this["optionsVirtualMeter"] = virtualMeters;
-        this["vMeters"] = response.virtualMeters;
+        this.optionsVirtualMeter.set(virtualMeters);
+        this.vMeters.set(response.virtualMeters);
       },
       error: error => {
         console.log(error);
@@ -275,7 +274,7 @@ export class BeWaterSmartComponent implements OnInit {
    * returns an VirtualMeter based on the given id
    */
   getVirtualMeter(virtualMeterId: string): VirtualMeter | undefined {
-    const vMeter = this.vMeters.filter(vMeter => vMeter.id === virtualMeterId);
+    const vMeter = this.vMeters().filter(vMeter => vMeter.id === virtualMeterId);
 
     if (!vMeter.length) return undefined;
     
@@ -293,7 +292,7 @@ export class BeWaterSmartComponent implements OnInit {
    * returns an algorithm based on the given name
    */
   getAlgorithm(algorithmName: string): Algorithm | undefined {
-    const algorithm = this.algorithms.filter(algorithm => algorithm.name === algorithmName);
+    const algorithm = this.algorithms().filter(algorithm => algorithm.name === algorithmName);
 
     if (!algorithm.length) return undefined;
 
@@ -329,10 +328,10 @@ export class BeWaterSmartComponent implements OnInit {
    * @param item variable holding the checkbox information
    */
   toggleSelectedModel(item: any) {
-    if (this.selectedModel === item) {
-      this.selectedModel = undefined; // Untick the selected item
+    if (this.selectedModel() === item) {
+      this.selectedModel.set(undefined); // Untick the selected item
     } else {
-      this.selectedModel = item; // Tick the selected item
+      this.selectedModel.set(item); // Tick the selected item
     }
   }
 
@@ -358,10 +357,10 @@ export class BeWaterSmartComponent implements OnInit {
         next: response => {
           if (response.hasOwnProperty("virtualMeterId")) {
             this.extractVMeters();
-            this.selectedPhysicalMeters = [];
-            this.selectedVirtualMeters = [];
-            this.newVMeterName = "";
-            this.newSuperMeterName = "";
+            this.selectedPhysicalMeters.set([]);
+            this.selectedVirtualMeters.set([]);
+            this.newVMeterName.set("");
+            this.newSuperMeterName.set("");
           }
         },
         error: error => {
@@ -390,14 +389,14 @@ export class BeWaterSmartComponent implements OnInit {
    * @param index index of meter in arr, to hotreload page
    */
   deleteVMeterById(id: string, index: number): void {
-    let tmp = this.vMeters.splice(index, 1);
+    let tmp = this.vMeters().splice(index, 1);
 
     console.log(tmp);
 
     this.bwsService.delVirtualMeterById(id).subscribe({
       next: response => {
         if (response && response.hasOwnProperty("msg")) {
-          this.vMeters.push(tmp[0]);
+          this.vMeters().push(tmp[0]);
           alert(
             "Virtual Meter with Name " +
               id +
@@ -417,42 +416,47 @@ export class BeWaterSmartComponent implements OnInit {
    * train one of the Models and retrieve the training data
    */
   trainModel(): void {
-    if (this.choiceVirtualMeter) {
-      this.selectedVirtualMeter = this.getVirtualMeter(this.choiceVirtualMeter);
+    const choiceVirtualMeter = this.choiceVirtualMeter();
+    if (choiceVirtualMeter) {
+      this.selectedVirtualMeter.set(this.getVirtualMeter(choiceVirtualMeter));
     }
-
-    if (!this.selectedVirtualMeter) {
+    
+    const selectedVirtualMeter = this.selectedVirtualMeter();
+    if (!selectedVirtualMeter) {
       console.log("No Virtual Meter detected!");
       return;
     }
 
-    if (this.choiceAlgorithm) {
-      this.selectedAlgorithm = this.getAlgorithm(this.choiceAlgorithm);
+    const choiceAlgorithm = this.choiceAlgorithm();
+    if (choiceAlgorithm) {
+      this.selectedAlgorithm.set(this.getAlgorithm(choiceAlgorithm));
     }
 
-    if (!this.selectedAlgorithm) {
+    const selectedAlgorithm = this.selectedAlgorithm();
+    if (!selectedAlgorithm) {
       console.log("No algorithm detected!");
       return;
     }
 
-    if (!this.modelComment) {
+    const modelComment = this.modelComment();
+    if (!modelComment) {
       alert("a comment is necessary!");
       return;
     }
 
     this.bwsService
       .putTrainModel(
-        this.selectedVirtualMeter,
-        this.selectedAlgorithm,
-        this.modelComment,
+        selectedVirtualMeter,
+        selectedAlgorithm,
+        modelComment,
       )
       .subscribe({
         next: () => {
           this.extractModels();
-          this.choiceAlgorithm = undefined;
-          this.selectedAlgorithm = undefined;
-          this.selectedVirtualMeter = undefined;
-          this.modelComment = undefined;
+          this.choiceAlgorithm.set(undefined);
+          this.selectedAlgorithm.set(undefined);
+          this.selectedVirtualMeter.set(undefined);
+          this.modelComment.set(undefined);
         },
         error: error => {
           console.log(error);
@@ -467,12 +471,12 @@ export class BeWaterSmartComponent implements OnInit {
    * @param index place in list to correctly remove model afterwards
    */
   deleteModel(vMeterId: string, algId: string, index: number): void {
-    let tmp = this.models.splice(index, 1);
+    let tmp = this.models().splice(index, 1);
 
     this.bwsService.delModel(vMeterId, algId).subscribe({
       next: response => {
         if (response && response.hasOwnProperty("message")) {
-          this.models.push(tmp[0]);
+          this.models().push(tmp[0]);
           alert("Model not found");
         }
       },
@@ -489,13 +493,14 @@ export class BeWaterSmartComponent implements OnInit {
    * @returns if a value for the api request is missing
    */
   getForecast(): void {
-    if (!this.selectedModel) {
+    const selectedModel = this.selectedModel();
+    if (!selectedModel) {
       alert("No model chosen");
       return;
     }
 
-    let vMeterId = this.selectedModel.refMeter;
-    let algId = this.selectedModel.algorithm;
+    const vMeterId = selectedModel.refMeter;
+    const algId = selectedModel.algorithm;
 
     this.bwsService.getCreateForecast(vMeterId, algId).then((response) => {
         if (response.hasOwnProperty("msg")) {
