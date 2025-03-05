@@ -48,23 +48,6 @@
               {
                 "path": "scripts/esbuild/prebuild.cjs",
                 "options": {}
-              },
-              {
-                "path": "node_modules/@cptpiepmatz/esbuild-plugin-spreet/plugin.js",
-                "options": {
-                  "input": "src/assets/generated/remixicon",
-                  "output": "public/generated/remixicon",
-                  "sdf": true
-                }
-              },
-              {
-                "path": "node_modules/@cptpiepmatz/esbuild-plugin-spreet/plugin.js",
-                "options": {
-                  "input": "src/assets/generated/remixicon",
-                  "output": "public/generated/remixicon@2x",
-                  "sdf": true,
-                  "retina": true
-                }
               }
             ],
             "outputPath": "dist/wisdom-oss/frontend",
