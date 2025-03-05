@@ -19,6 +19,8 @@ import {signals} from "../../../signals";
   providers: [provideIcons({remixStackFill})],
 })
 export class LayerSelectionControlComponent {
+  readonly translatePrefix = input("");
+
   readonly layers =
     input.required<
       Record<string, signals.ToggleableSignal<WritableSignal<boolean>>>

@@ -61,6 +61,7 @@
     "@angular/cli": "^19.1.6",
     "@angular/compiler-cli": "^19.1.5",
     "@compodoc/compodoc": "^1.1.26",
+    "@types/geojson": "^7946.0.16",
     "@types/jest": "^29.5.14",
     "esbuild-plugin-toml": "^0.0.1",
     "fake-indexeddb": "^6.0.0",

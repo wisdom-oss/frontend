@@ -3,16 +3,127 @@
     <mgl-map
       class="is-fullheight"
       [style]="style"
-      [zoom]="[6.8]"
-      [center]="{lat: 52.8, lon: 9.2}"
+      [zoom]="[12.5]"
+      [center]="{lat: 53.14, lon: 8.21}"
       [canvasContextAttributes]="{preserveDrawingBuffer: true}"
-      [attributionControl]="false"
     >
-    <mgl-control position="top-right">
-      <map-layer-selection-control
-        [layers]="{}"
-      ></map-layer-selection-control>
-    </mgl-control>
+      <mgl-image
+        id="pattern"
+        url="/public/map/crosshatch.svg"
+      ></mgl-image>
+      <ng-container controls>
+        <mgl-control position="top-right">
+          <map-layer-selection-control
+            translatePrefix="oowv-action-map.layer."
+            [layers]="selectedLayers"
+          ></map-layer-selection-control>
+        </mgl-control>
+        <mgl-control
+          mglNavigation
+          [showCompass]="false"
+          position="top-left"
+        ></mgl-control>
+      </ng-container>
+      <ng-container sources>
+        <mgl-geojson-source
+          id="infiltration-areas-source"
+          [data]="geoData.infiltration_areas()"
+        ></mgl-geojson-source>
+        <mgl-geojson-source
+          id="trench-register-source"
+          [data]="geoData.trench_register()"
+        ></mgl-geojson-source>
+        <mgl-geojson-source
+          id="heavy-rain-simulation-source"
+          [data]="geoData.heavy_rain_simulation()"
+        ></mgl-geojson-source>
+        <mgl-geojson-source
+          id="emergency-flow-ways-source"
+          [data]="geoData.emergency_flow_ways()"
+        ></mgl-geojson-source>
+        <mgl-geojson-source
+          id="heavy-rain-flooded-streets-source"
+          [data]="geoData.heavy_rain_flooded_streets()"
+        ></mgl-geojson-source>
+        <mgl-geojson-source
+          id="greenable-roofs-source"
+          [data]="geoData.greenable_roofs()"
+        ></mgl-geojson-source>
+        <mgl-geojson-source
+          id="heavy-rain-traffic-control-source"
+          [data]="geoData.heavy_rain_traffic_control()"
+        ></mgl-geojson-source>
+        <mgl-geojson-source
+          id="heavy-rain-flooded-bus-stops-source"
+          [data]="geoData.heavy_rain_flooded_bus_stops()"
+        ></mgl-geojson-source>
+      </ng-container>
+      <ng-container layers>
+        <mgl-layer
+          id="infiltration-areas-layer-fill"
+          type="fill"
+          source="infiltration-areas-source"
+          [paint]="{
+            'fill-pattern': 'pattern',
+            'fill-opacity': 0.5,
+          }"
+        ></mgl-layer>
+        <!-- <mgl-layer
+          id="heavy-rain-simulation-layer-fill"
+          type="fill"
+          source="heavy-rain-simulation-source"
+          [paint]="{
+            'fill-color': '#ff691a',
+            'fill-opacity': 0.5,
+          }"
+        ></mgl-layer>
+        <mgl-layer
+          id="emergency-flow-ways-layer-fill"
+          type="fill"
+          source="emergency-flow-ways-source"
+          [paint]="{
+            'fill-color': '#e1b336',
+            'fill-opacity': 0.5,
+          }"
+        ></mgl-layer>
+        <mgl-layer
+          id="heavy-rain-flooded-streets-layer-fill"
+          type="fill"
+          source="heavy-rain-flooded-streets-source"
+          [paint]="{
+            'fill-color': '#222222',
+            'fill-opacity': 0.5,
+          }"
+        ></mgl-layer>
+        <mgl-layer
+          id="greenable-roofs-layer-fill"
+          type="fill"
+          source="greenable-roofs-source"
+          [paint]="{
+            'fill-color': 'green',
+            'fill-opacity': 0.5,
+          }"
+        ></mgl-layer>
+        <mgl-layer
+          id="heavy-rain-traffic-control-layer-fill"
+          type="fill"
+          source="heavy-rain-traffic-control-source"
+          [paint]="{
+            'fill-color': '#da1320',
+            'fill-opacity': 0.5,
+          }"
+        ></mgl-layer>
+        <mgl-layer
+          id="heavy-rain-flooded-bus-stops-layer-symbol"
+          type="symbol"
+          source="heavy-rain-flooded-bus-stops-source"
+          [layout]="{
+            'icon-image': 'remixicon:bus-fill',
+            'icon-ignore-placement': true,
+            'icon-size': 1.2,
+          }"
+        ></mgl-layer> -->
+      </ng-container>
     </mgl-map>
   </div>
 </div>

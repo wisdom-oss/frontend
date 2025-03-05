@@ -25,13 +25,13 @@ import {StyleSpecification} from "maplibre-gl";
 import * as turf from "@turf/turf";
 
 import {DisplayInfoControlComponent} from "./map/display-info-control/display-info-control.component";
-import {LayerSelectionControlComponent} from "../../common/components/map/layer-selection-control/layer-selection-control.component";
 import {LegendControlComponent} from "./map/legend-control/legend-control.component";
 import {GrowlService} from "./growl.service";
 import {WithdrawalInfoControlComponent} from "./map/withdrawal-info-control/withdrawal-info-control.component";
 import {WaterRightsServiceService} from "../../api/water-rights-service.service";
 import nlwknMeasurementClassificationColors from "../../assets/nlwkn-measurement-classification-colors.toml";
 import colorful from "../../assets/map/styles/colorful.json";
+import {LayerSelectionControlComponent} from "../../common/components/map/layer-selection-control/layer-selection-control.component";
 import {ResizeMapOnLoadDirective} from "../../common/directives/resize-map-on-load.directive";
 import {signals} from "../../common/signals";
 
