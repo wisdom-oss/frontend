@@ -9,10 +9,10 @@ import {provideIcons, NgIcon} from "@ng-icons/core";
 import {remixStackFill} from "@ng-icons/remixicon";
 import {TranslatePipe} from "@ngx-translate/core";
 
-import {signals} from "../../../../common/signals";
+import {signals} from "../../../signals";
 
 @Component({
-  selector: "growl-layer-selection-control",
+  selector: "map-layer-selection-control",
   imports: [NgIcon, TranslatePipe],
   templateUrl: "./layer-selection-control.component.html",
   styles: ``,
