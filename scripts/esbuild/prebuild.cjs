@@ -23,7 +23,7 @@ function prebuildPlugin(_options = {}) {
     async setup(_build) {
       await Promise.all([
         buildNlwknMeasurementClassificationColorSvgs(),
-        extractRemixicons(),
+        extractRemixicons().then(buildSpritesheets),
       ]);
     },
   };
@@ -96,6 +96,38 @@ async function extractRemixicons() {
     let name = toKebabCase(key.slice("remix".length));
     let path = `src/assets/generated/remixicon/${name}.svg`;
     await writeFile(path, svg);
+  }
+}
+
+/**
+ * Generates sprite sheets from extracted Remix Icons.
+ *
+ * This function utilizes `@cptpiepmatz/spreet` to create distance field (SDF) spritesheets.
+ * The generated spritesheets are saved in the `public/generated/remixicon/` directory.
+ *
+ * Two versions are created:
+ * - `public/generated/remixicon/`: Standard spritesheet.
+ * - `public/generated/remixicon@2x/`: Retina version with higher resolution.
+ *
+ * @throws {Error} If the sprite sheet generation fails.
+ */
+async function buildSpritesheets() {
+  try {
+    const {spreet} = await import("@cptpiepmatz/spreet");
+    await spreet(
+      "src/assets/generated/remixicon",
+      "public/generated/remixicon",
+      {sdf: true},
+    );
+    await spreet(
+      "src/assets/generated/remixicon",
+      "public/generated/remixicon@2x",
+      {sdf: true, retina: true},
+    );
+  } catch (e) {
+    // TODO: let it throw when underlying errors becomes real error
+    console.error(e);
+    throw e;
   }
 }
 
