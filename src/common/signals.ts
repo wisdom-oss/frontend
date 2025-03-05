@@ -126,9 +126,9 @@ export namespace signals {
    * Initially, the signal holds `undefined`.
    * When the promise resolves, the signal updates with the mapped value.
    *
-   * This can very useful when working with API services which often return 
+   * This can very useful when working with API services which often return
    * promises.
-   * 
+   *
    * @param map A mapping function to transform the resolved value before
    *            storing it in the signal.
    *            Defaults to an identity function.
