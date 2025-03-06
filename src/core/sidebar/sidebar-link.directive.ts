@@ -6,5 +6,5 @@ import {input, signal, Directive} from "@angular/core";
 })
 export class SidebarLinkDirective {
   readonly routerLink = input.required<string>();
-  readonly isActive = signal(true);
+  readonly isActive = signal(false);
 }

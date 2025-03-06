@@ -1,0 +1,30 @@
+<div
+  class="maplibregl-ctrl-group p-1"
+  (mouseenter)="collapsed.set(false)"
+  (mouseleave)="collapsed.set(true)"
+>
+  @if (collapsed()) {
+    <span class="icon is-medium">
+      <ng-icon size="2em" name="remixStackFill"></ng-icon>
+    </span>
+  } @else {
+    <table>
+      @for (layer of layerIter(); track layer[0]) {
+        <tr>
+          <th class="has-text-dark">
+            <input
+              [id]="layer[0]"
+              type="checkbox"
+              class="switch is-thin"
+              (click)="layer[1].toggle()"
+              [checked]="layer[1]()"
+            />
+            <label [for]="layer[0]" class="is-size-7" style="height: 1.5em">{{
+              translatePrefix() + layer[0] | translate
+            }}</label>
+          </th>
+        </tr>
+      }
+    </table>
+  }
+</div>

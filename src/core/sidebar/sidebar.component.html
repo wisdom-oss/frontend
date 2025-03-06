@@ -2,17 +2,44 @@
   <div class="menu">
     <p class="menu-label icon-text">
       <span class="icon">
-        <ng-icon name="remixBookShelfLine"></ng-icon>
+        <ng-icon name="remixMap2Fill"></ng-icon>
       </span>
-      <span>Category</span>
+      <span>Groundwater</span>
     </p>
     <ul class="menu-list">
       <li>
-        <a class="icon-text" routerLink="/">
+        <a class="icon-text" routerLink="/growl">
           <span class="icon">
-            <ng-icon name="remixBookLine"></ng-icon>
+            <ng-icon name="remixDatabase2Fill"></ng-icon>
           </span>
-          <span>Item</span>
+          <span>GroWL</span>
+        </a>
+      </li>
+    </ul>
+    <p class="menu-label icon-text">
+      <span class="icon">
+        <ng-icon name="oowv"></ng-icon>
+      </span>
+      <span>OOWV</span>
+    </p>
+    <ul class="menu-list">
+      <li [class.unauthorized]="!authorized.oowvActionMap()">
+        <a class="icon-text" routerLink="/oowv/action-map">
+          <span class="icon">
+            <ng-icon-stack size="1em">
+              <ng-icon name="remixMapLine"></ng-icon>
+              <span
+                style="
+                  font-size: 0.6em;
+                  font-weight: 700;
+                  position: absolute;
+                  top: -0.3em;
+                "
+                >!</span
+              >
+            </ng-icon-stack>
+          </span>
+          <span translate>oowv-action-map.display.module</span>
         </a>
       </li>
     </ul>

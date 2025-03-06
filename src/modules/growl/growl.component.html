@@ -1,0 +1,354 @@
+<div class="card block is-fullheight is-flex is-flex-direction-column">
+  <div class="card-content p-0 is-clipped is-flex-grow-1 is-fullheight">
+    <mgl-map
+      class="is-fullheight"
+      [style]="style"
+      [zoom]="[6.8]"
+      [center]="{lat: 52.8, lon: 9.2}"
+      [canvasContextAttributes]="{preserveDrawingBuffer: true}"
+      [attributionControl]="false"
+      (click)="updateAverageWithdrawals(hoveredFeatures.groundwaterBody())"
+      (click)="fitBounds.set((hoverClusterPolygonDelay() ?? {}).bbox)"
+      [fitBounds]="$any(fitBounds())"
+      [fitBoundsOptions]="{
+        animate: true,
+        duration: 500,
+        essential: true,
+      }"
+    >
+      @let groundwaterMeasurementStations =
+        service.data.groundwaterMeasurementStations();
+      @let groundwaterBodies = service.data.groundwaterBodies();
+      @let ndsMunicipals = service.data.ndsMunicipals();
+      @let waterRightUsageLocations = service.data.waterRightUsageLocations();
+      @let oldWaterRightUsageLocations =
+        service.data.oldWaterRightUsageLocations();
+      <ng-container images>
+        @for (color of measurementColors | keyvalue; track color.key) {
+          <mgl-image
+            [id]="'measurement-classification-' + color.key + '-image'"
+            [url]="
+              '/public/generated/groundwater-level-station-marker/' +
+              color.key +
+              '.png'
+            "
+          ></mgl-image>
+        }
+      </ng-container>
+      <ng-container controls>
+        <mgl-control position="top-right">
+          <map-layer-selection-control
+            translatePrefix="growl.layer."
+            [layers]="selectedLayers"
+          ></map-layer-selection-control>
+        </mgl-control>
+        <mgl-control
+          mglNavigation
+          [showCompass]="false"
+          position="top-left"
+        ></mgl-control>
+        <mgl-control
+          mglAttribution
+          position="bottom-right"
+          [compact]="true"
+          [customAttribution]="[attribution()]"
+        ></mgl-control>
+        <!-- using ng-containers we can ensure this ordering -->
+        <ng-container>
+          @if (selectedLayers.groundwaterLevelStations()) {
+            <mgl-control position="bottom-left">
+              <!-- the type structure is too complex for Angular here -->
+              <growl-legend-control
+                [count]="$any(service.data.measurementClassificationCount())"
+              ></growl-legend-control>
+            </mgl-control>
+          }
+        </ng-container>
+        <ng-container>
+          @let groundwaterBody = hoveredFeatures.groundwaterBody();
+          @if (groundwaterBody) {
+            <mgl-control position="bottom-left">
+              <growl-display-info-control
+                [data]="displayGroundwaterBody(groundwaterBody)"
+              ></growl-display-info-control>
+            </mgl-control>
+          }
+        </ng-container>
+        <ng-container>
+          @let ndsMunicipal = hoveredFeatures.ndsMunicipal();
+          @if (ndsMunicipal) {
+            <mgl-control position="bottom-left">
+              <growl-display-info-control
+                [data]="displayNdsMunicipal(ndsMunicipal)"
+              ></growl-display-info-control>
+            </mgl-control>
+          }
+        </ng-container>
+        <ng-container>
+          @let groundwaterMeasurementStation =
+            hoveredFeatures.groundwaterMeasurementStation();
+          @if (groundwaterMeasurementStation) {
+            <mgl-control position="bottom-left">
+              <growl-display-info-control
+                [data]="
+                  displayGroundwaterMeasurementStation(
+                    groundwaterMeasurementStation
+                  )
+                "
+              ></growl-display-info-control>
+            </mgl-control>
+          }
+        </ng-container>
+        <ng-container>
+          @let withdrawals = averageWithdrawals();
+          @if (withdrawals) {
+            <mgl-control position="bottom-right">
+              <growl-withdrawal-info-control
+                [in]="withdrawals"
+              ></growl-withdrawal-info-control>
+            </mgl-control>
+          }
+        </ng-container>
+      </ng-container>
+      <ng-container sources>
+        <mgl-geojson-source
+          id="groundwater-bodies-source"
+          [data]="groundwaterBodies"
+        ></mgl-geojson-source>
+        <mgl-geojson-source id="nds-municipals-source" [data]="ndsMunicipals">
+        </mgl-geojson-source>
+        <mgl-geojson-source
+          id="groundwater-measurement-stations-source"
+          [data]="groundwaterMeasurementStations"
+        ></mgl-geojson-source>
+        <mgl-geojson-source
+          id="water-right-usage-locations-source"
+          [data]="waterRightUsageLocations"
+          [cluster]="true"
+          [clusterMinPoints]="10"
+          [clusterRadius]="60"
+          #waterRightUsageLocationsSource
+        >
+        </mgl-geojson-source>
+        <mgl-geojson-source
+          id="old-water-right-usage-locations-source"
+          [data]="oldWaterRightUsageLocations"
+          [cluster]="true"
+          [clusterMinPoints]="10"
+          [clusterRadius]="60"
+          #oldWaterRightUsageLocationsSource
+        >
+        </mgl-geojson-source>
+        <mgl-geojson-source
+          id="hover-cluster-polygon-source"
+          [data]="
+            hoverClusterPolygon.value() ?? {
+              type: 'FeatureCollection',
+              features: [],
+            }
+          "
+        ></mgl-geojson-source>
+      </ng-container>
+      <ng-container layers *ngIf="selectedLayersUpdate()">
+        <ng-container groundwater-bodies>
+          @if (
+            groundwaterBodies.features.length &&
+            selectedLayers.groundwaterBodies()
+          ) {
+            <mgl-layer
+              id="groundwater-bodies-layer-fill"
+              type="fill"
+              source="groundwater-bodies-source"
+              [paint]="{
+                'fill-color': '#0088aa',
+                'fill-opacity': 0.3,
+              }"
+              (layerMouseMove)="
+                hoveredFeatures.groundwaterBody.set($any($event.features![0]!))
+              "
+              (layerMouseLeave)="hoveredFeatures.groundwaterBody.set(null)"
+            ></mgl-layer>
+            <mgl-layer
+              id="groundwater-bodies-layer-line"
+              type="line"
+              source="groundwater-bodies-source"
+              [paint]="{
+                'line-color': '#0088aa',
+                'line-width': 3,
+              }"
+            ></mgl-layer>
+            <mgl-layer
+              id="groundwater-bodies-layer-line-bold"
+              type="line"
+              source="groundwater-bodies-source"
+              [paint]="{
+                'line-color': '#0088aa',
+                'line-width': 10,
+              }"
+              [filter]="['==', ['get', 'key'], '' + averageWithdrawals()?.key]"
+            ></mgl-layer>
+          }
+        </ng-container>
+        <ng-container nds-municipals>
+          @if (
+            ndsMunicipals.features.length && selectedLayers.ndsMunicipals()
+          ) {
+            <mgl-layer
+              id="nds-municipals-layer-fill"
+              type="fill"
+              source="nds-municipals-source"
+              [paint]="{'fill-opacity': 0}"
+              (layerMouseMove)="
+                hoveredFeatures.ndsMunicipal.set($any($event.features![0]!))
+              "
+              (layerMouseLeave)="hoveredFeatures.ndsMunicipal.set(null)"
+            ></mgl-layer>
+            <mgl-layer
+              id="nds-municipals-layer-line"
+              type="line"
+              source="nds-municipals-source"
+              [paint]="{
+                'line-color': 'black',
+                'line-width': 2,
+              }"
+            ></mgl-layer>
+          }
+        </ng-container>
+        <ng-container groundwater-measurement-stations>
+          @if (
+            groundwaterMeasurementStations.features.length &&
+            selectedLayers.groundwaterLevelStations()
+          ) {
+            @for (color of measurementColors | keyvalue; track color.key) {
+              <!-- prettier-ignore -->
+              <mgl-layer
+                [id]="'groundwater-measurement-stations-layer-' + color.key + '-symbol'"
+                type="symbol"
+                source="groundwater-measurement-stations-source"
+                [layout]="{
+                  'icon-image': 'measurement-classification-' + color.key + '-image',
+                  'icon-size': ['interpolate', ['linear'], ['zoom'], 5, 0.1, 12, 1],
+                  'icon-ignore-placement': true,
+                  'symbol-z-order': 'source',
+                  'icon-overlap': 'always',
+                }"
+                [filter]="['==', ['get', 'classification'], '' + color.key]"
+                (layerMouseMove)="
+                  hoveredFeatures.groundwaterMeasurementStation.set(
+                    $any($event.features![0]!)
+                  )
+                "
+                (layerMouseLeave)="
+                  hoveredFeatures.groundwaterMeasurementStation.set(null)
+                "
+              ></mgl-layer>
+            }
+          }
+        </ng-container>
+        <ng-container water-right-usage-locations-group>
+          @let color = "#5B7289";
+          <ng-container hover-cluster-polygon>
+            @if (hoverClusterPolygonDelay()) {
+              <mgl-layer
+                id="hover-cluster-polygon-fill"
+                type="fill"
+                source="hover-cluster-polygon-source"
+                [paint]="{
+                  'fill-color': color,
+                  'fill-opacity': 0.1,
+                }"
+              ></mgl-layer>
+              <mgl-layer
+                id="hover-cluster-polygon-line"
+                type="line"
+                source="hover-cluster-polygon-source"
+                [paint]="{
+                  'line-color': color,
+                  'line-width': 3,
+                }"
+              ></mgl-layer>
+            }
+          </ng-container>
+          @for (current of [true, false]; track current) {
+            @let locations =
+              current ? waterRightUsageLocations : oldWaterRightUsageLocations;
+            @let selected =
+              current
+                ? selectedLayers.waterRightUsageLocations
+                : selectedLayers.oldWaterRightUsageLocations;
+            @let prefix = current ? "" : "old-";
+            <ng-container water-right-usage-locations>
+              @if (locations.features.length && selected()) {
+                <mgl-layer
+                  [id]="prefix + 'water-right-usage-locations-layer-symbol'"
+                  type="symbol"
+                  [source]="prefix + 'water-right-usage-locations-source'"
+                  [filter]="['!=', ['get', 'cluster'], true]"
+                  [layout]="{
+                    'icon-image': 'remixicon:map-pin-2-fill',
+                    'icon-anchor': 'bottom',
+                    'icon-size': 1.2,
+                    'icon-ignore-placement': true,
+                  }"
+                  [paint]="{
+                    'icon-color': color,
+                  }"
+                ></mgl-layer>
+                <mgl-layer
+                  [id]="
+                    prefix + 'water-right-usage-locations-layer-symbol-cluster'
+                  "
+                  type="symbol"
+                  [source]="prefix + 'water-right-usage-locations-source'"
+                  [filter]="['==', ['get', 'cluster'], true]"
+                  [layout]="{
+                    'icon-image': 'remixicon:checkbox-multiple-blank-line',
+                    'icon-anchor': 'center',
+                    'icon-size': 1.1,
+                    'icon-offset': [0, -20],
+                    'text-field': ['get', 'point_count_abbreviated'],
+                    'text-font': ['noto_sans_regular'],
+                    'text-size': 18,
+                    'text-offset': [0, 0.1],
+                  }"
+                  [paint]="{
+                    'icon-color': color,
+                  }"
+                  (layerMouseMove)="
+                    hoveredFeatures.waterRightUsageLocationCluster.set(
+                      $any($event.features![0]!)
+                    )
+                  "
+                  (layerMouseLeave)="
+                    hoveredFeatures.waterRightUsageLocationCluster.set(null)
+                  "
+                ></mgl-layer>
+              }
+            </ng-container>
+          }
+        </ng-container>
+      </ng-container>
+    </mgl-map>
+  </div>
+  <div class="card-content">
+    <div class="columns level">
+      <div class="column level-item">
+        <input
+          class="slider is-fullwidth is-primary m-0"
+          step="1"
+          min="0"
+          max="6"
+          value="6"
+          type="range"
+          (input)="selectMeasurementDay($any(6 - +$any($event.target).value))"
+        />
+      </div>
+      <div class="column level-item is-narrow">
+        {{
+          service.data.measurementsDate().toDate()
+            | date: "longDate" : undefined : lang()
+        }}
+      </div>
+    </div>
+  </div>
+</div>

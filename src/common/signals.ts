@@ -1,4 +1,7 @@
-import {signal, WritableSignal} from "@angular/core";
+import {effect, inject, signal, Signal, WritableSignal} from "@angular/core";
+import {Duration} from "dayjs/plugin/duration";
+
+import {injections} from "./injections";
 
 /**
  * Custom signal extensions.
@@ -72,5 +75,81 @@ export namespace signals {
         s.set(!value);
       },
     });
+  }
+
+  /**
+   * Retrieves the active language signal.
+   *
+   * This function returns the signal representing the currently selected
+   * language as a language code (`"en"` or `"de"`).
+   * It is useful for localization-related tasks, such as formatting dates
+   * using Angular pipes.
+   *
+   * @example
+   * const langSignal = signals.lang();
+   * console.log(langSignal()); // "en" or "de"
+   *
+   * @attention This function requires an injection context.
+   * Ensure it is called within an environment where Angular's dependency
+   * injection is available, such as inside a component, directive, or
+   * service constructor.
+   */
+  export const lang = () => inject(injections.LANG_SIGNAL);
+
+  /**
+   * Delays the signal's updates by a specified duration.
+   *
+   * This can be useful for resolving Angular lifecycle conflicts, as the signal
+   * will not update immediately.
+   * Setting no delay still delays by one update cycle, which can resolve issues
+   * caused by update races.
+   *
+   * @example
+   * const mySignal = signals.signal(1);
+   * const delayedSignal = signals.delay(mySignal, Duration.fromMillis(500));
+   * delayedSignal(); // Updates after a 500ms delay
+   */
+  export function delay<T>(s: Signal<T>, delay?: Duration): Signal<T> {
+    let delayed = signal(s());
+    effect(() => {
+      let value = s();
+      setTimeout(() => delayed.set(value), delay?.asMilliseconds());
+    });
+    return delayed;
+  }
+
+  /**
+   * Creates a signal from a promise.
+   *
+   * This function takes a promise and returns a signal that updates with the
+   * resolved value of the promise.
+   * Initially, the signal holds `undefined`.
+   * When the promise resolves, the signal updates with the mapped value.
+   *
+   * This can very useful when working with API services which often return
+   * promises.
+   *
+   * @param map A mapping function to transform the resolved value before
+   *            storing it in the signal.
+   *            Defaults to an identity function.
+   *
+   * @example
+   * const mySignal = signals.fromPromise(fetchData());
+   *
+   * effect(() => {
+   *   console.log(mySignal()); // Initially undefined, then updates with resolved value.
+   * });
+   *
+   * @example
+   * // Using a mapping function
+   * const userSignal = signals.fromPromise(fetchUser(), user => user.name);
+   */
+  export function fromPromise<T, U = T>(
+    promise: Promise<T>,
+    map: (value: T) => U = value => value as unknown as U,
+  ): Signal<undefined | U> {
+    let mapped = signal<undefined | U>(undefined);
+    promise.then(value => mapped.set(map(value)));
+    return mapped;
   }
 }

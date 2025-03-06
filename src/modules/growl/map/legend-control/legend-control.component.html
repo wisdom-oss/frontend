@@ -1,0 +1,22 @@
+<div class="maplibregl-ctrl-group p-1 pr-2">
+  <table>
+    @for (item of legendItemsIter; track item) {
+      <tr class="level mb-0 is-mobile">
+        <div class="level-left" style="gap: unset">
+          <td class="level-item mr-0">
+            <span class="icon">
+              <i
+                style="height: 1rem; width: 1rem; border: black solid 2px"
+                [style.backgroundColor]="legendColors[item]"
+              ></i>
+            </span>
+          </td>
+          <td class="level-item">
+            ({{ count()[item] }})
+            {{ "growl.measurement-classification." + item | translate }}
+          </td>
+        </div>
+      </tr>
+    }
+  </table>
+</div>

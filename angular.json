@@ -44,6 +44,10 @@
               {
                 "path": "node_modules/esbuild-plugin-toml/index.js",
                 "options": {}
+              },
+              {
+                "path": "scripts/esbuild/prebuild.cjs",
+                "options": {}
               }
             ],
             "outputPath": "dist/wisdom-oss/frontend",
@@ -65,15 +69,26 @@
               },
               {
                 "glob": "**/*",
-                "input": "public"
+                "input": "public",
+                "output": "public"
               }
             ],
             "styles": ["src/styles.scss"],
             "scripts": [],
-            "allowedCommonJsDependencies": ["ajv", "dayjs"],
+            "allowedCommonJsDependencies": [
+              "ajv",
+              "dayjs",
+              "maplibre-gl",
+              "@turf/jsts",
+              "rbush",
+              "skmeans",
+              "concaveman",
+              "fast-deep-equal",
+              "earcut"
+            ],
             "stylePreprocessorOptions": {
               "sass": {
-                "silenceDeprecations": ["global-builtin"]
+                "silenceDeprecations": ["global-builtin", "import"]
               }
             }
           },
@@ -82,8 +97,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "1500kB",
-                  "maximumError": "3MB"
+                  "maximumWarning": "5MB",
+                  "maximumError": "10MB"
                 },
                 {
                   "type": "anyComponentStyle",
