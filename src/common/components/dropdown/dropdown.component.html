@@ -11,7 +11,7 @@
       (click)="kind() == 'click' && isActive.set(!isActive())"
     >
       <span>{{
-        changeMenuName() ? choiceName() : (menuName() | translate)
+        changeMenuName() ? (choiceName() | translate) : (menuName() | translate)
       }}</span>
       <span class="icon is-small">
         <ng-icon *ngIf(!isActive()) name="remixArrowUpSLine"></ng-icon>
