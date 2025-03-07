@@ -404,6 +404,15 @@ export class WaterDemandPredictionComponent implements OnInit {
             this.chartType(),
           );
 
+          let realDataset = this.createNewDataset(
+            this.currentPredictedSmartmeterData?.realValue!,
+            "real values",
+            this.currentPredictedSmartmeterData?.resolution!,
+            this.currentPredictedSmartmeterData?.timeframe!,
+            false,
+            this.chartType(),
+          );
+
           let lower_conf_int = this.createNewDataset(
             this.currentPredictedSmartmeterData?.lower_conf_values!,
             "lower_confidence_interval",
@@ -425,6 +434,7 @@ export class WaterDemandPredictionComponent implements OnInit {
           let smartmeterdata: PredictedSmartmeterDataset = {
             upper_conf_interval_dataset: upper_conf_int,
             dataset: newDataset,
+            realValue_dataset: realDataset,
             lower_conf_interval_dataset: lower_conf_int,
             labels: this.currentPredictedSmartmeterData?.dateObserved!,
           };
@@ -558,6 +568,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     /** add relevant datasets based on resolution to chartData */
     this.predictedDatasets[resolution].forEach(entry => {
       this.chartDataPredictedValues.datasets.push(entry.dataset);
+      this.chartDataPredictedValues.datasets.push(entry.realValue_dataset);
       this.chartDataPredictedValues.datasets.push(
         entry.lower_conf_interval_dataset,
       );

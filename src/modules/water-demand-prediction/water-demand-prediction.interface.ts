@@ -19,6 +19,7 @@ export interface SmartmeterDataset {
 export interface PredictedSmartmeterDataset extends SmartmeterDataset {
   lower_conf_interval_dataset: ChartDataset;
   upper_conf_interval_dataset: ChartDataset;
+  realValue_dataset: ChartDataset;
 }
 
 export interface DatasetSmartmeter extends SingleSmartmeter {
@@ -28,4 +29,5 @@ export interface DatasetSmartmeter extends SingleSmartmeter {
 export interface PredictionSingleSmartmeter extends SingleSmartmeter {
   lower_conf_values: [];
   upper_conf_values: [];
+  realValue: [];
 }
