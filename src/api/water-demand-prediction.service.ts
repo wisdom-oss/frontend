@@ -89,11 +89,13 @@ export class WaterDemandPredictionService {
   }
 
   fetchSingleSmartmeter(
+    startpoint: string,
     nameOfSmartmeter: string,
     timeframe: string,
     resolution: string,
   ): Observable<any> {
     return this.sendRequest("post", "/singleSmartmeter", {
+      startpoint: startpoint,
       name: nameOfSmartmeter,
       timeframe: timeframe,
       resolution: resolution,
@@ -101,11 +103,13 @@ export class WaterDemandPredictionService {
   }
 
   fetchSinglePredictionSmartmeter(
+    startpoint: string,
     nameOfSmartmeter: string,
     timeframe: string,
     resolution: string,
   ): Observable<any> {
     return this.sendRequest("post", "/loadModelAndPredict", {
+      startpoint: startpoint,
       name: nameOfSmartmeter,
       timeframe: timeframe,
       resolution: resolution,
@@ -113,11 +117,13 @@ export class WaterDemandPredictionService {
   }
 
   trainModelOnSingleSmartmeter(
+    startpoint: string,
     nameOfSmartmeter: string,
     timeframe: string,
     resolution: string,
   ): Observable<any> {
     return this.sendRequest("post", "/trainModel", {
+      startpoint: startpoint,
       name: nameOfSmartmeter,
       timeframe: timeframe,
       resolution: resolution,

@@ -28,7 +28,7 @@ export class WaterDemandPredictionComponent implements OnInit {
   /** the displayed resolution in the charts of real data */
   displayedResolution = signal<string>("hourly");
 
-  /** variables resolution dropdown */
+  /** variables startpoint dropdown */
   menuStartPoint = "water-demand-prediction.startpoint.menu";
   optionsStartPoint: Record<string, string> = {
     "2021-05-26T00:00:00": "water-demand-prediction.startpoint.options.a",
@@ -306,6 +306,7 @@ export class WaterDemandPredictionComponent implements OnInit {
 
     this.waterDemandService
       .trainModelOnSingleSmartmeter(
+        this.choiceStartPoint(),
         this.choiceSmartmeter(),
         this.choiceTime(),
         this.choiceResolution(),
@@ -336,6 +337,7 @@ export class WaterDemandPredictionComponent implements OnInit {
 
     this.waterDemandService
       .fetchSingleSmartmeter(
+        this.choiceStartPoint(),
         this.choiceSmartmeter(),
         this.choiceTime(),
         this.choiceResolution(),
@@ -392,6 +394,7 @@ export class WaterDemandPredictionComponent implements OnInit {
 
     this.waterDemandService
       .fetchSinglePredictionSmartmeter(
+        this.choiceStartPoint(),
         this.choiceSmartmeter(),
         this.choiceTime(),
         this.choiceResolution(),
