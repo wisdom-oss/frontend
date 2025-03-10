@@ -85,3 +85,19 @@ de = "Liniendiagramm"
 [graph.mode.bar]
 en = "Bar Chart"
 de = "Balkendiagramm"
+
+[startpoint.menu]
+en = "Start Point"
+de = "Startpunkt"
+
+[startpoint.options.a]
+en = "Start of Timeseries"
+de = "Start der Zeitreihe"
+
+[startpoint.options.b]
+en = "Start of June 2021"
+de = "Anfang Juni 2021"
+
+[startpoint.options.c]
+en = "Start of 2022"
+de = "Anfang 2022"

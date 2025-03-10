@@ -28,10 +28,23 @@ export class WaterDemandPredictionComponent implements OnInit {
   /** the displayed resolution in the charts of real data */
   displayedResolution = signal<string>("hourly");
 
-  /** variables name dropdown */
-  menuSmartmeter = "water-demand-prediction.choice.smartmeter";
-  optionsSmartmeter: Record<string, string> = {};
-  choiceSmartmeter = signal<string>("urn:ngsi-ld:Device:atypical-household");
+  /** variables resolution dropdown */
+  menuStartPoint = "water-demand-prediction.startpoint.menu";
+  optionsStartPoint: Record<string, string> = {
+    "2021-05-26T00:00:00": "water-demand-prediction.startpoint.options.a",
+    "2021-06-01T00:00:00": "water-demand-prediction.startpoint.options.b",
+    "2022-01-01T00:00:00": "water-demand-prediction.startpoint.options.c",
+  };
+  choiceStartPoint = signal<string>("2021-05-26T00:00:00");
+
+  /** variables resolution dropdown */
+  menuResolution = "water-demand-prediction.choice.resolution";
+  optionsResolution: Record<string, string> = {
+    hourly: "water-demand-prediction.resolution.hourly",
+    daily: "water-demand-prediction.resolution.daily",
+    weekly: "water-demand-prediction.resolution.weekly",
+  };
+  choiceResolution = signal<string>("hourly");
 
   /** variables timeframe dropdown */
   menuTime = "water-demand-prediction.choice.timeframe";
@@ -46,14 +59,10 @@ export class WaterDemandPredictionComponent implements OnInit {
   };
   choiceTime = signal<string>("one week");
 
-  /** variables resolution dropdown */
-  menuResolution = "water-demand-prediction.choice.resolution";
-  optionsResolution: Record<string, string> = {
-    hourly: "water-demand-prediction.resolution.hourly",
-    daily: "water-demand-prediction.resolution.daily",
-    weekly: "water-demand-prediction.resolution.weekly",
-  };
-  choiceResolution = signal<string>("hourly");
+  /** variables name dropdown */
+  menuSmartmeter = "water-demand-prediction.choice.smartmeter";
+  optionsSmartmeter: Record<string, string> = {};
+  choiceSmartmeter = signal<string>("urn:ngsi-ld:Device:atypical-household");
 
   /** data object of current requested Smartmeterdata */
   currentSmartmeterData?: SingleSmartmeter;

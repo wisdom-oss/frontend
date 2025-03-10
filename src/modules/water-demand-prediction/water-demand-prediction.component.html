@@ -80,6 +80,13 @@
           <div class="is-fullwidth">
             <div class="">
               <dropdown
+                [menuName]="menuStartPoint"
+                [options]="optionsStartPoint"
+                [changeMenuName]="true"
+                kind="hover"
+                (choice)="choiceStartPoint.set($event)"
+              ></dropdown>
+              <dropdown
                 [menuName]="menuResolution"
                 [options]="optionsResolution"
                 [changeMenuName]="true"
@@ -106,7 +113,10 @@
               >
                 {{ "water-demand-prediction.request.realdata" | translate }}
               </button>
-              <button class="button is-info is-rounded" (click)="trainModel()">
+              <button
+                class="button is-primary is-rounded"
+                (click)="trainModel()"
+              >
                 Train Model
               </button>
             </div>
