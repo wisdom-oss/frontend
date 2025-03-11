@@ -70,10 +70,10 @@ jobs:
           echo "IMAGE_TAG=${branch/\//-}" >> $GITHUB_ENV
 
       - name: pull-image
-        run: ssh ${{ secrets.USERNAME }}@${{ vars.HOSTNAME }} "FRONTEND_VERSION='${{ env.IMAGE_NAME }}' docker compose pull frontend"
+        run: ssh ${{ secrets.USERNAME }}@${{ vars.HOSTNAME }} "FRONTEND_VERSION='${{ env.IMAGE_TAG }}' docker compose pull frontend"
 
       - name: restart-container
-        run: ssh ${{ secrets.USERNAME }}@${{ vars.HOSTNAME }} "FRONTEND_VERSION='${{ env.IMAGE_NAME }}' docker compose up -d frontend"
+        run: ssh ${{ secrets.USERNAME }}@${{ vars.HOSTNAME }} "FRONTEND_VERSION='${{ env.IMAGE_TAG }}' docker compose up -d frontend"
 
   deploy-protected:
     strategy:
@@ -102,7 +102,7 @@ jobs:
           echo "IMAGE_TAG=${branch/\//-}" >> $GITHUB_ENV
 
       - name: pull-image
-        run: ssh ${{ secrets.USERNAME }}@${{ vars.HOSTNAME }} "FRONTEND_VERSION='${{ env.IMAGE_NAME }}' docker compose pull frontend"
+        run: ssh ${{ secrets.USERNAME }}@${{ vars.HOSTNAME }} "FRONTEND_VERSION='${{ env.IMAGE_TAG }}' docker compose pull frontend"
 
       - name: restart-container
-        run: ssh ${{ secrets.USERNAME }}@${{ vars.HOSTNAME }} "FRONTEND_VERSION='${{ env.IMAGE_NAME }}' docker compose up -d frontend"
+        run: ssh ${{ secrets.USERNAME }}@${{ vars.HOSTNAME }} "FRONTEND_VERSION='${{ env.IMAGE_TAG }}' docker compose up -d frontend"
