@@ -70,7 +70,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "jsr": "^0.13.4",
     "npm-check-updates": "^17.1.15",
-    "oxlint": "^0.15.13",
+    "oxlint": "^0.15.14",
     "prettier": "3.5.3",
     "prettier-plugin-toml": "2.0.2",
     "pretty-ts-imports": "^1.1.0",
