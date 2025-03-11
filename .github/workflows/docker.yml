@@ -64,6 +64,7 @@ jobs:
     environment: ${{ matrix.deploy.environment }}
     runs-on: self-hosted
     name: deploy (${{ matrix.deploy.environment }})
+    continue-on-error: true
     needs:
       - merge
     steps:
