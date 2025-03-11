@@ -9,9 +9,11 @@ on:
       # Build for semver formatted tags
       - "v*.*.*"
 
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+
 
 jobs:
   build:
@@ -48,55 +50,34 @@ jobs:
         with:
           registry-password: ${{ secrets.GITHUB_TOKEN }}
 
-  deploy-dev:
-    environment: dev
+  deploy:
+    strategy:
+      matrix:
+        deploy:
+          - environment: dev
+            rule: (github.ref != format('refs/heads/{0}', github.event.repository.default_branch)) && github.event_name == 'push'
+          - environment: demo
+            rule: (github.ref == format('refs/heads/{0}', github.event.repository.default_branch)) && github.event_name == 'push'
+          - environment: live
+            rule: (github.ref == format('refs/heads/{0}', github.event.repository.default_branch)) && github.event_name == 'push'
+
+    environment: ${{ matrix.deploy.environment }}
     runs-on: self-hosted
-    if: (github.ref != format('refs/heads/{0}', github.event.repository.default_branch)) && github.event_name == 'push'
+    name: deploy (${{ matrix.deploy.environment }})
     needs:
       - merge
     steps:
       - name: setup-ssh
+        if: ${{ matrix.deploy.rule }}
         run: |
           install -m 600 -D /dev/null ~/.ssh/id_rsa
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
           ssh-keyscan -H ${{ vars.HOSTNAME }} > ~/.ssh/known_hosts
 
       - name: pull-image
+        if: ${{ matrix.deploy.rule }}
         run: ssh ${{ secrets.USERNAME }}@${{ vars.HOSTNAME }} "FRONTEND_VERSION='${{ github.ref_name }}' docker compose pull frontend"
 
       - name: restart-container
-        run: ssh ${{ secrets.USERNAME }}@${{ vars.HOSTNAME }} "FRONTEND_VERSION='${{ github.ref_name }}' docker compose up -d frontend"
-
-  deploy-demo:
-    environment: demo
-    runs-on: self-hosted
-    if: (github.ref == format('refs/heads/{0}', github.event.repository.default_branch)) && github.event_name == 'push'
-    steps:
-      - name: setup-ssh
-        run: |
-          install -m 600 -D /dev/null ~/.ssh/id_rsa
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ vars.HOSTNAME }} > ~/.ssh/known_hosts
-
-      - name: pull-image
-        run: ssh ${{ secrets.USERNAME }}@${{ vars.HOSTNAME }} "FRONTEND_VERSION='${{ github.ref_name }}' docker compose pull frontend"
-
-      - name: restart-container
-        run: ssh ${{ secrets.USERNAME }}@${{ vars.HOSTNAME }} "FRONTEND_VERSION='${{ github.ref_name }}' docker compose up -d frontend"
-
-  deploy-live:
-    environment: live
-    runs-on: self-hosted
-    if: (github.ref == format('refs/heads/{0}', github.event.repository.default_branch)) && github.event_name == 'push'
-    steps:
-      - name: setup-ssh
-        run: |
-          install -m 600 -D /dev/null ~/.ssh/id_rsa
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ vars.HOSTNAME }} > ~/.ssh/known_hosts
-
-      - name: pull-image
-        run: ssh ${{ secrets.USERNAME }}@${{ vars.HOSTNAME }} "FRONTEND_VERSION='${{ github.ref_name }}' docker compose pull frontend"
-
-      - name: restart-container
+        if: ${{ matrix.deploy.rule }}
         run: ssh ${{ secrets.USERNAME }}@${{ vars.HOSTNAME }} "FRONTEND_VERSION='${{ github.ref_name }}' docker compose up -d frontend"
