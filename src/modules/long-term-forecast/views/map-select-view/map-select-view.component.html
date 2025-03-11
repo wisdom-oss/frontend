@@ -1,0 +1,127 @@
+<div class="card block is-fullheight is-flex is-flex-direction-column">
+  <div class="card-content p-0 is-clipped is-flex-grow-1 is-fullheight">
+    <mgl-map
+      class="is-fullheight"
+      [style]="style"
+      [zoom]="[6.8]"
+      [center]="{lat: 52.8, lon: 9.2}"
+      [canvasContextAttributes]="{preserveDrawingBuffer: true}"
+    >
+      <ng-container controls>
+        <mgl-control
+          mglNavigation
+          [showCompass]="false"
+          position="top-left"
+        ></mgl-control>
+        <mgl-control position="bottom-left">
+          <!-- button element is styled by maplibre -->
+          <div class="button is-primary">do stuff</div>
+        </mgl-control>
+        <mgl-control position="top-right">
+          <div
+            data-theme="light"
+            (mouseenter_)="mapControl.collapsed.set(false)"
+            (mouseleave_)="mapControl.collapsed.set(true)"
+          >
+            @if (mapControl.collapsed()) {
+              <span class="icon is-medium">
+                <ng-icon size="2em" name="remixStackFill"></ng-icon>
+              </span>
+            } @else {
+              <div class="buttons has-addons">
+                @for (item of mapControl.possibleLayers; track item) {
+                  <div
+                    class="button is-small"
+                    [class.is-primary]="mapControl.visibleLayer() == item"
+                    (click)="mapControl.visibleLayer.set(item)"
+                    [translate]="'long-term-forecast.layer.' + item"
+                  ></div>
+                }
+              </div>
+            }
+          </div>
+        </mgl-control>
+      </ng-container>
+      <ng-container sources>
+        @let counties = sources.counties();
+        @if (counties) {
+          <mgl-geojson-source
+            id="counties-source"
+            [data]="counties"
+          ></mgl-geojson-source>
+        }
+        @let municipals = sources.municipals();
+        @if (municipals) {
+          <mgl-geojson-source
+            id="municipals-source"
+            [data]="municipals"
+          ></mgl-geojson-source>
+        }
+      </ng-container>
+      <ng-container layers>
+        @let neutralColor = "#A0A0A0";
+        @let selectedColor = "#007ACC";
+
+        @for (layer of mapControl.possibleLayers; track layer) {
+          @if (mapControl.visibleLayer() == layer) {
+            <mgl-layer
+              [id]="layer + '-fill'"
+              type="fill"
+              [source]="layer + '-source'"
+              [paint]="{
+                'fill-color': [
+                  'case',
+                  ['get', 'selected'],
+                  selectedColor,
+                  neutralColor,
+                ],
+                'fill-opacity': 0.5,
+              }"
+              (layerMouseMove)="onLayerMouseMove($event)"
+              (layerMouseLeave)="onLayerMouseMove($event)"
+            ></mgl-layer>
+            <mgl-layer
+              [id]="layer + '-line'"
+              type="line"
+              [source]="layer + '-source'"
+              [paint]="{
+                'line-color': [
+                  'case',
+                  ['get', 'selected'],
+                  selectedColor,
+                  neutralColor,
+                ],
+                'line-width': ['case', ['get', 'hover'], 4, 2],
+              }"
+              [layout]="{
+                'line-sort-key': ['case', ['get', 'selected'], 1, 0],
+              }"
+            ></mgl-layer>
+            <!-- <mgl-layer
+              [id]="layer + '-line-hover'"
+              type="line"
+              [source]="layer + '-source'"
+              [paint]="{
+                'line-color': neutralColor,
+                'line-width': 4,
+              }"
+              [filter]="['==', ['get', 'key'], '' + selection.hover()]"
+            ></mgl-layer> -->
+            <!-- <mgl-layer
+              [id]="layer + '-fill-selected'"
+              type="fill"
+              [source]="layer + '-source'"
+              [paint]="{
+                'fill-color': selectedColor,
+                'fill-opacity': 0.5,
+              }"
+              (layerMouseMove)="onLayerMouseMove($event)"
+              (layerMouseLeave)="onLayerMouseMove($event)"
+              [filter]="['match', ['get', 'key'], ['lol']]"
+            ></mgl-layer> -->
+          }
+        }
+      </ng-container>
+    </mgl-map>
+  </div>
+</div>

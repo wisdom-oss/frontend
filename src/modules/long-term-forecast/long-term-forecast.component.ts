@@ -1,9 +1,9 @@
 import {Component} from "@angular/core";
+import {RouterOutlet} from "@angular/router";
 
 @Component({
-  selector: "wisdom-long-term-forecast",
-  imports: [],
-  templateUrl: "./long-term-forecast.component.html",
+  imports: [RouterOutlet],
+  template: "<router-outlet></router-outlet>",
   styles: ``,
 })
 export class LongTermForecastComponent {}
