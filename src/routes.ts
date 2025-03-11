@@ -5,8 +5,8 @@ import {CoreComponent} from "./core/core.component";
 import {permissionsGuard} from "./core/auth/permissions.guard";
 import {GreeterComponent} from "./core/greeter/greeter.component";
 import {GrowlComponent} from "./modules/growl/growl.component";
+import {LongTermForecastComponent} from "./modules/long-term-forecast/long-term-forecast.component";
 import {OowvActionMapComponent} from "./modules/oowv/action-map/action-map.component";
-import { LongTermForecastComponent } from "./modules/long-term-forecast/long-term-forecast.component";
 
 export const routes: Routes = [
   {path: "callback", component: CallbackComponent},
