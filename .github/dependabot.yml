@@ -3,9 +3,16 @@ updates:
   - package-ecosystem: npm
     assignees:
       - cptpiepmatz
-    labels: []
+    labels: [ ]
     directory: "/"
     schedule:
       interval: weekly
     allow:
       - dependency-type: direct
+    groups:
+      angular:
+        patterns:
+          - "@angular/*"
+      ng-icons:
+        patterns:
+          - "@ng-icons/*"
