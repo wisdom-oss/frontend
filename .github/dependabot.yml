@@ -9,3 +9,10 @@ updates:
       interval: weekly
     allow:
       - dependency-type: direct
+    groups:
+      angular:
+        patterns:
+          - "@angular/*"
+      ng-icons:
+        patterns:
+          - "@ng-icons/*"
