@@ -1,20 +1,54 @@
-import {ViewChildren, Component, AfterViewInit, QueryList} from "@angular/core";
+import {HttpClient} from "@angular/common/http";
+import {
+  computed,
+  inject,
+  ViewChildren,
+  Component,
+  AfterViewInit,
+  QueryList,
+} from "@angular/core";
 import {NavigationEnd, RouterLink, Router} from "@angular/router";
-import {provideIcons, NgIconComponent} from "@ng-icons/core";
-import {remixDatabase2Fill, remixMap2Fill} from "@ng-icons/remixicon";
+import {
+  provideIcons,
+  provideNgIconLoader,
+  NgIconComponent,
+  NgIconStack,
+} from "@ng-icons/core";
+import {
+  remixDatabase2Fill,
+  remixMap2Fill,
+  remixMapLine,
+} from "@ng-icons/remixicon";
+import {TranslateDirective} from "@ngx-translate/core";
 import {filter} from "rxjs";
 
 import {SidebarLinkDirective} from "./sidebar-link.directive";
+import {OowvActionMapComponent} from "../../modules/oowv/action-map/action-map.component";
+import {AuthService} from "../auth/auth.service";
 
 @Component({
   selector: "sidebar",
-  imports: [NgIconComponent, RouterLink, SidebarLinkDirective],
+  imports: [
+    NgIconComponent,
+    NgIconStack,
+    RouterLink,
+    SidebarLinkDirective,
+    TranslateDirective,
+  ],
   templateUrl: "./sidebar.component.html",
   styleUrl: "./sidebar.component.scss",
   providers: [
     provideIcons({
       remixMap2Fill,
       remixDatabase2Fill,
+      remixMapLine,
+    }),
+    provideNgIconLoader(name => {
+      if (name != "oowv") return "";
+      const http = inject(HttpClient);
+      return http.get("https://www.oowv.de/favicons/favicon.svg", {
+        responseType: "text",
+      });
     }),
   ],
 })
@@ -22,7 +56,16 @@ export class SidebarComponent implements AfterViewInit {
   @ViewChildren(SidebarLinkDirective)
   routerLinks?: QueryList<SidebarLinkDirective>;
 
-  constructor(private router: Router) {}
+  protected authorized = {
+    oowvActionMap: computed(() =>
+      this.auth.scopes().has(...OowvActionMapComponent.SCOPES),
+    ),
+  };
+
+  constructor(
+    private router: Router,
+    private auth: AuthService,
+  ) {}
 
   ngAfterViewInit(): void {
     this.highlightCurrentRoute();

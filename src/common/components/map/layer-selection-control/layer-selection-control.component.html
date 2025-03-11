@@ -20,7 +20,7 @@
               [checked]="layer[1]()"
             />
             <label [for]="layer[0]" class="is-size-7" style="height: 1.5em">{{
-              "growl.layer." + layer[0] | translate
+              translatePrefix() + layer[0] | translate
             }}</label>
           </th>
         </tr>

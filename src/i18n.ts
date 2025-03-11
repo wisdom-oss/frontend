@@ -6,9 +6,14 @@ import {
 import {asserts} from "./common/asserts";
 import core from "./core/i18n.toml";
 import growl from "./modules/growl/i18n.toml";
+import oowvActionMap from "./modules/oowv/action-map/i18n.toml";
 
 // add translations to this record
-const modules: NestedStringRecord = {core, growl};
+const modules: NestedStringRecord = {
+  core,
+  growl,
+  "oowv-action-map": oowvActionMap,
+};
 
 export function configureTranslations(service: TranslateService) {
   let defaultLanguage = service.getBrowserLang() ?? "en";
