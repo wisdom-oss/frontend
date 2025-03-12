@@ -107,12 +107,14 @@ export class WaterDemandPredictionService {
     nameOfSmartmeter: string,
     timeframe: string,
     resolution: string,
+    useWeather: boolean,
   ): Observable<any> {
     return this.sendRequest("post", "/loadModelAndPredict", {
       startpoint: startpoint,
       name: nameOfSmartmeter,
       timeframe: timeframe,
       resolution: resolution,
+      useWeather: useWeather,
     });
   }
 
@@ -121,12 +123,14 @@ export class WaterDemandPredictionService {
     nameOfSmartmeter: string,
     timeframe: string,
     resolution: string,
+    useWeather: boolean,
   ): Observable<any> {
     return this.sendRequest("post", "/trainModel", {
       startpoint: startpoint,
       name: nameOfSmartmeter,
       timeframe: timeframe,
       resolution: resolution,
+      useWeather: useWeather,
     });
   }
 

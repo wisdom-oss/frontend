@@ -74,6 +74,10 @@ de = "Wähle Auflösung"
 en = "Display Data"
 de = "Zeige Daten an"
 
+[request.trainModel]
+en = "Train Model"
+de = "Modell trainieren"
+
 [request.preddata]
 en = "Display predicted data"
 de = "Zeige vorhergesagte Daten an"

@@ -76,6 +76,12 @@ export class WaterDemandPredictionComponent implements OnInit {
   /** Record to hold all saved predicted ChartDatasets */
   predictedDatasets: Record<string, PredictedSmartmeterDataset[]> = {};
 
+  /**allows multiple records over all charts if true */
+  allowCheckMultiple = signal<boolean>(true);
+
+  /** if weather data should be incorporated or not */
+  useWeather: boolean = true;
+
   /**
    * data skeleton for the line graph
    */
@@ -151,6 +157,11 @@ export class WaterDemandPredictionComponent implements OnInit {
     this.fetchMeterInformation();
     this.fetchDataSmartmeter();
     this.chartDataPredictedValues.labels = this.chartDataCurrentValues.labels;
+  }
+
+  /** toggle the weather check mark */
+  toggleWeather() {
+    this.useWeather = !this.useWeather;
   }
 
   /** set the displayed resolution and update the chart to mirror that
@@ -310,6 +321,7 @@ export class WaterDemandPredictionComponent implements OnInit {
         this.choiceSmartmeter(),
         this.choiceTime(),
         this.choiceResolution(),
+        this.useWeather,
       )
       .subscribe({
         next: response => {
@@ -398,6 +410,7 @@ export class WaterDemandPredictionComponent implements OnInit {
         this.choiceSmartmeter(),
         this.choiceTime(),
         this.choiceResolution(),
+        this.useWeather,
       )
       .subscribe({
         next: (response: PredictionSingleSmartmeter) => {
@@ -487,6 +500,10 @@ export class WaterDemandPredictionComponent implements OnInit {
    * @returns true if request unique, false else
    */
   checkParameters(pred: boolean): boolean {
+    if (this.allowCheckMultiple()) {
+      return true;
+    }
+
     if (
       !this.choiceSmartmeter() ||
       !this.choiceResolution() ||

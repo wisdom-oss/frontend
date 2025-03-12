@@ -79,6 +79,18 @@
           <!--dropdown buttons for selection -->
           <div class="is-fullwidth">
             <div class="">
+              <button
+                class="button is-primary is-rounded"
+                (click)="fetchDataSmartmeter()"
+              >
+                {{ "water-demand-prediction.request.realdata" | translate }}
+              </button>
+              <button
+                class="button is-primary is-rounded"
+                (click)="trainModel()"
+              >
+                {{ "water-demand-prediction.request.trainModel" | translate }}
+              </button>
               <dropdown
                 [menuName]="menuStartPoint"
                 [options]="optionsStartPoint"
@@ -107,18 +119,6 @@
                 kind="hover"
                 (choice)="choiceSmartmeter.set($event)"
               ></dropdown>
-              <button
-                class="button is-primary is-rounded"
-                (click)="fetchDataSmartmeter()"
-              >
-                {{ "water-demand-prediction.request.realdata" | translate }}
-              </button>
-              <button
-                class="button is-primary is-rounded"
-                (click)="trainModel()"
-              >
-                Train Model
-              </button>
             </div>
           </div>
         </div>
@@ -149,6 +149,13 @@
         </div>
         <div class="buttons is-justify-content-space-around">
           <!-- menus for prediction values -->
+          <button
+            class="button is-rounded"
+            [class.is-success]="useWeather"
+            (click)="toggleWeather()"
+          >
+            <span>{{ useWeather ? "Use Weather" : "Don't Use Weather" }}</span>
+          </button>
           <button
             class="button is-primary is-rounded"
             (click)="fetchPredDataSmartmeter()"
