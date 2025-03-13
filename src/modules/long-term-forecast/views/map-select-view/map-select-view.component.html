@@ -43,18 +43,22 @@
         </mgl-control>
       </ng-container>
       <ng-container sources>
-        @let counties = sources.counties();
+        @let counties = geoData.counties();
         @if (counties) {
           <mgl-geojson-source
             id="counties-source"
             [data]="counties"
+            promoteId="key"
+            #countiesSource
           ></mgl-geojson-source>
         }
-        @let municipals = sources.municipals();
+        @let municipals = geoData.municipals();
         @if (municipals) {
           <mgl-geojson-source
             id="municipals-source"
             [data]="municipals"
+            promoteId="key"
+            #municipalsSource
           ></mgl-geojson-source>
         }
       </ng-container>
@@ -71,54 +75,56 @@
               [paint]="{
                 'fill-color': [
                   'case',
-                  ['get', 'selected'],
+                  ['boolean', ['feature-state', 'selected'], false],
                   selectedColor,
                   neutralColor,
                 ],
                 'fill-opacity': 0.5,
               }"
-              (layerMouseMove)="onLayerMouseMove($event)"
-              (layerMouseLeave)="onLayerMouseMove($event)"
+              (layerMouseMove)="onHover($event)"
+              (layerMouseLeave)="onHover($event)"
+              (layerClick)="onClick()"
             ></mgl-layer>
             <mgl-layer
-              [id]="layer + '-line'"
-              type="line"
-              [source]="layer + '-source'"
-              [paint]="{
-                'line-color': [
-                  'case',
-                  ['get', 'selected'],
-                  selectedColor,
-                  neutralColor,
-                ],
-                'line-width': ['case', ['get', 'hover'], 4, 2],
-              }"
-              [layout]="{
-                'line-sort-key': ['case', ['get', 'selected'], 1, 0],
-              }"
-            ></mgl-layer>
-            <!-- <mgl-layer
-              [id]="layer + '-line-hover'"
+              [id]="layer + '-line-unselected'"
               type="line"
               [source]="layer + '-source'"
               [paint]="{
                 'line-color': neutralColor,
-                'line-width': 4,
+                'line-width': [
+                  'case',
+                  ['boolean', ['feature-state', 'hovered'], false],
+                  4,
+                  2,
+                ],
+                'line-opacity': [
+                  'case',
+                  ['boolean', ['feature-state', 'selected'], false],
+                  0,
+                  1,
+                ],
               }"
-              [filter]="['==', ['get', 'key'], '' + selection.hover()]"
-            ></mgl-layer> -->
-            <!-- <mgl-layer
-              [id]="layer + '-fill-selected'"
-              type="fill"
+            ></mgl-layer>
+            <mgl-layer
+              [id]="layer + '-line-selected'"
+              type="line"
               [source]="layer + '-source'"
               [paint]="{
-                'fill-color': selectedColor,
-                'fill-opacity': 0.5,
+                'line-color': selectedColor,
+                'line-width': [
+                  'case',
+                  ['boolean', ['feature-state', 'hovered'], false],
+                  4,
+                  2,
+                ],
+                'line-opacity': [
+                  'case',
+                  ['boolean', ['feature-state', 'selected'], false],
+                  1,
+                  0,
+                ],
               }"
-              (layerMouseMove)="onLayerMouseMove($event)"
-              (layerMouseLeave)="onLayerMouseMove($event)"
-              [filter]="['match', ['get', 'key'], ['lol']]"
-            ></mgl-layer> -->
+            ></mgl-layer>
           }
         }
       </ng-container>

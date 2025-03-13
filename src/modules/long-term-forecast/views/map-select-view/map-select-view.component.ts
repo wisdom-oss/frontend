@@ -1,4 +1,4 @@
-import {computed, effect, signal, Component, Signal} from "@angular/core";
+import {effect, signal, viewChild, Component} from "@angular/core";
 import {
   ControlComponent,
   LayerComponent,
@@ -36,6 +36,10 @@ import {signals} from "../../../../common/signals";
 })
 export class MapSelectViewComponent {
   protected style = colorful as any as StyleSpecification;
+  protected countiesSource =
+    viewChild.required<GeoJSONSourceComponent>("countiesSource");
+  protected municipalsSource =
+    viewChild.required<GeoJSONSourceComponent>("municipalsSource");
 
   protected mapControl = {
     possibleLayers: ["counties", "municipals"] as const,
@@ -49,16 +53,7 @@ export class MapSelectViewComponent {
     municipals: new Set<string>(),
   };
 
-  private geoData;
-
-  protected sources = {
-    counties: computed(() =>
-      this.updateFeatureCollection(this.geoData.counties),
-    ),
-    municipals: computed(() =>
-      this.updateFeatureCollection(this.geoData.municipals),
-    ),
-  };
+  protected geoData;
 
   constructor(geo: GeoDataService) {
     this.geoData = {
@@ -79,16 +74,13 @@ export class MapSelectViewComponent {
     contents: GeoDataService.LayerContents | null,
   ): FeatureCollection<G> {
     let features: Feature<G>[] = [];
-    let selected = 0;
 
     for (let content of contents?.data ?? []) {
       features.push({
         type: "Feature",
         geometry: content.geometry as G,
-        id: content.id,
         properties: {
           key: content.key,
-          selected: !!(selected++ % 3),
         },
       });
     }
@@ -96,23 +88,49 @@ export class MapSelectViewComponent {
     return {type: "FeatureCollection", features};
   }
 
-  protected onLayerMouseMove(event: {features?: Feature[]}) {
+  protected onHover(event: {features?: Feature[]}) {
     console.log(event.features?.[0].properties);
-    this.selection.hover.set(event.features?.[0].properties?.["key"]);
+    let previousHover = this.selection.hover();
+    if (previousHover) {
+      let id = {id: previousHover};
+      this.countiesSource().removeFeatureState(id, "hovered");
+      this.municipalsSource().removeFeatureState(id, "hovered");
+    }
+
+    let hover: string | undefined = event.features?.[0].properties?.["key"];
+    this.selection.hover.set(hover);
+    if (hover) {
+      let id = {id: hover};
+      this.countiesSource().setFeatureState(id, {hovered: true});
+      this.municipalsSource().setFeatureState(id, {hovered: true});
+    }
   }
 
-  // TODO: update collection in place instead
-  private updateFeatureCollection(
-    featureCollection: Signal<undefined | FeatureCollection>,
-  ): undefined | FeatureCollection {
-    let collection = featureCollection();
+  protected onClick() {
     let hover = this.selection.hover();
-    if (!collection) return undefined;
-    let features = collection.features.map(feature => {
-      let key = feature.properties!["key"] as string;
-      feature.properties!["hover"] = hover == key;
-      return feature;
-    });
-    return {type: "FeatureCollection", features};
+    if (!hover) return;
+    let id = {id: hover};
+
+    if (this.mapControl.visibleLayer() == "counties") {
+      if (this.selection.counties.has(hover)) {
+        this.countiesSource().removeFeatureState(id, "selected");
+        this.selection.counties.delete(hover);
+        return;
+      }
+
+      this.countiesSource().setFeatureState(id, {selected: true});
+      this.selection.counties.add(hover);
+    }
+
+    if (this.mapControl.visibleLayer() == "municipals") {
+      if (this.selection.municipals.has(hover)) {
+        this.municipalsSource().removeFeatureState(id, "selected");
+        this.selection.municipals.delete(hover);
+        return;
+      }
+
+      this.municipalsSource().setFeatureState(id, {selected: true});
+      this.selection.municipals.add(hover);
+    }
   }
 }
