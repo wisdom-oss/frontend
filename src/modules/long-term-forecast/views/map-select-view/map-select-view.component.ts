@@ -1,4 +1,4 @@
-import {effect, signal, viewChild, Component} from "@angular/core";
+import {computed, effect, signal, viewChild, Component} from "@angular/core";
 import {
   ControlComponent,
   LayerComponent,
@@ -56,18 +56,20 @@ export class MapSelectViewComponent {
   protected geoData;
 
   constructor(geo: GeoDataService) {
+    let counties = signals.fromPromise(
+      geo.fetchLayerContents("nds_counties"),
+      this.intoFeatureCollection,
+    );
+    let municipals = signals.fromPromise(
+      geo.fetchLayerContents("nds_municipals"),
+      this.intoFeatureCollection,
+    );
+    let loaded = computed(() => !!counties() && !!municipals());
     this.geoData = {
-      counties: signals.fromPromise(
-        geo.fetchLayerContents("nds_counties"),
-        this.intoFeatureCollection,
-      ),
-      municipals: signals.fromPromise(
-        geo.fetchLayerContents("nds_municipals"),
-        this.intoFeatureCollection,
-      ),
+      counties,
+      municipals,
+      loaded,
     };
-
-    effect(() => console.log(this.selection.hover()));
   }
 
   private intoFeatureCollection<G extends Geometry>(
@@ -89,7 +91,6 @@ export class MapSelectViewComponent {
   }
 
   protected onHover(event: {features?: Feature[]}) {
-    console.log(event.features?.[0].properties);
     let previousHover = this.selection.hover();
     if (previousHover) {
       let id = {id: previousHover};

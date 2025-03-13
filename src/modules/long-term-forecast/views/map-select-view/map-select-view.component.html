@@ -67,7 +67,7 @@
         @let selectedColor = "#007ACC";
 
         @for (layer of mapControl.possibleLayers; track layer) {
-          @if (mapControl.visibleLayer() == layer) {
+          @if (geoData.loaded() && mapControl.visibleLayer() == layer) {
             <mgl-layer
               [id]="layer + '-fill'"
               type="fill"
