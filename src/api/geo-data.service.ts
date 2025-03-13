@@ -11,9 +11,8 @@ import {GeoJSON} from "geojson";
 import {firstValueFrom} from "rxjs";
 
 import {httpContexts} from "../common/http-contexts";
-import {typeUtils} from "../common/type-utils";
 
-const URL = "/api/geodata" as const;
+const URL = "/api/geodata/v2" as const;
 
 @Injectable({
   providedIn: "root",
@@ -104,11 +103,8 @@ export class GeoDataService {
 export namespace GeoDataService {
   export type LayerInformation = JTDDataType<typeof LAYER_INFORMATION>;
   export type AvailableLayers = JTDDataType<typeof AVAILABLE_LAYERS_SCHEMA>;
-  export type LayerContents = typeUtils.UpdateElements<
-    JTDDataType<typeof LAYER_CONTENTS>,
-    "geometry",
-    {geometry: GeoJSON}
-  >;
+  export type LayerContent = Omit<JTDDataType<typeof LAYER_CONTENT>, "geometry"> & {geometry: GeoJSON};
+  export type LayerContents = Omit<JTDDataType<typeof LAYER_CONTENTS>, "data"> & {data: LayerContent[]};
   export type IdentifiedObjects = JTDDataType<typeof IDENTIFIED_OBJECTS>;
 }
 
@@ -121,6 +117,7 @@ const LAYER_INFORMATION = {
   optionalProperties: {
     description: {type: "string"},
     attribution: {type: "string"},
+    attributionURL: {type: "string"},
     crs: {type: "uint32"},
     private: {type: "boolean"},
   },
@@ -149,7 +146,13 @@ const LAYER_CONTENT = {
 } as const;
 
 const LAYER_CONTENTS = {
-  elements: LAYER_CONTENT,
+  properties: {
+    data: {elements: LAYER_CONTENT}
+  },
+  optionalProperties: {
+    attribution: {type: "string", nullable: true},
+    attributionURL: {type: "string", nullable: true},
+  }
 } as const;
 
 const IDENTIFIED_OBJECTS = {

@@ -81,7 +81,7 @@ export class MapSelectViewComponent {
     let features: Feature<G>[] = [];
     let selected = 0;
 
-    for (let content of contents ?? []) {
+    for (let content of contents?.data ?? []) {
       features.push({
         type: "Feature",
         geometry: content.geometry as G,
