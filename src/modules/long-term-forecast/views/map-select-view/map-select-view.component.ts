@@ -1,4 +1,4 @@
-import {computed, effect, signal, viewChild, Component} from "@angular/core";
+import {computed, signal, viewChild, Component} from "@angular/core";
 import {
   ControlComponent,
   LayerComponent,
