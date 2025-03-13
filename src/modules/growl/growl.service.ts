@@ -156,7 +156,9 @@ export class GrowlService {
     );
 
     (async () => {
-      let contents = (await service.fetchLayerContents(layerName, undefined, cacheTtl))?.data ?? [];
+      let contents =
+        (await service.fetchLayerContents(layerName, undefined, cacheTtl))
+          ?.data ?? [];
 
       let features: Feature<G, GeoProperties>[] = [];
       for (let content of contents) {

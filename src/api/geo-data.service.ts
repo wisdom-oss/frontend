@@ -103,8 +103,14 @@ export class GeoDataService {
 export namespace GeoDataService {
   export type LayerInformation = JTDDataType<typeof LAYER_INFORMATION>;
   export type AvailableLayers = JTDDataType<typeof AVAILABLE_LAYERS_SCHEMA>;
-  export type LayerContent = Omit<JTDDataType<typeof LAYER_CONTENT>, "geometry"> & {geometry: GeoJSON};
-  export type LayerContents = Omit<JTDDataType<typeof LAYER_CONTENTS>, "data"> & {data: LayerContent[]};
+  export type LayerContent = Omit<
+    JTDDataType<typeof LAYER_CONTENT>,
+    "geometry"
+  > & {geometry: GeoJSON};
+  export type LayerContents = Omit<
+    JTDDataType<typeof LAYER_CONTENTS>,
+    "data"
+  > & {data: LayerContent[]};
   export type IdentifiedObjects = JTDDataType<typeof IDENTIFIED_OBJECTS>;
 }
 
@@ -147,12 +153,12 @@ const LAYER_CONTENT = {
 
 const LAYER_CONTENTS = {
   properties: {
-    data: {elements: LAYER_CONTENT}
+    data: {elements: LAYER_CONTENT},
   },
   optionalProperties: {
     attribution: {type: "string", nullable: true},
     attributionURL: {type: "string", nullable: true},
-  }
+  },
 } as const;
 
 const IDENTIFIED_OBJECTS = {
