@@ -64,18 +64,23 @@ export class MapSelectViewComponent {
       geo.fetchLayerContents("nds_municipals"),
       this.intoFeatureCollection,
     );
-    let loaded = computed(() => !!counties() && !!municipals());
     this.geoData = {
-      counties,
-      municipals,
-      loaded,
+      counties: computed(() => counties()?.[0]),
+      municipals: computed(() => municipals()?.[0]),
+      loaded: computed(() => !!counties() && !!municipals()),
+      attribution: computed(() => counties()?.[1]),
     };
   }
 
   private intoFeatureCollection<G extends Geometry>(
     contents: GeoDataService.LayerContents | null,
-  ): FeatureCollection<G> {
+  ): [
+    FeatureCollection<G>,
+    Partial<{attribution: string; attributionURL: string}>,
+  ] {
     let features: Feature<G>[] = [];
+
+    console.log(contents);
 
     for (let content of contents?.data ?? []) {
       features.push({
@@ -83,11 +88,17 @@ export class MapSelectViewComponent {
         geometry: content.geometry as G,
         properties: {
           key: content.key,
+          name: content.name,
         },
       });
     }
 
-    return {type: "FeatureCollection", features};
+    let featureCollection = {type: "FeatureCollection", features} as const;
+    let attribution = {
+      attribution: contents?.attribution ?? undefined,
+      attributionURL: contents?.attributionURL ?? undefined,
+    } as const;
+    return [featureCollection, attribution];
   }
 
   protected onHover(event: {features?: Feature[]}) {

@@ -6,6 +6,9 @@
       [zoom]="[6.8]"
       [center]="{lat: 52.8, lon: 9.2}"
       [canvasContextAttributes]="{preserveDrawingBuffer: true}"
+      [attributionControl]="{
+        customAttribution: geoData.attribution()?.attribution,
+      }"
     >
       <ng-container controls>
         <mgl-control
@@ -123,6 +126,15 @@
                   1,
                   0,
                 ],
+              }"
+            ></mgl-layer>
+            <mgl-layer
+              [id]="layer + '-text'"
+              type="symbol"
+              [source]="layer + '-source'"
+              [layout]="{
+                'text-field': ['get', 'name'],
+                'text-font': ['noto_sans_regular'],
               }"
             ></mgl-layer>
           }
