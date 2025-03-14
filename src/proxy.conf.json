@@ -14,5 +14,13 @@
     "pathRewrite": {
       "^/local": ""
     }
+  },
+  "/dev/**": {
+    "target": "http://wisdom-dev.vlba.uni-oldenburg.de:9120",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/dev": ""
+    }
   }
 }

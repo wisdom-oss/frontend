@@ -8,7 +8,7 @@ const API_PREFIX = "waterdemand";
 const DEV_PREFIX = "local";
 
 // need to be specified when docker is on server
-const DOCKER_PREFIX = undefined;
+const DOCKER_PREFIX = "dev";
 
 const enum Status {
   Dev = 0,
@@ -16,7 +16,7 @@ const enum Status {
   Production = 2,
 }
 
-const PROD_STATUS: Status = Status.Dev;
+const PROD_STATUS: Status = Status.DockerDev;
 
 /**
  * injects the service to be singleton throughout project.
@@ -62,7 +62,6 @@ export class WaterDemandPredictionService {
         final_url = this.router
           .parseUrl("/" + DOCKER_PREFIX + "/" + API_PREFIX + url)
           .toString();
-        console.log(final_url);
         break;
       case Status.Production:
         final_url = this.router.parseUrl("/api/" + API_PREFIX + url).toString();
@@ -77,11 +76,12 @@ export class WaterDemandPredictionService {
         );
     }
 
-    return this.http.request<T>(
-      method,
-      final_url!,
-      requestOptions,
-    ) as Observable<T>;
+    let test: string = "/dev/waterdemand/meterInformation";
+
+    console.log(test);
+    /** console.log(final_url) */
+
+    return this.http.request<T>(method, test!, requestOptions) as Observable<T>;
   }
 
   fetchMeterInformation(): Observable<any> {
