@@ -10,7 +10,7 @@ import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {remixStackFill} from "@ng-icons/remixicon";
 import {TranslateDirective} from "@ngx-translate/core";
 import {FeatureCollection, Feature, Geometry} from "geojson";
-import {Map, StyleSpecification} from "maplibre-gl";
+import {StyleSpecification} from "maplibre-gl";
 
 import {GeoDataService} from "../../../../api/geo-data.service";
 import colorful from "../../../../assets/map/styles/colorful.json";
