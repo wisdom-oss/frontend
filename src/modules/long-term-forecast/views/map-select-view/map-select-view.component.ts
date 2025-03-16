@@ -10,7 +10,7 @@ import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {remixStackFill} from "@ng-icons/remixicon";
 import {TranslateDirective} from "@ngx-translate/core";
 import {FeatureCollection, Feature, Geometry} from "geojson";
-import {StyleSpecification} from "maplibre-gl";
+import {Map, StyleSpecification} from "maplibre-gl";
 
 import {GeoDataService} from "../../../../api/geo-data.service";
 import colorful from "../../../../assets/map/styles/colorful.json";
@@ -35,6 +35,9 @@ import {signals} from "../../../../common/signals";
   ],
 })
 export class MapSelectViewComponent {
+  private mapComponent = viewChild(MapComponent);
+  private map = computed(() => this.mapComponent()?.mapInstance);
+
   protected style = colorful as any as StyleSpecification;
   protected countiesSource =
     viewChild.required<GeoJSONSourceComponent>("countiesSource");
@@ -101,47 +104,54 @@ export class MapSelectViewComponent {
     return [featureCollection, attribution];
   }
 
-  protected onHover(event: {features?: Feature[]}) {
+  protected onHover(source: string, event: {features?: Feature[]}) {
+    let map = this.map()!;
+
     let previousHover = this.selection.hover();
     if (previousHover) {
-      let id = {id: previousHover};
-      this.countiesSource().removeFeatureState(id, "hovered");
-      this.municipalsSource().removeFeatureState(id, "hovered");
+      let id = {source, id: previousHover};
+      map.removeFeatureState(id, "hovered");
+      map.removeFeatureState(id, "hovered");
     }
 
     let hover: string | undefined = event.features?.[0].properties?.["key"];
     this.selection.hover.set(hover);
     if (hover) {
-      let id = {id: hover};
-      this.countiesSource().setFeatureState(id, {hovered: true});
-      this.municipalsSource().setFeatureState(id, {hovered: true});
+      let id = {source, id: hover};
+      map.setFeatureState(id, {hovered: true});
+      map.setFeatureState(id, {hovered: true});
     }
   }
 
   protected onClick() {
     let hover = this.selection.hover();
     if (!hover) return;
-    let id = {id: hover};
+
+    let map = this.map()!;
 
     if (this.mapControl.visibleLayer() == "counties") {
+      let id = {source: "counties-source", id: hover};
+
       if (this.selection.counties.has(hover)) {
-        this.countiesSource().removeFeatureState(id, "selected");
+        map.removeFeatureState(id, "selected");
         this.selection.counties.delete(hover);
         return;
       }
 
-      this.countiesSource().setFeatureState(id, {selected: true});
+      map.setFeatureState(id, {selected: true});
       this.selection.counties.add(hover);
     }
 
     if (this.mapControl.visibleLayer() == "municipals") {
+      let id = {source: "municipals-source", id: hover};
+
       if (this.selection.municipals.has(hover)) {
-        this.municipalsSource().removeFeatureState(id, "selected");
+        map.removeFeatureState(id, "selected");
         this.selection.municipals.delete(hover);
         return;
       }
 
-      this.municipalsSource().setFeatureState(id, {selected: true});
+      map.setFeatureState(id, {selected: true});
       this.selection.municipals.add(hover);
     }
   }

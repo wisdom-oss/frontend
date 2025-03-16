@@ -71,10 +71,11 @@
 
         @for (layer of mapControl.possibleLayers; track layer) {
           @if (geoData.loaded() && mapControl.visibleLayer() == layer) {
+            @let source = layer + "-source";
             <mgl-layer
               [id]="layer + '-fill'"
               type="fill"
-              [source]="layer + '-source'"
+              [source]="source"
               [paint]="{
                 'fill-color': [
                   'case',
@@ -84,14 +85,14 @@
                 ],
                 'fill-opacity': 0.5,
               }"
-              (layerMouseMove)="onHover($event)"
-              (layerMouseLeave)="onHover($event)"
+              (layerMouseMove)="onHover(source, $event)"
+              (layerMouseLeave)="onHover(source, $event)"
               (layerClick)="onClick()"
             ></mgl-layer>
             <mgl-layer
               [id]="layer + '-line-unselected'"
               type="line"
-              [source]="layer + '-source'"
+              [source]="source"
               [paint]="{
                 'line-color': neutralColor,
                 'line-width': [
@@ -111,7 +112,7 @@
             <mgl-layer
               [id]="layer + '-line-selected'"
               type="line"
-              [source]="layer + '-source'"
+              [source]="source"
               [paint]="{
                 'line-color': selectedColor,
                 'line-width': [
@@ -131,7 +132,7 @@
             <mgl-layer
               [id]="layer + '-text'"
               type="symbol"
-              [source]="layer + '-source'"
+              [source]="source"
               [layout]="{
                 'text-field': ['get', 'name'],
                 'text-font': ['noto_sans_regular'],
