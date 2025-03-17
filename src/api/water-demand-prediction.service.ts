@@ -16,7 +16,7 @@ const enum Status {
   Production = 2,
 }
 
-const PROD_STATUS: Status = Status.DockerDev;
+const PROD_STATUS: Status = Status.Dev;
 
 /**
  * injects the service to be singleton throughout project.
@@ -76,12 +76,11 @@ export class WaterDemandPredictionService {
         );
     }
 
-    let test: string = "/dev/waterdemand/meterInformation";
-
-    console.log(test);
-    /** console.log(final_url) */
-
-    return this.http.request<T>(method, test!, requestOptions) as Observable<T>;
+    return this.http.request<T>(
+      method,
+      final_url!,
+      requestOptions,
+    ) as Observable<T>;
   }
 
   fetchMeterInformation(): Observable<any> {
