@@ -93,7 +93,7 @@ export namespace signals {
    *
    * @template T The type of values stored in the set.
    */
-  export type SetSignal<T> = Omit<WritableSignal<Set<T>>, "set" | "update"> & {
+  export type SetSignal<T> = Signal<Set<T>> & {
     add(value: T): Set<T>;
     clear(): void;
     delete(value: T): boolean;
