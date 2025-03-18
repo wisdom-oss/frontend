@@ -1,4 +1,11 @@
-import {effect, inject, signal, Signal, WritableSignal} from "@angular/core";
+import {
+  effect,
+  inject,
+  signal,
+  CreateSignalOptions,
+  Signal,
+  WritableSignal,
+} from "@angular/core";
 import {Duration} from "dayjs/plugin/duration";
 
 import {injections} from "./injections";
@@ -73,6 +80,65 @@ export namespace signals {
       value: () => {
         let value = s();
         s.set(!value);
+      },
+    });
+  }
+
+  /**
+   * A specialized signal for managing a set of unique values.
+   *
+   * Unlike using a {@link WritableSignal<Set<T>>}, this signal provides
+   * built-in methods for adding, deleting, and clearing values without
+   * requiring explicit updates.
+   *
+   * @template T The type of values stored in the set.
+   */
+  export type SetSignal<T> = Omit<WritableSignal<Set<T>>, "set" | "update"> & {
+    add(value: T): Set<T>;
+    clear(): void;
+    delete(value: T): boolean;
+  };
+
+  /**
+   * Creates a `SetSignal`, a writable signal that manages a `Set<T>` efficiently.
+   *
+   * Unlike a {@link WritableSignal<Set<T>>}, which requires manually
+   * calling a signal update when modifying it, this signal provides built-in
+   * `add`, `delete`, and `clear` methods that automatically update the signal.
+   *
+   * @template T The type of values stored in the set.
+   * @param iterable (Optional) Initial values for the set.
+   *
+   * @example
+   * // Creating an empty set signal
+   * const mySet = signals.set<number>();
+   *
+   * mySet.add(5); // Adds 5
+   * console.log(mySet()); // Set { 5 }
+   *
+   * // Creating a set with initial values
+   * const mySetWithValues = signals.set(["apple", "banana"]);
+   * mySetWithValues.delete("banana"); // Removes "banana"
+   * console.log(mySetWithValues()); // Set { "apple" }
+   */
+  export function set<T>(iterable?: Iterable<T>): SetSignal<T> {
+    let inner = new Set(iterable);
+    let s = signal(inner);
+    return Object.assign(s, {
+      add(value: T) {
+        let result = inner.add(value);
+        s.update(inner => inner);
+        return result;
+      },
+      clear() {
+        let result = inner.clear();
+        s.update(inner => inner);
+        return result;
+      },
+      delete(value: T) {
+        let result = inner.delete(value);
+        s.update(inner => inner);
+        return result;
       },
     });
   }
