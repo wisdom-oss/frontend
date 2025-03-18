@@ -1,11 +1,4 @@
-import {
-  effect,
-  inject,
-  signal,
-  CreateSignalOptions,
-  Signal,
-  WritableSignal,
-} from "@angular/core";
+import {effect, inject, signal, Signal, WritableSignal} from "@angular/core";
 import {Duration} from "dayjs/plugin/duration";
 
 import {injections} from "./injections";

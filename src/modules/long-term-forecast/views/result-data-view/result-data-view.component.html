@@ -19,13 +19,23 @@
           <label class="label">Algorithm</label>
           <p class="control has-icons-left">
             <span class="select is-fullwidth">
-              <select class="is-fullwidth">
-                @for (algo of ["a", "b", "c"]; track algo) {
-                  <option>{{ algo }}</option>
+              <select
+                class="is-fullwidth"
+                (change)="selectedAlgorithm.set($event.)"
+              >
+                @for (algo of availableAlgorithms() ?? []; track algo) {
+                  <option
+                    [selected]="selectedAlgorithm() == algo.identifier"
+                    [value]="algo.identifier"
+                  >
+                    {{ algo.displayName }}
+                  </option>
                 }
               </select>
             </span>
-            <span class="icon is-left" style="color: inherit"> </span>
+            <span class="icon is-left" style="color: inherit">
+              <ng-icon name="remixBarChartBoxAiLine"></ng-icon>
+            </span>
           </p>
         </div>
       </div>

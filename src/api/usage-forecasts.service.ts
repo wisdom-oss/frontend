@@ -81,7 +81,7 @@ const AVAILABLE_ALGORITHMS = {
       identifier: {type: "string"},
       displayName: {type: "string"},
       description: {type: "string"},
-      parameters: {
+      parameter: {
         values: {
           discriminator: "type",
           mapping: {
