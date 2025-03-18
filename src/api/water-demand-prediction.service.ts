@@ -16,7 +16,7 @@ const enum Status {
   Production = 2,
 }
 
-const PROD_STATUS: Status = Status.Dev;
+const PROD_STATUS: Status = Status.DockerDev;
 
 /**
  * injects the service to be singleton throughout project.

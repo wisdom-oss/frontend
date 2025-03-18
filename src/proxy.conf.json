@@ -16,7 +16,7 @@
     }
   },
   "/dev/**": {
-    "target": "http://wisdom-dev.vlba.uni-oldenburg.de:9120",
+    "target": "http://wisdom-dev.vlba.uni-oldenburg.de:8090",
     "secure": false,
     "changeOrigin": true,
     "pathRewrite": {
