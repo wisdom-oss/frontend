@@ -2,17 +2,17 @@ import {inject} from "@angular/core";
 import {CanActivateFn, Router, UrlTree} from "@angular/router";
 
 /**
- * A route guard that ensures required query parameters are present before 
+ * A route guard that ensures required query parameters are present before
  * allowing access.
  *
- * This function takes one or more required query parameters and returns a 
+ * This function takes one or more required query parameters and returns a
  * {@link CanActivateFn}.
- * If any required query parameter is missing, the user is redirected to a 
+ * If any required query parameter is missing, the user is redirected to a
  * specified route.
  *
- * @param required A single query parameter or an array of query parameters that 
+ * @param required A single query parameter or an array of query parameters that
  *                 must be present.
- * @param redirectTo A path or {@link UrlTree} to redirect to if any required 
+ * @param redirectTo A path or {@link UrlTree} to redirect to if any required
  *                   parameter is missing.
  *                   If not provided, the guard simply denies access.
  *

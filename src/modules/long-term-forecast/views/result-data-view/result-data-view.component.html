@@ -1,1 +1,34 @@
-<p>result-data-view works!</p>
+<div
+  class="columns block"
+  style="
+    margin: calc(var(--bulma-column-gap) * -1);
+    height: calc(100% + 2 * var(--bulma-column-gap));
+  "
+>
+  <div class="column" chart></div>
+  <div class="column" configuration>
+    <div class="message is-fullheight is-flex is-flex-direction-column">
+      <div class="message-header">
+        <p>Configure Forecast</p>
+      </div>
+      <div
+        class="message-body is-flex-grow-1 is-flex is-flex-direction-column"
+        style="overflow-y: auto"
+      >
+        <div class="field">
+          <label class="label">Algorithm</label>
+          <p class="control has-icons-left">
+            <span class="select is-fullwidth">
+              <select class="is-fullwidth">
+                @for (algo of ["a", "b", "c"]; track algo) {
+                  <option>{{ algo }}</option>
+                }
+              </select>
+            </span>
+            <span class="icon is-left" style="color: inherit"> </span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

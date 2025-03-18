@@ -12,7 +12,7 @@ import {firstValueFrom} from "rxjs";
 
 import {httpContexts} from "../common/http-contexts";
 
-const URL = "/api/geodata/v2" as const;
+const URL = "/api/geodata" as const;
 
 @Injectable({
   providedIn: "root",
@@ -22,7 +22,7 @@ export class GeoDataService {
 
   fetchAvailableLayers(): Promise<GeoDataService.AvailableLayers> {
     return firstValueFrom(
-      this.http.get<GeoDataService.AvailableLayers>(`${URL}/`, {
+      this.http.get<GeoDataService.AvailableLayers>(`${URL}/v2/`, {
         context: new HttpContext().set(
           httpContexts.validateSchema,
           AVAILABLE_LAYERS_SCHEMA,
@@ -36,12 +36,15 @@ export class GeoDataService {
   ): Promise<GeoDataService.LayerInformation | null> {
     try {
       return await firstValueFrom(
-        this.http.get<GeoDataService.LayerInformation>(`${URL}/${layerRef}`, {
-          context: new HttpContext().set(
-            httpContexts.validateSchema,
-            LAYER_INFORMATION,
-          ),
-        }),
+        this.http.get<GeoDataService.LayerInformation>(
+          `${URL}/v2/${layerRef}`,
+          {
+            context: new HttpContext().set(
+              httpContexts.validateSchema,
+              LAYER_INFORMATION,
+            ),
+          },
+        ),
       );
     } catch (error) {
       if (!(error instanceof HttpErrorResponse)) throw error;
@@ -60,7 +63,7 @@ export class GeoDataService {
     cacheTtl = dayjs.duration(1, "week"),
   ): Promise<GeoDataService.LayerContents | null> {
     try {
-      let url = `${URL}/content/${layerRef}`;
+      let url = `${URL}/v2/content/${layerRef}`;
       if (filter) {
         let queryParams = [];
         for (let [key, value] of Object.entries({
@@ -88,7 +91,7 @@ export class GeoDataService {
 
   identify(keys: string[]): Promise<GeoDataService.IdentifiedObjects> {
     let queryParams = keys.map(k => `key=${k}`);
-    let url = `${URL}/identify?${queryParams.join("=")}`;
+    let url = `${URL}/v1/identify?${queryParams.join("=")}`;
     return firstValueFrom(
       this.http.get<GeoDataService.IdentifiedObjects>(url, {
         context: new HttpContext().set(
