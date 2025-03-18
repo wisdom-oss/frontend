@@ -85,7 +85,7 @@ export class SidebarComponent implements AfterViewInit {
         this.router.isActive(link, {
           matrixParams: "ignored",
           queryParams: "ignored",
-          paths: "exact",
+          paths: "subset",
           fragment: "ignored",
         }),
       );
