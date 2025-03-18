@@ -1,4 +1,5 @@
-import {computed, signal, viewChild, Component} from "@angular/core";
+import {computed, effect, signal, viewChild, Component} from "@angular/core";
+import {RouterLink} from "@angular/router";
 import {
   ControlComponent,
   LayerComponent,
@@ -24,6 +25,7 @@ import {signals} from "../../../../common/signals";
     MapComponent,
     NavigationControlDirective,
     NgIconComponent,
+    RouterLink,
     TranslateDirective,
   ],
   templateUrl: "./map-select-view.component.html",
@@ -52,11 +54,20 @@ export class MapSelectViewComponent {
 
   protected selection = {
     hover: signal<string | undefined>(undefined),
-    counties: new Set<string>(),
-    municipals: new Set<string>(),
+    counties: signals.set<string>(),
+    municipals: signals.set<string>(),
   };
 
   protected geoData;
+
+  readonly keys = computed(() => {
+    switch (this.mapControl.visibleLayer()) {
+      case "counties":
+        return Array.from(this.selection.counties());
+      case "municipals":
+        return Array.from(this.selection.municipals());
+    }
+  });
 
   constructor(geo: GeoDataService) {
     let counties = signals.fromPromise(
@@ -82,8 +93,6 @@ export class MapSelectViewComponent {
     Partial<{attribution: string; attributionURL: string}>,
   ] {
     let features: Feature<G>[] = [];
-
-    console.log(contents);
 
     for (let content of contents?.data ?? []) {
       features.push({
@@ -132,7 +141,7 @@ export class MapSelectViewComponent {
     if (this.mapControl.visibleLayer() == "counties") {
       let id = {source: "counties-source", id: hover};
 
-      if (this.selection.counties.has(hover)) {
+      if (this.selection.counties().has(hover)) {
         map.removeFeatureState(id, "selected");
         this.selection.counties.delete(hover);
         return;
@@ -145,7 +154,7 @@ export class MapSelectViewComponent {
     if (this.mapControl.visibleLayer() == "municipals") {
       let id = {source: "municipals-source", id: hover};
 
-      if (this.selection.municipals.has(hover)) {
+      if (this.selection.municipals().has(hover)) {
         map.removeFeatureState(id, "selected");
         this.selection.municipals.delete(hover);
         return;

@@ -9,3 +9,7 @@ de = "Kommunen"
 [layer.counties]
 en = "Counties"
 de = "Landkreise"
+
+[calc-forecast]
+en = "Calculate Forecast"
+de = "Berechne Prognose"

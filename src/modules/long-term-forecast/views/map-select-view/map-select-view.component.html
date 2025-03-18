@@ -7,6 +7,7 @@
       [center]="{lat: 52.8, lon: 9.2}"
       [canvasContextAttributes]="{preserveDrawingBuffer: true}"
       [attributionControl]="{
+        compact: true,
         customAttribution: geoData.attribution()?.attribution,
       }"
     >
@@ -18,7 +19,13 @@
         ></mgl-control>
         <mgl-control position="bottom-left">
           <!-- button element is styled by maplibre -->
-          <div class="button is-primary">do stuff</div>
+          <a
+            class="button is-primary"
+            translate="long-term-forecast.calc-forecast"
+            [routerLink]="keys().length ? 'results' : null"
+            [queryParams]="{key: keys()}"
+            [attr.disabled]="keys().length ? null : true"
+          ></a>
         </mgl-control>
         <mgl-control position="top-right">
           <div
