@@ -94,17 +94,37 @@ export namespace signals {
    * @template T The type of values stored in the set.
    */
   export type SetSignal<T> = Signal<Set<T>> & {
+    /**
+     * Adds a value to the set.
+     *
+     * Notifies only if the set did not have the provided value.
+     */
     add(value: T): Set<T>;
+
+    /**
+     * Clears all values from the set.
+     *
+     * Notifies only if the set was not already empty.
+     */
     clear(): void;
+
+    /**
+     * Deletes a value from the set.
+     *
+     * Notifies only if the value was actually removed.
+     *
+     * @returns `true` if the value was removed, `false` if it was not in the set.
+     */
     delete(value: T): boolean;
   };
 
   /**
-   * Creates a `SetSignal`, a writable signal that manages a `Set<T>` efficiently.
+   * Creates a `SetSignal`, a signal that manages a `Set<T>` efficiently.
    *
    * Unlike a {@link WritableSignal<Set<T>>}, which requires manually
    * calling a signal update when modifying it, this signal provides built-in
-   * `add`, `delete`, and `clear` methods that automatically update the signal.
+   * `add`, `delete`, and `clear` methods that only notify subscribers when the
+   * set actually changes.
    *
    * @template T The type of values stored in the set.
    * @param iterable (Optional) Initial values for the set.
@@ -113,31 +133,38 @@ export namespace signals {
    * // Creating an empty set signal
    * const mySet = signals.set<number>();
    *
-   * mySet.add(5); // Adds 5
+   * mySet.add(5); // Adds 5 and notifies
    * console.log(mySet()); // Set { 5 }
+   *
+   * mySet.add(5); // No notification, since 5 is already in the set
    *
    * // Creating a set with initial values
    * const mySetWithValues = signals.set(["apple", "banana"]);
-   * mySetWithValues.delete("banana"); // Removes "banana"
+   * mySetWithValues.delete("banana"); // Removes "banana" and notifies
+   * mySetWithValues.delete("banana"); // No notification, since "banana" was already removed
    * console.log(mySetWithValues()); // Set { "apple" }
    */
   export function set<T>(iterable?: Iterable<T>): SetSignal<T> {
     let inner = new Set(iterable);
-    let s = signal(inner);
+    // Since we do not expose `set` or `update`, all updates are intentional.
+    // This ensures that notifications only occur on actual set changes.
+    let s = signal(inner, {equal: () => false});
+
     return Object.assign(s, {
       add(value: T) {
+        if (inner.has(value)) return inner; // No change, no notification
         let result = inner.add(value);
-        s.update(inner => inner);
+        s.set(inner); // Notify only on actual addition
         return result;
       },
       clear() {
-        let result = inner.clear();
-        s.update(inner => inner);
-        return result;
+        if (inner.size === 0) return; // No change, no notification
+        inner.clear();
+        s.set(inner); // Notify only if set was not empty
       },
       delete(value: T) {
         let result = inner.delete(value);
-        s.update(inner => inner);
+        if (result) s.set(inner); // Notify only on actual removal
         return result;
       },
     });
