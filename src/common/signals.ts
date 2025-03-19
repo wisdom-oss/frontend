@@ -1,4 +1,6 @@
 import {effect, inject, signal, Signal, WritableSignal} from "@angular/core";
+import {toSignal} from "@angular/core/rxjs-interop";
+import {FormControl} from "@angular/forms";
 import {Duration} from "dayjs/plugin/duration";
 
 import {injections} from "./injections";
@@ -237,5 +239,69 @@ export namespace signals {
     let mapped = signal<undefined | U>(undefined);
     promise.then(value => mapped.set(map(value)));
     return mapped;
+  }
+
+  /**
+   * A signal that wraps an Angular `FormControl`.
+   *
+   * This signal provides reactive access to the form control's value
+   * and allows updating it directly.
+   *
+   * @example
+   * const mySignal = signals.formControl<string>("");
+   *
+   * // Reading the current value
+   * console.log(mySignal()); // ""
+   *
+   * // Updating the value
+   * mySignal.set("new value");
+   *
+   * // Using in a template with Angular's form control directive:
+   * ```html
+   * <input [formControl]="mySignal.formControl">
+   * ```
+   */
+  export type FormControlSignal<T> = Signal<T> & {
+    /**
+     * The associated `FormControl` instance.
+     *
+     * This can be used in templates via the `[formControl]` directive.
+     */
+    formControl: FormControl<T>;
+
+    /**
+     * Updates the value of the form control.
+     *
+     * This is equivalent to calling `setValue` on the underlying `FormControl`.
+     *
+     * @param value The new value to set.
+     */
+    set(value: T): void;
+  };
+
+  /**
+   * Creates a `FormControlSignal` from an initial value.
+   *
+   * This function returns a signal that is linked to an Angular
+   * {@link FormControl}, allowing seamless two-way binding with form inputs.
+   * Ensure you have the `ReactiveFormsModule` imported.
+   *
+   * @example
+   * const mySignal = signals.formControl<string>("default");
+   *
+   * // Using in a component template:
+   * ```html
+   * <input [formControl]="mySignal.formControl">
+   * ```
+   */
+  export function formControl<T>(initialValue: T): FormControlSignal<T> {
+    let inner = new FormControl(initialValue) as FormControl<T>;
+    let s = toSignal(inner.valueChanges, {initialValue});
+    return Object.assign(s, {
+      formControl: inner,
+      set(value: T) {
+        inner.setValue(value);
+      },
+    });
   }
 }
