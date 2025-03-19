@@ -30,3 +30,9 @@ html {
   // avoid inherited colors from outer components for the map
   color: bulma.$text;
 }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+}
