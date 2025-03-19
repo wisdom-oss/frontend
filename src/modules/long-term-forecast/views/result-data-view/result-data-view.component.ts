@@ -1,3 +1,4 @@
+import {NgIf, NgForOf, TitleCasePipe, KeyValuePipe} from "@angular/common";
 import {computed, effect, Component} from "@angular/core";
 import {ReactiveFormsModule} from "@angular/forms";
 import {provideIcons, NgIcon} from "@ng-icons/core";
@@ -5,9 +6,20 @@ import {remixBarChartBoxAiLine} from "@ng-icons/remixicon";
 
 import {UsageForecastsService} from "../../../../api/usage-forecasts.service";
 import {signals} from "../../../../common/signals";
+import {EmptyPipe} from "../../../../common/pipes/empty.pipe";
+import { BaseChartDirective } from "ng2-charts";
 
 @Component({
-  imports: [NgIcon, ReactiveFormsModule],
+  imports: [
+    EmptyPipe,
+    KeyValuePipe,
+    NgForOf,
+    NgIcon,
+    NgIf,
+    ReactiveFormsModule,
+    TitleCasePipe,
+    BaseChartDirective
+  ],
   templateUrl: "./result-data-view.component.html",
   styles: ``,
   providers: [
