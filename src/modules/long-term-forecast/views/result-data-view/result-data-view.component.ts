@@ -3,11 +3,11 @@ import {computed, effect, Component} from "@angular/core";
 import {ReactiveFormsModule} from "@angular/forms";
 import {provideIcons, NgIcon} from "@ng-icons/core";
 import {remixBarChartBoxAiLine} from "@ng-icons/remixicon";
+import {BaseChartDirective} from "ng2-charts";
 
 import {UsageForecastsService} from "../../../../api/usage-forecasts.service";
 import {signals} from "../../../../common/signals";
 import {EmptyPipe} from "../../../../common/pipes/empty.pipe";
-import { BaseChartDirective } from "ng2-charts";
 
 @Component({
   imports: [
@@ -18,7 +18,7 @@ import { BaseChartDirective } from "ng2-charts";
     NgIf,
     ReactiveFormsModule,
     TitleCasePipe,
-    BaseChartDirective
+    BaseChartDirective,
   ],
   templateUrl: "./result-data-view.component.html",
   styles: ``,
