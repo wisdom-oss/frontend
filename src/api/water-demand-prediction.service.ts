@@ -3,20 +3,11 @@ import {Injectable} from "@angular/core";
 import {Router} from "@angular/router";
 import {Observable} from "rxjs";
 
-const API_PREFIX = "waterdemand";
+const PREFIX = "/local"; /** local development */
+//const PREFIX = "/dev/development" /** development on wisdom.dev */
+//const PREFIX = "/dev/training" /** training container on wisdom.dev */
 
-const DEV_PREFIX = "local";
-
-// need to be specified when docker is on server
-const DOCKER_PREFIX = "dev";
-
-const enum Status {
-  Dev = 0,
-  DockerDev = 1,
-  Production = 2,
-}
-
-const PROD_STATUS: Status = Status.DockerDev;
+const API_PREFIX = "/waterdemand";
 
 /**
  * injects the service to be singleton throughout project.
@@ -50,31 +41,7 @@ export class WaterDemandPredictionService {
       body: requestBody,
     };
 
-    let final_url: string | undefined;
-
-    switch (PROD_STATUS) {
-      case Status.Dev:
-        final_url = this.router
-          .parseUrl("/" + DEV_PREFIX + "/" + API_PREFIX + url)
-          .toString();
-        break;
-      case Status.DockerDev:
-        final_url = this.router
-          .parseUrl("/" + DOCKER_PREFIX + "/" + API_PREFIX + url)
-          .toString();
-        break;
-      case Status.Production:
-        final_url = this.router.parseUrl("/api/" + API_PREFIX + url).toString();
-        break;
-      default:
-        console.error(
-          "Error: PROD_STATUS has an unexpected value:",
-          PROD_STATUS,
-        );
-        throw new Error(
-          "Invalid PROD_STATUS value, cannot determine final_url.",
-        );
-    }
+    let final_url = this.router.parseUrl(PREFIX + API_PREFIX + url).toString();
 
     return this.http.request<T>(
       method,

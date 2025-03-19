@@ -15,12 +15,20 @@
       "^/local": ""
     }
   },
-  "/dev/**": {
+  "/dev/development/**": {
     "target": "http://wisdom-dev.vlba.uni-oldenburg.de:8090",
     "secure": false,
     "changeOrigin": true,
     "pathRewrite": {
-      "^/dev": ""
+      "^/dev/development": ""
+    }
+  },
+  "/dev/training/**": {
+    "target": "http://wisdom-dev.vlba.uni-oldenburg.de:9120",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/dev/training": ""
     }
   }
 }
