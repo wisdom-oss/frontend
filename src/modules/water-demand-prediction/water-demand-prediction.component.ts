@@ -415,6 +415,7 @@ export class WaterDemandPredictionComponent implements OnInit {
       .subscribe({
         next: (response: PredictionSingleSmartmeter) => {
           this.currentPredictedSmartmeterData = response;
+          console.log(this.currentPredictedSmartmeterData);
         },
         error: error => {
           console.log(error);
