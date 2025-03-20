@@ -1,3 +1,4 @@
+import {CommonModule} from "@angular/common";
 import {
   signal,
   ViewChildren,
@@ -20,7 +21,7 @@ import {DropdownComponent} from "../../common/components/dropdown/dropdown.compo
 
 @Component({
   selector: "water-demand-prediction",
-  imports: [BaseChartDirective, DropdownComponent, TranslatePipe],
+  imports: [BaseChartDirective, DropdownComponent, TranslatePipe, CommonModule],
   templateUrl: "./water-demand-prediction.component.html",
   styles: ``,
 })
@@ -35,7 +36,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     "2021-06-01T00:00:00": "water-demand-prediction.startpoint.options.b",
     "2022-01-01T00:00:00": "water-demand-prediction.startpoint.options.c",
   };
-  choiceStartPoint = signal<string>("2021-05-26T00:00:00");
+  choiceStartPoint = signal<string>("2022-01-01T00:00:00");
 
   /** variables resolution dropdown */
   menuResolution = "water-demand-prediction.choice.resolution";
@@ -62,13 +63,18 @@ export class WaterDemandPredictionComponent implements OnInit {
   /** variables name dropdown */
   menuSmartmeter = "water-demand-prediction.choice.smartmeter";
   optionsSmartmeter: Record<string, string> = {};
-  choiceSmartmeter = signal<string>("urn:ngsi-ld:Device:atypical-household");
+  choiceSmartmeter = signal<string>("urn:ngsi-ld:Device:retired-household");
+
+  /** if weather data should be incorporated or not */
+  useWeather: boolean = true;
 
   /** data object of current requested Smartmeterdata */
   currentSmartmeterData?: SingleSmartmeter;
 
   /** data object of current requested Smartmeterdata */
-  currentPredictedSmartmeterData?: PredictionSingleSmartmeter;
+  currentPredictedSmartmeterData = signal<PredictionSingleSmartmeter | null>(
+    null,
+  );
 
   /** Record to hold all saved ChartDatasets */
   savedDatasets: Record<string, SmartmeterDataset[]> = {};
@@ -78,9 +84,6 @@ export class WaterDemandPredictionComponent implements OnInit {
 
   /**allows multiple records over all charts if true */
   allowCheckMultiple = signal<boolean>(true);
-
-  /** if weather data should be incorporated or not */
-  useWeather: boolean = true;
 
   /**
    * data skeleton for the line graph
@@ -150,6 +153,15 @@ export class WaterDemandPredictionComponent implements OnInit {
   @ViewChildren(BaseChartDirective) charts:
     | QueryList<BaseChartDirective>
     | undefined;
+
+  explainMAE: string =
+    "In the context of machine learning, absolute error refers to the magnitude of difference between the prediction of an observation and the true value of that observation. MAE takes the average of absolute errors for a group of predictions and observations as a measurement of the magnitude of errors for the entire group. MAE can also be referred as L1 loss function.";
+  explainRMSE: string =
+    "Root mean square error or root mean square deviation is one of the most commonly used measures for evaluating the quality of predictions. It shows how far predictions fall from measured true values using Euclidean distance.";
+  explainMSE: string =
+    "In the fields of regression analysis and machine learning, the Mean Square Error (MSE) is a crucial metric for evaluating the performance of predictive models. It measures the average squared difference between the predicted and the actual target values within a dataset. The primary objective of the MSE is to assess the quality of a model's predictions by measuring how closely they align with the ground truth.";
+  explainR2: string =
+    "The R-squared metric — R², or the coefficient of determination – is used to measure how well a model fits data, and how well it can predict future outcomes. Simply put, it tells you how much of the variation in your data can be explained by your model. The closer the R-squared value is to one, the better your model fits the data.";
 
   constructor(public waterDemandService: WaterDemandPredictionService) {}
 
@@ -254,7 +266,6 @@ export class WaterDemandPredictionComponent implements OnInit {
       let value = (hash >> (i * 8)) & 0xff;
       color += ("00" + value.toString(16)).slice(-2);
     }
-    console.log(color);
     return color;
   }
 
@@ -325,7 +336,6 @@ export class WaterDemandPredictionComponent implements OnInit {
       )
       .subscribe({
         next: response => {
-          console.log(response);
           alert(response);
         },
         error: error => {
@@ -414,45 +424,50 @@ export class WaterDemandPredictionComponent implements OnInit {
       )
       .subscribe({
         next: (response: PredictionSingleSmartmeter) => {
-          this.currentPredictedSmartmeterData = response;
-          console.log(this.currentPredictedSmartmeterData);
+          this.currentPredictedSmartmeterData.set(null);
+          this.currentPredictedSmartmeterData.set(response);
+          console.log(
+            "Updated signal value:",
+            this.currentPredictedSmartmeterData(),
+          );
         },
         error: error => {
           console.log(error);
         },
         complete: () => {
+          console.log(this.currentPredictedSmartmeterData);
           let newDataset = this.createNewDataset(
-            this.currentPredictedSmartmeterData?.numValue!,
-            this.currentPredictedSmartmeterData?.name!,
-            this.currentPredictedSmartmeterData?.resolution!,
-            this.currentPredictedSmartmeterData?.timeframe!,
+            this.currentPredictedSmartmeterData()!.numValue,
+            this.currentPredictedSmartmeterData()!.name,
+            this.currentPredictedSmartmeterData()!.resolution,
+            this.currentPredictedSmartmeterData()!.timeframe,
             false,
             this.chartType(),
           );
 
           let realDataset = this.createNewDataset(
-            this.currentPredictedSmartmeterData?.realValue!,
+            this.currentPredictedSmartmeterData()!.realValue,
             "real values",
-            this.currentPredictedSmartmeterData?.resolution!,
-            this.currentPredictedSmartmeterData?.timeframe!,
+            this.currentPredictedSmartmeterData()!.resolution,
+            this.currentPredictedSmartmeterData()!.timeframe,
             false,
             this.chartType(),
           );
 
           let lower_conf_int = this.createNewDataset(
-            this.currentPredictedSmartmeterData?.lower_conf_values!,
+            this.currentPredictedSmartmeterData()!.lower_conf_values,
             "lower_confidence_interval",
-            this.currentPredictedSmartmeterData?.resolution!,
-            this.currentPredictedSmartmeterData?.timeframe!,
+            this.currentPredictedSmartmeterData()!.resolution,
+            this.currentPredictedSmartmeterData()!.timeframe,
             0,
             this.chartType(),
           );
 
           let upper_conf_int = this.createNewDataset(
-            this.currentPredictedSmartmeterData?.upper_conf_values!,
+            this.currentPredictedSmartmeterData()!.upper_conf_values,
             "upper_confidence_interval",
-            this.currentPredictedSmartmeterData?.resolution!,
-            this.currentPredictedSmartmeterData?.timeframe!,
+            this.currentPredictedSmartmeterData()!.resolution,
+            this.currentPredictedSmartmeterData()!.timeframe,
             0,
             this.chartType(),
           );
@@ -462,32 +477,29 @@ export class WaterDemandPredictionComponent implements OnInit {
             dataset: newDataset,
             realValue_dataset: realDataset,
             lower_conf_interval_dataset: lower_conf_int,
-            labels: this.currentPredictedSmartmeterData?.dateObserved!,
+            labels: this.currentPredictedSmartmeterData()!.dateObserved,
           };
-
-          console.log(smartmeterdata);
-
           if (
             !this.predictedDatasets[
-              this.currentPredictedSmartmeterData?.resolution!
+              this.currentPredictedSmartmeterData()!.resolution
             ]
           ) {
             this.predictedDatasets[
-              this.currentPredictedSmartmeterData?.resolution!
+              this.currentPredictedSmartmeterData()!.resolution
             ] = [];
           }
 
           this.predictedDatasets[
-            this.currentPredictedSmartmeterData?.resolution!
+            this.currentPredictedSmartmeterData()!.resolution
           ].push(smartmeterdata);
 
           this.setDisplayedResolution(
-            this.currentPredictedSmartmeterData?.resolution!,
+            this.currentPredictedSmartmeterData()!.resolution,
           );
+
           this.showPredictedDatasats(
-            this.currentPredictedSmartmeterData?.resolution!,
+            this.currentPredictedSmartmeterData()!.resolution,
           );
-          this.currentPredictedSmartmeterData = undefined;
         },
       });
   }

@@ -105,3 +105,23 @@ de = "Anfang Juni 2021"
 [startpoint.options.c]
 en = "Start of 2022"
 de = "Anfang 2022"
+
+[useWeather.On]
+en = "Use Weather Data"
+de = "Nutze Wetterdaten"
+
+[useWeather.Off]
+en = "Do not use Weather Data"
+de = "Nutze keine Wetterdaten"
+
+[metrics.MAE]
+en = "Mean Absolute Error"
+de = "Mittlerer abs. Fehler"
+
+[metrics.MSE]
+en = "Mean Squared Error"
+de = "Mittlere quadratische Abweichung"
+
+[metrics.RMSE]
+en = "Root Mean Squared Error"
+de = "Wurzel des mittleren quadratischen Fehlers"

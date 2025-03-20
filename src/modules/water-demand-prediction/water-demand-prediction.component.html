@@ -76,9 +76,9 @@
               [type]="chartType()"
             ></canvas>
           </div>
-          <!--dropdown buttons for selection -->
+          <!--buttons for showing and training -->
           <div class="is-fullwidth">
-            <div class="">
+            <div class="buttons is-justify-content-space-around">
               <button
                 class="button is-primary is-rounded"
                 (click)="fetchDataSmartmeter()"
@@ -91,33 +91,47 @@
               >
                 {{ "water-demand-prediction.request.trainModel" | translate }}
               </button>
-              <dropdown
-                [menuName]="menuStartPoint"
-                [options]="optionsStartPoint"
-                [changeMenuName]="true"
-                kind="hover"
-                (choice)="choiceStartPoint.set($event)"
-              ></dropdown>
+              <button
+                class="button is-rounded"
+                [class.is-success]="useWeather"
+                (click)="toggleWeather()"
+              >
+                <span>{{
+                  useWeather
+                    ? ("water-demand-prediction.useWeather.On" | translate)
+                    : ("water-demand-prediction.useWeather.Off" | translate)
+                }}</span>
+              </button>
+            </div>
+            <!-- drop down menus-->
+            <div class="buttons is-justify-content-space-around">
               <dropdown
                 [menuName]="menuResolution"
                 [options]="optionsResolution"
                 [changeMenuName]="true"
                 kind="hover"
-                (choice)="choiceResolution.set($event)"
+                [(choice)]="choiceResolution"
               ></dropdown>
               <dropdown
                 [menuName]="menuTime"
                 [options]="optionsTime"
                 [changeMenuName]="true"
                 kind="hover"
-                (choice)="choiceTime.set($event)"
+                [(choice)]="choiceTime"
               ></dropdown>
               <dropdown
                 [menuName]="menuSmartmeter"
                 [options]="optionsSmartmeter"
                 [changeMenuName]="true"
                 kind="hover"
-                (choice)="choiceSmartmeter.set($event)"
+                [(choice)]="choiceSmartmeter"
+              ></dropdown>
+              <dropdown
+                [menuName]="menuStartPoint"
+                [options]="optionsStartPoint"
+                [changeMenuName]="true"
+                kind="hover"
+                [(choice)]="choiceStartPoint"
               ></dropdown>
             </div>
           </div>
@@ -130,6 +144,7 @@
         <div class="level">
           <div class="level-left">
             <div class="buttons has-addons is-justify-content-start">
+              <!-- reset button -->
               <button
                 class="button is-primary is-rounded"
                 (click)="resetPredictionChart()"
@@ -148,20 +163,70 @@
           ></canvas>
         </div>
         <div class="buttons is-justify-content-space-around">
-          <!-- menus for prediction values -->
-          <button
-            class="button is-rounded"
-            [class.is-success]="useWeather"
-            (click)="toggleWeather()"
-          >
-            <span>{{ useWeather ? "Use Weather" : "Don't Use Weather" }}</span>
-          </button>
+          <!-- buttons for prediction values -->
           <button
             class="button is-primary is-rounded"
             (click)="fetchPredDataSmartmeter()"
           >
             {{ "water-demand-prediction.request.preddata" | translate }}
           </button>
+        </div>
+        <!-- Analysis metrics -->
+        <div>
+          <table class="table is-fullwidth">
+            <thead>
+              <th title="{{ explainMAE }}">
+                {{ "water-demand-prediction.metrics.MAE" | translate }}
+              </th>
+              <th title="{{ explainMSE }}">
+                {{ "water-demand-prediction.metrics.MSE" | translate }}
+              </th>
+              <th title="{{ explainRMSE }}">
+                {{ "water-demand-prediction.metrics.RMSE" | translate }}
+              </th>
+              <th title="{{ explainR2 }}">R2</th>
+            </thead>
+            <tbody>
+              <tr *ngIf="currentPredictedSmartmeterData()">
+                <td
+                  title="{{
+                    currentPredictedSmartmeterData()?.meanAbsoluteError
+                  }}"
+                >
+                  {{
+                    currentPredictedSmartmeterData()!.meanAbsoluteError * 100
+                      | number: "1.2-2"
+                  }}%
+                </td>
+                <td
+                  title="{{
+                    currentPredictedSmartmeterData()?.meanSquaredError
+                  }}"
+                >
+                  {{
+                    currentPredictedSmartmeterData()!.meanSquaredError * 100
+                      | number: "1.2-2"
+                  }}%
+                </td>
+                <td
+                  title="{{
+                    currentPredictedSmartmeterData()?.rootOfmeanSquaredError
+                  }}"
+                >
+                  {{
+                    currentPredictedSmartmeterData()!.rootOfmeanSquaredError *
+                      100 | number: "1.2-2"
+                  }}%
+                </td>
+                <td title="{{ currentPredictedSmartmeterData()?.r2 }}">
+                  {{
+                    currentPredictedSmartmeterData()!.r2 * 100
+                      | number: "1.2-2"
+                  }}%
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
