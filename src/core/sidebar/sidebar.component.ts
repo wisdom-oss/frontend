@@ -9,16 +9,20 @@ import {
 } from "@angular/core";
 import {NavigationEnd, RouterLink, Router} from "@angular/router";
 import {
+  remixBookLine,
+  remixBookShelfLine,
+  remixLineChartLine,
+  remixRfidLine,
+  remixDatabase2Fill,
+  remixMap2Fill,
+  remixMapLine,
+} from "@ng-icons/remixicon";
+import {
   provideIcons,
   provideNgIconLoader,
   NgIconComponent,
   NgIconStack,
 } from "@ng-icons/core";
-import {
-  remixDatabase2Fill,
-  remixMap2Fill,
-  remixMapLine,
-} from "@ng-icons/remixicon";
 import {TranslateDirective} from "@ngx-translate/core";
 import {filter} from "rxjs";
 
@@ -39,6 +43,10 @@ import {AuthService} from "../auth/auth.service";
   styleUrl: "./sidebar.component.scss",
   providers: [
     provideIcons({
+      remixBookShelfLine,
+      remixBookLine,
+      remixRfidLine,
+      remixLineChartLine,
       remixMap2Fill,
       remixDatabase2Fill,
       remixMapLine,
