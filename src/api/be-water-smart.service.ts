@@ -1,110 +1,81 @@
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpContext} from "@angular/common/http";
 import {Injectable} from "@angular/core";
-import {Router} from "@angular/router";
-import {Observable, firstValueFrom} from "rxjs";
+import {firstValueFrom} from "rxjs";
+import {JTDDataType} from "ajv/dist/core";
 
-import {
-  AllAlgorithms,
-  ForeCast,
-  VirtualMeter,
-  AllPhysicalMeters,
-  AllVirtualMeters,
-  AllModels,
-} from "../modules/be-water-smart/bws-interfaces";
+import {httpContexts} from "../common/http-contexts";
 
-/**
- * constant holding the api prefix to reach the bws api
- */
-const URL = "/api/bws";
+const URL = "/api/bws" as const;
 
 @Injectable({
   providedIn: "root",
 })
 export class BeWaterSmartService {
-  constructor(
-    private http: HttpClient,
-    private router: Router,
-  ) {}
+  constructor(private http: HttpClient) {}
 
-  /**
-   * generalized request method for bws api
-   * @param method to use for request
-   * @param url string as api endpoint
-   * @param requestBody bonus information in post and put requests
-   * @returns an Observable with the set interface
-   */
-  sendRequest<T>(
-    method: "get" | "post" | "put" | "delete",
-    url: string,
-    requestBody?: any,
-  ) {
-    /**
-     * normal URL for server
-     */
-    const normalURL = this.router.parseUrl(URL + url).toString();
-
-    let requestOptions: any = {
-      responseType: "json",
-      body: requestBody,
-    };
-
-    return this.http.request<T>(
-      method,
-      normalURL,
-      requestOptions,
-    ) as Observable<T>;
+  fetchPhysicalMeters(): Promise<BeWaterSmartService.PhysicalMeters> {
+    return firstValueFrom(
+      this.http.get<BeWaterSmartService.PhysicalMeters>(`${URL}/physical-meters`, 
+        {
+          context: new HttpContext().set(
+            httpContexts.validateSchema,
+            PHYSICAL_METERS,
+          ),
+        },
+      ),
+    );
   }
 
-  /**
-   * uses send request method to test the reachability of bws api
-   * @returns success message or http error
-   */
-  getDebugMessage() {
-    return this.sendRequest("get", "/debug");
+  fetchVirtualMeters(): Promise<BeWaterSmartService.VirtualMeters> {
+    return firstValueFrom(
+      this.http.get<BeWaterSmartService.VirtualMeters>(`${URL}/virtual-meters`,
+        {
+          context: new HttpContext().set(
+            httpContexts.validateSchema,
+            VIRTUAL_METERS,
+          )
+        },
+      ),
+    );
   }
 
-  /**
-   * requests physical meter information from bws api
-   * @returns observable containing list of all pm information
-   */
-  getPhysicalMeters() {
-    return this.sendRequest<AllPhysicalMeters>("get", "/physical-meters");
+  fetchAlgorithms(): Promise<BeWaterSmartService.Algorithms> {
+    return firstValueFrom(
+      this.http.get<BeWaterSmartService.Algorithms>(`${URL}/algorithms`,
+        {
+          context: new HttpContext().set(
+            httpContexts.validateSchema,
+            ALGORITHMS,
+          )
+        },
+      ),
+    );
   }
 
-  /**
-   * requests virtual meter information from bws api
-   * @returns observable containing list of all vm information
-   */
-  getVirtualMeters() {
-    return this.sendRequest<AllVirtualMeters>("get", "/virtual-meters");
+  fetchModels(): Promise<BeWaterSmartService.Models> {
+    return firstValueFrom(
+      this.http.get<BeWaterSmartService.Models>(`${URL}/models`,
+        {
+          context: new HttpContext().set(
+            httpContexts.validateSchema,
+            MODELS,
+          )
+        },
+      ),
+    );
   }
 
-  /**
-   * requests all algorithms provided by bws api
-   * @returns observable containing list of all algorithms
-   */
-  getAlgorithms() {
-    return this.sendRequest<AllAlgorithms>("get", "/algorithms");
-  }
-
-  /**
-   * requests all trained models from bws api
-   * @returns observable containing list of all trained models
-   */
-  getModels() {
-    return this.sendRequest<AllModels>("get", "/models");
-  }
-
-  /**
-   * request the forecast data to create a graph from bws api
-   * @param meterId id of the virtual meter being used
-   * @param alg name of the algorithm being used
-   * @returns observable containing all measuring points for the next day
-   */
-  getCreateForecast(meterId: string, alg: string): Promise<ForeCast[]> {
-    let url = "/meters/" + meterId + "/forecast" + "?algorithm=" + alg;
-
-    return firstValueFrom(this.sendRequest<ForeCast[]>("get", url));
+  getCreateForecast(meterId: string, algId: string): Promise<BeWaterSmartService.ForeCasts> {
+    return firstValueFrom(
+      this.http.get<BeWaterSmartService.ForeCasts>(`${URL}/meters/${meterId}/forecast?algorithm=${algId}`,
+        {
+          context: new HttpContext().set(
+            httpContexts.validateSchema,
+            FORECASTS
+          )
+        },
+      ),
+    );
   }
 
   /**
@@ -116,7 +87,7 @@ export class BeWaterSmartService {
   addVirtualMeterWithId(id: string, submeters: any) {
     let url = "/virtual-meters?name=" + id;
 
-    return this.sendRequest<AllVirtualMeters>("post", url, submeters);
+    return //this.sendRequest<AllVirtualMeters>("post", url, submeters);
   }
 
   /**
@@ -127,7 +98,7 @@ export class BeWaterSmartService {
   delVirtualMeterById(input: string) {
     let url = "/virtual-meters/" + input;
 
-    return this.sendRequest("delete", url);
+    return //this.sendRequest("delete", url);
   }
 
   /**
@@ -140,7 +111,7 @@ export class BeWaterSmartService {
    * @param comment string to identify the trained model afterwards
    * @returns observable containing all training data in a list
    */
-  putTrainModel(meter: VirtualMeter, input: Algorithm, comment?: string) {
+  putTrainModel(meter: BeWaterSmartService.VirtualMeter, input: Algorithm, comment?: string) {
     let virt = meter.id.toString();
     let alg = input.name.toString();
 
@@ -150,7 +121,7 @@ export class BeWaterSmartService {
       url = url + "?comment=" + comment;
     }
 
-    return this.sendRequest<AllModels>("put", url);
+    return //this.sendRequest<AllModels>("put", url);
   }
 
   /**
@@ -164,6 +135,198 @@ export class BeWaterSmartService {
   delModel(meter: string, alg: string) {
     let url = "/models/" + meter + ":MLModel:" + alg;
 
-    return this.sendRequest("delete", url);
+    return //this.sendRequest("delete", url);
   }
 }
+
+export namespace BeWaterSmartService {
+  export type PhysicalMeter =  JTDDataType<typeof PHYSICAL_METER>;
+  export type PhysicalMeters =  JTDDataType<typeof PHYSICAL_METERS>;
+  export type VirtualMeter = JTDDataType<typeof VIRTUAL_METER>;
+  export type VirtualMeters = JTDDataType<typeof VIRTUAL_METERS>;
+  export type Algorithm = JTDDataType<typeof ALGORITHM>;
+  export type Algorithms = JTDDataType<typeof ALGORITHMS>;
+  export type Model = JTDDataType<typeof MODEL>;
+  export type Models = JTDDataType<typeof MODELS>;
+  export type ForeCast = JTDDataType<typeof FORECAST>;
+  export type ForeCasts = JTDDataType<typeof FORECASTS>;
+}
+
+const PHYSICAL_METER = {
+  properties: {
+    address: {
+      properties: {
+        addressCountry: {type: "string"},
+        addressLocality: {type: "string"},
+        streetAddress: {type: "string"},
+      },
+    },
+    category: {type: "string"},
+    date: {type: "string"},
+    description: {type: "string"},
+    id: {type: "string"},
+    type: {type: "string"},
+  },
+} as const;
+
+const PHYSICAL_METERS = {
+  properties: {
+    meters: {
+      elements: PHYSICAL_METER,
+    },
+  },
+} as const;
+
+const VIRTUAL_METER = {
+  properties: {
+    dateCreated: {type: "string"},
+    description: {type: "string"},
+     id: {type: "string"},
+     submeterIds: {
+      elements: {type: "string"},
+     },
+     supermeterIds: {
+      elements: {type: "string"},
+     },
+  },
+} as const;
+
+const VIRTUAL_METERS = {
+  properties: {
+    virtualMeters: {
+      elements: VIRTUAL_METER,
+    },
+  },
+} as const;
+
+const ALGORITHM = {
+  properties: {
+    description: {type: "string"},
+    estimatedTrainingTime: {type: "int32", nullable: true},
+    name: {type: "string"},
+  },
+} as const;
+
+const ALGORITHMS = {
+  properties: {
+    algorithms: {
+      elements: ALGORITHM,
+    },
+  },
+} as const;
+
+const MODEL = {
+  properties: {
+    algorithm: {type: "string"},
+    comment: {type: "string"},
+    dateCreated: {type: "string"},
+    dateModified: {type: "string"},
+    description: {type: "string"},
+    evaluation: {
+      properties: {
+        actualTestConsumption: {
+          elements: {type: "float32"},
+        },
+        metrics: {
+          properties: {
+            mape: {type: "float32"},
+            mse: {type: "float32"},
+            rmse: {type: "float32"},
+            smape: {type: "float32"},
+          },
+        },
+        predictedTestConsumption: {
+          elements: {type: "float32"},
+        },
+        testCovariates: {
+          properties: {
+            day: {
+              elements: {type: "float32"},
+            },
+            is_holiday: {
+              elements: {type: "int32"},
+            },
+            is_weekend: {
+              elements: {type: "int32"},
+            },
+            month: {
+              elements: {type: "float32"},
+            },
+            "precipitation (mm)": {
+              elements: {type: "float32"},
+            },
+            year: {
+              elements: {type: "int32"},
+            },
+          },
+        },
+        testTimestamps: {
+          elements: {type: "string"},
+        },
+      },
+    },
+    hyperparameters: {
+      optionalProperties: {
+        country_holidays: {type: "string"},
+        daily_seasonality: {type: "int32"},
+        weekly_seasonality: {type: "int32"},
+        yearly_seasonality: {type: "int32"},
+        colsample_bytree: {type: "float32"},
+        eval_metric: {type: "string"},
+        gamma: {type: "int32"},
+        lags: {type: "int32"},
+        lags_future_covariates: {
+          elements: {type: "int32"},
+        },
+        learning_rate: {type: "float32"},
+        max_depth: {type: "int32"},
+        min_child_weight: {type: "int32"},
+        objective: {type: "string"}, 
+        verbose: {type: "int32"},
+        verbosity: {type: "int32"},
+      },
+    },
+    id: {type: "string"},
+    inputAttributes: {
+      elements: {type: "string"},
+    },
+    isDefault: {type: "boolean"},
+    isModelValid: {type: "boolean"},
+    mlFramework: {type: "string"},
+    refMeter: {type: "string"},
+  },
+} as const;
+
+const MODELS = {
+  properties: {
+    MLModels: {
+      elements: MODEL,
+    },
+  },
+} as const;
+
+const FORECAST = {
+  properties: {
+    covariateValues: {
+      properties: {
+        day: {type: "int32"},
+        is_holiday: {type: "int32"},
+        is_weekend: {type: "int32"},
+        month: {type: "float32"},
+        "precipitation (mm)": {type: "int32"},
+        year: {type: "int32"},
+      },
+    },
+    datePredicted: {type: "string"},
+    histRefValues: {},
+    id: {type: "string"},
+    numValue: {type: "float32"},
+    refDevice: {type: "string"},
+    type: {type: "string"},
+    unit: {type: "string"},
+  },
+} as const;
+
+const FORECASTS = {
+    elements: FORECAST,
+} as const;
