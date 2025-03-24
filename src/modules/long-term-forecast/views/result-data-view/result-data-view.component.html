@@ -6,13 +6,49 @@
   "
 >
   <ng-container chart>
+    @let options =
+      {
+        maintainAspectRatio: false,
+        onClick: onChartClick,
+        scales: {
+          x: {
+            stacked: true,
+            title: {
+              display: true,
+              text: "Year",
+            },
+            grid: {
+              display: false,
+            },
+          },
+          y: {
+            stacked: true,
+            title: {
+              display: true,
+              text: "Water Usage [m³]",
+            },
+          },
+        },
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+      };
+
     <div class="column" style="min-width: 25em">
       <div class="card" style="height: 100%">
-        <div class="card-content" style="height: 100%">
+        <div
+          class="card-content skeleton-block"
+          [class.skeleton-block]="datasets.value() | empty"
+          style="height: 100%"
+        >
           <canvas
             baseChart
             type="bar"
-            style="height: 100%; width: 100%"
+            class="is-fullheight is-fullwidth"
+            [options]="options"
+            [datasets]="datasets.value()"
           ></canvas>
         </div>
       </div>
