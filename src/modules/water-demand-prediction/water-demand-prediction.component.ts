@@ -68,6 +68,8 @@ export class WaterDemandPredictionComponent implements OnInit {
   /** if weather data should be incorporated or not */
   useWeather: boolean = true;
 
+  standard_weather: string = "air_temperature";
+
   /** data object of current requested Smartmeterdata */
   currentSmartmeterData?: SingleSmartmeter;
 
@@ -326,13 +328,21 @@ export class WaterDemandPredictionComponent implements OnInit {
       return;
     }
 
+    let weather: string;
+
+    if (this.useWeather) {
+      weather = this.standard_weather;
+    } else {
+      weather = "plain";
+    }
+
     this.waterDemandService
       .trainModelOnSingleSmartmeter(
         this.choiceStartPoint(),
         this.choiceSmartmeter(),
         this.choiceTime(),
         this.choiceResolution(),
-        this.useWeather,
+        weather,
       )
       .subscribe({
         next: response => {
@@ -414,13 +424,21 @@ export class WaterDemandPredictionComponent implements OnInit {
       return;
     }
 
+    let weather: string;
+
+    if (this.useWeather) {
+      weather = this.standard_weather;
+    } else {
+      weather = "plain";
+    }
+
     this.waterDemandService
       .fetchSinglePredictionSmartmeter(
         this.choiceStartPoint(),
         this.choiceSmartmeter(),
         this.choiceTime(),
         this.choiceResolution(),
-        this.useWeather,
+        weather,
       )
       .subscribe({
         next: (response: PredictionSingleSmartmeter) => {
@@ -435,7 +453,6 @@ export class WaterDemandPredictionComponent implements OnInit {
           console.log(error);
         },
         complete: () => {
-          console.log(this.currentPredictedSmartmeterData);
           let newDataset = this.createNewDataset(
             this.currentPredictedSmartmeterData()!.numValue,
             this.currentPredictedSmartmeterData()!.name,
@@ -447,7 +464,7 @@ export class WaterDemandPredictionComponent implements OnInit {
 
           let realDataset = this.createNewDataset(
             this.currentPredictedSmartmeterData()!.realValue,
-            "real values",
+            "real values" + this.currentPredictedSmartmeterData()!.name,
             this.currentPredictedSmartmeterData()!.resolution,
             this.currentPredictedSmartmeterData()!.timeframe,
             false,

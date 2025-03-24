@@ -41,6 +41,8 @@ export class WaterDemandPredictionService {
       body: requestBody,
     };
 
+    console.log(requestBody);
+
     let final_url = this.router.parseUrl(PREFIX + API_PREFIX + url).toString();
 
     return this.http.request<T>(
@@ -73,14 +75,14 @@ export class WaterDemandPredictionService {
     nameOfSmartmeter: string,
     timeframe: string,
     resolution: string,
-    useWeather: boolean,
+    weatherCapability: string,
   ): Observable<any> {
     return this.sendRequest("post", "/loadModelAndPredict", {
       startpoint: startpoint,
       name: nameOfSmartmeter,
       timeframe: timeframe,
       resolution: resolution,
-      useWeather: useWeather,
+      weatherCapability: weatherCapability,
     });
   }
 
@@ -89,14 +91,14 @@ export class WaterDemandPredictionService {
     nameOfSmartmeter: string,
     timeframe: string,
     resolution: string,
-    useWeather: boolean,
+    weatherCapability: string,
   ): Observable<any> {
     return this.sendRequest("post", "/trainModel", {
       startpoint: startpoint,
       name: nameOfSmartmeter,
       timeframe: timeframe,
       resolution: resolution,
-      useWeather: useWeather,
+      weatherCapability: weatherCapability,
     });
   }
 

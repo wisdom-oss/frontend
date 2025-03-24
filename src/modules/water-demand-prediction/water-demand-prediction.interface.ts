@@ -19,6 +19,8 @@ export interface PredictionSingleSmartmeter extends SingleSmartmeter {
   meanSquaredError: number;
   rootOfmeanSquaredError: number;
   r2: number;
+  aic: number;
+  fit_time: string;
 }
 
 export interface SmartmeterDataset {
