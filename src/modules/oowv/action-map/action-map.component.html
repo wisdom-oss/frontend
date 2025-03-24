@@ -1,5 +1,8 @@
 <div class="card block is-fullheight is-flex is-flex-direction-column">
-  <div class="card-content p-0 is-clipped is-flex-grow-1 is-fullheight">
+  <div 
+    class="card-content p-0 is-clipped is-flex-grow-1 is-fullheight"
+    [class.skeleton-block]="!initialLoad()"
+  >
     <mgl-map
       class="is-fullheight"
       [style]="style"
