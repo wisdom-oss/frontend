@@ -11,7 +11,7 @@ import {UsageForecastsService} from "../../../../api/usage-forecasts.service";
 import {GeoDataService} from "../../../../api/geo-data.service";
 import {signals} from "../../../../common/signals";
 import {EmptyPipe} from "../../../../common/pipes/empty.pipe";
-import {RgbaColor} from "../../../../common/rgba-color";
+import {RgbaColor} from "../../../../common/utils/rgba-color";
 
 type ChartDatasets = ChartDataset<"bar", {x: string; y: number}[]>[];
 
@@ -44,6 +44,8 @@ export class ResultDataViewComponent {
     let id = this.selectedAlgorithmIdentifier();
     return available.find(algo => algo.identifier == id);
   });
+
+  protected parameters: Record<string, Record<string, any>> = {};
 
   protected forecastResult = signal<undefined | UsageForecastsService.Result>(
     undefined,
