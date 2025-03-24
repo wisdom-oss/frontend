@@ -89,9 +89,10 @@ export class GeoDataService {
     }
   }
 
-  identify(keys: string[]): Promise<GeoDataService.IdentifiedObjects> {
-    let queryParams = keys.map(k => `key=${k}`);
-    let url = `${URL}/v1/identify?${queryParams.join("=")}`;
+  identify(keys: Iterable<string>): Promise<GeoDataService.IdentifiedObjects> {
+    let queryParams: string[] = [];
+    for (let key of keys) queryParams.push(`key=${key}`);
+    let url = `${URL}/v1/identify?${queryParams.join("&")}`;
     return firstValueFrom(
       this.http.get<GeoDataService.IdentifiedObjects>(url, {
         context: new HttpContext().set(
