@@ -9,8 +9,8 @@ export function defaults<K extends string | number | symbol, V>(
 /**
  * Wraps a record so that any missing key will automatically get a default value.
  *
- * If a `defaultGenerator` is provided, it's called with the missing key to 
- * create the value. 
+ * If a `defaultGenerator` is provided, it's called with the missing key to
+ * create the value.
  * If no generator is given, missing keys will default to an empty object (`{}`).
  * This avoids having to check for key presence before using the value.
  *
@@ -24,7 +24,7 @@ export function defaults<K extends string | number | symbol, V>(
  * ```
  *
  * @remarks
- * The `initial` object is not cloned. 
+ * The `initial` object is not cloned.
  * Any changes to the returned record will directly affect the original one.
  */
 export function defaults<K extends string | number | symbol, V>(
@@ -36,6 +36,6 @@ export function defaults<K extends string | number | symbol, V>(
     get(_target, prop, _receiver) {
       if (!(prop in initial)) initial[prop as K] = gen(prop as K) as V;
       return initial[prop as K];
-    }
+    },
   });
 }
