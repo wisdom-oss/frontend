@@ -1,7 +1,7 @@
 import {HttpClient, HttpContext} from "@angular/common/http";
 import {Injectable} from "@angular/core";
-import {firstValueFrom} from "rxjs";
 import {JTDDataType} from "ajv/dist/core";
+import {firstValueFrom} from "rxjs";
 
 import {httpContexts} from "../common/http-contexts";
 
@@ -15,7 +15,8 @@ export class BeWaterSmartService {
 
   fetchPhysicalMeters(): Promise<BeWaterSmartService.PhysicalMeters> {
     return firstValueFrom(
-      this.http.get<BeWaterSmartService.PhysicalMeters>(`${URL}/physical-meters`, 
+      this.http.get<BeWaterSmartService.PhysicalMeters>(
+        `${URL}/physical-meters`,
         {
           context: new HttpContext().set(
             httpContexts.validateSchema,
@@ -28,12 +29,13 @@ export class BeWaterSmartService {
 
   fetchVirtualMeters(): Promise<BeWaterSmartService.VirtualMeters> {
     return firstValueFrom(
-      this.http.get<BeWaterSmartService.VirtualMeters>(`${URL}/virtual-meters`,
+      this.http.get<BeWaterSmartService.VirtualMeters>(
+        `${URL}/virtual-meters`,
         {
           context: new HttpContext().set(
             httpContexts.validateSchema,
             VIRTUAL_METERS,
-          )
+          ),
         },
       ),
     );
@@ -41,45 +43,41 @@ export class BeWaterSmartService {
 
   fetchAlgorithms(): Promise<BeWaterSmartService.Algorithms> {
     return firstValueFrom(
-      this.http.get<BeWaterSmartService.Algorithms>(`${URL}/algorithms`,
-        {
-          context: new HttpContext().set(
-            httpContexts.validateSchema,
-            ALGORITHMS,
-          )
-        },
-      ),
+      this.http.get<BeWaterSmartService.Algorithms>(`${URL}/algorithms`, {
+        context: new HttpContext().set(httpContexts.validateSchema, ALGORITHMS),
+      }),
     );
   }
 
   fetchModels(): Promise<BeWaterSmartService.Models> {
     return firstValueFrom(
-      this.http.get<BeWaterSmartService.Models>(`${URL}/models`,
-        {
-          context: new HttpContext().set(
-            httpContexts.validateSchema,
-            MODELS,
-          )
-        },
-      ),
+      this.http.get<BeWaterSmartService.Models>(`${URL}/models`, {
+        context: new HttpContext().set(httpContexts.validateSchema, MODELS),
+      }),
     );
   }
 
-  getCreateForecast(meterId: string, algId: string): Promise<BeWaterSmartService.ForeCasts> {
+  getCreateForecast(
+    meterId: string,
+    algId: string,
+  ): Promise<BeWaterSmartService.ForeCasts> {
     return firstValueFrom(
-      this.http.get<BeWaterSmartService.ForeCasts>(`${URL}/meters/${meterId}/forecast?algorithm=${algId}`,
+      this.http.get<BeWaterSmartService.ForeCasts>(
+        `${URL}/meters/${meterId}/forecast?algorithm=${algId}`,
         {
           context: new HttpContext().set(
             httpContexts.validateSchema,
-            FORECASTS
-          )
+            FORECASTS,
+          ),
         },
       ),
     );
   }
 
   addVirtualMeterWithId(id: string, submeters: {submeterIds: string[]}) {
-    return firstValueFrom(this.http.post(`${URL}/virtual-meters?name=${id}`, submeters));
+    return firstValueFrom(
+      this.http.post(`${URL}/virtual-meters?name=${id}`, submeters),
+    );
   }
 
   delVirtualMeterById(id: string) {
@@ -89,7 +87,11 @@ export class BeWaterSmartService {
   /**
    * train a new model via bws api -> every virtual meter can only hold a single model in combination with a algorithm
    */
-  putTrainModel(meter: BeWaterSmartService.VirtualMeter, input: Algorithm, comment?: string) {
+  putTrainModel(
+    meter: BeWaterSmartService.VirtualMeter,
+    input: Algorithm,
+    comment?: string,
+  ) {
     let virt = meter.id.toString();
     let alg = input.name.toString();
 
@@ -102,13 +104,15 @@ export class BeWaterSmartService {
   }
 
   delModel(meter: string, alg: string) {
-    return firstValueFrom(this.http.delete(`${URL}/models/${meter}:MLModel:${alg}`));
+    return firstValueFrom(
+      this.http.delete(`${URL}/models/${meter}:MLModel:${alg}`),
+    );
   }
 }
 
 export namespace BeWaterSmartService {
-  export type PhysicalMeter =  JTDDataType<typeof PHYSICAL_METER>;
-  export type PhysicalMeters =  JTDDataType<typeof PHYSICAL_METERS>;
+  export type PhysicalMeter = JTDDataType<typeof PHYSICAL_METER>;
+  export type PhysicalMeters = JTDDataType<typeof PHYSICAL_METERS>;
   export type VirtualMeter = JTDDataType<typeof VIRTUAL_METER>;
   export type VirtualMeters = JTDDataType<typeof VIRTUAL_METERS>;
   export type Algorithm = JTDDataType<typeof ALGORITHM>;
@@ -148,13 +152,13 @@ const VIRTUAL_METER = {
   properties: {
     dateCreated: {type: "string"},
     description: {type: "string"},
-     id: {type: "string"},
-     submeterIds: {
+    id: {type: "string"},
+    submeterIds: {
       elements: {type: "string"},
-     },
-     supermeterIds: {
+    },
+    supermeterIds: {
       elements: {type: "string"},
-     },
+    },
   },
 } as const;
 
@@ -248,7 +252,7 @@ const MODEL = {
         learning_rate: {type: "float32"},
         max_depth: {type: "int32"},
         min_child_weight: {type: "int32"},
-        objective: {type: "string"}, 
+        objective: {type: "string"},
         verbose: {type: "int32"},
         verbosity: {type: "int32"},
       },
@@ -263,7 +267,7 @@ const MODEL = {
   },
   optionalProperties: {
     isDefault: {type: "boolean"},
-  }
+  },
 } as const;
 
 const MODELS = {
@@ -297,5 +301,5 @@ const FORECAST = {
 } as const;
 
 const FORECASTS = {
-    elements: FORECAST,
+  elements: FORECAST,
 } as const;

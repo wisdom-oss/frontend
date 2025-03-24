@@ -1,6 +1,13 @@
 import {DatePipe} from "@angular/common";
 import {CommonModule} from "@angular/common";
-import {Component, OnInit, viewChild, signal, WritableSignal, Signal} from "@angular/core";
+import {
+  signal,
+  viewChild,
+  Component,
+  OnInit,
+  Signal,
+  WritableSignal,
+} from "@angular/core";
 import {FormsModule} from "@angular/forms";
 import {provideIcons, NgIcon} from "@ng-icons/core";
 import {remixAddLine, remixDeleteBin5Line} from "@ng-icons/remixicon";
@@ -12,11 +19,12 @@ import {
   Plugin,
   ChartType,
 } from "chart.js";
+import dayjs from "dayjs";
 import {BaseChartDirective} from "ng2-charts";
+
 import {BeWaterSmartService} from "../../api/be-water-smart.service";
 import {DropdownComponent} from "../../common/components/dropdown/dropdown.component";
 import {TransformStringPipe} from "../../core/pipes/transform-string.pipe";
-import dayjs from "dayjs";
 
 @Component({
   selector: "be-water-smart",
@@ -45,37 +53,51 @@ export class BeWaterSmartComponent implements OnInit {
   optionsAlgorithm: WritableSignal<Record<string, string>> = signal({});
   choiceAlgorithm: WritableSignal<string | undefined> = signal(undefined);
 
-  menuVirtualMeter: Signal<string> = signal("be-water-smart.hints.virtual_meter");
+  menuVirtualMeter: Signal<string> = signal(
+    "be-water-smart.hints.virtual_meter",
+  );
   optionsVirtualMeter: WritableSignal<Record<string, string>> = signal({});
   choiceVirtualMeter: WritableSignal<string | undefined> = signal(undefined);
 
   // ---------- Physical Meter Parameters ----------
 
-  pMeters: WritableSignal<BeWaterSmartService.PhysicalMeters["meters"]> = signal([]); // list of physical meters | jsonobjects
-  selectedPhysicalMeters: WritableSignal<BeWaterSmartService.PhysicalMeters["meters"]> = signal([]); // list of selected physical meters for virtual meter creation
+  pMeters: WritableSignal<BeWaterSmartService.PhysicalMeters["meters"]> =
+    signal([]); // list of physical meters | jsonobjects
+  selectedPhysicalMeters: WritableSignal<
+    BeWaterSmartService.PhysicalMeters["meters"]
+  > = signal([]); // list of selected physical meters for virtual meter creation
 
   // ---------- Virtual Meter Parameters ----------
 
-  vMeters: WritableSignal<BeWaterSmartService.VirtualMeters["virtualMeters"]> = signal([]); // list of virtual meters | jsonobjects
-  selectedVirtualMeters: WritableSignal<BeWaterSmartService.VirtualMeters["virtualMeters"]> = signal([]); // a list of selectedVirtualMeters to create a Super Meter
-  selectedVirtualMeter: WritableSignal<BeWaterSmartService.VirtualMeter | undefined> = signal(undefined); // selected virtual meter to train a model
+  vMeters: WritableSignal<BeWaterSmartService.VirtualMeters["virtualMeters"]> =
+    signal([]); // list of virtual meters | jsonobjects
+  selectedVirtualMeters: WritableSignal<
+    BeWaterSmartService.VirtualMeters["virtualMeters"]
+  > = signal([]); // a list of selectedVirtualMeters to create a Super Meter
+  selectedVirtualMeter: WritableSignal<
+    BeWaterSmartService.VirtualMeter | undefined
+  > = signal(undefined); // selected virtual meter to train a model
   newVMeterName: WritableSignal<string> = signal(""); // name of potential new virtual meter
   newSuperMeterName: WritableSignal<string> = signal(""); // name of potential new virtual meter created from other virtual meters
 
   // ---------- Algorithm Parameters ----------
-  
-  algorithms: WritableSignal<BeWaterSmartService.Algorithms["algorithms"]> = signal([]); // list of all Algorithm
-  selectedAlgorithm: WritableSignal<BeWaterSmartService.Algorithm | undefined> = signal(undefined); // algorithm to train with a virtual meter
+
+  algorithms: WritableSignal<BeWaterSmartService.Algorithms["algorithms"]> =
+    signal([]); // list of all Algorithm
+  selectedAlgorithm: WritableSignal<BeWaterSmartService.Algorithm | undefined> =
+    signal(undefined); // algorithm to train with a virtual meter
   models: WritableSignal<BeWaterSmartService.Models["MLModels"]> = signal([]); // all trained models
-  selectedModel: WritableSignal<BeWaterSmartService.Model | undefined> = signal(undefined); // selected model for consumption forecast
+  selectedModel: WritableSignal<BeWaterSmartService.Model | undefined> =
+    signal(undefined); // selected model for consumption forecast
   modelComment: WritableSignal<string | undefined> = signal(undefined); // comment to reidentify a model
 
   // ------------------------------ Chart Parameters --------------------------------------------
 
-  chartRef = viewChild(BaseChartDirective); 
+  chartRef = viewChild(BaseChartDirective);
 
   chartType: ChartType = "line"; // type of graph to use in chart
-  chartOptions: ChartConfiguration["options"] = { //options used for the line chart to visualize prediction values
+  chartOptions: ChartConfiguration["options"] = {
+    //options used for the line chart to visualize prediction values
     responsive: true,
     scales: {
       y: {
@@ -104,10 +126,11 @@ export class BeWaterSmartComponent implements OnInit {
     },
   };
 
-  standardLabels: string[] = Array.from({length: 23}, ((_, i) => `${i+1}:00`));
+  standardLabels: string[] = Array.from({length: 23}, (_, i) => `${i + 1}:00`);
 
   chartColor: string = "#FFFFFF"; //  color of the ng2chart
-  chartData: ChartData<"line"> = { // data skeleton for the line graph
+  chartData: ChartData<"line"> = {
+    // data skeleton for the line graph
     labels: this.standardLabels, // X-axis labels
     datasets: [], // data points
   };
@@ -154,8 +177,12 @@ export class BeWaterSmartComponent implements OnInit {
     });
   }
 
-  getVirtualMeter(virtualMeterId: string): BeWaterSmartService.VirtualMeter | undefined {
-    const vMeter = this.vMeters().filter(vMeter => vMeter.id === virtualMeterId);
+  getVirtualMeter(
+    virtualMeterId: string,
+  ): BeWaterSmartService.VirtualMeter | undefined {
+    const vMeter = this.vMeters().filter(
+      vMeter => vMeter.id === virtualMeterId,
+    );
     if (!vMeter.length) return undefined;
     return vMeter[0];
   }
@@ -171,8 +198,12 @@ export class BeWaterSmartComponent implements OnInit {
     });
   }
 
-  getAlgorithm(algorithmName: string): BeWaterSmartService.Algorithm | undefined {
-    const algorithm = this.algorithms().filter(algorithm => algorithm.name === algorithmName);
+  getAlgorithm(
+    algorithmName: string,
+  ): BeWaterSmartService.Algorithm | undefined {
+    const algorithm = this.algorithms().filter(
+      algorithm => algorithm.name === algorithmName,
+    );
     if (!algorithm.length) return undefined;
     return algorithm[0];
   }
@@ -185,16 +216,20 @@ export class BeWaterSmartComponent implements OnInit {
 
   // ---------- Checkbox Functions ----------
 
-  toggleSelectedMeter(item: BeWaterSmartService.VirtualMeter | BeWaterSmartService.PhysicalMeter, event: Event, meters: WritableSignal<any[]>): void {
-      const isChecked = (event.target as HTMLInputElement).checked;
+  toggleSelectedMeter(
+    item: BeWaterSmartService.VirtualMeter | BeWaterSmartService.PhysicalMeter,
+    event: Event,
+    meters: WritableSignal<any[]>,
+  ): void {
+    const isChecked = (event.target as HTMLInputElement).checked;
 
-      if (isChecked) {
-        meters().push(item);
-      } else {
-        let newMeters = meters();
-        newMeters =newMeters.filter((value) => !(value === item));
-        meters.set(newMeters);
-      }
+    if (isChecked) {
+      meters().push(item);
+    } else {
+      let newMeters = meters();
+      newMeters = newMeters.filter(value => !(value === item));
+      meters.set(newMeters);
+    }
   }
 
   /**
@@ -222,7 +257,12 @@ export class BeWaterSmartComponent implements OnInit {
       return;
     }
 
-    this.bwsService.addVirtualMeterWithId(selectedMeter, this.createSubMeterList(selectedMeters)).then(response => {
+    this.bwsService
+      .addVirtualMeterWithId(
+        selectedMeter,
+        this.createSubMeterList(selectedMeters),
+      )
+      .then(response => {
         if (response.hasOwnProperty("virtualMeterId")) {
           this.extractVMeters();
           this.selectedPhysicalMeters.set([]);
@@ -230,8 +270,7 @@ export class BeWaterSmartComponent implements OnInit {
           this.newVMeterName.set("");
           this.newSuperMeterName.set("");
         }
-      }
-    );
+      });
   }
 
   /**
@@ -254,7 +293,9 @@ export class BeWaterSmartComponent implements OnInit {
     this.bwsService.delVirtualMeterById(id).then(response => {
       if (response && response.hasOwnProperty("msg")) {
         this.vMeters().push(tmp[0]);
-        alert(`Virtual Meter with Name ${id} not found and can not be deleted!`);
+        alert(
+          `Virtual Meter with Name ${id} not found and can not be deleted!`,
+        );
       }
     });
   }
@@ -269,7 +310,7 @@ export class BeWaterSmartComponent implements OnInit {
     if (choiceVirtualMeter) {
       this.selectedVirtualMeter.set(this.getVirtualMeter(choiceVirtualMeter));
     }
-    
+
     const selectedVirtualMeter = this.selectedVirtualMeter();
     if (!selectedVirtualMeter) {
       console.log("No Virtual Meter detected!");
@@ -293,14 +334,15 @@ export class BeWaterSmartComponent implements OnInit {
       return;
     }
 
-    this.bwsService.putTrainModel(selectedVirtualMeter, selectedAlgorithm, modelComment).then( _ => {
-        this.extractModels(); 
+    this.bwsService
+      .putTrainModel(selectedVirtualMeter, selectedAlgorithm, modelComment)
+      .then(_ => {
+        this.extractModels();
         this.choiceAlgorithm.set(undefined);
         this.selectedAlgorithm.set(undefined);
         this.selectedVirtualMeter.set(undefined);
         this.modelComment.set(undefined);
-      }
-    );
+      });
   }
 
   deleteModel(vMeterId: string, algId: string, index: number): void {
@@ -330,24 +372,24 @@ export class BeWaterSmartComponent implements OnInit {
     const vMeterId = selectedModel.refMeter;
     const algId = selectedModel.algorithm;
 
-   this.bwsService.getCreateForecast(vMeterId, algId).then((response) => {
-        if (response.hasOwnProperty("msg")) {
-          console.log(response);
-        } else {
-          let predValues = response.map(item => item.numValue);
+    this.bwsService.getCreateForecast(vMeterId, algId).then(response => {
+      if (response.hasOwnProperty("msg")) {
+        console.log(response);
+      } else {
+        let predValues = response.map(item => item.numValue);
 
-          let date = response[0].datePredicted;
+        let date = response[0].datePredicted;
 
-          let label =
-            vMeterId.replace(this.prefixes[0], "") +
-            " " +
-            algId +
-            " " +
-            dayjs(date).format("DD.MM.YY");
+        let label =
+          vMeterId.replace(this.prefixes[0], "") +
+          " " +
+          algId +
+          " " +
+          dayjs(date).format("DD.MM.YY");
 
-          this.addGraphToChart(predValues, label);
-        }
-      });
+        this.addGraphToChart(predValues, label);
+      }
+    });
   }
 
   /**

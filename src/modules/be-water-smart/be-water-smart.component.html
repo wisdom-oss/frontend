@@ -1,5 +1,7 @@
-
-<div class="container is-flex is-flex-direction-column is-fullheight" [style.overflow]="'auto'">
+<div
+  class="container is-flex is-flex-direction-column is-fullheight"
+  [style.overflow]="'auto'"
+>
   @let slice = 20;
   @let heightMC = "30em";
   @let heightMF = "15em";
@@ -130,9 +132,14 @@
                   <td class="is-narrow has-text-centered">
                     <button
                       class="button is-danger is-small"
-                      (click)="deleteModel(item.refMeter, item.algorithm, $index)"
+                      (click)="
+                        deleteModel(item.refMeter, item.algorithm, $index)
+                      "
                     >
-                      <ng-icon name="remixDeleteBin5Line" size="1.5em"></ng-icon>
+                      <ng-icon
+                        name="remixDeleteBin5Line"
+                        size="1.5em"
+                      ></ng-icon>
                     </button>
                   </td>
                 </tr>
@@ -157,7 +164,7 @@
 
         <div class="field is-grouped is-justify-content-center">
           <!-- Choose Algorithm -->
-          <div class="control" [style.width] ="'20%'">
+          <div class="control" [style.width]="'20%'">
             <label class="label" for="algorithmSelect">{{
               "be-water-smart.model_training.algorithm" | translate
             }}</label>
@@ -222,7 +229,10 @@
 
         <div
           class="table-container"
-          [style]="{height: heightTable, overflow: pMeters() ? 'auto' : 'hidden'}"
+          [style]="{
+            height: heightTable,
+            overflow: pMeters() ? 'auto' : 'hidden',
+          }"
         >
           <table class="table is-hoverable is-fullwidth">
             <thead class="has-background-dark">
@@ -312,9 +322,7 @@
             <button
               class="button is-primary"
               [disabled]="!selectedPhysicalMeters().length"
-              (click)="
-                addVMeter(selectedPhysicalMeters(), newVMeterName())
-              "
+              (click)="addVMeter(selectedPhysicalMeters(), newVMeterName())"
             >
               <ng-icon name="remixAddLine" size="1.5em"></ng-icon>
             </button>
@@ -333,7 +341,10 @@
         <!-- Table to show all VirtualMeters -->
         <div
           class="table-container"
-          [style]="{height: heightTable, overflow: vMeters() ? 'auto' : 'hidden'}"
+          [style]="{
+            height: heightTable,
+            overflow: vMeters() ? 'auto' : 'hidden',
+          }"
         >
           <table class="table is-hoverable is-fullwidth">
             <thead class="has-background-dark">
@@ -406,7 +417,10 @@
                       class="button is-danger is-small"
                       (click)="deleteVMeterById(item.id, $index)"
                     >
-                      <ng-icon name="remixDeleteBin5Line" size="1.5em"></ng-icon>
+                      <ng-icon
+                        name="remixDeleteBin5Line"
+                        size="1.5em"
+                      ></ng-icon>
                     </button>
                   </td>
                 </tr>
@@ -432,9 +446,7 @@
             <button
               class="button is-primary"
               [disabled]="!selectedVirtualMeters().length"
-              (click)="
-                addVMeter(selectedVirtualMeters(), newSuperMeterName())
-              "
+              (click)="addVMeter(selectedVirtualMeters(), newSuperMeterName())"
             >
               <ng-icon name="remixAddLine" size="1.5em"></ng-icon>
             </button>

@@ -9,20 +9,20 @@ import {
 } from "@angular/core";
 import {NavigationEnd, RouterLink, Router} from "@angular/router";
 import {
-  remixBookLine,
-  remixBookShelfLine,
-  remixLineChartLine,
-  remixRfidLine,
-  remixDatabase2Fill,
-  remixMap2Fill,
-  remixMapLine,
-} from "@ng-icons/remixicon";
-import {
   provideIcons,
   provideNgIconLoader,
   NgIconComponent,
   NgIconStack,
 } from "@ng-icons/core";
+import {
+  remixBookLine,
+  remixBookShelfLine,
+  remixDatabase2Fill,
+  remixLineChartLine,
+  remixMap2Fill,
+  remixMapLine,
+  remixRfidLine,
+} from "@ng-icons/remixicon";
 import {TranslateDirective} from "@ngx-translate/core";
 import {filter} from "rxjs";
 
