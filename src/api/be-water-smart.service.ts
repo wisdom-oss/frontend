@@ -78,64 +78,31 @@ export class BeWaterSmartService {
     );
   }
 
-  /**
-   * posts a request to bws api in order to create a new virtual meter
-   * @param id name of the virtual meter
-   * @param submeters all physical meters contained by the virtual meter
-   * @returns observable containing a success or http error msg
-   */
-  addVirtualMeterWithId(id: string, submeters: any) {
-    let url = "/virtual-meters?name=" + id;
+  addVirtualMeterWithId(id: string, submeters: {submeterIds: string[]}) {
+    return firstValueFrom(this.http.post(`${URL}/virtual-meters?name=${id}`, submeters));
+  }
 
-    return //this.sendRequest<AllVirtualMeters>("post", url, submeters);
+  delVirtualMeterById(id: string) {
+    return firstValueFrom(this.http.delete(`${URL}/virtual-meters/${id}`));
   }
 
   /**
-   * deletes virtual meter per id from the bws api
-   * @param input the name of virtual meter to be deleted
-   * @returns observable containing success or http error msg
-   */
-  delVirtualMeterById(input: string) {
-    let url = "/virtual-meters/" + input;
-
-    return //this.sendRequest("delete", url);
-  }
-
-  /**
-   * train a new model via bws api using loading bar in http context,
-   * because of long execution time.
-   * -> every virtual meter can only hold a single model in combination with a
-   * algorithm
-   * @param meter virtual meter to be used as training data
-   * @param input the algorithm to train
-   * @param comment string to identify the trained model afterwards
-   * @returns observable containing all training data in a list
+   * train a new model via bws api -> every virtual meter can only hold a single model in combination with a algorithm
    */
   putTrainModel(meter: BeWaterSmartService.VirtualMeter, input: Algorithm, comment?: string) {
     let virt = meter.id.toString();
     let alg = input.name.toString();
 
-    let url = "/meters/" + virt + "/models/" + alg;
-
+    let url = `${URL}/meters/${virt}/models/${alg}`;
     if (comment) {
-      url = url + "?comment=" + comment;
+      url = `${url}?comment=${comment}`;
     }
 
-    return //this.sendRequest<AllModels>("put", url);
+    return firstValueFrom(this.http.put<BeWaterSmartService.Models>(url, null));
   }
 
-  /**
-   * delete request for the bws api.
-   * as requested by the api itself, you cant reference a model directly, but rather have to type in the
-   * virtual meter and algorithm used and the api tracks down, which model it could be. Don't know why.
-   * @param meter name of the virtual meter which got used to train the model
-   * @param alg algorithm trained in the model
-   * @returns observable containing success or http error msg
-   */
   delModel(meter: string, alg: string) {
-    let url = "/models/" + meter + ":MLModel:" + alg;
-
-    return //this.sendRequest("delete", url);
+    return firstValueFrom(this.http.delete(`${URL}/models/${meter}:MLModel:${alg}`));
   }
 }
 
@@ -290,11 +257,13 @@ const MODEL = {
     inputAttributes: {
       elements: {type: "string"},
     },
-    isDefault: {type: "boolean"},
     isModelValid: {type: "boolean"},
     mlFramework: {type: "string"},
     refMeter: {type: "string"},
   },
+  optionalProperties: {
+    isDefault: {type: "boolean"},
+  }
 } as const;
 
 const MODELS = {

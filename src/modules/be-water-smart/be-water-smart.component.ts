@@ -1,6 +1,6 @@
 import {DatePipe} from "@angular/common";
 import {CommonModule} from "@angular/common";
-import {Component, OnInit, viewChild, signal, WritableSignal, Signal, effect} from "@angular/core";
+import {Component, OnInit, viewChild, signal, WritableSignal, Signal} from "@angular/core";
 import {FormsModule} from "@angular/forms";
 import {provideIcons, NgIcon} from "@ng-icons/core";
 import {remixAddLine, remixDeleteBin5Line} from "@ng-icons/remixicon";
@@ -37,10 +37,7 @@ import {TransformStringPipe} from "../../common/pipes/transform-string.pipe";
 export class BeWaterSmartComponent implements OnInit {
   // ---------- StringFormatting ----------
 
-  /**
-   * array of prefixes to remove from id-strings of smart meters
-   */
-  prefixes: string[] = ["urn:ngsi-ld:virtualMeter:", "urn:ngsi-ld:Device:"];
+  prefixes: string[] = ["urn:ngsi-ld:virtualMeter:", "urn:ngsi-ld:Device:"]; //array of prefixes to remove from id-strings of smart meters
 
   // ---------- Layout Parameters ----------
 
@@ -166,7 +163,6 @@ export class BeWaterSmartComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // initialize all displays when rendering web page
     this.extractPMeters();
     this.extractVMeters();
     this.extractAlgorithms();
@@ -224,19 +220,16 @@ export class BeWaterSmartComponent implements OnInit {
 
   // ---------- Checkbox Functions ----------
 
-  toggleSelectedMeter(item: any, event: Event, selectedMeters: any): void {
-    const isChecked = (event.target as HTMLInputElement).checked;
+  toggleSelectedMeter(item: BeWaterSmartService.VirtualMeter | BeWaterSmartService.PhysicalMeter, event: Event, meters: WritableSignal<any[]>): void {
+      const isChecked = (event.target as HTMLInputElement).checked;
 
-    if (isChecked) {
-      selectedMeters.push(item);
-    } else {
-      const index = selectedMeters.findIndex(
-        (meter: {id: any}) => meter.id === item.id,
-      );
-      if (index > -1) {
-        selectedMeters.splice(index, 1); // Remove the item if unchecked
+      if (isChecked) {
+        meters().push(item);
+      } else {
+        let newMeters = meters();
+        newMeters =newMeters.filter((value) => !(value === item));
+        meters.set(newMeters);
       }
-    }
   }
 
   /**
@@ -264,32 +257,23 @@ export class BeWaterSmartComponent implements OnInit {
       return;
     }
 
-    /**this.bwsService
-      .addVirtualMeterWithId(
-        selectedMeter,
-        this.createSubMeterList(selectedMeters),
-      )
-      .subscribe({
-        next: response => {
-          if (response.hasOwnProperty("virtualMeterId")) {
-            this.extractVMeters();
-            this.selectedPhysicalMeters.set([]);
-            this.selectedVirtualMeters.set([]);
-            this.newVMeterName.set("");
-            this.newSuperMeterName.set("");
-          }
-        },
-        error: error => {
-          console.log(error);
-        },
-      });**/
+    this.bwsService.addVirtualMeterWithId(selectedMeter, this.createSubMeterList(selectedMeters)).then(response => {
+        if (response.hasOwnProperty("virtualMeterId")) {
+          this.extractVMeters();
+          this.selectedPhysicalMeters.set([]);
+          this.selectedVirtualMeters.set([]);
+          this.newVMeterName.set("");
+          this.newSuperMeterName.set("");
+        }
+      }
+    );
   }
 
   /**
    * help function for addVMeter()
    * @returns a list of all ids which are inside the virtual meter
    */
-  createSubMeterList(selectedMeters: any): object {
+  createSubMeterList(selectedMeters: any): {submeterIds: string[]} {
     let id_list: string[] = [];
 
     selectedMeters.forEach((item: {id: string}) => {
@@ -299,31 +283,15 @@ export class BeWaterSmartComponent implements OnInit {
     return {submeterIds: id_list};
   }
 
-  /**
-   * delete a virtual meter
-   * @param id  name of virtual meter, which functions as it's id
-   * @param index index of meter in arr, to hotreload page
-   */
   deleteVMeterById(id: string, index: number): void {
-    let tmp = this.vMeters().splice(index, 1);
+    const tmp = this.vMeters().splice(index, 1);
 
-    console.log(tmp);
-
-    /**this.bwsService.delVirtualMeterById(id).subscribe({
-      next: response => {
-        if (response && response.hasOwnProperty("msg")) {
-          this.vMeters().push(tmp[0]);
-          alert(
-            "Virtual Meter with Name " +
-              id +
-              " not found and can not be deleted!",
-          );
-        }
-      },
-      error: error => {
-        console.log(error);
-      },
-    });**/
+    this.bwsService.delVirtualMeterById(id).then(response => {
+      if (response && response.hasOwnProperty("msg")) {
+        this.vMeters().push(tmp[0]);
+        alert(`Virtual Meter with Name ${id} not found and can not be deleted!`);
+      }
+    });
   }
 
   // ---------- Algorithm Functions ----------
@@ -360,46 +328,25 @@ export class BeWaterSmartComponent implements OnInit {
       return;
     }
 
-    /**this.bwsService
-      .putTrainModel(
-        selectedVirtualMeter,
-        selectedAlgorithm,
-        modelComment,
-      )
-      .subscribe({
-        next: () => {
-          this.extractModels();
-          this.choiceAlgorithm.set(undefined);
-          this.selectedAlgorithm.set(undefined);
-          this.selectedVirtualMeter.set(undefined);
-          this.modelComment.set(undefined);
-        },
-        error: error => {
-          console.log(error);
-        },
-      });**/
+    this.bwsService.putTrainModel(selectedVirtualMeter, selectedAlgorithm, modelComment).then( _ => {
+        this.extractModels(); 
+        this.choiceAlgorithm.set(undefined);
+        this.selectedAlgorithm.set(undefined);
+        this.selectedVirtualMeter.set(undefined);
+        this.modelComment.set(undefined);
+      }
+    );
   }
 
-  /**
-   * delete a model from database using bws service
-   * @param vMeterId id of virtual meter the model is trained on
-   * @param algId id of algorithm which got used to train model
-   * @param index place in list to correctly remove model afterwards
-   */
   deleteModel(vMeterId: string, algId: string, index: number): void {
     let tmp = this.models().splice(index, 1);
 
-    /**this.bwsService.delModel(vMeterId, algId).subscribe({
-      next: response => {
-        if (response && response.hasOwnProperty("message")) {
-          this.models().push(tmp[0]);
-          alert("Model not found");
-        }
-      },
-      error: error => {
-        console.log(error);
-      },
-    });**/
+    this.bwsService.delModel(vMeterId, algId).then(response => {
+      if (response && response.hasOwnProperty("message")) {
+        this.models().push(tmp[0]);
+        alert("Model not found");
+      }
+    });
   }
 
   // ---------- Forecast Creation -----------
