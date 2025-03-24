@@ -7,8 +7,6 @@ import {
   GeoJSONSourceComponent,
   NavigationControlDirective,
 } from "@maplibre/ngx-maplibre-gl";
-import {provideIcons, NgIconComponent} from "@ng-icons/core";
-import {remixStackFill} from "@ng-icons/remixicon";
 import {TranslateDirective} from "@ngx-translate/core";
 import {FeatureCollection, Feature, Geometry} from "geojson";
 import {StyleSpecification} from "maplibre-gl";
@@ -24,17 +22,11 @@ import {signals} from "../../../../common/signals";
     LayerComponent,
     MapComponent,
     NavigationControlDirective,
-    NgIconComponent,
     RouterLink,
     TranslateDirective,
   ],
   templateUrl: "./map-select-view.component.html",
   styles: ``,
-  providers: [
-    provideIcons({
-      remixStackFill,
-    }),
-  ],
 })
 export class MapSelectViewComponent {
   private mapComponent = viewChild(MapComponent);
@@ -49,7 +41,6 @@ export class MapSelectViewComponent {
   protected mapControl = {
     possibleLayers: ["counties", "municipals"] as const,
     visibleLayer: signal<"counties" | "municipals">("counties"),
-    collapsed: signal(false),
   };
 
   protected selection = {

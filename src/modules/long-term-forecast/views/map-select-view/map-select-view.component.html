@@ -28,27 +28,17 @@
           ></a>
         </mgl-control>
         <mgl-control position="top-right">
-          <div
-            data-theme="light"
-            (mouseenter_)="mapControl.collapsed.set(false)"
-            (mouseleave_)="mapControl.collapsed.set(true)"
-          >
-            @if (mapControl.collapsed()) {
-              <span class="icon is-medium">
-                <ng-icon size="2em" name="remixStackFill"></ng-icon>
-              </span>
-            } @else {
-              <div class="buttons has-addons">
-                @for (item of mapControl.possibleLayers; track item) {
-                  <div
-                    class="button is-small"
-                    [class.is-primary]="mapControl.visibleLayer() == item"
-                    (click)="mapControl.visibleLayer.set(item)"
-                    [translate]="'long-term-forecast.layer.' + item"
-                  ></div>
-                }
-              </div>
-            }
+          <div data-theme="light">
+            <div class="buttons has-addons">
+              @for (item of mapControl.possibleLayers; track item) {
+                <div
+                  class="button is-small"
+                  [class.is-primary]="mapControl.visibleLayer() == item"
+                  (click)="mapControl.visibleLayer.set(item)"
+                  [translate]="'long-term-forecast.layer.' + item"
+                ></div>
+              }
+            </div>
           </div>
         </mgl-control>
       </ng-container>
