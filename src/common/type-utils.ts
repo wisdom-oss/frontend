@@ -1,3 +1,5 @@
+import {Signal} from "@angular/core";
+
 export namespace typeUtils {
   // prettier-ignore
   /**
@@ -23,4 +25,22 @@ export namespace typeUtils {
     O extends keyof A[0], 
     U,
   > = (Omit<A[0], O> & U)[];
+
+  /**
+   * Extracts the inner type from a `Signal<T>` or any extension of it like `WritableSignal<T>`.
+   *
+   * @template T The type to extract from, expected to extend `Signal<T>`.
+   *
+   * @example
+   * ```ts
+   * import { Signal, WritableSignal } from '@angular/core';
+   *
+   * declare const s: Signal<number>;
+   * declare const w: WritableSignal<string>;
+   *
+   * type A = Signaled<typeof s>; // number
+   * type B = Signaled<typeof w>; // string
+   * ```
+   */
+  export type Signaled<T> = T extends Signal<infer U> ? U : never;
 }
