@@ -11,6 +11,7 @@ import {FormsModule} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
 import {provideIcons, NgIcon} from "@ng-icons/core";
 import {remixBarChartBoxAiLine} from "@ng-icons/remixicon";
+import {TranslateDirective, TranslatePipe} from "@ngx-translate/core";
 import {ScriptableContext, ChartDataset, ChartOptions} from "chart.js";
 import {BaseChartDirective} from "ng2-charts";
 
@@ -33,6 +34,8 @@ type ChartDatasets = ChartDataset<"bar", {x: string; y: number}[]>[];
     NgIcon,
     NgIf,
     TitleCasePipe,
+    TranslateDirective,
+    TranslatePipe,
   ],
   templateUrl: "./result-data-view.component.html",
   styles: ``,

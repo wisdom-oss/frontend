@@ -15,8 +15,8 @@ import {
   NgIconStack,
 } from "@ng-icons/core";
 import {
+  remixBarChartFill,
   remixDatabase2Fill,
-  remixLineChartLine,
   remixMap2Fill,
   remixMapLine,
   remixWaterPercentFill,
@@ -45,7 +45,7 @@ import {AuthService} from "../auth/auth.service";
       remixMap2Fill,
       remixMapLine,
       remixWaterPercentFill,
-      remixLineChartLine,
+      remixBarChartFill,
     }),
     provideNgIconLoader(name => {
       if (name != "oowv") return "";

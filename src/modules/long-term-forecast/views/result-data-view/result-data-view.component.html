@@ -15,7 +15,7 @@
             stacked: true,
             title: {
               display: true,
-              text: "Year",
+              text: "long-term-forecast.chart.legend.year" | translate,
             },
             grid: {
               display: false,
@@ -25,7 +25,7 @@
             stacked: true,
             title: {
               display: true,
-              text: "Water Usage [m³]",
+              text: "long-term-forecast.chart.legend.water-usage" | translate,
             },
           },
         },
@@ -58,7 +58,7 @@
     <div configuration class="column is-one-quarter">
       <div class="message is-fullheight is-flex is-flex-direction-column">
         <div class="message-header">
-          <p>Configure Forecast</p>
+          <p translate="long-term-forecast.config-forecast"></p>
         </div>
         <div
           class="message-body is-flex-grow-1 is-flex is-flex-direction-column"
@@ -92,7 +92,10 @@
             algorithm-parameters
             *ngIf="algorithm && !(algorithm.parameter | empty)"
           >
-            <p class="title is-5 mb-2 mt-2">Parameters</p>
+            <p
+              class="title is-5 mb-2 mt-2"
+              translate="long-term-forecast.parameters"
+            ></p>
             @for (param of algorithm.parameter | keyvalue; track param.key) {
               <div class="field">
                 <div class="control">
@@ -149,9 +152,8 @@
               <button
                 class="button is-primary is-fullwidth is-justify-content-center"
                 (click)="fetchForecast()"
-              >
-                Calculate Forecast
-              </button>
+                translate="long-term-forecast.calc-forecast"
+              ></button>
             </div>
           </ng-container>
         </div>
