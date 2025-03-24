@@ -1,7 +1,14 @@
 import {NgIf, NgForOf, TitleCasePipe, KeyValuePipe} from "@angular/common";
-import {computed, resource, signal, viewChild, Component} from "@angular/core";
-import {ReactiveFormsModule} from "@angular/forms";
-import {ActivatedRoute} from "@angular/router";
+import {
+  computed,
+  model,
+  resource,
+  signal,
+  viewChild,
+  Component,
+} from "@angular/core";
+import {FormsModule} from "@angular/forms";
+import {ActivatedRoute, Router} from "@angular/router";
 import {provideIcons, NgIcon} from "@ng-icons/core";
 import {remixBarChartBoxAiLine} from "@ng-icons/remixicon";
 import {ScriptableContext, ChartDataset, ChartOptions} from "chart.js";
@@ -12,19 +19,20 @@ import {GeoDataService} from "../../../../api/geo-data.service";
 import {signals} from "../../../../common/signals";
 import {EmptyPipe} from "../../../../common/pipes/empty.pipe";
 import {RgbaColor} from "../../../../common/utils/rgba-color";
+import {defaults} from "../../../../common/utils/defaults";
 
 type ChartDatasets = ChartDataset<"bar", {x: string; y: number}[]>[];
 
 @Component({
   imports: [
+    BaseChartDirective,
     EmptyPipe,
+    FormsModule,
     KeyValuePipe,
     NgForOf,
     NgIcon,
     NgIf,
-    ReactiveFormsModule,
     TitleCasePipe,
-    BaseChartDirective,
   ],
   templateUrl: "./result-data-view.component.html",
   styles: ``,
@@ -36,16 +44,14 @@ type ChartDatasets = ChartDataset<"bar", {x: string; y: number}[]>[];
 })
 export class ResultDataViewComponent {
   protected keys: string[];
-
+  protected parameters: Record<string, Record<string, any>> = defaults({});
   protected availableAlgorithms;
-  protected selectedAlgorithmIdentifier = signals.formControl("exponential");
+  protected selectedAlgorithmIdentifier = model("exponential");
   protected selectedAlgorithm = computed(() => {
     let available = this.availableAlgorithms() ?? [];
     let id = this.selectedAlgorithmIdentifier();
     return available.find(algo => algo.identifier == id);
   });
-
-  protected parameters: Record<string, Record<string, any>> = {};
 
   protected forecastResult = signal<undefined | UsageForecastsService.Result>(
     undefined,
@@ -62,12 +68,20 @@ export class ResultDataViewComponent {
     private service: UsageForecastsService,
     route: ActivatedRoute,
     private geoDataService: GeoDataService,
+    private router: Router,
   ) {
     this.availableAlgorithms = signals.fromPromise(
       service.fetchAvailableAlgorithms(),
     );
 
-    this.keys = route.snapshot.queryParams["key"]!; // ensured by query params guard
+    this.keys = route.snapshot.queryParamMap.getAll("key"); // ensured by query params guard
+    let queryAlgorithm = route.snapshot.queryParamMap.get("algorithm");
+    if (queryAlgorithm) this.selectedAlgorithmIdentifier.set(queryAlgorithm);
+    let algorithm = this.selectedAlgorithmIdentifier();
+    let queryParameters = route.snapshot.queryParamMap.get("parameters");
+    if (queryParameters)
+      this.parameters[algorithm] = JSON.parse(queryParameters);
+
     this.fetchForecast();
   }
 
@@ -76,7 +90,17 @@ export class ResultDataViewComponent {
     // we need to set the value here instead of using signals.fromPromise to
     // not break reactivity detection
     this.forecastResult.set(undefined);
-    let result = await this.service.fetchForecast(algorithm, this.keys);
+    let parameters = this.parameters[algorithm];
+    this.router.navigate([], {
+      queryParams: {
+        key: this.keys,
+        algorithm: algorithm,
+        parameters: JSON.stringify(parameters),
+      },
+    });
+    let result = await this.service.fetchForecast(algorithm, this.keys, {
+      parameters,
+    });
     this.forecastResult.set(result);
   }
 

@@ -72,7 +72,7 @@
                 <span class="select is-fullwidth">
                   <select
                     class="is-fullwidth"
-                    [formControl]="selectedAlgorithmIdentifier.formControl"
+                    [(ngModel)]="selectedAlgorithmIdentifier"
                   >
                     @for (algo of availableAlgorithms() ?? []; track algo) {
                       <option [value]="algo.identifier">
@@ -104,13 +104,17 @@
                     class="input"
                     type="text"
                     [placeholder]="param.value.default"
+                    [(ngModel)]="parameters[algorithm.identifier][param.key]"
                   />
                   <span
                     *ngIf="param.value.type == 'str' && param.value.enums"
                     class="select"
                     style="width: 100%"
                   >
-                    <select style="width: 100%">
+                    <select
+                      style="width: 100%"
+                      [(ngModel)]="parameters[algorithm.identifier][param.key]"
+                    >
                       <option
                         *ngFor="let enum of param.value.enums"
                         [ngValue]="enum"
@@ -125,6 +129,7 @@
                     class="input"
                     type="number"
                     [placeholder]="param.value.default"
+                    [(ngModel)]="parameters[algorithm.identifier][param.key]"
                   />
                   <span
                     *ngIf="!['str', 'int', 'float'].includes(param.value.type)"
@@ -143,7 +148,7 @@
             <div class="control">
               <button
                 class="button is-primary is-fullwidth is-justify-content-center"
-                click
+                (click)="fetchForecast()"
               >
                 Calculate Forecast
               </button>
