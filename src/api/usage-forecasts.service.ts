@@ -135,16 +135,18 @@ const RESULT = {
       },
     },
     data: {
-      properties: {
-        label: {type: "string"},
-        x: {type: "uint32"},
-        y: {type: "float64"},
-      },
-      optionalProperties: {
-        uncertainty: {
-          properties: {
-            0: {type: "float64"},
-            1: {type: "float64"},
+      elements: {
+        properties: {
+          label: {type: "string"},
+          x: {type: "uint32"},
+          y: {type: "float64"},
+        },
+        optionalProperties: {
+          uncertainty: {
+            properties: {
+              0: {type: "float64"},
+              1: {type: "float64"},
+            },
           },
         },
       },
