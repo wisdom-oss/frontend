@@ -1,7 +1,11 @@
-<div
-  class="container is-flex is-flex-direction-column is-fullheight"
-  [style]="{overflow: 'auto'}"
->
+
+<div class="container is-flex is-flex-direction-column is-fullheight" [style.overflow]="'auto'">
+  @let slice = 20;
+  @let heightMC = "30em";
+  @let heightMF = "15em";
+  @let heightLS = "30em";
+  @let heightTable = "20em";
+
   <div class="columns my-1 is-fullwidth">
     <!--Graph Field-->
     <div class="column is-two-fifths">
@@ -128,7 +132,7 @@
                       class="button is-danger is-small"
                       (click)="deleteModel(item.refMeter, item.algorithm, $index)"
                     >
-                      <ng-icon name="remixDeleteBin5Line" size="16px"></ng-icon>
+                      <ng-icon name="remixDeleteBin5Line" size="1.5em"></ng-icon>
                     </button>
                   </td>
                 </tr>
@@ -312,7 +316,7 @@
                 addVMeter(selectedPhysicalMeters(), newVMeterName())
               "
             >
-              <ng-icon name="remixAddLine" size="24px"></ng-icon>
+              <ng-icon name="remixAddLine" size="1.5em"></ng-icon>
             </button>
           </div>
         </div>
@@ -402,7 +406,7 @@
                       class="button is-danger is-small"
                       (click)="deleteVMeterById(item.id, $index)"
                     >
-                      <ng-icon name="remixDeleteBin5Line" size="16px"></ng-icon>
+                      <ng-icon name="remixDeleteBin5Line" size="1.5em"></ng-icon>
                     </button>
                   </td>
                 </tr>
@@ -427,12 +431,12 @@
           <div class="control">
             <button
               class="button is-primary"
-              [disabled]="!selectedVirtualMeters.length"
+              [disabled]="!selectedVirtualMeters().length"
               (click)="
                 addVMeter(selectedVirtualMeters(), newSuperMeterName())
               "
             >
-              <ng-icon name="remixAddLine" size="24px"></ng-icon>
+              <ng-icon name="remixAddLine" size="1.5em"></ng-icon>
             </button>
           </div>
         </div>

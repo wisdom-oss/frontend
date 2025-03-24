@@ -4,7 +4,6 @@ import {Component, OnInit, viewChild, signal, WritableSignal, Signal} from "@ang
 import {FormsModule} from "@angular/forms";
 import {provideIcons, NgIcon} from "@ng-icons/core";
 import {remixAddLine, remixDeleteBin5Line} from "@ng-icons/remixicon";
-import {TranslateService} from "@ngx-translate/core";
 import {TranslatePipe} from "@ngx-translate/core";
 import {
   ChartConfiguration,
@@ -16,7 +15,8 @@ import {
 import {BaseChartDirective} from "ng2-charts";
 import {BeWaterSmartService} from "../../api/be-water-smart.service";
 import {DropdownComponent} from "../../common/components/dropdown/dropdown.component";
-import {TransformStringPipe} from "../../common/pipes/transform-string.pipe";
+import {TransformStringPipe} from "../../core/pipes/transform-string.pipe";
+import dayjs from "dayjs";
 
 @Component({
   selector: "be-water-smart",
@@ -38,14 +38,6 @@ export class BeWaterSmartComponent implements OnInit {
   // ---------- StringFormatting ----------
 
   prefixes: string[] = ["urn:ngsi-ld:virtualMeter:", "urn:ngsi-ld:Device:"]; //array of prefixes to remove from id-strings of smart meters
-
-  // ---------- Layout Parameters ----------
-
-  slice: number = 20;
-  heightMC: string = "500px";
-  heightMF: string = "250px";
-  heightLS: string = "500px";
-  heightTable: string = "300px";
 
   // ---------- Dropdowns ----------
 
@@ -112,31 +104,7 @@ export class BeWaterSmartComponent implements OnInit {
     },
   };
 
-  standardLabels: string[] = [ // standard xAxis labels for prediction values
-    "01:00",
-    "02:00",
-    "03:00",
-    "04:00",
-    "05:00",
-    "06:00",
-    "07:00",
-    "08:00",
-    "09:00",
-    "10:00",
-    "11:00",
-    "12:00",
-    "13:00",
-    "14:00",
-    "15:00",
-    "16:00",
-    "17:00",
-    "18:00",
-    "19:00",
-    "20:00",
-    "21:00",
-    "22:00",
-    "23:00",
-  ];
+  standardLabels: string[] = Array.from({length: 23}, ((_, i) => `${i+1}:00`));
 
   chartColor: string = "#FFFFFF"; //  color of the ng2chart
   chartData: ChartData<"line"> = { // data skeleton for the line graph
@@ -157,10 +125,7 @@ export class BeWaterSmartComponent implements OnInit {
 
   chartPlugins = [this.backgroundPlugin];
 
-  constructor(
-    public bwsService: BeWaterSmartService,
-    private translate: TranslateService,
-  ) {}
+  constructor(public bwsService: BeWaterSmartService) {}
 
   ngOnInit(): void {
     this.extractPMeters();
@@ -374,11 +339,11 @@ export class BeWaterSmartComponent implements OnInit {
           let date = response[0].datePredicted;
 
           let label =
-            this.transformString(vMeterId, this.prefixes[0]) +
+            vMeterId.replace(this.prefixes[0], "") +
             " " +
             algId +
             " " +
-            this.transformDate(date);
+            dayjs(date).format("DD.MM.YY");
 
           this.addGraphToChart(predValues, label);
         }
@@ -419,30 +384,5 @@ export class BeWaterSmartComponent implements OnInit {
     const b = Math.floor(Math.random() * 256); // Random blue value (0-255)
 
     return `rgb(${r}, ${g}, ${b})`; // Return the color in rgb() format
-  }
-
-  // ---------- Utility Functions ----------
-
-  /**
-   * pipe implementation to clean the ids from the smart meters
-   * @param value the whole string to change
-   * @param removable the string to remove
-   * @returns the tidied up string
-   */
-  transformString(value: string, removable: string): string {
-    let t = new TransformStringPipe();
-    return t.transform(value, removable);
-  }
-
-  /**
-   * pipe implementation to clean a date to readable format
-   * @param date initial date
-   * @param format format to use
-   * @returns the new date as a string
-   */
-  transformDate(date: string): string {
-    const datePipe = new DatePipe("en-US");
-    const formattedDate = datePipe.transform(date, "dd.MM.yyyy");
-    return formattedDate || date;
   }
 }
