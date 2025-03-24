@@ -46,7 +46,12 @@ export class UsageForecastsService {
       }
     }
 
-    let context = new HttpContext().set(httpContexts.validateSchema, RESULT);
+    let context = new HttpContext()
+      .set(httpContexts.validateSchema, RESULT)
+      .set(httpContexts.cache, [
+        JSON.stringify({key, options}),
+        dayjs.duration(1, "day"),
+      ]);
 
     return firstValueFrom(
       this.http.post<Result>(`${URL}/${scriptIdentifier}`, formData, {
