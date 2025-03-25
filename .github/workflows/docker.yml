@@ -40,6 +40,7 @@ jobs:
 
   merge:
     runs-on: ubuntu-latest
+    if: github.actor != 'dependabot[bot]'
     needs:
       - build
     steps:
@@ -47,3 +48,63 @@ jobs:
         name:
         with:
           registry-password: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy:
+    runs-on: self-hosted
+    environment:
+      name: dev
+      url: https://wisdom-dev.vlba.uni-oldenburg.de
+    needs:
+      - merge
+    if: (github.ref != format('refs/heads/{0}', github.event.repository.default_branch)) && github.event_name == 'push'
+    steps:
+      - name: setup-ssh
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ vars.HOSTNAME }} > ~/.ssh/known_hosts
+
+      - name: fix-image-naming
+        env:
+          branch: "${{ github.ref_name }}"
+        run: |
+          echo "IMAGE_TAG=${branch/\//-}" >> $GITHUB_ENV
+
+      - name: pull-image
+        run: ssh ${{ secrets.USERNAME }}@${{ vars.HOSTNAME }} "FRONTEND_VERSION='${{ env.IMAGE_TAG }}' docker compose pull frontend"
+
+      - name: restart-container
+        run: ssh ${{ secrets.USERNAME }}@${{ vars.HOSTNAME }} "FRONTEND_VERSION='${{ env.IMAGE_TAG }}' docker compose up -d frontend"
+
+  deploy-protected:
+    strategy:
+      matrix:
+        environment:
+          - demo
+          - live
+    environment: ${{ matrix.environment }}
+    runs-on: self-hosted
+    name: deploy (${{ matrix.environment }})
+    continue-on-error: true
+    if: false
+    # if: (github.ref == format('refs/heads/{0}', github.event.repository.default_branch)) && github.event_name == 'push'
+    needs:
+      - merge
+    steps:
+      - name: setup-ssh
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ vars.HOSTNAME }} > ~/.ssh/known_hosts
+
+      - name: fix-image-naming
+        env:
+          branch: "${{ github.ref_name }}"
+        run: |
+          echo "IMAGE_TAG=${branch/\//-}" >> $GITHUB_ENV
+
+      - name: pull-image
+        run: ssh ${{ secrets.USERNAME }}@${{ vars.HOSTNAME }} "FRONTEND_VERSION='${{ env.IMAGE_TAG }}' docker compose pull frontend"
+
+      - name: restart-container
+        run: ssh ${{ secrets.USERNAME }}@${{ vars.HOSTNAME }} "FRONTEND_VERSION='${{ env.IMAGE_TAG }}' docker compose up -d frontend"

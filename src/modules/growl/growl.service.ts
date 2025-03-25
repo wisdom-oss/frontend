@@ -14,7 +14,6 @@ import {
   Geometry,
   Point,
   MultiPolygon,
-  Polygon,
 } from "geojson";
 
 import {GroundwaterLevelsService} from "../../api/groundwater-levels.service";
@@ -24,7 +23,7 @@ import {utils} from "../../common/utils";
 
 export namespace GrowlService {
   // geo data
-  export type GroundwaterBodies = Polygons;
+  export type GroundwaterBodies = MultiPolygons;
   export type GroundwaterMeasurementStations = Points<
     Partial<LenientMeasurement>
   >;
@@ -73,7 +72,7 @@ export class GrowlService {
   private geo: {
     service: GeoDataService;
     groundwaterMeasurementStations: Signal<Points>;
-    groundwaterBodies: Signal<Polygons>;
+    groundwaterBodies: Signal<MultiPolygons>;
     ndsMunicipals: Signal<MultiPolygons>;
     waterRightUsageLocations: Signal<Points>;
     oldWaterRightUsageLocations: Signal<Points>;
@@ -119,7 +118,7 @@ export class GrowlService {
       groundwaterBodies: GrowlService.geoDataSignal(
         service,
         "groundwater_bodies",
-        "Polygon",
+        "MultiPolygon",
         dayjs.duration(1, "year"),
       ),
       ndsMunicipals: GrowlService.geoDataSignal(
@@ -270,5 +269,4 @@ type LenientMeasurement = Omit<Measurement, "classification"> & {
 
 type GeoProperties<P = {}> = {name?: string | null; key: string} & P;
 type Points<P = {}> = FeatureCollection<Point, GeoProperties<P>>;
-type Polygons<P = {}> = FeatureCollection<Polygon, GeoProperties<P>>;
 type MultiPolygons<P = {}> = FeatureCollection<MultiPolygon, GeoProperties<P>>;
