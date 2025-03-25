@@ -7,7 +7,7 @@ import {GreeterComponent} from "./core/greeter/greeter.component";
 import {BeWaterSmartComponent} from "./modules/be-water-smart/be-water-smart.component";
 import {GrowlComponent} from "./modules/growl/growl.component";
 import {OowvActionMapComponent} from "./modules/oowv/action-map/action-map.component";
-import { WeatherDataComponent } from "./modules/weather-data/weather-data.component";
+import {WeatherDataComponent} from "./modules/weather-data/weather-data.component";
 
 export const routes: Routes = [
   {path: "callback", component: CallbackComponent},

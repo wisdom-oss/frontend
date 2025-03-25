@@ -1,1 +1,36 @@
-<p>weather-data works!</p>
+<div class="is-fullwidth is-fullheight is-flex is-flex-direction-column">
+  <p class="title" translate="weather-data.title.dwd"></p>
+  <div class="columns no-main-padding is-flex-grow-1">
+    <div class="column is-fullheight">
+      <div class="card is-fullheight">
+        <div class="card-content p-0 is-fullheight is-clipped">
+          <mgl-map
+            class="is-fullheight"
+            [style]="colorful"
+            [zoom]="[5.3]"
+            [center]="{
+              lat: 51.16,
+              lon: 10.45,
+            }"
+          >
+            <ng-container controls>
+              <mgl-control
+                mglNavigation
+                [showCompass]="false"
+                position="top-left"
+              ></mgl-control>
+              <mgl-control position="top-right">
+                <map-layer-selection-control
+                  [layers]="layers"
+                ></map-layer-selection-control>
+              </mgl-control>
+            </ng-container>
+          </mgl-map>
+        </div>
+      </div>
+    </div>
+    <div class="column is-fullheight">
+      <div class="card is-fullheight"></div>
+    </div>
+  </div>
+</div>

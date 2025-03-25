@@ -1,3 +1,7 @@
 [display.module]
 en = "Weather Data"
 de = "Wetterdaten"
+
+[title.dwd]
+en = "German Meteorological Service"
+de = "Deutscher Wetterdienst"
