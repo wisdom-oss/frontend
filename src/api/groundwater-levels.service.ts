@@ -5,7 +5,7 @@ import dayjs, {Dayjs} from "dayjs";
 import {Point} from "geojson";
 import {firstValueFrom} from "rxjs";
 
-import {typeUtils} from "../common/type-utils";
+import {typeUtils} from "../common/utils/type-utils";
 import {httpContexts} from "../common/http-contexts";
 
 const URL = "/api/groundwater-levels" as const;

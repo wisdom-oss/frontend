@@ -1,4 +1,6 @@
 import {effect, inject, signal, Signal, WritableSignal} from "@angular/core";
+import {toSignal} from "@angular/core/rxjs-interop";
+import {FormControl} from "@angular/forms";
 import {Duration} from "dayjs/plugin/duration";
 
 import {injections} from "./injections";
@@ -78,6 +80,92 @@ export namespace signals {
   }
 
   /**
+   * A specialized signal for managing a set of unique values.
+   *
+   * Unlike using a {@link WritableSignal<Set<T>>}, this signal provides
+   * built-in methods for adding, deleting, and clearing values without
+   * requiring explicit updates.
+   *
+   * @template T The type of values stored in the set.
+   */
+  export type SetSignal<T> = Signal<Set<T>> & {
+    /**
+     * Adds a value to the set.
+     *
+     * Notifies only if the set did not have the provided value.
+     */
+    add(value: T): Set<T>;
+
+    /**
+     * Clears all values from the set.
+     *
+     * Notifies only if the set was not already empty.
+     */
+    clear(): void;
+
+    /**
+     * Deletes a value from the set.
+     *
+     * Notifies only if the value was actually removed.
+     *
+     * @returns `true` if the value was removed, `false` if it was not in the set.
+     */
+    delete(value: T): boolean;
+  };
+
+  /**
+   * Creates a `SetSignal`, a signal that manages a `Set<T>` efficiently.
+   *
+   * Unlike a {@link WritableSignal<Set<T>>}, which requires manually
+   * calling a signal update when modifying it, this signal provides built-in
+   * `add`, `delete`, and `clear` methods that only notify subscribers when the
+   * set actually changes.
+   *
+   * @template T The type of values stored in the set.
+   * @param iterable (Optional) Initial values for the set.
+   *
+   * @example
+   * // Creating an empty set signal
+   * const mySet = signals.set<number>();
+   *
+   * mySet.add(5); // Adds 5 and notifies
+   * console.log(mySet()); // Set { 5 }
+   *
+   * mySet.add(5); // No notification, since 5 is already in the set
+   *
+   * // Creating a set with initial values
+   * const mySetWithValues = signals.set(["apple", "banana"]);
+   * mySetWithValues.delete("banana"); // Removes "banana" and notifies
+   * mySetWithValues.delete("banana"); // No notification, since "banana" was already removed
+   * console.log(mySetWithValues()); // Set { "apple" }
+   */
+  export function set<T>(iterable?: Iterable<T>): SetSignal<T> {
+    let inner = new Set(iterable);
+    // Since we do not expose `set` or `update`, all updates are intentional.
+    // This ensures that notifications only occur on actual set changes.
+    let s = signal(inner, {equal: () => false});
+
+    return Object.assign(s, {
+      add(value: T) {
+        if (inner.has(value)) return inner; // No change, no notification
+        let result = inner.add(value);
+        s.set(inner); // Notify only on actual addition
+        return result;
+      },
+      clear() {
+        if (inner.size === 0) return; // No change, no notification
+        inner.clear();
+        s.set(inner); // Notify only if set was not empty
+      },
+      delete(value: T) {
+        let result = inner.delete(value);
+        if (result) s.set(inner); // Notify only on actual removal
+        return result;
+      },
+    });
+  }
+
+  /**
    * Retrieves the active language signal.
    *
    * This function returns the signal representing the currently selected
@@ -151,5 +239,69 @@ export namespace signals {
     let mapped = signal<undefined | U>(undefined);
     promise.then(value => mapped.set(map(value)));
     return mapped;
+  }
+
+  /**
+   * A signal that wraps an Angular `FormControl`.
+   *
+   * This signal provides reactive access to the form control's value
+   * and allows updating it directly.
+   *
+   * @example
+   * const mySignal = signals.formControl<string>("");
+   *
+   * // Reading the current value
+   * console.log(mySignal()); // ""
+   *
+   * // Updating the value
+   * mySignal.set("new value");
+   *
+   * // Using in a template with Angular's form control directive:
+   * ```html
+   * <input [formControl]="mySignal.formControl">
+   * ```
+   */
+  export type FormControlSignal<T> = Signal<T> & {
+    /**
+     * The associated `FormControl` instance.
+     *
+     * This can be used in templates via the `[formControl]` directive.
+     */
+    formControl: FormControl<T>;
+
+    /**
+     * Updates the value of the form control.
+     *
+     * This is equivalent to calling `setValue` on the underlying `FormControl`.
+     *
+     * @param value The new value to set.
+     */
+    set(value: T): void;
+  };
+
+  /**
+   * Creates a `FormControlSignal` from an initial value.
+   *
+   * This function returns a signal that is linked to an Angular
+   * {@link FormControl}, allowing seamless two-way binding with form inputs.
+   * Ensure you have the `ReactiveFormsModule` imported.
+   *
+   * @example
+   * const mySignal = signals.formControl<string>("default");
+   *
+   * // Using in a component template:
+   * ```html
+   * <input [formControl]="mySignal.formControl">
+   * ```
+   */
+  export function formControl<T>(initialValue: T): FormControlSignal<T> {
+    let inner = new FormControl(initialValue) as FormControl<T>;
+    let s = toSignal(inner.valueChanges, {initialValue});
+    return Object.assign(s, {
+      formControl: inner,
+      set(value: T) {
+        inner.setValue(value);
+      },
+    });
   }
 }

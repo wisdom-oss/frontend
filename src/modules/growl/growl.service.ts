@@ -19,7 +19,7 @@ import {
 import {GroundwaterLevelsService} from "../../api/groundwater-levels.service";
 import {GeoDataService} from "../../api/geo-data.service";
 import nlwknMeasurementClassificationColors from "../../assets/nlwkn-measurement-classification-colors.toml";
-import {utils} from "../../common/utils";
+import {range} from "../../common/utils/range";
 
 export namespace GrowlService {
   // geo data
@@ -157,8 +157,8 @@ export class GrowlService {
 
     (async () => {
       let contents =
-        (await service.fetchLayerContents(layerName, undefined, cacheTtl)) ??
-        [];
+        (await service.fetchLayerContents(layerName, undefined, cacheTtl))
+          ?.data ?? [];
 
       let features: Feature<G, GeoProperties>[] = [];
       for (let content of contents) {
@@ -203,7 +203,7 @@ export class GrowlService {
     }
 
     let today = dayjs();
-    let week = utils.range(7);
+    let week = range(7);
     let measurements = Object.fromEntries(
       week.map(i => {
         let day = today.subtract(dayjs.duration(i, "day"));

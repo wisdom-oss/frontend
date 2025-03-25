@@ -88,7 +88,7 @@ export class OowvActionMapComponent {
   ): FeatureCollection<G> {
     let features: Feature<G>[] = [];
 
-    for (let content of contents ?? []) {
+    for (let content of contents?.data ?? []) {
       features.push({
         type: "Feature",
         geometry: content.geometry as G,
