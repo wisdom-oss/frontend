@@ -27,7 +27,6 @@ import {DropdownComponent} from "../../common/components/dropdown/dropdown.compo
 import {TransformStringPipe} from "../../core/pipes/transform-string.pipe";
 
 @Component({
-  selector: "be-water-smart",
   templateUrl: "be-water-smart.component.html",
   imports: [
     CommonModule,
@@ -40,7 +39,7 @@ import {TransformStringPipe} from "../../core/pipes/transform-string.pipe";
     DropdownComponent,
   ],
   providers: [provideIcons({remixAddLine, remixDeleteBin5Line})],
-  styleUrls: ["be-water-smart.scss"],
+  styleUrl: "be-water-smart.scss",
 })
 export class BeWaterSmartComponent implements OnInit {
   // ---------- StringFormatting ----------
