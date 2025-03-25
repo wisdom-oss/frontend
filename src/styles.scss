@@ -29,7 +29,23 @@ html {
   max-height: 100%;
 }
 
+.no-main-padding {
+  margin: calc(var(--bulma-column-gap) * -1);
+
+  &.is-fullheight {
+    $height: calc(100% + 2 * var(--bulma-column-gap));
+    height: $height;
+    max-height: $height;
+  }
+}
+
 .maplibregl-map {
   // avoid inherited colors from outer components for the map
   color: bulma.$text;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
 }

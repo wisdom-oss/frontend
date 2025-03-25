@@ -97,7 +97,7 @@
                   <td class="has-text-centered">
                     <abbr title="{{ item.refMeter }}">
                       {{
-                        (item.refMeter | transformString: prefixes[0]).slice(
+                        (item.refMeter | removeSubstring: prefixes[0]).slice(
                           0,
                           slice
                         )
@@ -280,7 +280,7 @@
                   <td class="is-narrow has-text-centered">
                     <abbr title="{{ item.id }}">
                       {{
-                        (item.id | transformString: prefixes[1]).slice(0, slice)
+                        (item.id | removeSubstring: prefixes[1]).slice(0, slice)
                       }}
                     </abbr>
                   </td>
@@ -393,7 +393,7 @@
                   <td class="is-narrow has-text-centered">
                     <abbr title="{{ item.id }}">
                       {{
-                        (item.id | transformString: prefixes[0]).slice(0, slice)
+                        (item.id | removeSubstring: prefixes[0]).slice(0, slice)
                       }}
                     </abbr>
                   </td>
