@@ -19,7 +19,6 @@ import {signals} from "../../../common/signals";
 import {Scopes} from "../../../core/auth/scopes";
 
 @Component({
-  selector: "oowv-action-map",
   imports: [
     ControlComponent,
     GeoJSONSourceComponent,
@@ -31,7 +30,6 @@ import {Scopes} from "../../../core/auth/scopes";
     NgIf,
   ],
   templateUrl: "./action-map.component.html",
-  styles: ``,
 })
 export class OowvActionMapComponent {
   static readonly SCOPES: Scopes.Scope[] = ["geodata:read"];

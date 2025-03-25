@@ -36,7 +36,6 @@ import {ResizeMapOnLoadDirective} from "../../common/directives/resize-map-on-lo
 import {signals} from "../../common/signals";
 
 @Component({
-  selector: "growl",
   imports: [
     AttributionControlDirective,
     ControlComponent,
@@ -55,7 +54,6 @@ import {signals} from "../../common/signals";
     WithdrawalInfoControlComponent,
   ],
   templateUrl: "./growl.component.html",
-  styles: ``,
 })
 export class GrowlComponent {
   protected style = colorful as any as StyleSpecification;

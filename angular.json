@@ -8,8 +8,8 @@
       "schematics": {
         "@schematics/angular:component": {
           "skipTests": true,
-          "inlineStyle": true,
-          "style": "scss"
+          "style": "none",
+          "skipSelector": true
         },
         "@schematics/angular:class": {
           "skipTests": true
