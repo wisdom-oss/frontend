@@ -33,3 +33,7 @@ de = "Wenn das nicht funktioniert:"
 [callback.home]
 en = "Back to Home"
 de = "Zurück zur Startseite"
+
+[sidebar.category.rainfall]
+en = "Rainfall"
+de = "Niederschlag"

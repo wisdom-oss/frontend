@@ -8,6 +8,7 @@ import core from "./core/i18n.toml";
 import beWaterSmart from "./modules/be-water-smart/i18n.toml";
 import growl from "./modules/growl/i18n.toml";
 import oowvActionMap from "./modules/oowv/action-map/i18n.toml";
+import weatherData from "./modules/weather-data/i18n.toml";
 
 // add translations to this record
 const modules: NestedStringRecord = {
@@ -15,6 +16,7 @@ const modules: NestedStringRecord = {
   growl,
   "be-water-smart": beWaterSmart,
   "oowv-action-map": oowvActionMap,
+  "weather-data": weatherData,
 };
 
 export function configureTranslations(service: TranslateService) {
