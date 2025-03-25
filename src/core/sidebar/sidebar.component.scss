@@ -37,3 +37,7 @@ nav {
     }
   }
 }
+
+.menu-list li:not(:last-child) {
+  padding-bottom: calc(var(--bulma-box-padding) / 2);
+}

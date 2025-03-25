@@ -22,8 +22,8 @@ import {
   remixLineChartLine,
   remixMap2Fill,
   remixMapLine,
-  remixWaterPercentFill,
   remixRfidLine,
+  remixWaterPercentFill,
 } from "@ng-icons/remixicon";
 import {TranslateDirective} from "@ngx-translate/core";
 import {filter} from "rxjs";
@@ -45,15 +45,15 @@ import {AuthService} from "../auth/auth.service";
   styleUrl: "./sidebar.component.scss",
   providers: [
     provideIcons({
-      remixBookShelfLine,
+      remixBarChartFill,
       remixBookLine,
-      remixRfidLine,
+      remixBookShelfLine,
+      remixDatabase2Fill,
       remixLineChartLine,
       remixMap2Fill,
-      remixDatabase2Fill,
       remixMapLine,
+      remixRfidLine,
       remixWaterPercentFill,
-      remixBarChartFill,
     }),
     provideNgIconLoader(name => {
       if (name != "oowv") return "";

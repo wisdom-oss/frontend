@@ -14,8 +14,8 @@ import oowvActionMap from "./modules/oowv/action-map/i18n.toml";
 const modules: NestedStringRecord = {
   core,
   growl,
-  "long-term-forecast": longTermForecast,
   "be-water-smart": beWaterSmart,
+  "long-term-forecast": longTermForecast,
   "oowv-action-map": oowvActionMap,
 };
 
