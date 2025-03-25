@@ -1,10 +1,4 @@
-<div
-  class="columns block"
-  style="
-    margin: calc(var(--bulma-column-gap) * -1);
-    height: calc(100% + 2 * var(--bulma-column-gap));
-  "
->
+<div class="columns block is-fullheight no-main-padding">
   <ng-container chart>
     @let options =
       {
@@ -37,11 +31,10 @@
       };
 
     <div class="column" style="min-width: 25em">
-      <div class="card" style="height: 100%">
+      <div class="card is-fullheight">
         <div
-          class="card-content skeleton-block"
+          class="card-content skeleton-block is-fullheight"
           [class.skeleton-block]="datasets.value() | empty"
-          style="height: 100%"
         >
           <canvas
             baseChart
