@@ -1,9 +1,9 @@
 import {Pipe, PipeTransform} from "@angular/core";
 
 @Pipe({
-  name: "transformString",
+  name: "removeSubstring",
 })
-export class TransformStringPipe implements PipeTransform {
+export class RemoveSubstringPipe implements PipeTransform {
   transform(value: string, search: string): string {
     if (!value || !search) {
       return value; // Return original value if no search string is provided

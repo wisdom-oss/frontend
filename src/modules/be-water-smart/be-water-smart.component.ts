@@ -24,7 +24,7 @@ import {BaseChartDirective} from "ng2-charts";
 
 import {BeWaterSmartService} from "../../api/be-water-smart.service";
 import {DropdownComponent} from "../../common/components/dropdown/dropdown.component";
-import {TransformStringPipe} from "../../core/pipes/transform-string.pipe";
+import {RemoveSubstringPipe} from "../../common/pipes/remove-substring.pipe";
 
 @Component({
   selector: "be-water-smart",
@@ -33,7 +33,7 @@ import {TransformStringPipe} from "../../core/pipes/transform-string.pipe";
     CommonModule,
     FormsModule,
     TranslatePipe,
-    TransformStringPipe,
+    RemoveSubstringPipe,
     DatePipe,
     BaseChartDirective,
     NgIcon,
