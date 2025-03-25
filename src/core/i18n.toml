@@ -34,6 +34,6 @@ de = "Wenn das nicht funktioniert:"
 en = "Back to Home"
 de = "Zurück zur Startseite"
 
-[sidebar.category.rainfall]
-en = "Rainfall"
+[sidebar.category.precipitation]
+en = "Precipitation"
 de = "Niederschlag"
