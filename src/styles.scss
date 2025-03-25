@@ -1,4 +1,7 @@
 @use "./variables.scss";
+@use "../node_modules/bulma/sass/components/navbar.scss" with (
+  $navbar-breakpoint: 690px
+);
 @use "../node_modules/bulma/sass/" as bulma;
 
 @use "../node_modules/bulma-slider/src/sass/" as bulma-slider;
