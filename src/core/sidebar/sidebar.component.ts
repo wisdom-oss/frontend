@@ -16,10 +16,14 @@ import {
 } from "@ng-icons/core";
 import {
   remixBarChartFill,
+  remixBookLine,
+  remixBookShelfLine,
   remixDatabase2Fill,
+  remixLineChartLine,
   remixMap2Fill,
   remixMapLine,
   remixWaterPercentFill,
+  remixRfidLine,
 } from "@ng-icons/remixicon";
 import {TranslateDirective} from "@ngx-translate/core";
 import {filter} from "rxjs";
@@ -41,8 +45,12 @@ import {AuthService} from "../auth/auth.service";
   styleUrl: "./sidebar.component.scss",
   providers: [
     provideIcons({
-      remixDatabase2Fill,
+      remixBookShelfLine,
+      remixBookLine,
+      remixRfidLine,
+      remixLineChartLine,
       remixMap2Fill,
+      remixDatabase2Fill,
       remixMapLine,
       remixWaterPercentFill,
       remixBarChartFill,

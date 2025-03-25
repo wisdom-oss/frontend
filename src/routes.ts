@@ -4,6 +4,7 @@ import {CallbackComponent} from "./core/auth/callback/callback.component";
 import {CoreComponent} from "./core/core.component";
 import {permissionsGuard} from "./core/auth/permissions.guard";
 import {GreeterComponent} from "./core/greeter/greeter.component";
+import {BeWaterSmartComponent} from "./modules/be-water-smart/be-water-smart.component";
 import {GrowlComponent} from "./modules/growl/growl.component";
 import {LongTermForecastComponent} from "./modules/long-term-forecast/long-term-forecast.component";
 import {longTermForecastRoutes} from "./modules/long-term-forecast/routes";
@@ -16,6 +17,7 @@ export const routes: Routes = [
     component: CoreComponent,
     children: [
       {path: "", component: GreeterComponent}, // Default child route
+      {path: "be-water-smart", component: BeWaterSmartComponent},
       {path: "growl", component: GrowlComponent},
       {
         path: "long-term-forecast",
