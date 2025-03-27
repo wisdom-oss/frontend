@@ -65,10 +65,14 @@ export class WaterDemandPredictionComponent implements OnInit {
   optionsSmartmeter: Record<string, string> = {};
   choiceSmartmeter = signal<string>("urn:ngsi-ld:Device:retired-household");
 
-  /** if weather data should be incorporated or not */
-  useWeather: boolean = true;
-
-  standard_weather: string = "air_temperature";
+  menuWeather = "water-demand-prediction.choice.weather";
+  optionsWeather: Record<string, string> = {
+    plain: "water-demand-prediction.weather.plain",
+    air_temperature: "water-demand-prediction.weather.air_temperature",
+    precipitation: "water-demand-prediction.weather.precipitation",
+    moisture: "water-demand-prediction.weather.moisture",
+  };
+  choiceWeather = signal<string>("plain");
 
   /** data object of current requested Smartmeterdata */
   currentSmartmeterData?: SingleSmartmeter;
@@ -171,11 +175,6 @@ export class WaterDemandPredictionComponent implements OnInit {
     this.fetchMeterInformation();
     this.fetchDataSmartmeter();
     this.chartDataPredictedValues.labels = this.chartDataCurrentValues.labels;
-  }
-
-  /** toggle the weather check mark */
-  toggleWeather() {
-    this.useWeather = !this.useWeather;
   }
 
   /** set the displayed resolution and update the chart to mirror that
@@ -328,21 +327,13 @@ export class WaterDemandPredictionComponent implements OnInit {
       return;
     }
 
-    let weather: string;
-
-    if (this.useWeather) {
-      weather = this.standard_weather;
-    } else {
-      weather = "plain";
-    }
-
     this.waterDemandService
       .trainModelOnSingleSmartmeter(
         this.choiceStartPoint(),
         this.choiceSmartmeter(),
         this.choiceTime(),
         this.choiceResolution(),
-        weather,
+        this.choiceWeather(),
       )
       .subscribe({
         next: response => {
@@ -424,21 +415,13 @@ export class WaterDemandPredictionComponent implements OnInit {
       return;
     }
 
-    let weather: string;
-
-    if (this.useWeather) {
-      weather = this.standard_weather;
-    } else {
-      weather = "plain";
-    }
-
     this.waterDemandService
       .fetchSinglePredictionSmartmeter(
         this.choiceStartPoint(),
         this.choiceSmartmeter(),
         this.choiceTime(),
         this.choiceResolution(),
-        weather,
+        this.choiceWeather(),
       )
       .subscribe({
         next: (response: PredictionSingleSmartmeter) => {

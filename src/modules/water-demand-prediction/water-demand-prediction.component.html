@@ -91,17 +91,6 @@
               >
                 {{ "water-demand-prediction.request.trainModel" | translate }}
               </button>
-              <button
-                class="button is-rounded"
-                [class.is-success]="useWeather"
-                (click)="toggleWeather()"
-              >
-                <span>{{
-                  useWeather
-                    ? ("water-demand-prediction.useWeather.On" | translate)
-                    : ("water-demand-prediction.useWeather.Off" | translate)
-                }}</span>
-              </button>
             </div>
             <!-- drop down menus-->
             <div class="buttons is-justify-content-space-around">
@@ -132,6 +121,13 @@
                 [changeMenuName]="true"
                 kind="hover"
                 [(choice)]="choiceStartPoint"
+              ></dropdown>
+              <dropdown
+                [menuName]="menuWeather"
+                [options]="optionsWeather"
+                [changeMenuName]="true"
+                kind="hover"
+                [(choice)]="choiceWeather"
               ></dropdown>
             </div>
           </div>

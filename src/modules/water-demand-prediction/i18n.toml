@@ -70,6 +70,10 @@ de = "Wähle Zeitrahmen"
 en = "Select Resolution"
 de = "Wähle Auflösung"
 
+[choice.weather]
+en = "Select Weather"
+de = "Wähle Wetter"
+
 [request.realdata]
 en = "Display Data"
 de = "Zeige Daten an"
@@ -125,3 +129,19 @@ de = "Mittlere quadratische Abweichung"
 [metrics.RMSE]
 en = "Root Mean Squared Error"
 de = "Wurzel des mittleren quadratischen Fehlers"
+
+[weather.air_temperature]
+en = "Temperature"
+de = "Temperatur"
+
+[weather.precipitation]
+en = "Precipitation"
+de = "Niederschlag"
+
+[weather.moisture]
+en = "Moisture"
+de = "Feuchtigkeit"
+
+[weather.plain]
+en = "No Weather"
+de = "Kein Wetter"
