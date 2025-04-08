@@ -5,7 +5,15 @@
   <map-layer-selection-control
     [layers]="layers"
     [collapsible]="false"
-    style="position: absolute; top: 1em; left: 1em"
+    style="position: absolute; top: 1em; left: 1em; z-index: 1;"
   ></map-layer-selection-control>
-  <div #container class="is-fullwidth is-fullheight"></div>
+  <div class="is-fullwidth is-fullheight">
+    <div 
+      #container
+      resize-observer
+      (resize)="onResize()"
+      class="is-fullwidth is-fullheight"
+      style="position: absolute; z-index: 0;"
+    ></div>
+  </div>
 </div>
