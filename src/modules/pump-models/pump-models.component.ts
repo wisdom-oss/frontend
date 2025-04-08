@@ -25,8 +25,8 @@ import {Once} from "../../common/utils/once";
 import {httpContexts} from "../../common/http-contexts";
 import {signals} from "../../common/signals";
 import {LayerSelectionControlComponent} from "../../common/components/map/layer-selection-control/layer-selection-control.component";
+import {ResizeObserverDirective} from "../../common/directives/resize-observer.directive";
 import {keys} from "../../common/utils/keys";
-import { ResizeObserverDirective } from "../../common/directives/resize-observer.directive";
 
 const MODEL_URLS = {
   TGA: "/files/WW-Langeoog/20191105-4001110-WW-TGA.ifc",
