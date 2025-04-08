@@ -1,10 +1,10 @@
 import {
   computed,
+  effect,
   input,
   signal,
   Component,
   WritableSignal,
-  effect,
 } from "@angular/core";
 import {provideIcons, NgIcon} from "@ng-icons/core";
 import {remixStackFill} from "@ng-icons/remixicon";

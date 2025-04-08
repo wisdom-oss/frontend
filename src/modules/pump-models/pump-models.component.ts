@@ -5,18 +5,19 @@ import {
 } from "@angular/common";
 import {HttpClient, HttpContext} from "@angular/common/http";
 import {
+  effect,
+  signal,
   viewChild,
   Component,
   OnDestroy,
   OnInit,
   AfterViewInit,
   ElementRef,
-  signal,
-  effect,
 } from "@angular/core";
 import {FragmentsGroup} from "@thatopen/fragments";
 import dayjs from "dayjs";
 import {firstValueFrom} from "rxjs";
+import {Vector3} from "three";
 
 import * as OBC from "@thatopen/components";
 
@@ -24,8 +25,7 @@ import {Once} from "../../common/utils/once";
 import {httpContexts} from "../../common/http-contexts";
 import {signals} from "../../common/signals";
 import {LayerSelectionControlComponent} from "../../common/components/map/layer-selection-control/layer-selection-control.component";
-import { keys } from "../../common/utils/keys";
-import { Vector3 } from "three";
+import {keys} from "../../common/utils/keys";
 
 const MODEL_URLS = {
   TGA: "/files/WW-Langeoog/20191105-4001110-WW-TGA.ifc",
@@ -45,7 +45,7 @@ const MODEL_URLS = {
 export class PumpModelsComponent implements OnInit, AfterViewInit, OnDestroy {
   protected container =
     viewChild.required<ElementRef<HTMLDivElement>>("container");
-  
+
   private components = new OBC.Components();
   private fragments = this.components.get(OBC.FragmentsManager);
   private world = signal<undefined | OBC.World>(undefined);
@@ -55,8 +55,10 @@ export class PumpModelsComponent implements OnInit, AfterViewInit, OnDestroy {
     ARCH: new Once<FragmentsGroup>(),
     GEL: new Once<FragmentsGroup>(),
   } as const;
-  
-  protected modelLoading = signals.fromPromise(Promise.all(Object.values(this.models)));
+
+  protected modelLoading = signals.fromPromise(
+    Promise.all(Object.values(this.models)),
+  );
   protected layers = {
     // TGA: signals.toggleable(true),
     ELT: signals.toggleable(false),
