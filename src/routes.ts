@@ -9,6 +9,7 @@ import {GrowlComponent} from "./modules/growl/growl.component";
 import {LongTermForecastComponent} from "./modules/long-term-forecast/long-term-forecast.component";
 import {longTermForecastRoutes} from "./modules/long-term-forecast/routes";
 import {OowvActionMapComponent} from "./modules/oowv/action-map/action-map.component";
+import { PumpModelsComponent } from "./modules/pump-models/pump-models.component";
 
 export const routes: Routes = [
   {path: "callback", component: CallbackComponent},
@@ -24,6 +25,7 @@ export const routes: Routes = [
         component: LongTermForecastComponent,
         children: longTermForecastRoutes,
       },
+      {path: "pump-models", component: PumpModelsComponent},
       {
         path: "oowv/action-map",
         component: OowvActionMapComponent,
