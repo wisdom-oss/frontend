@@ -36,6 +36,7 @@
     "@ng-icons/core": "^31.2.0",
     "@ng-icons/remixicon": "^31.2.0",
     "@ngx-translate/core": "^16.0.4",
+    "@thatopen/components": "^2.4.5",
     "@turf/turf": "^7.2.0",
     "@twemoji/svg": "^15.0.0",
     "@wisdom-oss/brand": "github:wisdom-oss/brand",
@@ -51,7 +52,9 @@
     "maplibre-gl": "^5.3.0",
     "ng2-charts": "^8.0.0",
     "rxjs": "~7.8.2",
+    "three": "~0.160.1",
     "tslib": "^2.8.1",
+    "web-ifc": "~0.0.66",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
