@@ -80,8 +80,8 @@ export class PumpModelsComponent implements OnInit, AfterViewInit, OnDestroy {
       if (!world) return;
 
       for (let layer of keys(this.layers)) {
-        if (this.layers[layer]()) world.scene.three.add(models[layer]());
-        else world.scene.three.remove(models[layer]());
+        if (this.layers[layer]()) world.scene.three.add(models[layer]()!);
+        else world.scene.three.remove(models[layer]()!);
       }
     });
   }
