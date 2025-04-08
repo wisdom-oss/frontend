@@ -148,4 +148,12 @@ export class PumpModelsComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.fragments.dispose();
   }
+
+  onResize(): void {
+    let world = this.world();
+    if (!world) return;
+    let camera = world.camera as OBC.SimpleCamera;
+    // execute aspect ratio one cycle later
+    setTimeout(() => camera.updateAspect());
+  }
 }
