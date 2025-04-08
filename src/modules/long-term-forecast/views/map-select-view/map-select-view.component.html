@@ -1,0 +1,143 @@
+<div class="card block is-fullheight is-flex is-flex-direction-column">
+  <div class="card-content p-0 is-clipped is-flex-grow-1 is-fullheight">
+    <mgl-map
+      class="is-fullheight"
+      [style]="style"
+      [zoom]="[6.8]"
+      [center]="{lat: 52.8, lon: 9.2}"
+      [canvasContextAttributes]="{preserveDrawingBuffer: true}"
+      [attributionControl]="{
+        compact: true,
+        customAttribution: geoData.attribution()?.attribution,
+      }"
+    >
+      <ng-container controls>
+        <mgl-control
+          mglNavigation
+          [showCompass]="false"
+          position="top-left"
+        ></mgl-control>
+        <mgl-control position="bottom-left">
+          <!-- button element is styled by maplibre -->
+          <a
+            class="button is-primary"
+            translate="long-term-forecast.calc-forecast"
+            [routerLink]="keys().length ? 'results' : null"
+            [queryParams]="{key: keys()}"
+            [attr.disabled]="keys().length ? null : true"
+          ></a>
+        </mgl-control>
+        <mgl-control position="top-right">
+          <div data-theme="light">
+            <div class="buttons has-addons">
+              @for (item of mapControl.possibleLayers; track item) {
+                <div
+                  class="button is-small"
+                  [class.is-primary]="mapControl.visibleLayer() == item"
+                  (click)="mapControl.visibleLayer.set(item)"
+                  [translate]="'long-term-forecast.layer.' + item"
+                ></div>
+              }
+            </div>
+          </div>
+        </mgl-control>
+      </ng-container>
+      <ng-container sources>
+        @let counties = geoData.counties();
+        @if (counties) {
+          <mgl-geojson-source
+            id="counties-source"
+            [data]="counties"
+            promoteId="key"
+            #countiesSource
+          ></mgl-geojson-source>
+        }
+        @let municipals = geoData.municipals();
+        @if (municipals) {
+          <mgl-geojson-source
+            id="municipals-source"
+            [data]="municipals"
+            promoteId="key"
+            #municipalsSource
+          ></mgl-geojson-source>
+        }
+      </ng-container>
+      <ng-container layers>
+        @let neutralColor = "#A0A0A0";
+        @let selectedColor = "#007ACC";
+
+        @for (layer of mapControl.possibleLayers; track layer) {
+          @if (geoData.loaded() && mapControl.visibleLayer() == layer) {
+            @let source = layer + "-source";
+            <mgl-layer
+              [id]="layer + '-fill'"
+              type="fill"
+              [source]="source"
+              [paint]="{
+                'fill-color': [
+                  'case',
+                  ['boolean', ['feature-state', 'selected'], false],
+                  selectedColor,
+                  neutralColor,
+                ],
+                'fill-opacity': 0.5,
+              }"
+              (layerMouseMove)="onHover(source, $event)"
+              (layerMouseLeave)="onHover(source, $event)"
+              (layerClick)="onClick()"
+            ></mgl-layer>
+            <mgl-layer
+              [id]="layer + '-line-unselected'"
+              type="line"
+              [source]="source"
+              [paint]="{
+                'line-color': neutralColor,
+                'line-width': [
+                  'case',
+                  ['boolean', ['feature-state', 'hovered'], false],
+                  4,
+                  2,
+                ],
+                'line-opacity': [
+                  'case',
+                  ['boolean', ['feature-state', 'selected'], false],
+                  0,
+                  1,
+                ],
+              }"
+            ></mgl-layer>
+            <mgl-layer
+              [id]="layer + '-line-selected'"
+              type="line"
+              [source]="source"
+              [paint]="{
+                'line-color': selectedColor,
+                'line-width': [
+                  'case',
+                  ['boolean', ['feature-state', 'hovered'], false],
+                  4,
+                  2,
+                ],
+                'line-opacity': [
+                  'case',
+                  ['boolean', ['feature-state', 'selected'], false],
+                  1,
+                  0,
+                ],
+              }"
+            ></mgl-layer>
+            <mgl-layer
+              [id]="layer + '-text'"
+              type="symbol"
+              [source]="source"
+              [layout]="{
+                'text-field': ['get', 'name'],
+                'text-font': ['noto_sans_regular'],
+              }"
+            ></mgl-layer>
+          }
+        }
+      </ng-container>
+    </mgl-map>
+  </div>
+</div>

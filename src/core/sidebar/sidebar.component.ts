@@ -15,6 +15,7 @@ import {
   NgIconStack,
 } from "@ng-icons/core";
 import {
+  remixBarChartFill,
   remixBookLine,
   remixBookShelfLine,
   remixDatabase2Fill,
@@ -22,6 +23,7 @@ import {
   remixMap2Fill,
   remixMapLine,
   remixRfidLine,
+  remixWaterPercentFill,
 } from "@ng-icons/remixicon";
 import {TranslateDirective} from "@ngx-translate/core";
 import {filter} from "rxjs";
@@ -43,13 +45,15 @@ import {AuthService} from "../auth/auth.service";
   styleUrl: "./sidebar.component.scss",
   providers: [
     provideIcons({
-      remixBookShelfLine,
+      remixBarChartFill,
       remixBookLine,
-      remixRfidLine,
+      remixBookShelfLine,
+      remixDatabase2Fill,
       remixLineChartLine,
       remixMap2Fill,
-      remixDatabase2Fill,
       remixMapLine,
+      remixRfidLine,
+      remixWaterPercentFill,
     }),
     provideNgIconLoader(name => {
       if (name != "oowv") return "";
@@ -89,7 +93,7 @@ export class SidebarComponent implements AfterViewInit {
         this.router.isActive(link, {
           matrixParams: "ignored",
           queryParams: "ignored",
-          paths: "exact",
+          paths: "subset",
           fragment: "ignored",
         }),
       );
