@@ -1,1 +1,11 @@
-<p>pump-models works!</p>
+<div
+  class="card is-fullwidth is-fullheight is-clipped"
+  [class.skeleton-block]="!modelLoading()"
+>
+  <map-layer-selection-control 
+    [layers]="layers"
+    [collapsible]="false"
+    style="position: absolute; top: 1em; left: 1em;"
+  ></map-layer-selection-control>
+  <div #container class="is-fullwidth is-fullheight"></div>
+</div>

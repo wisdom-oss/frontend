@@ -1,7 +1,7 @@
 <div
   class="maplibregl-ctrl-group p-1"
   (mouseenter)="collapsed.set(false)"
-  (mouseleave)="collapsed.set(true)"
+  (mouseleave)="collapsible() && collapsed.set(true)"
 >
   @if (collapsed()) {
     <span class="icon is-medium">

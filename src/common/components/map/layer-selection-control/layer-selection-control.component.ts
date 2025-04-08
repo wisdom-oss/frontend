@@ -4,6 +4,7 @@ import {
   signal,
   Component,
   WritableSignal,
+  effect,
 } from "@angular/core";
 import {provideIcons, NgIcon} from "@ng-icons/core";
 import {remixStackFill} from "@ng-icons/remixicon";
@@ -20,6 +21,7 @@ import {signals} from "../../../signals";
 })
 export class LayerSelectionControlComponent {
   readonly translatePrefix = input("");
+  readonly collapsible = input(true);
 
   readonly layers =
     input.required<
@@ -29,4 +31,8 @@ export class LayerSelectionControlComponent {
   // don't use `keyvalue` pipe to ensure order
   protected layerIter = computed(() => Object.entries(this.layers()));
   protected collapsed = signal(true);
+
+  constructor() {
+    effect(() => this.collapsed.set(this.collapsible()));
+  }
 }
