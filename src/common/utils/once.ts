@@ -1,3 +1,5 @@
+// oxlint-disable unicorn/no-thenable
+
 /**
  * A one-time value container that acts like a promise.
  *
