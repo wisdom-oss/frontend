@@ -14,11 +14,12 @@ import {
   AfterViewInit,
   ElementRef,
 } from "@angular/core";
-import {FragmentsGroup, FragmentMesh} from "@thatopen/fragments";
+import {FragmentsGroup, FragmentMesh, FragmentIdMap} from "@thatopen/fragments";
 import dayjs from "dayjs";
 import {firstValueFrom} from "rxjs";
 
 import * as OBC from "@thatopen/components";
+import * as OBCF from "@thatopen/components-front";
 
 import {Once} from "../../common/utils/once";
 import {httpContexts} from "../../common/http-contexts";
@@ -50,6 +51,7 @@ export class PumpModelsComponent implements OnInit, AfterViewInit, OnDestroy {
   private fragments = this.components.get(OBC.FragmentsManager);
   private world = signal<undefined | OBC.World>(undefined);
   private caster = signal<undefined | OBC.SimpleRaycaster>(undefined);
+  private highlighter = undefined as undefined | OBCF.Highlighter;
   private models = {
     TGA: new Once<FragmentsGroup>(),
     ELT: new Once<FragmentsGroup>(),
@@ -150,6 +152,9 @@ export class PumpModelsComponent implements OnInit, AfterViewInit, OnDestroy {
     let caster = casters.get(world);
     this.caster.set(caster);
 
+    this.highlighter = components.get(OBCF.Highlighter);
+    this.highlighter.setup({world, hoverEnabled: false, selectEnabled: false});
+
     this.world.set(world);
   }
 
@@ -165,14 +170,69 @@ export class PumpModelsComponent implements OnInit, AfterViewInit, OnDestroy {
     setTimeout(() => camera.updateAspect());
   }
 
-  async onClick() {
-    let TGA = await this.models.TGA;
-    let casted = this.caster()!.castRay(TGA.items.map(item => item.mesh));
-    if (!casted || !(casted.object instanceof FragmentMesh)) return;
-    let fragment = casted.object;
-    let fragmentMap = TGA.getFragmentMap();
-    let expressId = Array.from(fragmentMap[fragment.uuid])[0];
-    let props = await TGA.getProperties(expressId);
-    console.log(props);
+  async raycast(): Promise<null | FragmentMesh> {
+    let meshes = (await this.models.TGA).items.map(item => item.mesh);
+    for (let layer of keys(this.layers)) {
+      if (!this.layers[layer]()) continue;
+      meshes.push(...(await this.models[layer]).items.map(item => item.mesh));
+    }
+
+    let casted = this.caster()!.castRay(meshes)?.object;
+    if (!(casted instanceof FragmentMesh)) return null;
+    return casted;
+  }
+
+  async findProperties(
+    mesh: FragmentMesh
+  ): Promise<null | {
+    model: FragmentsGroup,
+    expressId: number,
+    properties: Record<string, any>
+  }> {
+    for (let layer of keys(this.models)) {
+      if (!(layer == "TGA" || this.layers[layer]())) continue;
+      let model = await this.models[layer];
+      let fragmentMap = model.getFragmentMap();
+      let entry = fragmentMap[mesh.uuid];
+      if (!entry) continue;
+      let expressId = Array.from(entry)[0];
+      if (!expressId) continue;
+      let properties = await model.getProperties(expressId);
+      if (properties) return {model, expressId, properties};
+    }
+    
+    return null;
+  }
+
+  async selectRaycast(
+    name: "select" | "hover", 
+    exclude?: FragmentIdMap,
+  ): Promise<null | Record<string, any>> {
+    this.highlighter!.clear(name);
+
+    let casted = await this.raycast();
+    if (!casted) return null;
+    let found = await this.findProperties(casted);
+    if (!found) return null;
+    let {properties, model, expressId} = found;
+
+    this.highlighter!.highlightByID(name, model.getFragmentMap([expressId]), undefined, undefined, exclude);
+    return properties;
+  }
+
+  async onClick(): Promise<void> {
+    await this.selectRaycast("select");
+  }
+
+  private lastMousePos = {x: 0, y: 0};
+  private moveThreshold = 10;
+  async onMouseMove(event: MouseEvent): Promise<void> {
+    let dx = event.clientX - this.lastMousePos.x;
+    let dy = event.clientY - this.lastMousePos.y;
+    let distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance < this.moveThreshold) return;
+    await this.selectRaycast("hover", this.highlighter!.selection["select"]);
+    this.lastMousePos = {x: event.clientX, y: event.clientY};
   }
 }
