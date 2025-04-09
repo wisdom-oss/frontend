@@ -1,4 +1,4 @@
-import {output, Directive, ElementRef, OnDestroy} from "@angular/core";
+import {output, OnDestroy, Directive, ElementRef} from "@angular/core";
 
 /**
  * Directive that listens for resize events on the attached element

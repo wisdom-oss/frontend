@@ -14,10 +14,9 @@ import {
   AfterViewInit,
   ElementRef,
 } from "@angular/core";
-import {FragmentsGroup} from "@thatopen/fragments";
+import {FragmentsGroup, FragmentMesh} from "@thatopen/fragments";
 import dayjs from "dayjs";
 import {firstValueFrom} from "rxjs";
-import {Vector3} from "three";
 
 import * as OBC from "@thatopen/components";
 
@@ -50,6 +49,7 @@ export class PumpModelsComponent implements OnInit, AfterViewInit, OnDestroy {
   private components = new OBC.Components();
   private fragments = this.components.get(OBC.FragmentsManager);
   private world = signal<undefined | OBC.World>(undefined);
+  private caster = signal<undefined | OBC.SimpleRaycaster>(undefined);
   private models = {
     TGA: new Once<FragmentsGroup>(),
     ELT: new Once<FragmentsGroup>(),
@@ -138,8 +138,18 @@ export class PumpModelsComponent implements OnInit, AfterViewInit, OnDestroy {
     world.scene.setup();
     world.scene.three.background = null;
 
-    await Promise.all(Object.values(this.models));
-    world.scene.three.add(await this.models.TGA);
+    let [TGA] = await Promise.all([
+      this.models.TGA,
+      this.models.ELT,
+      this.models.ARCH,
+      this.models.GEL,
+    ]);
+    world.scene.three.add(TGA);
+
+    let casters = components.get(OBC.Raycasters);
+    let caster = casters.get(world);
+    this.caster.set(caster);
+
     this.world.set(world);
   }
 
@@ -153,5 +163,16 @@ export class PumpModelsComponent implements OnInit, AfterViewInit, OnDestroy {
     let camera = world.camera as OBC.SimpleCamera;
     // execute aspect ratio one cycle later
     setTimeout(() => camera.updateAspect());
+  }
+
+  async onClick() {
+    let TGA = await this.models.TGA;
+    let casted = this.caster()!.castRay(TGA.items.map(item => item.mesh));
+    if (!casted || !(casted.object instanceof FragmentMesh)) return;
+    let fragment = casted.object;
+    let fragmentMap = TGA.getFragmentMap();
+    let expressId = Array.from(fragmentMap[fragment.uuid])[0];
+    let props = await TGA.getProperties(expressId);
+    console.log(props);
   }
 }
