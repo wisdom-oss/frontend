@@ -1,5 +1,6 @@
 import {
   Location,
+  JsonPipe,
   LocationStrategy,
   PathLocationStrategy,
 } from "@angular/common";
@@ -14,7 +15,8 @@ import {
   AfterViewInit,
   ElementRef,
 } from "@angular/core";
-import {FragmentsGroup, FragmentMesh, FragmentIdMap} from "@thatopen/fragments";
+import {FormsModule} from "@angular/forms";
+import {FragmentsGroup, FragmentIdMap, FragmentMesh} from "@thatopen/fragments";
 import dayjs from "dayjs";
 import {firstValueFrom} from "rxjs";
 
@@ -24,7 +26,6 @@ import * as OBCF from "@thatopen/components-front";
 import {Once} from "../../common/utils/once";
 import {httpContexts} from "../../common/http-contexts";
 import {signals} from "../../common/signals";
-import {LayerSelectionControlComponent} from "../../common/components/map/layer-selection-control/layer-selection-control.component";
 import {ResizeObserverDirective} from "../../common/directives/resize-observer.directive";
 import {keys} from "../../common/utils/keys";
 
@@ -36,7 +37,7 @@ const MODEL_URLS = {
 } as const;
 
 @Component({
-  imports: [LayerSelectionControlComponent, ResizeObserverDirective],
+  imports: [JsonPipe, ResizeObserverDirective, FormsModule],
   providers: [
     Location,
     {provide: LocationStrategy, useClass: PathLocationStrategy},
@@ -59,15 +60,19 @@ export class PumpModelsComponent implements OnInit, AfterViewInit, OnDestroy {
     GEL: new Once<FragmentsGroup>(),
   } as const;
 
-  protected modelLoading = signals.fromPromise(
+  protected modelsLoaded = signals.fromPromise(
     Promise.all(Object.values(this.models)),
   );
   protected layers = {
-    // TGA: signals.toggleable(true),
+    // TGA: always enabled
     ELT: signals.toggleable(false),
     ARCH: signals.toggleable(false),
     GEL: signals.toggleable(false),
   } as const;
+  protected highlight = signal<null | {
+    name: string,
+    properties: Record<string, any>,
+  }>(null);
 
   constructor(
     private location: Location,
@@ -146,6 +151,7 @@ export class PumpModelsComponent implements OnInit, AfterViewInit, OnDestroy {
       this.models.ARCH,
       this.models.GEL,
     ]);
+    world.camera.updateAspect();
     world.scene.three.add(TGA);
 
     let casters = components.get(OBC.Raycasters);
@@ -182,12 +188,10 @@ export class PumpModelsComponent implements OnInit, AfterViewInit, OnDestroy {
     return casted;
   }
 
-  async findProperties(
-    mesh: FragmentMesh
-  ): Promise<null | {
-    model: FragmentsGroup,
-    expressId: number,
-    properties: Record<string, any>
+  async findProperties(mesh: FragmentMesh): Promise<null | {
+    model: FragmentsGroup;
+    expressId: number;
+    properties: Record<string, any>;
   }> {
     for (let layer of keys(this.models)) {
       if (!(layer == "TGA" || this.layers[layer]())) continue;
@@ -200,12 +204,12 @@ export class PumpModelsComponent implements OnInit, AfterViewInit, OnDestroy {
       let properties = await model.getProperties(expressId);
       if (properties) return {model, expressId, properties};
     }
-    
+
     return null;
   }
 
   async selectRaycast(
-    name: "select" | "hover", 
+    name: "select" | "hover",
     exclude?: FragmentIdMap,
   ): Promise<null | Record<string, any>> {
     this.highlighter!.clear(name);
@@ -216,12 +220,23 @@ export class PumpModelsComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!found) return null;
     let {properties, model, expressId} = found;
 
-    this.highlighter!.highlightByID(name, model.getFragmentMap([expressId]), undefined, undefined, exclude);
+    this.highlighter!.highlightByID(
+      name,
+      model.getFragmentMap([expressId]),
+      undefined,
+      undefined,
+      exclude,
+    );
     return properties;
   }
 
   async onClick(): Promise<void> {
-    await this.selectRaycast("select");
+    let res = await this.selectRaycast("select");
+    if (!res) return this.highlight.set(null);
+    this.highlight.set({
+      name: res["Name"]["value"],
+      properties: res,
+    });
   }
 
   private lastMousePos = {x: 0, y: 0};
