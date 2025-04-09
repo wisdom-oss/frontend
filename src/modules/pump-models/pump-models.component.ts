@@ -16,17 +16,27 @@ import {
   ElementRef,
 } from "@angular/core";
 import {FormsModule} from "@angular/forms";
+import {
+  SimpleCamera,
+  Components,
+  IfcLoader,
+  FragmentsManager,
+  SimpleRaycaster,
+  Raycasters,
+  SimpleRenderer,
+  SimpleScene,
+  World,
+  Worlds,
+} from "@thatopen/components";
+import {Highlighter} from "@thatopen/components-front";
 import {FragmentsGroup, FragmentIdMap, FragmentMesh} from "@thatopen/fragments";
 import dayjs from "dayjs";
 import {firstValueFrom} from "rxjs";
 
-import * as OBC from "@thatopen/components";
-import * as OBCF from "@thatopen/components-front";
-
+import {ResizeObserverDirective} from "../../common/directives/resize-observer.directive";
 import {Once} from "../../common/utils/once";
 import {httpContexts} from "../../common/http-contexts";
 import {signals} from "../../common/signals";
-import {ResizeObserverDirective} from "../../common/directives/resize-observer.directive";
 import {keys} from "../../common/utils/keys";
 
 const MODEL_URLS = {
@@ -48,11 +58,11 @@ export class PumpModelsComponent implements OnInit, AfterViewInit, OnDestroy {
   protected container =
     viewChild.required<ElementRef<HTMLDivElement>>("container");
 
-  private components = new OBC.Components();
-  private fragments = this.components.get(OBC.FragmentsManager);
-  private world = signal<undefined | OBC.World>(undefined);
-  private caster = signal<undefined | OBC.SimpleRaycaster>(undefined);
-  private highlighter = undefined as undefined | OBCF.Highlighter;
+  private components = new Components();
+  private fragments = this.components.get(FragmentsManager);
+  private world = signal<undefined | World>(undefined);
+  private caster = signal<undefined | SimpleRaycaster>(undefined);
+  private highlighter = undefined as undefined | Highlighter;
   private models = {
     TGA: new Once<FragmentsGroup>(),
     ELT: new Once<FragmentsGroup>(),
@@ -70,8 +80,8 @@ export class PumpModelsComponent implements OnInit, AfterViewInit, OnDestroy {
     GEL: signals.toggleable(false),
   } as const;
   protected highlight = signal<null | {
-    name: string,
-    properties: Record<string, any>,
+    name: string;
+    properties: Record<string, any>;
   }>(null);
 
   constructor(
@@ -98,7 +108,7 @@ export class PumpModelsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   async ngOnInit() {
     let components = this.components;
-    let fragmentIfcLoader = components.get(OBC.IfcLoader);
+    let fragmentIfcLoader = components.get(IfcLoader);
     fragmentIfcLoader.settings.autoSetWasm = false;
     fragmentIfcLoader.settings.wasm = {
       path: this.location.prepareExternalUrl("/web-ifc/"),
@@ -125,16 +135,12 @@ export class PumpModelsComponent implements OnInit, AfterViewInit, OnDestroy {
     let container = this.container().nativeElement;
     let components = this.components;
 
-    let worlds = components.get(OBC.Worlds);
-    let world = worlds.create<
-      OBC.SimpleScene,
-      OBC.SimpleCamera,
-      OBC.SimpleRenderer
-    >();
+    let worlds = components.get(Worlds);
+    let world = worlds.create<SimpleScene, SimpleCamera, SimpleRenderer>();
 
-    world.scene = new OBC.SimpleScene(components);
-    world.renderer = new OBC.SimpleRenderer(components, container);
-    world.camera = new OBC.SimpleCamera(components);
+    world.scene = new SimpleScene(components);
+    world.renderer = new SimpleRenderer(components, container);
+    world.camera = new SimpleCamera(components);
 
     components.init();
 
@@ -154,11 +160,11 @@ export class PumpModelsComponent implements OnInit, AfterViewInit, OnDestroy {
     world.camera.updateAspect();
     world.scene.three.add(TGA);
 
-    let casters = components.get(OBC.Raycasters);
+    let casters = components.get(Raycasters);
     let caster = casters.get(world);
     this.caster.set(caster);
 
-    this.highlighter = components.get(OBCF.Highlighter);
+    this.highlighter = components.get(Highlighter);
     this.highlighter.setup({world, hoverEnabled: false, selectEnabled: false});
 
     this.world.set(world);
@@ -171,7 +177,7 @@ export class PumpModelsComponent implements OnInit, AfterViewInit, OnDestroy {
   onResize(): void {
     let world = this.world();
     if (!world) return;
-    let camera = world.camera as OBC.SimpleCamera;
+    let camera = world.camera as SimpleCamera;
     // execute aspect ratio one cycle later
     setTimeout(() => camera.updateAspect());
   }
