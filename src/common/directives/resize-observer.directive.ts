@@ -1,4 +1,4 @@
-import {output, Directive, ElementRef} from "@angular/core";
+import {output, Directive, ElementRef, OnDestroy} from "@angular/core";
 
 /**
  * Directive that listens for resize events on the attached element
@@ -16,12 +16,16 @@ import {output, Directive, ElementRef} from "@angular/core";
 @Directive({
   selector: "[resize-observer]",
 })
-export class ResizeObserverDirective {
+export class ResizeObserverDirective implements OnDestroy {
   readonly resize = output<ResizeObserverEntry[]>();
 
   private observer = new ResizeObserver(entries => this.resize.emit(entries));
 
   constructor(private element: ElementRef) {
     this.observer.observe(element.nativeElement);
+  }
+
+  ngOnDestroy(): void {
+    this.observer.disconnect();
   }
 }
