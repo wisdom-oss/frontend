@@ -131,17 +131,15 @@ export class PumpModelsComponent implements OnInit, AfterViewInit, OnDestroy {
 
     components.init();
 
-    world.camera.controls.setLookAt(12, 6, 8, 0, 0, -10);
+    let position = [-1.12, 1.75, 3.57] as const;
+    let target = [5.78, -1.72, 1.38] as const;
+    world.camera.controls.setLookAt(...position, ...target);
 
     world.scene.setup();
     world.scene.three.background = null;
 
     await Promise.all(Object.values(this.models));
     world.scene.three.add(await this.models.TGA);
-    let out = new Vector3();
-    world.camera.controls.getPosition(out);
-    console.log(out);
-    world.camera.controls.fitToSphere(await this.models.TGA, true);
     this.world.set(world);
   }
 
