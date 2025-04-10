@@ -68,6 +68,11 @@
                 "output": "twemoji"
               },
               {
+                "glob": "**/*.wasm",
+                "input": "node_modules/web-ifc",
+                "output": "web-ifc"
+              },
+              {
                 "glob": "**/*",
                 "input": "public",
                 "output": "public"

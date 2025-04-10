@@ -1,5 +1,6 @@
 import {
   computed,
+  effect,
   input,
   signal,
   Component,
@@ -20,6 +21,7 @@ import {signals} from "../../../signals";
 })
 export class LayerSelectionControlComponent {
   readonly translatePrefix = input("");
+  readonly collapsible = input(true);
 
   readonly layers =
     input.required<
@@ -29,4 +31,8 @@ export class LayerSelectionControlComponent {
   // don't use `keyvalue` pipe to ensure order
   protected layerIter = computed(() => Object.entries(this.layers()));
   protected collapsed = signal(true);
+
+  constructor() {
+    effect(() => this.collapsed.set(this.collapsible()));
+  }
 }
