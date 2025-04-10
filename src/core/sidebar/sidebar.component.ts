@@ -32,6 +32,7 @@ import {filter} from "rxjs";
 
 import {SidebarLinkDirective} from "./sidebar-link.directive";
 import {OowvActionMapComponent} from "../../modules/oowv/action-map/action-map.component";
+import {PumpModelsComponent} from "../../modules/pump-models/pump-models.component";
 import {AuthService} from "../auth/auth.service";
 
 @Component({
@@ -75,6 +76,9 @@ export class SidebarComponent implements AfterViewInit {
   protected authorized = {
     oowvActionMap: computed(() =>
       this.auth.scopes().has(...OowvActionMapComponent.SCOPES),
+    ),
+    pumpModels: computed(() =>
+      this.auth.scopes().has(...PumpModelsComponent.SCOPES),
     ),
   };
 

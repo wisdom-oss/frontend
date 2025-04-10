@@ -38,12 +38,13 @@ import {Once} from "../../common/utils/once";
 import {httpContexts} from "../../common/http-contexts";
 import {signals} from "../../common/signals";
 import {keys} from "../../common/utils/keys";
+import {Scopes} from "../../core/auth/scopes";
 
 const MODEL_URLS = {
-  TGA: "/files/WW-Langeoog/20191105-4001110-WW-TGA.ifc",
-  ELT: "/files/WW-Langeoog/20191028-4001110-WW-ELT.ifc",
-  ARCH: "/files/WW-Langeoog/20191028-4001110-WW-Arch.ifc",
-  GEL: "/files/WW-Langeoog/20191028-4001110-WW-Gel.ifc",
+  TGA: "/api/files/v1/oowv-ifc-files/langeoog-pumps/tga.ifc",
+  ELT: "/api/files/v1/oowv-ifc-files/langeoog-pumps/elt.ifc",
+  ARCH: "/api/files/v1/oowv-ifc-files/langeoog-pumps/arch.ifc",
+  GEL: "/api/files/v1/oowv-ifc-files/langeoog-pumps/gel.ifc",
 } as const;
 
 @Component({
@@ -55,6 +56,8 @@ const MODEL_URLS = {
   templateUrl: "./pump-models.component.html",
 })
 export class PumpModelsComponent implements OnInit, AfterViewInit, OnDestroy {
+  static readonly SCOPES: Scopes.Scope[] = ["static-files:read"];
+
   protected container =
     viewChild.required<ElementRef<HTMLDivElement>>("container");
 

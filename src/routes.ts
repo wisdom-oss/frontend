@@ -25,7 +25,11 @@ export const routes: Routes = [
         component: LongTermForecastComponent,
         children: longTermForecastRoutes,
       },
-      {path: "pump-models", component: PumpModelsComponent},
+      {
+        path: "pump-models",
+        component: PumpModelsComponent,
+        canActivate: [permissionsGuard(...PumpModelsComponent.SCOPES)],
+      },
       {
         path: "oowv/action-map",
         component: OowvActionMapComponent,
