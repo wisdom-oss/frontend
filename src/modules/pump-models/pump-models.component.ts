@@ -19,7 +19,6 @@ import {FormsModule} from "@angular/forms";
 import {
   SimpleCamera,
   Components,
-  IfcLoader,
   FragmentsManager,
   SimpleRaycaster,
   Raycasters,
@@ -127,14 +126,6 @@ export class PumpModelsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async ngOnInit() {
-    let components = this.components;
-    let fragmentIfcLoader = components.get(IfcLoader);
-    fragmentIfcLoader.settings.autoSetWasm = false;
-    fragmentIfcLoader.settings.wasm = {
-      path: this.location.prepareExternalUrl("/web-ifc/"),
-      absolute: true,
-    };
-
     for (let layer of keys(this.models)) {
       let {frag, json} = MODEL_URLS[layer];
       let context = (url: string) =>
