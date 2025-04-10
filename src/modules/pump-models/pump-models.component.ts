@@ -29,7 +29,12 @@ import {
   Worlds,
 } from "@thatopen/components";
 import {Highlighter} from "@thatopen/components-front";
-import {FragmentsGroup, FragmentIdMap, FragmentMesh} from "@thatopen/fragments";
+import {
+  FragmentsGroup,
+  FragmentIdMap,
+  FragmentMesh,
+  IfcProperties,
+} from "@thatopen/fragments";
 import dayjs from "dayjs";
 import {firstValueFrom} from "rxjs";
 
@@ -41,10 +46,22 @@ import {keys} from "../../common/utils/keys";
 import {Scopes} from "../../core/auth/scopes";
 
 const MODEL_URLS = {
-  TGA: "/api/files/v1/oowv-ifc-files/langeoog-pumps/tga.ifc",
-  ELT: "/api/files/v1/oowv-ifc-files/langeoog-pumps/elt.ifc",
-  ARCH: "/api/files/v1/oowv-ifc-files/langeoog-pumps/arch.ifc",
-  GEL: "/api/files/v1/oowv-ifc-files/langeoog-pumps/gel.ifc",
+  TGA: {
+    frag: "/api/files/v1/oowv-ifc-files/langeoog-pumps/tga.ifc.frag",
+    json: "/api/files/v1/oowv-ifc-files/langeoog-pumps/tga.ifc.json",
+  },
+  ELT: {
+    frag: "/api/files/v1/oowv-ifc-files/langeoog-pumps/elt.ifc.frag",
+    json: "/api/files/v1/oowv-ifc-files/langeoog-pumps/elt.ifc.json",
+  },
+  ARCH: {
+    frag: "/api/files/v1/oowv-ifc-files/langeoog-pumps/arch.ifc.frag",
+    json: "/api/files/v1/oowv-ifc-files/langeoog-pumps/arch.ifc.json",
+  },
+  GEL: {
+    frag: "/api/files/v1/oowv-ifc-files/langeoog-pumps/gel.ifc.frag",
+    json: "/api/files/v1/oowv-ifc-files/langeoog-pumps/gel.ifc.json",
+  },
 } as const;
 
 @Component({
@@ -119,18 +136,29 @@ export class PumpModelsComponent implements OnInit, AfterViewInit, OnDestroy {
     };
 
     for (let layer of keys(this.models)) {
-      let url = MODEL_URLS[layer];
-      let data = await firstValueFrom(
-        this.http.get(url, {
-          responseType: "arraybuffer",
-          context: new HttpContext().set(httpContexts.cache, [
-            url,
-            dayjs.duration(1, "week"),
-          ]),
-        }),
-      );
-      let buffer = new Uint8Array(data);
-      this.models[layer].set(await fragmentIfcLoader.load(buffer));
+      let {frag, json} = MODEL_URLS[layer];
+      let context = (url: string) =>
+        new HttpContext().set(httpContexts.cache, [
+          url,
+          dayjs.duration(1, "week"),
+        ]);
+
+      let [buffer, properties] = await Promise.all([
+        firstValueFrom(
+          this.http.get(frag, {
+            responseType: "arraybuffer",
+            context: context(frag),
+          }),
+        ).then(data => new Uint8Array(data)),
+        firstValueFrom(
+          this.http.get<IfcProperties>(json, {
+            responseType: "json",
+            context: context(json),
+          }),
+        ),
+      ]);
+
+      this.models[layer].set(this.fragments.load(buffer, {properties}));
     }
   }
 
