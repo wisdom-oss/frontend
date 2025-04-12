@@ -233,7 +233,7 @@ export namespace signals {
    * const userSignal = signals.fromPromise(fetchUser(), user => user.name);
    */
   export function fromPromise<T, U = T>(
-    promise: Promise<T>,
+    promise: PromiseLike<T>,
     map: (value: T) => U = value => value as unknown as U,
   ): Signal<undefined | U> {
     let mapped = signal<undefined | U>(undefined);

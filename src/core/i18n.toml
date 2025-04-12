@@ -41,3 +41,7 @@ de = "Grundwasser"
 [sidebar.category.water-usage]
 en = "Water Usage"
 de = "Wasserverbrauch"
+
+[sidebar.category.waterworks]
+en = "Waterworks"
+de = "Wasserwerke"

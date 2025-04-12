@@ -42,6 +42,22 @@
     </ul>
     <p class="menu-label icon-text">
       <span class="icon">
+        <ng-icon name="remixBuilding3Fill"></ng-icon>
+      </span>
+      <span translate>core.sidebar.category.waterworks</span>
+    </p>
+    <ul class="menu-list">
+      <li [class.unauthorized]="!authorized.pumpModels()">
+        <a class="icon-text" routerLink="/pump-models">
+          <span class="icon">
+            <ng-icon name="remixInstanceLine"></ng-icon>
+          </span>
+          <span translate>pump-models.display.module</span>
+        </a>
+      </li>
+    </ul>
+    <p class="menu-label icon-text">
+      <span class="icon">
         <ng-icon name="oowv"></ng-icon>
       </span>
       <span>OOWV</span>
