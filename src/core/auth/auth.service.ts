@@ -203,7 +203,7 @@ const JWT_PAYLOAD_SCHEMA = {
     sub: {type: "string"},
   },
   optionalProperties: {
-    iat: { type: "uint32" },
+    iat: {type: "uint32"},
     jti: {type: "string"},
   },
 } as const;
