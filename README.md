@@ -32,14 +32,14 @@ workflows, services, and data in the water industry:
   collaboration with the [Oldenburgisch-Ostfriesischen Wasserverband (OOWV)](OOWV).
 
 - **AWARD**[^3]:  
-  The third phase of the project, building upon the foundations of WISdoM and 
-  WISdoM 2.0. 
-  AWARD aims to enhance data-driven decision-making in the water industry, 
-  focusing on resilience and sustainability. 
-  The platform continues to be developed in collaboration with OOWV and other 
-  partners. 
-  
-The frontend is built with [Angular] and styled using [Bulma], providing users 
+  The third phase of the project, building upon the foundations of WISdoM and
+  WISdoM 2.0.
+  AWARD aims to enhance data-driven decision-making in the water industry,
+  focusing on resilience and sustainability.
+  The platform continues to be developed in collaboration with OOWV and other
+  partners.
+
+The frontend is built with [Angular] and styled using [Bulma], providing users
 with a modern and intuitive interface.
 
 <div align="center">
@@ -71,5 +71,7 @@ This project is licensed under the terms of the
 [Node]: https://nodejs.org
 
 [^1]: https://uol.de/vlba/projekte/wisdom
+
 [^2]: https://uol.de/vlba/wisdom20
+
 [^3]: https://uol.de/vlba/projekte/award

@@ -93,16 +93,18 @@ In order to automatically format and lint the codebase,
 you can use [husky](https://typicode.github.io/husky/get-started.html).
 
 Install via:
+
 ```sh
 npm install --global husky
 ```
 
 And make sure `npm` still functions with repeating:
+
 ```sh
 npm install
 ```
 
-Then, whenever you commit anything via git or GitHub Desktop, both scripts get 
+Then, whenever you commit anything via git or GitHub Desktop, both scripts get
 executed before the commit happens and you don't have to do so manually.
 
 ## Code Organization
