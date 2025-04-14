@@ -90,21 +90,22 @@ The [CI](https://github.com/wisdom-oss/frontend/actions) enforces this.
 ## Git Pre-Commit Hooks
 
 In order to automatically format and lint the codebase,
-you can use husky (https://typicode.github.io/husky/get-started.html)
-install via
+you can use [husky](https://typicode.github.io/husky/get-started.html).
+
+Install via:
 
 ```sh
 npm install --global husky
 ```
 
-and make sure npm still functions with repeating
+And make sure `npm` still functions with repeating:
 
 ```sh
 npm install
 ```
 
-Then, whenever you commit anything via git or GitHub Desktop, both scripts get executed
-before the commit happens and you don't have to do so manually
+Then, whenever you commit anything via git or GitHub Desktop, both scripts get
+executed before the commit happens and you don't have to do so manually.
 
 ## Code Organization
 
@@ -123,7 +124,6 @@ Key directories:
     - `config.ts`: App configuration.
     - `i18n.ts`: Configures translation files and namespaces for the application.
     - `routes.ts`: Application routes.
-    - `proxy.conf.json`: Local API proxy for development.
     - `styles.scss`: Global styles.
     - `variables.scss`: Shared Bulma variables.
 
