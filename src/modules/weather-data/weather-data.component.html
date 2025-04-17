@@ -25,6 +25,15 @@
                 ></map-layer-selection-control>
               </mgl-control>
             </ng-container>
+            <ng-container sources>
+              @let stationsFeatureCollection = stations();
+              @if (stationsFeatureCollection) {
+                <mgl-geojson-source
+                  id="stations"
+                  [data]="stationsFeatureCollection"
+                ></mgl-geojson-source>
+              }
+            </ng-container>
           </mgl-map>
         </div>
       </div>
