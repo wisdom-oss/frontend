@@ -1,0 +1,97 @@
+<div
+  class="card is-fullwidth is-fullheight is-clipped"
+  [class.skeleton-block]="!modelsLoaded()"
+>
+  @if (modelsLoaded()) {
+    <div
+      class="message"
+      style="position: absolute; top: 1em; left: 1em; z-index: 1"
+    >
+      <div class="message-body py-1 px-2" style="border: none">
+        <table>
+          <tr>
+            <input
+              id="elt"
+              type="checkbox"
+              class="switch is-thin"
+              [(ngModel)]="layers.ELT"
+            />
+            <label for="elt" class="py-0 is-size-7" style="height: 1.5em"
+              >ELT</label
+            >
+          </tr>
+          <tr>
+            <input
+              id="arch"
+              type="checkbox"
+              class="switch is-thin"
+              [(ngModel)]="layers.ARCH"
+            />
+            <label for="arch" class="py-0 is-size-7" style="height: 1.5em"
+              >ARCH</label
+            >
+          </tr>
+          <tr>
+            <input
+              id="gel"
+              type="checkbox"
+              class="switch is-thin"
+              [(ngModel)]="layers.GEL"
+            />
+            <label for="gel" class="py-0 is-size-7" style="height: 1.5em"
+              >GEL</label
+            >
+          </tr>
+        </table>
+      </div>
+    </div>
+  }
+  @let highlightData = highlight();
+  @if (highlightData) {
+    <div
+      class="message"
+      style="
+        position: absolute;
+        top: 1em;
+        right: 1em;
+        z-index: 1;
+        width: fit-content;
+        min-width: 30%;
+        height: calc(100% - 2 * 1em);
+      "
+    >
+      <div class="message-header has-background-primary has-text-light">
+        {{ highlightData.name }}
+      </div>
+      <div
+        class="message-body p-0"
+        style="height: calc(100% - (1.25em * 2 + 1em))"
+      >
+        <div class="is-fullwidth is-fullheight" style="position: relative">
+          <div style="position: absolute" class="is-fullheight is-fullwidth">
+            <pre
+              style="
+                overflow: scroll;
+                background-color: inherit;
+                color: inherit;
+              "
+              class="is-fullheight is-fullwidth"
+              >{{ highlightData.properties | json }}</pre
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+  <div class="is-fullwidth is-fullheight">
+    <div
+      #container
+      resize-observer
+      (resize)="onResize()"
+      (click)="onClick()"
+      (mousemove)="onMouseMove($event)"
+      class="is-fullwidth is-fullheight"
+      style="position: absolute; z-index: 0"
+    ></div>
+  </div>
+</div>

@@ -195,14 +195,15 @@ const TOKEN_SET_SCHEMA = {
 
 const JWT_PAYLOAD_SCHEMA = {
   properties: {
-    exp: {type: "uint32"},
-    nbf: {type: "uint32"},
-    sub: {type: "string"},
     aud: {elements: {type: "string"}},
+    exp: {type: "uint32"},
     iss: {type: "string"},
+    nbf: {type: "uint32"},
     scopes: {elements: {type: "string"}},
+    sub: {type: "string"},
   },
   optionalProperties: {
+    iat: {type: "uint32"},
     jti: {type: "string"},
   },
 } as const;

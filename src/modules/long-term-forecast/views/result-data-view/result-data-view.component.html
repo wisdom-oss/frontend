@@ -1,0 +1,156 @@
+<div class="columns block is-fullheight no-main-padding">
+  <ng-container chart>
+    @let options =
+      {
+        maintainAspectRatio: false,
+        onClick: onChartClick,
+        scales: {
+          x: {
+            stacked: true,
+            title: {
+              display: true,
+              text: "long-term-forecast.chart.legend.year" | translate,
+            },
+            grid: {
+              display: false,
+            },
+          },
+          y: {
+            stacked: true,
+            title: {
+              display: true,
+              text: "long-term-forecast.chart.legend.water-usage" | translate,
+            },
+          },
+        },
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+      };
+
+    <div class="column" style="min-width: 25em">
+      <div class="card is-fullheight">
+        <div
+          class="card-content skeleton-block is-fullheight"
+          [class.skeleton-block]="datasets.value() | empty"
+        >
+          <canvas
+            baseChart
+            type="bar"
+            class="is-fullheight is-fullwidth"
+            [options]="options"
+            [datasets]="datasets.value()"
+          ></canvas>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+  <ng-container configuration>
+    <div configuration class="column is-one-quarter">
+      <div class="message is-fullheight is-flex is-flex-direction-column">
+        <div class="message-header">
+          <p translate="long-term-forecast.config-forecast"></p>
+        </div>
+        <div
+          class="message-body is-flex-grow-1 is-flex is-flex-direction-column"
+          style="overflow-y: auto"
+        >
+          @let algorithm = selectedAlgorithm();
+          <ng-container algorithm-selector>
+            <div class="field">
+              <label class="label">Algorithm</label>
+              <p class="control has-icons-left">
+                <span class="select is-fullwidth">
+                  <select
+                    class="is-fullwidth"
+                    [(ngModel)]="selectedAlgorithmIdentifier"
+                  >
+                    @for (algo of availableAlgorithms() ?? []; track algo) {
+                      <option [value]="algo.identifier">
+                        {{ algo.displayName }}
+                      </option>
+                    }
+                  </select>
+                </span>
+                <span class="icon is-left" style="color: inherit">
+                  <ng-icon name="remixBarChartBoxAiLine"></ng-icon>
+                </span>
+              </p>
+              <p class="help">{{ algorithm?.description }}</p>
+            </div>
+          </ng-container>
+          <ng-container
+            algorithm-parameters
+            *ngIf="algorithm && !(algorithm.parameter | empty)"
+          >
+            <p
+              class="title is-5 mb-2 mt-2"
+              translate="long-term-forecast.parameters"
+            ></p>
+            @for (param of algorithm.parameter | keyvalue; track param.key) {
+              <div class="field">
+                <div class="control">
+                  <label class="label">
+                    {{ param.key.split("_").join(" ") | titlecase }}
+                  </label>
+                  <input
+                    *ngIf="param.value.type == 'str' && !param.value.enums"
+                    class="input"
+                    type="text"
+                    [placeholder]="param.value.default"
+                    [(ngModel)]="parameters[algorithm.identifier][param.key]"
+                  />
+                  <span
+                    *ngIf="param.value.type == 'str' && param.value.enums"
+                    class="select"
+                    style="width: 100%"
+                  >
+                    <select
+                      style="width: 100%"
+                      [(ngModel)]="parameters[algorithm.identifier][param.key]"
+                    >
+                      <option
+                        *ngFor="let enum of param.value.enums"
+                        [ngValue]="enum"
+                        [selected]="enum == param.value.default"
+                      >
+                        {{ enum }}
+                      </option>
+                    </select>
+                  </span>
+                  <input
+                    *ngIf="['int', 'float'].includes(param.value.type)"
+                    class="input"
+                    type="number"
+                    [placeholder]="param.value.default"
+                    [(ngModel)]="parameters[algorithm.identifier][param.key]"
+                  />
+                  <span
+                    *ngIf="!['str', 'int', 'float'].includes(param.value.type)"
+                  >
+                    {{ param.value.default }}
+                  </span>
+                  <span class="help">
+                    {{ param.value.description }}
+                  </span>
+                </div>
+              </div>
+            }
+          </ng-container>
+          <ng-container forecast-button>
+            <div class="is-flex-grow-1" style="min-height: 1.5em"></div>
+            <div class="control">
+              <button
+                class="button is-primary is-fullwidth is-justify-content-center"
+                (click)="fetchForecast()"
+                translate="long-term-forecast.calc-forecast"
+              ></button>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>
