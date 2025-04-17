@@ -20,20 +20,14 @@ import {
   remixBookShelfLine,
   remixBuilding3Fill,
   remixDatabase2Fill,
-<<<<<<< HEAD
   remixDrizzleFill,
-=======
   remixInstanceLine,
->>>>>>> main
   remixLineChartLine,
   remixMap2Fill,
   remixMapLine,
   remixRfidLine,
-<<<<<<< HEAD
   remixSunCloudyFill,
-=======
   remixWaterPercentFill,
->>>>>>> main
 } from "@ng-icons/remixicon";
 import {TranslateDirective} from "@ngx-translate/core";
 import {filter} from "rxjs";
@@ -56,28 +50,19 @@ import {AuthService} from "../auth/auth.service";
   styleUrl: "./sidebar.component.scss",
   providers: [
     provideIcons({
-<<<<<<< HEAD
-      remixBookLine,
-      remixBookShelfLine,
-      remixDatabase2Fill,
-      remixDrizzleFill,
-=======
       remixBarChartFill,
       remixBookLine,
       remixBookShelfLine,
       remixBuilding3Fill,
       remixDatabase2Fill,
+      remixDrizzleFill,
       remixInstanceLine,
->>>>>>> main
       remixLineChartLine,
       remixMap2Fill,
       remixMapLine,
       remixRfidLine,
-<<<<<<< HEAD
       remixSunCloudyFill,
-=======
       remixWaterPercentFill,
->>>>>>> main
     }),
     provideNgIconLoader(name => {
       if (name != "oowv") return "";

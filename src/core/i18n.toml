@@ -34,14 +34,13 @@ de = "Wenn das nicht funktioniert:"
 en = "Back to Home"
 de = "Zurück zur Startseite"
 
-<<<<<<< HEAD
-[sidebar.category.precipitation]
-en = "Precipitation"
-de = "Niederschlag"
-=======
 [sidebar.category.groundwater]
 en = "Groundwater"
 de = "Grundwasser"
+
+[sidebar.category.precipitation]
+en = "Precipitation"
+de = "Niederschlag"
 
 [sidebar.category.water-usage]
 en = "Water Usage"
@@ -50,4 +49,3 @@ de = "Wasserverbrauch"
 [sidebar.category.waterworks]
 en = "Waterworks"
 de = "Wasserwerke"
->>>>>>> main
