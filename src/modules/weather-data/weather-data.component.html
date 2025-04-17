@@ -13,6 +13,7 @@
               lon: 10.45,
             }"
           >
+            @let stationsFeatureCollection = stations();
             <ng-container controls>
               <mgl-control
                 mglNavigation
@@ -26,12 +27,66 @@
               </mgl-control>
             </ng-container>
             <ng-container sources>
-              @let stationsFeatureCollection = stations();
               @if (stationsFeatureCollection) {
                 <mgl-geojson-source
-                  id="stations"
+                  id="stations-source"
                   [data]="stationsFeatureCollection"
+                  [cluster]="true"
+                  [clusterMinPoints]="5"
+                  #stationsSource
                 ></mgl-geojson-source>
+                <mgl-geojson-source
+                  mglClusterPolygon
+                  [source]="stationsSource"
+                  [clusterId]="hoverStationClusterId()"
+                  [data]="stationsClusterPolygonSource.polygon()"
+                  id="stations-cluster-source"
+                  #stationsClusterPolygonSource="cluster-polygon"
+                ></mgl-geojson-source>
+              }
+            </ng-container>
+            <ng-container layers>
+              @if (stationsFeatureCollection) {
+                <mgl-layer
+                  id="stations-symbol"
+                  type="symbol"
+                  source="stations-source"
+                  [filter]="['!=', ['get', 'cluster'], true]"
+                  [layout]="{
+                    'icon-image': 'remixicon:map-pin-2-line',
+                  }"
+                ></mgl-layer>
+                <mgl-layer
+                  id="stations-cluster-symbol"
+                  type="symbol"
+                  source="stations-source"
+                  [filter]="['==', ['get', 'cluster'], true]"
+                  [layout]="{
+                    'icon-image': 'remixicon:pin-distance-line',
+                  }"
+                  (layerMouseLeave)="hoverStationClusterId.set(null)"
+                  (layerMouseMove)="
+                    hoverStationClusterId.set(+$event.features![0].id!)
+                  "
+                ></mgl-layer>
+                <mgl-layer
+                  id="stations-cluster-fill"
+                  type="fill"
+                  source="stations-cluster-source"
+                  [paint]="{
+                    'fill-color': '#000000',
+                    'fill-opacity': 0.2,
+                  }"
+                ></mgl-layer>
+                <mgl-layer
+                  id="stations-cluster-line"
+                  type="line"
+                  source="stations-cluster-source"
+                  [paint]="{
+                    'line-color': '#000000',
+                    'line-width': 2,
+                  }"
+                ></mgl-layer>
               }
             </ng-container>
           </mgl-map>
