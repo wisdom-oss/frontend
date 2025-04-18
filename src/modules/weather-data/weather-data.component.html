@@ -1,7 +1,14 @@
 <div class="is-fullwidth is-fullheight is-flex is-flex-direction-column">
   <p class="title" translate="weather-data.title.dwd"></p>
-  <div class="columns no-main-padding is-flex-grow-1">
-    <div class="column is-fullheight">
+  <div
+    class="is-flex-grow-1 is-flex"
+    [class.is-flex-direction-row]="layout() == 'row'"
+    [class.is-flex-direction-column]="layout() == 'column'"
+    style="gap: var(--bulma-column-gap)"
+    resize-observer
+    (resize)="onColumnsResize($event)"
+  >
+    <div class="is-fullheight is-fullwidth">
       <div class="card is-fullheight">
         <div class="card-content p-0 is-fullheight is-clipped">
           <mgl-map
@@ -12,8 +19,15 @@
               lat: 51.16,
               lon: 10.45,
             }"
+            [fitBounds]="$any(fitBounds())"
+            [fitBoundsOptions]="{
+              animate: true,
+              duration: 500,
+              essential: true,
+            }"
+            (click)="fitBounds.set(clusterPolygonSource().polygon().bbox)"
+            (click)="hoverStationClusterId.set(null)"
           >
-            @let stationsFeatureCollection = stations();
             <ng-container controls>
               <mgl-control
                 mglNavigation
@@ -22,78 +36,73 @@
               ></mgl-control>
               <mgl-control position="top-right">
                 <map-layer-selection-control
-                  [layers]="layers"
+                  [layers]="layers()"
                 ></map-layer-selection-control>
               </mgl-control>
             </ng-container>
             <ng-container sources>
-              @if (stationsFeatureCollection) {
-                <mgl-geojson-source
-                  id="stations-source"
-                  [data]="stationsFeatureCollection"
-                  [cluster]="true"
-                  [clusterMinPoints]="5"
-                  #stationsSource
-                ></mgl-geojson-source>
-                <mgl-geojson-source
-                  mglClusterPolygon
-                  [source]="stationsSource"
-                  [clusterId]="hoverStationClusterId()"
-                  [data]="stationsClusterPolygonSource.polygon()"
-                  id="stations-cluster-source"
-                  #stationsClusterPolygonSource="cluster-polygon"
-                ></mgl-geojson-source>
-              }
+              <mgl-geojson-source
+                id="stations-source"
+                [data]="filteredStations()"
+                [cluster]="true"
+                [clusterMinPoints]="5"
+                #stationsSource
+              ></mgl-geojson-source>
+              <mgl-geojson-source
+                mglClusterPolygon
+                [source]="stationsSource"
+                [clusterId]="hoverStationClusterId()"
+                [data]="clusterPolygonSource().polygon()"
+                id="stations-cluster-source"
+              ></mgl-geojson-source>
             </ng-container>
             <ng-container layers>
-              @if (stationsFeatureCollection) {
-                <mgl-layer
-                  id="stations-symbol"
-                  type="symbol"
-                  source="stations-source"
-                  [filter]="['!=', ['get', 'cluster'], true]"
-                  [layout]="{
-                    'icon-image': 'remixicon:map-pin-2-line',
-                  }"
-                ></mgl-layer>
-                <mgl-layer
-                  id="stations-cluster-symbol"
-                  type="symbol"
-                  source="stations-source"
-                  [filter]="['==', ['get', 'cluster'], true]"
-                  [layout]="{
-                    'icon-image': 'remixicon:pin-distance-line',
-                  }"
-                  (layerMouseLeave)="hoverStationClusterId.set(null)"
-                  (layerMouseMove)="
-                    hoverStationClusterId.set(+$event.features![0].id!)
-                  "
-                ></mgl-layer>
-                <mgl-layer
-                  id="stations-cluster-fill"
-                  type="fill"
-                  source="stations-cluster-source"
-                  [paint]="{
-                    'fill-color': '#000000',
-                    'fill-opacity': 0.2,
-                  }"
-                ></mgl-layer>
-                <mgl-layer
-                  id="stations-cluster-line"
-                  type="line"
-                  source="stations-cluster-source"
-                  [paint]="{
-                    'line-color': '#000000',
-                    'line-width': 2,
-                  }"
-                ></mgl-layer>
-              }
+              <mgl-layer
+                id="stations-symbol"
+                type="symbol"
+                source="stations-source"
+                [filter]="['!=', ['get', 'cluster'], true]"
+                [layout]="{
+                  'icon-image': 'remixicon:map-pin-2-line',
+                }"
+              ></mgl-layer>
+              <mgl-layer
+                id="stations-cluster-symbol"
+                type="symbol"
+                source="stations-source"
+                [filter]="['==', ['get', 'cluster'], true]"
+                [layout]="{
+                  'icon-image': 'remixicon:pin-distance-line',
+                }"
+                (layerMouseLeave)="hoverStationClusterId.set(null)"
+                (layerMouseMove)="
+                  hoverStationClusterId.set(+$event.features![0].id!)
+                "
+              ></mgl-layer>
+              <mgl-layer
+                id="stations-cluster-fill"
+                type="fill"
+                source="stations-cluster-source"
+                [paint]="{
+                  'fill-color': '#000000',
+                  'fill-opacity': 0.2,
+                }"
+              ></mgl-layer>
+              <mgl-layer
+                id="stations-cluster-line"
+                type="line"
+                source="stations-cluster-source"
+                [paint]="{
+                  'line-color': '#000000',
+                  'line-width': 2,
+                }"
+              ></mgl-layer>
             </ng-container>
           </mgl-map>
         </div>
       </div>
     </div>
-    <div class="column is-fullheight">
+    <div class="is-fullheight is-fullwidth">
       <div class="card is-fullheight"></div>
     </div>
   </div>
