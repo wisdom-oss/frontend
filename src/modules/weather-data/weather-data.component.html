@@ -27,6 +27,7 @@
             }"
             (click)="fitBounds.set(clusterPolygonSource().polygon().bbox)"
             (click)="hoverStationClusterId.set(null)"
+            [cursor]="cursor()"
           >
             <ng-container controls>
               <mgl-control
@@ -65,6 +66,10 @@
                 [layout]="{
                   'icon-image': 'remixicon:map-pin-2-line',
                 }"
+                (layerMouseLeave)="hoverStationId.set(null)"
+                (layerMouseMove)="
+                  hoverStationId.set($event.features![0].properties['id'])
+                "
               ></mgl-layer>
               <mgl-layer
                 id="stations-cluster-symbol"
@@ -76,7 +81,9 @@
                 }"
                 (layerMouseLeave)="hoverStationClusterId.set(null)"
                 (layerMouseMove)="
-                  hoverStationClusterId.set(+$event.features![0].id!)
+                  hoverStationClusterId.set(
+                    util.cast($event.features![0].id, 'number')
+                  )
                 "
               ></mgl-layer>
               <mgl-layer

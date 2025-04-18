@@ -1,5 +1,6 @@
 import {
   computed,
+  effect,
   signal,
   viewChild,
   Component,
@@ -14,7 +15,8 @@ import {
   NavigationControlDirective,
 } from "@maplibre/ngx-maplibre-gl";
 import {TranslateDirective} from "@ngx-translate/core";
-import {BBox} from "geojson";
+import {geometry} from "@turf/turf";
+import {BBox, FeatureCollection, Point} from "geojson";
 import {StyleSpecification} from "maplibre-gl";
 
 import {DwdService} from "../../api/dwd.service";
@@ -24,6 +26,20 @@ import {signals} from "../../common/signals";
 import {ClusterPolygonSourceDirective} from "../../common/directives/cluster-polygon-source.directive";
 import {ResizeMapOnLoadDirective} from "../../common/directives/resize-map-on-load.directive";
 import {ResizeObserverDirective} from "../../common/directives/resize-observer.directive";
+import {MapCursorDirective} from "../../common/directives/map-cursor.directive";
+import {cast} from "../../common/utils/cast";
+import {typeUtils} from "../../common/utils/type-utils";
+
+type Stations = {
+  type: "FeatureCollection";
+  features: {
+    type: "Feature";
+    geometry: DwdService.V2.Stations["features"][0]["geometry"];
+    properties: DwdService.V2.Stations["features"][0]["properties"] & {
+      id: string;
+    };
+  }[];
+};
 
 @Component({
   imports: [
@@ -37,6 +53,7 @@ import {ResizeObserverDirective} from "../../common/directives/resize-observer.d
     ClusterPolygonSourceDirective,
     ResizeMapOnLoadDirective,
     ResizeObserverDirective,
+    MapCursorDirective,
   ],
   templateUrl: "./weather-data.component.html",
 })
@@ -47,15 +64,42 @@ export class WeatherDataComponent {
   );
 
   protected layout = signal<"row" | "column">("row");
+  protected cursor = computed(() =>
+    this.hoverStationId() || this.hoverStationClusterId() ? "pointer" : "grab",
+  );
 
   protected fitBounds = signal<BBox | undefined>(undefined);
+  protected hoverStationId = signal<null | string>(null);
   protected hoverStationClusterId = signal<null | number>(null);
-  protected stations: Signal<undefined | DwdService.V2.Stations>;
+  protected stations: Signal<undefined | Stations>;
   protected filteredStations = computed(() => this.filterStations());
   protected layers = computed(() => this.determineLayers());
 
+  protected util = {
+    cast,
+    log: (...args: any[]) => console.log(...args),
+  };
+
   constructor(private service: DwdService) {
-    this.stations = signals.fromPromise(this.service.v2.fetchStations());
+    this.stations = signals.fromPromise(
+      this.service.v2.fetchStations(),
+      stations => {
+        // TODO: make this obsolete in the backend
+        let features = stations.features.map(feature => ({
+          type: "Feature" as const,
+          id: feature.id,
+          geometry: feature.geometry,
+          properties: {
+            ...feature.properties,
+            id: feature.id,
+          },
+        }));
+
+        return {type: "FeatureCollection", features};
+      },
+    );
+
+    effect(() => console.log(this.hoverStationId()));
   }
 
   protected onColumnsResize([entry]: ResizeObserverEntry[]): void {
@@ -81,8 +125,8 @@ export class WeatherDataComponent {
     );
   }
 
-  private filterStations(): DwdService.V2.Stations {
-    let empty: DwdService.V2.Stations = {
+  private filterStations(): Stations {
+    let empty: Stations = {
       type: "FeatureCollection",
       features: [],
     };
