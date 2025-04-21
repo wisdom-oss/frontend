@@ -38,7 +38,7 @@
     "@ngx-translate/core": "^16.0.4",
     "@thatopen/components": "^2.4.5",
     "@thatopen/components-front": "~2.4.5",
-    "@thatopen/fragments": "~2.4.0",
+    "@thatopen/fragments": "~3.0.2",
     "@turf/turf": "^7.2.0",
     "@twemoji/svg": "^15.0.0",
     "@wisdom-oss/brand": "github:wisdom-oss/brand",
