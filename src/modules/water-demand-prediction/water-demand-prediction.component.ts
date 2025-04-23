@@ -29,23 +29,12 @@ export class WaterDemandPredictionComponent implements OnInit {
   /** the displayed resolution in the charts of real data */
   displayedResolution = signal<string>("hourly");
 
-  /** variables startpoint dropdown */
-  menuStartPoint = "water-demand-prediction.startpoint.menu";
-  optionsStartPoint: Record<string, string> = {
-    "2021-05-26T00:00:00": "water-demand-prediction.startpoint.options.a",
-    "2021-06-01T00:00:00": "water-demand-prediction.startpoint.options.b",
-    "2022-01-01T00:00:00": "water-demand-prediction.startpoint.options.c",
-  };
-  choiceStartPoint = signal<string>("2022-01-01T00:00:00");
+  /** DROP DOWN MENUS                                     */
 
-  /** variables resolution dropdown */
-  menuResolution = "water-demand-prediction.choice.resolution";
-  optionsResolution: Record<string, string> = {
-    hourly: "water-demand-prediction.resolution.hourly",
-    daily: "water-demand-prediction.resolution.daily",
-    weekly: "water-demand-prediction.resolution.weekly",
-  };
-  choiceResolution = signal<string>("hourly");
+  /** variables name dropdown */
+  menuSmartmeter = "water-demand-prediction.choice.smartmeter";
+  optionsSmartmeter: Record<string, string> = {};
+  choiceSmartmeter = signal<string>(Object.keys(this.optionsSmartmeter)[0]);
 
   /** variables timeframe dropdown */
   menuTime = "water-demand-prediction.choice.timeframe";
@@ -58,12 +47,25 @@ export class WaterDemandPredictionComponent implements OnInit {
     "one year": "water-demand-prediction.timeframe.one-year",
     all: "water-demand-prediction.timeframe.all",
   };
-  choiceTime = signal<string>("one week");
+  choiceTime = signal<string>(Object.keys(this.optionsTime)[0]);
 
-  /** variables name dropdown */
-  menuSmartmeter = "water-demand-prediction.choice.smartmeter";
-  optionsSmartmeter: Record<string, string> = {};
-  choiceSmartmeter = signal<string>("urn:ngsi-ld:Device:retired-household");
+  /** variables resolution dropdown */
+  menuResolution = "water-demand-prediction.choice.resolution";
+  optionsResolution: Record<string, string> = {
+    hourly: "water-demand-prediction.resolution.hourly",
+    daily: "water-demand-prediction.resolution.daily",
+    weekly: "water-demand-prediction.resolution.weekly",
+  };
+  choiceResolution = signal<string>(Object.keys(this.optionsResolution)[0]);
+
+  /** variables startpoint dropdown */
+  menuStartPoint = "water-demand-prediction.startpoint.menu";
+  optionsStartPoint: Record<string, string> = {
+    "2021-05-26T00:00:00": "water-demand-prediction.startpoint.options.a",
+    "2021-06-01T00:00:00": "water-demand-prediction.startpoint.options.b",
+    "2022-01-01T00:00:00": "water-demand-prediction.startpoint.options.c",
+  };
+  choiceStartPoint = signal<string>(Object.keys(this.optionsStartPoint)[0]);
 
   menuWeather = "water-demand-prediction.choice.weather";
   optionsWeather: Record<string, string> = {
@@ -72,7 +74,19 @@ export class WaterDemandPredictionComponent implements OnInit {
     precipitation: "water-demand-prediction.weather.precipitation",
     moisture: "water-demand-prediction.weather.moisture",
   };
-  choiceWeather = signal<string>("plain");
+  choiceWeather = signal<string>(Object.keys(this.optionsWeather)[0]);
+
+  /** EXPLAIN STRINGS */
+  explainMAE: string =
+    "In the context of machine learning, absolute error refers to the magnitude of difference between the prediction of an observation and the true value of that observation. MAE takes the average of absolute errors for a group of predictions and observations as a measurement of the magnitude of errors for the entire group. MAE can also be referred as L1 loss function.";
+  explainRMSE: string =
+    "Root mean square error or root mean square deviation is one of the most commonly used measures for evaluating the quality of predictions. It shows how far predictions fall from measured true values using Euclidean distance.";
+  explainMSE: string =
+    "In the fields of regression analysis and machine learning, the Mean Square Error (MSE) is a crucial metric for evaluating the performance of predictive models. It measures the average squared difference between the predicted and the actual target values within a dataset. The primary objective of the MSE is to assess the quality of a model's predictions by measuring how closely they align with the ground truth.";
+  explainR2: string =
+    "The R-squared metric — R², or the coefficient of determination – is used to measure how well a model fits data, and how well it can predict future outcomes. Simply put, it tells you how much of the variation in your data can be explained by your model. The closer the R-squared value is to one, the better your model fits the data.";
+
+  /** GRAPH DATA HOLDING */
 
   /** data object of current requested Smartmeterdata */
   currentSmartmeterData?: SingleSmartmeter;
@@ -160,20 +174,11 @@ export class WaterDemandPredictionComponent implements OnInit {
     | QueryList<BaseChartDirective>
     | undefined;
 
-  explainMAE: string =
-    "In the context of machine learning, absolute error refers to the magnitude of difference between the prediction of an observation and the true value of that observation. MAE takes the average of absolute errors for a group of predictions and observations as a measurement of the magnitude of errors for the entire group. MAE can also be referred as L1 loss function.";
-  explainRMSE: string =
-    "Root mean square error or root mean square deviation is one of the most commonly used measures for evaluating the quality of predictions. It shows how far predictions fall from measured true values using Euclidean distance.";
-  explainMSE: string =
-    "In the fields of regression analysis and machine learning, the Mean Square Error (MSE) is a crucial metric for evaluating the performance of predictive models. It measures the average squared difference between the predicted and the actual target values within a dataset. The primary objective of the MSE is to assess the quality of a model's predictions by measuring how closely they align with the ground truth.";
-  explainR2: string =
-    "The R-squared metric — R², or the coefficient of determination – is used to measure how well a model fits data, and how well it can predict future outcomes. Simply put, it tells you how much of the variation in your data can be explained by your model. The closer the R-squared value is to one, the better your model fits the data.";
-
   constructor(public waterDemandService: WaterDemandPredictionService) {}
 
   ngOnInit() {
     this.fetchMeterInformation();
-    this.fetchDataSmartmeter();
+    //this.fetchDataSmartmeter();
     this.chartDataPredictedValues.labels = this.chartDataCurrentValues.labels;
   }
 
@@ -308,7 +313,7 @@ export class WaterDemandPredictionComponent implements OnInit {
   fetchMeterInformation(): void {
     this.waterDemandService.fetchMeterInformation().subscribe({
       next: response => {
-        this.optionsSmartmeter = response;
+        this.optionsSmartmeter = response["names"];
       },
       error: error => {
         console.error(error);

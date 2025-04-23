@@ -3,9 +3,9 @@ import {Injectable} from "@angular/core";
 import {Router} from "@angular/router";
 import {Observable} from "rxjs";
 
-//const PREFIX = "/local"; /** local development */
+const PREFIX = "/local"; /** local development */
 //const PREFIX = "/dev/development" /** development on wisdom.dev */
-const PREFIX = "/dev/training"; /** training container on wisdom.dev */
+//const PREFIX = "/dev/training"; /** training container on wisdom.dev */
 
 const API_PREFIX = "/waterdemand";
 
@@ -41,8 +41,6 @@ export class WaterDemandPredictionService {
       body: requestBody,
     };
 
-    console.log(requestBody);
-
     let final_url = this.router.parseUrl(PREFIX + API_PREFIX + url).toString();
 
     return this.http.request<T>(
@@ -53,7 +51,7 @@ export class WaterDemandPredictionService {
   }
 
   fetchMeterInformation(): Observable<any> {
-    return this.sendRequest("get", "/meterInformation");
+    return this.sendRequest("get", "/meterNames");
   }
 
   fetchSingleSmartmeter(
