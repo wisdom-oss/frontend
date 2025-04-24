@@ -30,16 +30,7 @@ import {MapCursorDirective} from "../../common/directives/map-cursor.directive";
 import {cast} from "../../common/utils/cast";
 import {typeUtils} from "../../common/utils/type-utils";
 
-type Stations = {
-  type: "FeatureCollection";
-  features: {
-    type: "Feature";
-    geometry: DwdService.V2.Stations["features"][0]["geometry"];
-    properties: DwdService.V2.Stations["features"][0]["properties"] & {
-      id: string;
-    };
-  }[];
-};
+type Stations = DwdService.V2.Stations;
 
 @Component({
   imports: [
@@ -83,20 +74,6 @@ export class WeatherDataComponent {
   constructor(private service: DwdService) {
     this.stations = signals.fromPromise(
       this.service.v2.fetchStations(),
-      stations => {
-        // TODO: make this obsolete in the backend
-        let features = stations.features.map(feature => ({
-          type: "Feature" as const,
-          id: feature.id,
-          geometry: feature.geometry,
-          properties: {
-            ...feature.properties,
-            id: feature.id,
-          },
-        }));
-
-        return {type: "FeatureCollection", features};
-      },
     );
 
     effect(() => console.log(this.hoverStationId()));

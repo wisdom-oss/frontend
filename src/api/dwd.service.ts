@@ -54,6 +54,7 @@ const V2_STATIONS = {
           },
           properties: {
             properties: {
+              id: {type: "string"},
               name: {type: "string"},
               products: {
                 values: {
