@@ -77,7 +77,11 @@
                 [paint]="{
                   'icon-color': [
                     'case',
-                    ['==', ['get', 'id'], ['string', selectedStationId(), '']],
+                    [
+                      '==',
+                      ['get', 'id'],
+                      ['string', selectedStation()?.id, ''],
+                    ],
                     '#0088AA',
                     '#000000',
                   ],
@@ -128,69 +132,60 @@
     @let station = selectedStation();
     @if (station) {
       <div select class="is-fullheight is-fullwidth">
-        <nav class="panel is-primary">
-          <p class="panel-heading p-3">Attributes & Resolutions</p>
-          <div class="panel-block">
-            <p class="control has-icons-left">
-              <input class="input" type="text" placeholder="Search" />
-              <span class="icon is-left">
-                <i class="fas fa-search" aria-hidden="true"></i>
-              </span>
+        <div class="card is-fullheight is-flex is-flex-direction-column">
+          <div class="card-header has-background-primary">
+            <p class="card-header-title has-text-light">
+              Attributes & Resolutions
             </p>
           </div>
-          <p class="panel-tabs">
-            <a class="is-active">All</a>
-            <a>Public</a>
-            <a>Private</a>
-            <a>Sources</a>
-            <a>Forks</a>
-          </p>
-          <a class="panel-block is-active">
-            <span class="panel-icon">
-              <i class="fas fa-book" aria-hidden="true"></i>
-            </span>
-            bulma
-          </a>
-          <a class="panel-block">
-            <span class="panel-icon">
-              <i class="fas fa-book" aria-hidden="true"></i>
-            </span>
-            marksheet
-          </a>
-          <a class="panel-block">
-            <span class="panel-icon">
-              <i class="fas fa-book" aria-hidden="true"></i>
-            </span>
-            minireset.css
-          </a>
-          <a class="panel-block">
-            <span class="panel-icon">
-              <i class="fas fa-book" aria-hidden="true"></i>
-            </span>
-            jgthms.github.io
-          </a>
-          <a class="panel-block">
-            <span class="panel-icon">
-              <i class="fas fa-code-branch" aria-hidden="true"></i>
-            </span>
-            daniellowtw/infboard
-          </a>
-          <a class="panel-block">
-            <span class="panel-icon">
-              <i class="fas fa-code-branch" aria-hidden="true"></i>
-            </span>
-            mojs
-          </a>
-          <label class="panel-block">
-            <input type="checkbox" />
-            remember me
-          </label>
-          <div class="panel-block">
-            <button class="button is-link is-outlined is-fullwidth">
-              Reset all filters
-            </button>
+          <div
+            class="card-content"
+            style="overflow-y: auto; flex-basis: 0; flex-grow: 1"
+          >
+            <div class="is-flex is-flex-direction-column is-fullheight">
+              <div class="menu is-flex-grow-1">
+                <ul class="menu-list">
+                  @for (
+                    product of station.properties.products | keyvalue;
+                    track product.key
+                  ) {
+                    <li>
+                      <a
+                        (click)="selectedProduct.set(product.key)"
+                        [translate]="
+                          'weather-data.station.property.product.key.' +
+                          product.key
+                        "
+                      ></a>
+                      @if (product.key == selectedProduct()) {
+                        <ul>
+                          @for (
+                            resolution of product.value | keyvalue;
+                            track resolution.key
+                          ) {
+                            <li>
+                              <a
+                                [class.is-active]="
+                                  selectedResolution() == resolution.key
+                                "
+                                (click)="selectedResolution.set(resolution.key)"
+                                [translate]="
+                                  'weather-data.station.property.product.resolution.' +
+                                  resolution.key
+                                "
+                              ></a>
+                            </li>
+                          }
+                        </ul>
+                      }
+                    </li>
+                  }
+                </ul>
+              </div>
+              <button class="button is-primary">Download</button>
+            </div>
           </div>
-        </nav>
+        </div>
       </div>
     }
   </div>

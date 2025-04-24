@@ -5,3 +5,115 @@ de = "Wetterdaten"
 [title.dwd]
 en = "German Meteorological Service"
 de = "Deutscher Wetterdienst"
+
+[station.property.product.resolution.annual]
+en = "Annual"
+de = "Jährlich"
+
+[station.property.product.resolution.monthly]
+en = "Monthly"
+de = "Monatlich"
+
+[station.property.product.resolution.daily]
+en = "Daily"
+de = "Täglich"
+
+[station.property.product.resolution.subDaily]
+en = "Subdaily"
+de = "Mehrmals täglich"
+
+[station.property.product.resolution.hourly]
+en = "Hourly"
+de = "Stündlich"
+
+[station.property.product.resolution.every10Minutes]
+en = "Every 10 Minutes"
+de = "Alle 10 Minuten"
+
+[station.property.product.resolution.every5Minutes]
+en = "Every 5 Minutes"
+de = "Alle 5 Minuten"
+
+[station.property.product.resolution.everyMinute]
+en = "Every Minute"
+de = "Jede Minute"
+
+[station.property.product.key.cloudType]
+en = "Cloud Type"
+de = "Wolkentyp"
+
+[station.property.product.key.morePrecipitation]
+en = "Additional Precipitation"
+de = "Weitere Niederschläge"
+
+[station.property.product.key.precipitation]
+en = "Precipitation"
+de = "Niederschlag"
+
+[station.property.product.key.moreWeatherPhenomena]
+en = "Additional Weather Phenomena"
+de = "Weitere Wettererscheinungen"
+
+[station.property.product.key.waterEquivalent]
+en = "Water Equivalent"
+de = "Wasseräquivalent"
+
+[station.property.product.key.airTemperature]
+en = "Air Temperature"
+de = "Lufttemperatur"
+
+[station.property.product.key.cloudiness]
+en = "Cloudiness"
+de = "Bewölkung"
+
+[station.property.product.key.dewPoint]
+en = "Dew Point"
+de = "Taupunkt"
+
+[station.property.product.key.extremeTemperatures]
+en = "Extreme Temperatures"
+de = "Extreme Temperaturen"
+
+[station.property.product.key.moisture]
+en = "Humidity"
+de = "Luftfeuchtigkeit"
+
+[station.property.product.key.soil]
+en = "Soil"
+de = "Boden"
+
+[station.property.product.key.visibility]
+en = "Visibility"
+de = "Sichtweite"
+
+[station.property.product.key.weatherPhenomena]
+en = "Weather Phenomena"
+de = "Wettererscheinungen"
+
+[station.property.product.key.windSpeeds]
+en = "Wind Speeds"
+de = "Windgeschwindigkeiten"
+
+[station.property.product.key.extremeWinds]
+en = "Extreme Winds"
+de = "Extreme Winde"
+
+[station.property.product.key.pressure]
+en = "Pressure"
+de = "Luftdruck"
+
+[station.property.product.key.soilTemperature]
+en = "Soil Temperature"
+de = "Bodentemperatur"
+
+[station.property.product.key.solarRadiation]
+en = "Solar Radiation"
+de = "Solare Einstrahlung"
+
+[station.property.product.key.sun]
+en = "Sun"
+de = "Sonne"
+
+[station.property.product.key.windSynopsis]
+en = "Wind Synopsis"
+de = "Windübersicht"

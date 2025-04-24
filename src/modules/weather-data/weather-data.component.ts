@@ -1,3 +1,4 @@
+import {KeyValuePipe} from "@angular/common";
 import {
   computed,
   effect,
@@ -38,6 +39,7 @@ type Stations = DwdService.V2.Stations;
     ClusterPolygonSourceDirective,
     ControlComponent,
     GeoJSONSourceComponent,
+    KeyValuePipe,
     LayerComponent,
     LayerSelectionControlComponent,
     MapComponent,
@@ -77,6 +79,9 @@ export class WeatherDataComponent {
     );
   });
 
+  protected selectedProduct = signal<undefined | string>(undefined);
+  protected selectedResolution = signal<undefined | string>(undefined);
+
   protected util = {
     cast,
     log: (...args: any[]) => console.log(...args),
@@ -110,6 +115,18 @@ export class WeatherDataComponent {
       bbox[3] += padding;
       // update map after selector appeared
       setTimeout(() => this.fitBounds.set(bbox));
+    });
+
+    effect(() => {
+      // reset product when switching stations
+      this.selectedStation();
+      this.selectedProduct.set(undefined);
+    });
+
+    effect(() => {
+      // reset resolution when switching product
+      this.selectedProduct();
+      this.selectedResolution.set(undefined);
     });
   }
 
