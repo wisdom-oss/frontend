@@ -49,7 +49,7 @@ export class UsageForecastsService {
     let context = new HttpContext()
       .set(httpContexts.validateSchema, RESULT)
       .set(httpContexts.cache, [
-        JSON.stringify({URL, key, options}),
+        JSON.stringify({URL, key, scriptIdentifier, options}),
         dayjs.duration(1, "day"),
       ]);
 
