@@ -36,7 +36,7 @@
     "@ng-icons/core": "^31.3.0",
     "@ng-icons/remixicon": "^31.3.0",
     "@ngx-translate/core": "^16.0.4",
-    "@thatopen/components": "^2.4.5",
+    "@thatopen/components": "^2.4.10",
     "@thatopen/components-front": "~2.4.5",
     "@thatopen/fragments": "~2.4.0",
     "@turf/turf": "^7.2.0",
