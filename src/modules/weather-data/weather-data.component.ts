@@ -15,10 +15,11 @@ import {
   NavigationControlDirective,
 } from "@maplibre/ngx-maplibre-gl";
 import {TranslateDirective} from "@ngx-translate/core";
-import {geometry} from "@turf/turf";
-import {BBox, FeatureCollection, Point} from "geojson";
+import {BBox} from "geojson";
 import {StyleSpecification} from "maplibre-gl";
+
 import * as turf from "@turf/turf";
+
 import {DwdService} from "../../api/dwd.service";
 import colorful from "../../assets/map/styles/colorful.json";
 import {LayerSelectionControlComponent} from "../../common/components/map/layer-selection-control/layer-selection-control.component";
@@ -28,7 +29,6 @@ import {ResizeMapOnLoadDirective} from "../../common/directives/resize-map-on-lo
 import {ResizeObserverDirective} from "../../common/directives/resize-observer.directive";
 import {MapCursorDirective} from "../../common/directives/map-cursor.directive";
 import {cast} from "../../common/utils/cast";
-import {typeUtils} from "../../common/utils/type-utils";
 
 type Stations = DwdService.V2.Stations;
 
@@ -71,9 +71,10 @@ export class WeatherDataComponent {
     let stations = this.stations();
     let stationId = this.selectedStationId();
     if (!stations || !stationId) return null;
-    return stations
-      .features
-      .find(feature => feature.properties.id == stationId) ?? null;
+    return (
+      stations.features.find(feature => feature.properties.id == stationId) ??
+      null
+    );
   });
 
   protected util = {
