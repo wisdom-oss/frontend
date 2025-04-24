@@ -18,7 +18,7 @@ import {TranslateDirective} from "@ngx-translate/core";
 import {geometry} from "@turf/turf";
 import {BBox, FeatureCollection, Point} from "geojson";
 import {StyleSpecification} from "maplibre-gl";
-
+import * as turf from "@turf/turf";
 import {DwdService} from "../../api/dwd.service";
 import colorful from "../../assets/map/styles/colorful.json";
 import {LayerSelectionControlComponent} from "../../common/components/map/layer-selection-control/layer-selection-control.component";
@@ -34,17 +34,17 @@ type Stations = DwdService.V2.Stations;
 
 @Component({
   imports: [
+    ClusterPolygonSourceDirective,
     ControlComponent,
     GeoJSONSourceComponent,
     LayerComponent,
     LayerSelectionControlComponent,
     MapComponent,
+    MapCursorDirective,
     NavigationControlDirective,
-    TranslateDirective,
-    ClusterPolygonSourceDirective,
     ResizeMapOnLoadDirective,
     ResizeObserverDirective,
-    MapCursorDirective,
+    TranslateDirective,
   ],
   templateUrl: "./weather-data.component.html",
 })
@@ -66,17 +66,38 @@ export class WeatherDataComponent {
   protected filteredStations = computed(() => this.filterStations());
   protected layers = computed(() => this.determineLayers());
 
+  protected selectedStationId = signal<null | string>(null);
+  protected selectedStation = computed(() => {
+    let stations = this.stations();
+    let stationId = this.selectedStationId();
+    if (!stations || !stationId) return null;
+    return stations
+      .features
+      .find(feature => feature.properties.id == stationId) ?? null;
+  });
+
   protected util = {
     cast,
     log: (...args: any[]) => console.log(...args),
   };
 
   constructor(private service: DwdService) {
-    this.stations = signals.fromPromise(
-      this.service.v2.fetchStations(),
-    );
+    this.stations = signals.fromPromise(this.service.v2.fetchStations());
 
-    effect(() => console.log(this.hoverStationId()));
+    effect(() => console.log(this.selectedStation()));
+
+    effect(() => {
+      let station = this.selectedStation();
+      if (!station) return;
+      let bbox = turf.bbox(station.geometry);
+      let padding = 0.01;
+      bbox[0] -= padding;
+      bbox[1] -= padding;
+      bbox[2] += padding;
+      bbox[3] += padding;
+      // update map after selector appeared
+      setTimeout(() => this.fitBounds.set(bbox));
+    });
   }
 
   protected onColumnsResize([entry]: ResizeObserverEntry[]): void {

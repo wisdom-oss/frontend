@@ -8,7 +8,7 @@
     resize-observer
     (resize)="onColumnsResize($event)"
   >
-    <div class="is-fullheight is-fullwidth">
+    <div map class="is-fullheight is-fullwidth">
       <div class="card is-fullheight">
         <div class="card-content p-0 is-fullheight is-clipped">
           <mgl-map
@@ -27,6 +27,7 @@
             }"
             (click)="fitBounds.set(clusterPolygonSource().polygon().bbox)"
             (click)="hoverStationClusterId.set(null)"
+            (click)="selectedStationId.set(hoverStationId())"
             [cursor]="cursor()"
           >
             <ng-container controls>
@@ -46,7 +47,8 @@
                 id="stations-source"
                 [data]="filteredStations()"
                 [cluster]="true"
-                [clusterMinPoints]="10"
+                [clusterMinPoints]="2"
+                [clusterRadius]="100"
                 #stationsSource
               ></mgl-geojson-source>
               <mgl-geojson-source
@@ -66,10 +68,19 @@
                 [layout]="{
                   'icon-image': 'remixicon:map-pin-2-line',
                   'icon-anchor': 'bottom',
+                  'icon-overlap': 'always',
                   'text-field': ['get', 'name'],
                   'text-font': ['noto_sans_regular'],
                   'text-optional': true,
                   'text-anchor': 'top',
+                }"
+                [paint]="{
+                  'icon-color': [
+                    'case',
+                    ['==', ['get', 'id'], ['string', selectedStationId(), '']],
+                    '#0088AA',
+                    '#000000',
+                  ],
                 }"
                 (layerMouseLeave)="hoverStationId.set(null)"
                 (layerMouseMove)="
@@ -114,8 +125,73 @@
         </div>
       </div>
     </div>
-    <div class="is-fullheight is-fullwidth">
-      <div class="card is-fullheight"></div>
-    </div>
+    @let station = selectedStation();
+    @if (station) {
+      <div select class="is-fullheight is-fullwidth">
+        <nav class="panel is-primary">
+          <p class="panel-heading p-3">Attributes & Resolutions</p>
+          <div class="panel-block">
+            <p class="control has-icons-left">
+              <input class="input" type="text" placeholder="Search" />
+              <span class="icon is-left">
+                <i class="fas fa-search" aria-hidden="true"></i>
+              </span>
+            </p>
+          </div>
+          <p class="panel-tabs">
+            <a class="is-active">All</a>
+            <a>Public</a>
+            <a>Private</a>
+            <a>Sources</a>
+            <a>Forks</a>
+          </p>
+          <a class="panel-block is-active">
+            <span class="panel-icon">
+              <i class="fas fa-book" aria-hidden="true"></i>
+            </span>
+            bulma
+          </a>
+          <a class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-book" aria-hidden="true"></i>
+            </span>
+            marksheet
+          </a>
+          <a class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-book" aria-hidden="true"></i>
+            </span>
+            minireset.css
+          </a>
+          <a class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-book" aria-hidden="true"></i>
+            </span>
+            jgthms.github.io
+          </a>
+          <a class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-code-branch" aria-hidden="true"></i>
+            </span>
+            daniellowtw/infboard
+          </a>
+          <a class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-code-branch" aria-hidden="true"></i>
+            </span>
+            mojs
+          </a>
+          <label class="panel-block">
+            <input type="checkbox" />
+            remember me
+          </label>
+          <div class="panel-block">
+            <button class="button is-link is-outlined is-fullwidth">
+              Reset all filters
+            </button>
+          </div>
+        </nav>
+      </div>
+    }
   </div>
 </div>
