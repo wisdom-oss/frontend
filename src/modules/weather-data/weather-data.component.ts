@@ -7,6 +7,7 @@ import {
   Signal,
   WritableSignal,
 } from "@angular/core";
+import {ActivatedRoute, Router} from "@angular/router";
 import {
   ControlComponent,
   LayerComponent,
@@ -60,20 +61,19 @@ export class WeatherDataComponent {
   );
 
   protected fitBounds = signal<BBox | undefined>(undefined);
-  protected hoverStationId = signal<null | string>(null);
-  protected hoverStationClusterId = signal<null | number>(null);
+  protected hoverStationId = signal<undefined | string>(undefined);
+  protected hoverStationClusterId = signal<undefined | number>(undefined);
   protected stations: Signal<undefined | Stations>;
   protected filteredStations = computed(() => this.filterStations());
   protected layers = computed(() => this.determineLayers());
 
-  protected selectedStationId = signal<null | string>(null);
+  protected selectedStationId = signal<undefined | string>(undefined);
   protected selectedStation = computed(() => {
     let stations = this.stations();
     let stationId = this.selectedStationId();
-    if (!stations || !stationId) return null;
-    return (
-      stations.features.find(feature => feature.properties.id == stationId) ??
-      null
+    if (!stations || !stationId) return undefined;
+    return stations.features.find(
+      feature => feature.properties.id == stationId,
     );
   });
 
@@ -82,7 +82,19 @@ export class WeatherDataComponent {
     log: (...args: any[]) => console.log(...args),
   };
 
-  constructor(private service: DwdService) {
+  constructor(
+    private service: DwdService,
+    private route: ActivatedRoute,
+    private router: Router,
+  ) {
+    this.selectedStationId.set(route.snapshot.queryParams["station"]);
+    effect(() =>
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: {station: this.selectedStationId()},
+      }),
+    );
+
     this.stations = signals.fromPromise(this.service.v2.fetchStations());
 
     effect(() => console.log(this.selectedStation()));

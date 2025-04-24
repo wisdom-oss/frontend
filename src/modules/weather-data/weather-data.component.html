@@ -26,7 +26,7 @@
               essential: true,
             }"
             (click)="fitBounds.set(clusterPolygonSource().polygon().bbox)"
-            (click)="hoverStationClusterId.set(null)"
+            (click)="hoverStationClusterId.set(undefined)"
             (click)="selectedStationId.set(hoverStationId())"
             [cursor]="cursor()"
           >
@@ -82,7 +82,7 @@
                     '#000000',
                   ],
                 }"
-                (layerMouseLeave)="hoverStationId.set(null)"
+                (layerMouseLeave)="hoverStationId.set(undefined)"
                 (layerMouseMove)="
                   hoverStationId.set($event.features![0].properties['id'])
                 "
@@ -95,7 +95,7 @@
                 [layout]="{
                   'icon-image': 'remixicon:pin-distance-line',
                 }"
-                (layerMouseLeave)="hoverStationClusterId.set(null)"
+                (layerMouseLeave)="hoverStationClusterId.set(undefined)"
                 (layerMouseMove)="
                   hoverStationClusterId.set(
                     util.cast($event.features![0].id, 'number')
