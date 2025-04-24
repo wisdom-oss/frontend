@@ -46,7 +46,7 @@
                 id="stations-source"
                 [data]="filteredStations()"
                 [cluster]="true"
-                [clusterMinPoints]="5"
+                [clusterMinPoints]="10"
                 #stationsSource
               ></mgl-geojson-source>
               <mgl-geojson-source
@@ -65,6 +65,11 @@
                 [filter]="['!=', ['get', 'cluster'], true]"
                 [layout]="{
                   'icon-image': 'remixicon:map-pin-2-line',
+                  'icon-anchor': 'bottom',
+                  'text-field': ['get', 'name'],
+                  'text-font': ['noto_sans_regular'],
+                  'text-optional': true,
+                  'text-anchor': 'top',
                 }"
                 (layerMouseLeave)="hoverStationId.set(null)"
                 (layerMouseMove)="
