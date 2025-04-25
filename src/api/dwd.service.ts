@@ -34,10 +34,10 @@ export class DwdService {
         this.http.get<DwdService.V1.Station>(url, {
           context: new HttpContext()
             .set(httpContexts.validateSchema, V1_STATION)
-            .set(httpContexts.cache, [url, dayjs.duration(12, "hours")])
+            .set(httpContexts.cache, [url, dayjs.duration(12, "hours")]),
         }),
       );
-    }
+    },
   };
 }
 
@@ -59,28 +59,31 @@ const V1_STATION = {
     location: {
       additionalProperties: true,
     },
+    height: {type: "uint32"},
     historical: {type: "boolean"},
     capabilities: {
       elements: {
         properties: {
           dataType: {type: "string"},
-          resolution: {enum: [
-            "1_minute",
-            "5_minutes",
-            "10_minutes",
-            "hourly",
-            "subdaily",
-            "daily",
-            "monthly",
-            "annual",
-            "multi_annual",
-          ]},
+          resolution: {
+            enum: [
+              "1_minute",
+              "5_minutes",
+              "10_minutes",
+              "hourly",
+              "subdaily",
+              "daily",
+              "monthly",
+              "annual",
+              "multi_annual",
+            ],
+          },
           availableFrom: {type: "string"},
           availableUntil: {type: "string"},
-        }
-      }
-    }
-  }
+        },
+      },
+    },
+  },
 } as const;
 
 const V2_STATIONS = {

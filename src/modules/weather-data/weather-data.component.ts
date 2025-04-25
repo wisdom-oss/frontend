@@ -2,6 +2,7 @@ import {KeyValuePipe} from "@angular/common";
 import {
   computed,
   effect,
+  resource,
   signal,
   viewChild,
   Component,
@@ -79,6 +80,12 @@ export class WeatherDataComponent {
     );
   });
 
+  // works correctly, but we need keys for v2
+  protected stationInfo = resource({
+    request: () => this.selectedStationId(),
+    loader: ({request: stationId}) => this.service.v1.fetchStation(stationId)
+  }).value.asReadonly();
+
   protected selectedProduct = signal<undefined | string>(undefined);
   protected selectedResolution = signal<undefined | string>(undefined);
 
@@ -103,6 +110,7 @@ export class WeatherDataComponent {
     this.stations = signals.fromPromise(this.service.v2.fetchStations());
 
     effect(() => console.log(this.selectedStation()));
+    effect(() => console.log(this.stationInfo()));
 
     effect(() => {
       let station = this.selectedStation();

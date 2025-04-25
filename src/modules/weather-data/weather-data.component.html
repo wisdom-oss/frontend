@@ -129,8 +129,9 @@
         </div>
       </div>
     </div>
-    @let station = selectedStation();
-    @if (station) {
+    @let selected = selectedStation();
+    @let info = stationInfo();
+    @if (selected && info) {
       <div select class="is-fullheight is-fullwidth">
         <div class="card is-fullheight is-flex is-flex-direction-column">
           <div class="card-header has-background-primary">
@@ -146,7 +147,7 @@
               <div class="menu is-flex-grow-1">
                 <ul class="menu-list">
                   @for (
-                    product of station.properties.products | keyvalue;
+                    product of selected.properties.products | keyvalue;
                     track product.key
                   ) {
                     <li>
