@@ -27,14 +27,61 @@ export class DwdService {
     },
   };
 
-  readonly v1 = {};
+  readonly v1 = {
+    fetchStation: (stationId: string) => {
+      let url = `${URL}/v1/${stationId}`;
+      return firstValueFrom(
+        this.http.get<DwdService.V1.Station>(url, {
+          context: new HttpContext()
+            .set(httpContexts.validateSchema, V1_STATION)
+            .set(httpContexts.cache, [url, dayjs.duration(12, "hours")])
+        }),
+      );
+    }
+  };
 }
 
 export namespace DwdService {
+  export namespace V1 {
+    export type Station = JTDDataType<typeof V1_STATION>;
+  }
+
   export namespace V2 {
     export type Stations = JTDDataType<typeof V2_STATIONS>;
   }
 }
+
+const V1_STATION = {
+  properties: {
+    id: {type: "string"},
+    name: {type: "string"},
+    state: {type: "string"},
+    location: {
+      additionalProperties: true,
+    },
+    historical: {type: "boolean"},
+    capabilities: {
+      elements: {
+        properties: {
+          dataType: {type: "string"},
+          resolution: {enum: [
+            "1_minute",
+            "5_minutes",
+            "10_minutes",
+            "hourly",
+            "subdaily",
+            "daily",
+            "monthly",
+            "annual",
+            "multi_annual",
+          ]},
+          availableFrom: {type: "string"},
+          availableUntil: {type: "string"},
+        }
+      }
+    }
+  }
+} as const;
 
 const V2_STATIONS = {
   properties: {
