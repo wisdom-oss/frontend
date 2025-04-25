@@ -10,7 +10,7 @@ import {
 import {BBox, FeatureCollection, Point} from "geojson";
 import {StyleSpecification} from "maplibre-gl";
 
-import {WaterRightsServiceService} from "../../../../api/water-rights-service.service";
+import {WaterRightsService} from "../../../../api/water-rights.service";
 import colorful from "../../../../assets/map/styles/colorful.json";
 import {signals} from "../../../../common/signals";
 import {ResizeMapOnLoadDirective} from "../../../../common/directives/resize-map-on-load.directive";
@@ -50,7 +50,7 @@ export class SelectViewComponent {
   });
 
   constructor(
-    private service: WaterRightsServiceService,
+    private service: WaterRightsService,
     private router: Router,
     private route: ActivatedRoute,
   ) {

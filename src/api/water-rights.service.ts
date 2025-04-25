@@ -12,13 +12,13 @@ const URL = "/api/water-rights" as const;
 @Injectable({
   providedIn: "root",
 })
-export class WaterRightsServiceService {
+export class WaterRightsService {
   constructor(private http: HttpClient) {}
 
-  fetchUsageLocations(): Promise<WaterRightsServiceService.UsageLocations> {
+  fetchUsageLocations(): Promise<WaterRightsService.UsageLocations> {
     let url = `${URL}/`;
     return firstValueFrom(
-      this.http.get<WaterRightsServiceService.UsageLocations>(url, {
+      this.http.get<WaterRightsService.UsageLocations>(url, {
         context: new HttpContext()
           .set(httpContexts.validateSchema, USAGE_LOCATIONS)
           .set(httpContexts.cache, [url, dayjs.duration(3, "days")]),
@@ -26,16 +26,27 @@ export class WaterRightsServiceService {
     );
   }
 
+  fetchWaterRightDetails(no: number): Promise<WaterRightsService.WaterRightDetails> {
+    let url = `${URL}/details/${no}`;
+    return firstValueFrom(
+      this.http.get<WaterRightsService.WaterRightDetails>(url, {
+        context: new HttpContext()
+          .set(httpContexts.validateSchema, WATER_RIGHT_DETAILS)
+          .set(httpContexts.cache, [url, dayjs.duration(3, "days")])
+      }),
+    );
+  }
+
   fetchAverageWithdrawals(
     ...geometries: GeoJsonObject[]
-  ): Promise<WaterRightsServiceService.AverageWithdrawals> {
+  ): Promise<WaterRightsService.AverageWithdrawals> {
     let url = `${URL}/average-withdrawals`;
     let context = new HttpContext().set(
       httpContexts.validateSchema,
       AVERAGE_WITHDRAWALS,
     );
     return firstValueFrom(
-      this.http.post<WaterRightsServiceService.AverageWithdrawals>(
+      this.http.post<WaterRightsService.AverageWithdrawals>(
         url,
         geometries,
         {context},
@@ -44,9 +55,10 @@ export class WaterRightsServiceService {
   }
 }
 
-export namespace WaterRightsServiceService {
+export namespace WaterRightsService {
   export type AverageWithdrawals = JTDDataType<typeof AVERAGE_WITHDRAWALS>;
   export type UsageLocations = JTDDataType<typeof USAGE_LOCATIONS>;
+  export type WaterRightDetails = JTDDataType<typeof WATER_RIGHT_DETAILS>;
 }
 
 const KEY_VALUE = {
@@ -150,6 +162,39 @@ const USAGE_LOCATIONS = {
       },
     },
   },
+} as const;
+
+const WATER_RIGHT_DETAILS = {
+  properties: {
+    "water-right": {
+      properties: {},
+      optionalProperties: {
+        id: {type: "uint32"},
+        waterRightNumber: {type: "uint32"},
+        holder: {type: "string"},
+        validFrom: {type: "string"},
+        validUntil: {type: "string"},
+        status: {type: "string"},
+        legalTitle: {type: "string"},
+        waterAuthority: {type: "string"},
+        registeringAuthority: {type: "string"},
+        grantingAuthority: {type: "string"},
+        initiallyGranted: {type: "string"},
+        lastChange: {type: "string"},
+        fileReference: {type: "string"},
+        externalIdentifier: {type: "string"},
+        subject: {type: "string"},
+        address: {type: "string"},
+        legalDepartments: {
+          elements: {
+            enum: ["A", "B", "C", "D", "E", "F", "K", "L"]
+          }
+        },
+        annotation: {type: "string"},
+      }
+    },
+    "usage-locations": USAGE_LOCATIONS,
+  }
 } as const;
 
 const AVERAGE_WITHDRAWALS = {
