@@ -6,6 +6,14 @@ de = "Wetterdaten"
 en = "German Meteorological Service"
 de = "Deutscher Wetterdienst"
 
+[selector.title]
+en = "Attributes & Resolutions"
+de = "Attribute & Auflösungen"
+
+[selector.download]
+en = "Download"
+de = "Herunterladen"
+
 [station.property.product.resolution.annual]
 en = "Annual"
 de = "Jährlich"

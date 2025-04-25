@@ -1,14 +1,18 @@
-import {KeyValuePipe} from "@angular/common";
+import {KeyValuePipe, DOCUMENT} from "@angular/common";
 import {
   computed,
   effect,
+  inject,
+  model,
   resource,
   signal,
   viewChild,
   Component,
+  ElementRef,
   Signal,
   WritableSignal,
 } from "@angular/core";
+import {FormsModule} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
 import {
   ControlComponent,
@@ -17,7 +21,10 @@ import {
   GeoJSONSourceComponent,
   NavigationControlDirective,
 } from "@maplibre/ngx-maplibre-gl";
-import {TranslateDirective} from "@ngx-translate/core";
+import {provideIcons, NgIconComponent} from "@ng-icons/core";
+import {remixLoader4Fill} from "@ng-icons/remixicon";
+import {TranslateDirective, TranslatePipe} from "@ngx-translate/core";
+import dayjs from "dayjs";
 import {BBox} from "geojson";
 import {StyleSpecification} from "maplibre-gl";
 
@@ -35,6 +42,41 @@ import {cast} from "../../common/utils/cast";
 
 type Stations = DwdService.V2.Stations;
 
+const MAPPING = {
+  product: {
+    cloudType: "cloud_type",
+    morePrecipitation: "more_precip",
+    precipitation: "precipitation",
+    moreWeatherPhenomena: "more_weather_phenomena",
+    waterEquivalent: "water_equiv",
+    airTemperature: "air_temperature",
+    cloudiness: "cloudiness",
+    dewPoint: "dew_point",
+    extremeTemperatures: "extreme_temperature",
+    moisture: "moisture",
+    soil: "soil",
+    visibility: "visibility",
+    weatherPhenomena: "weather_phenomena",
+    windSpeeds: "wind",
+    extremeWinds: "extreme_wind",
+    pressure: "pressure",
+    soilTemperature: "soil_temperature",
+    solarRadiation: "solar",
+    sun: "sun",
+    windSynopsis: "wind_synop",
+  },
+  resolution: {
+    everyMinute: "1_minute",
+    every5Minutes: "5_minutes",
+    every10Minutes: "10_minutes",
+    hourly: "hourly",
+    subDaily: "subdaily",
+    daily: "daily",
+    monthly: "monthly",
+    annual: "annual",
+  },
+} as const;
+
 @Component({
   imports: [
     ClusterPolygonSourceDirective,
@@ -49,10 +91,24 @@ type Stations = DwdService.V2.Stations;
     ResizeMapOnLoadDirective,
     ResizeObserverDirective,
     TranslateDirective,
+    FormsModule,
+    NgIconComponent,
+    TranslatePipe,
   ],
   templateUrl: "./weather-data.component.html",
+  styleUrl: "./weather-data.component.scss",
+  providers: [
+    provideIcons({
+      remixLoader4Fill,
+    }),
+  ],
 })
 export class WeatherDataComponent {
+  protected lang = signals.lang();
+  protected document = inject(DOCUMENT);
+  private downloadAnchor =
+    viewChild.required<ElementRef<HTMLAnchorElement>>("downloadAnchor");
+
   protected colorful = colorful as any as StyleSpecification;
   protected clusterPolygonSource = viewChild.required(
     ClusterPolygonSourceDirective,
@@ -80,14 +136,46 @@ export class WeatherDataComponent {
     );
   });
 
-  // works correctly, but we need keys for v2
   protected stationInfo = resource({
     request: () => this.selectedStationId(),
-    loader: ({request: stationId}) => this.service.v1.fetchStation(stationId)
+    loader: ({request: stationId}) => this.service.v1.fetchStation(stationId),
   }).value.asReadonly();
 
-  protected selectedProduct = signal<undefined | string>(undefined);
-  protected selectedResolution = signal<undefined | string>(undefined);
+  protected selectedProduct = signal<
+    undefined | keyof (typeof MAPPING)["product"]
+  >(undefined);
+  protected selectedResolution = signal<
+    undefined | keyof (typeof MAPPING)["resolution"]
+  >(undefined);
+
+  protected productInfo = computed(() => {
+    let info = this.stationInfo();
+    let product = this.selectedProduct();
+    let resolution = this.selectedResolution();
+    if (!info || !product || !resolution) return;
+
+    let mappedProduct = MAPPING.product[product];
+    let mappedResolution = MAPPING.resolution[resolution];
+    return info.capabilities.find(
+      capability =>
+        capability.dataType == mappedProduct &&
+        capability.resolution == mappedResolution,
+    );
+  });
+
+  protected productAvailableFrom = signals.dayjs(
+    () => this.productInfo()?.availableFrom,
+  );
+  protected productAvailableUntil = signals.dayjs(
+    () => this.productInfo()?.availableUntil,
+  );
+
+  protected productFromRaw = model<any>();
+  protected productUntilRaw = model<any>();
+  protected productFrom = signals.dayjs(() => this.productFromRaw());
+  protected productUntil = signals.dayjs(() => this.productUntilRaw());
+
+  protected downloading = signal(false);
 
   protected util = {
     cast,
@@ -109,13 +197,11 @@ export class WeatherDataComponent {
 
     this.stations = signals.fromPromise(this.service.v2.fetchStations());
 
-    effect(() => console.log(this.selectedStation()));
-    effect(() => console.log(this.stationInfo()));
-
     effect(() => {
-      let station = this.selectedStation();
-      if (!station) return;
-      let bbox = turf.bbox(station.geometry);
+      let selected = this.selectedStation();
+      if (!selected) return;
+
+      let bbox = turf.bbox(selected.geometry);
       let padding = 0.01;
       bbox[0] -= padding;
       bbox[1] -= padding;
@@ -123,6 +209,9 @@ export class WeatherDataComponent {
       bbox[3] += padding;
       // update map after selector appeared
       setTimeout(() => this.fitBounds.set(bbox));
+
+      // force update again when info loaded
+      this.stationInfo();
     });
 
     effect(() => {
@@ -141,6 +230,35 @@ export class WeatherDataComponent {
   protected onColumnsResize([entry]: ResizeObserverEntry[]): void {
     let width = entry.borderBoxSize[0].inlineSize;
     this.layout.set(width < 700 ? "column" : "row");
+  }
+
+  protected async download(options: {
+    stationId: string;
+    product: (typeof MAPPING)["product"][keyof (typeof MAPPING)["product"]];
+    resolution: (typeof MAPPING)["resolution"][keyof (typeof MAPPING)["resolution"]];
+    from: dayjs.Dayjs;
+    until: dayjs.Dayjs;
+  }): Promise<void> {
+    this.downloading.set(true);
+
+    let {stationId, product, resolution, from, until} = options;
+    let data = await this.service.v1.fetchData({
+      stationId,
+      dataType: product,
+      granularity: resolution,
+      from,
+      until,
+    });
+
+    let blob = new Blob([JSON.stringify(data)], {type: "application/json"});
+    let url = URL.createObjectURL(blob);
+
+    let a = this.downloadAnchor().nativeElement;
+    a.href = url;
+    a.download = `WISdoM_Weather_Data_${this.stationInfo()!.name}_${product}_${resolution}.json`;
+    a.click();
+
+    this.downloading.set(false);
   }
 
   private determineLayers(): Record<

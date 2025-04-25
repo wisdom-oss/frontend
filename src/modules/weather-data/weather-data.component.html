@@ -39,6 +39,7 @@
               <mgl-control position="top-right">
                 <map-layer-selection-control
                   [layers]="layers()"
+                  translatePrefix="weather-data.station.property.product.key."
                 ></map-layer-selection-control>
               </mgl-control>
             </ng-container>
@@ -135,12 +136,13 @@
       <div select class="is-fullheight is-fullwidth">
         <div class="card is-fullheight is-flex is-flex-direction-column">
           <div class="card-header has-background-primary">
-            <p class="card-header-title has-text-light">
-              Attributes & Resolutions
-            </p>
+            <p
+              class="card-header-title has-text-light"
+              translate="weather-data.selector.title"
+            ></p>
           </div>
           <div
-            class="card-content"
+            class="card-content pb-0"
             style="overflow-y: auto; flex-basis: 0; flex-grow: 1"
           >
             <div class="is-flex is-flex-direction-column is-fullheight">
@@ -152,7 +154,7 @@
                   ) {
                     <li>
                       <a
-                        (click)="selectedProduct.set(product.key)"
+                        (click)="selectedProduct.set($any(product.key))"
                         [translate]="
                           'weather-data.station.property.product.key.' +
                           product.key
@@ -169,7 +171,9 @@
                                 [class.is-active]="
                                   selectedResolution() == resolution.key
                                 "
-                                (click)="selectedResolution.set(resolution.key)"
+                                (click)="
+                                  selectedResolution.set($any(resolution.key))
+                                "
                                 [translate]="
                                   'weather-data.station.property.product.resolution.' +
                                   resolution.key
@@ -183,7 +187,51 @@
                   }
                 </ul>
               </div>
-              <button class="button is-primary">Download</button>
+              <div class="is-flex" style="gap: 0.5em">
+                <input
+                  class="p-1 my-2 is-flex-grow-1"
+                  type="date"
+                  [min]="productAvailableFrom()?.format('YYYY-MM-DD')"
+                  [max]="productAvailableUntil()?.format('YYYY-MM-DD')"
+                  [disabled]="!productInfo()"
+                  [style.cursor]="productInfo() ? 'auto' : 'not-allowed'"
+                  [(ngModel)]="productFromRaw"
+                />
+                <input
+                  class="p-1 my-2 is-flex-grow-1"
+                  type="date"
+                  [min]="productAvailableFrom()?.format('YYYY-MM-DD')"
+                  [max]="productAvailableUntil()?.format('YYYY-MM-DD')"
+                  [disabled]="!productInfo()"
+                  [style.cursor]="productInfo() ? 'auto' : 'not-allowed'"
+                  [(ngModel)]="productUntilRaw"
+                />
+              </div>
+              <button
+                class="button is-primary"
+                [disabled]="
+                  !productFromRaw() || !productUntilRaw() || downloading()
+                "
+                (click)="
+                  download({
+                    stationId: info.id,
+                    product: $any(productInfo()!.dataType),
+                    resolution: $any(productInfo()!.resolution),
+                    from: productFrom()!,
+                    until: productUntil()!,
+                  })
+                "
+              >
+                @if (downloading()) {
+                  <span class="spinner">
+                    <ng-icon name="remixLoader4Fill"></ng-icon>
+                  </span>
+                } @else {
+                  {{ "weather-data.selector.download" | translate }}
+                }
+              </button>
+              <a #downloadAnchor></a>
+              <div class="p-3"></div>
             </div>
           </div>
         </div>

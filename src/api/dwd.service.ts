@@ -1,7 +1,7 @@
-import {HttpClient, HttpContext} from "@angular/common/http";
+import {HttpClient, HttpContext, HttpParams} from "@angular/common/http";
 import {Injectable} from "@angular/core";
 import {JTDDataType} from "ajv/dist/core";
-import dayjs from "dayjs";
+import dayjs, {Dayjs} from "dayjs";
 import {firstValueFrom} from "rxjs";
 
 import {httpContexts} from "../common/http-contexts";
@@ -12,6 +12,8 @@ const URL = "/api/dwd" as const;
   providedIn: "root",
 })
 export class DwdService {
+  private cacheTtl = dayjs.duration(12, "hours");
+
   constructor(private http: HttpClient) {}
 
   readonly v2 = {
@@ -21,20 +23,53 @@ export class DwdService {
         this.http.get<DwdService.V2.Stations>(url, {
           context: new HttpContext()
             .set(httpContexts.validateSchema, V2_STATIONS)
-            .set(httpContexts.cache, [url, dayjs.duration(12, "hours")]),
+            .set(httpContexts.cache, [url, this.cacheTtl]),
         }),
       );
     },
   };
 
   readonly v1 = {
-    fetchStation: (stationId: string) => {
+    fetchStations: (): Promise<DwdService.V1.Stations> => {
+      let url = `${URL}/v1/`;
+      return firstValueFrom(
+        this.http.get<DwdService.V1.Stations>(url, {
+          context: new HttpContext()
+            .set(httpContexts.validateSchema, V1_STATIONS)
+            .set(httpContexts.cache, [url, this.cacheTtl]),
+        }),
+      );
+    },
+
+    fetchStation: (stationId: string): Promise<DwdService.V1.Station> => {
       let url = `${URL}/v1/${stationId}`;
       return firstValueFrom(
         this.http.get<DwdService.V1.Station>(url, {
           context: new HttpContext()
             .set(httpContexts.validateSchema, V1_STATION)
-            .set(httpContexts.cache, [url, dayjs.duration(12, "hours")]),
+            .set(httpContexts.cache, [url, this.cacheTtl]),
+        }),
+      );
+    },
+
+    fetchData: (parameters: {
+      stationId: string;
+      dataType: string;
+      granularity: string;
+      from?: Dayjs;
+      until?: Dayjs;
+    }): Promise<DwdService.V1.Data> => {
+      let {stationId, dataType, granularity, from, until} = parameters;
+      let url = `${URL}/v1/${stationId}/${dataType}/${granularity}`;
+      let params = new HttpParams();
+      if (from) params = params.set("from", from.unix());
+      if (until) params = params.set("until", until.unix());
+      return firstValueFrom(
+        this.http.get<DwdService.V1.Data>(url, {
+          params,
+          context: new HttpContext()
+            .set(httpContexts.validateSchema, V1_DATA)
+            .set(httpContexts.cache, [url + params.toString(), this.cacheTtl]),
         }),
       );
     },
@@ -44,6 +79,8 @@ export class DwdService {
 export namespace DwdService {
   export namespace V1 {
     export type Station = JTDDataType<typeof V1_STATION>;
+    export type Stations = JTDDataType<typeof V1_STATIONS>;
+    export type Data = JTDDataType<typeof V1_DATA>;
   }
 
   export namespace V2 {
@@ -57,9 +94,10 @@ const V1_STATION = {
     name: {type: "string"},
     state: {type: "string"},
     location: {
+      properties: {},
       additionalProperties: true,
     },
-    height: {type: "uint32"},
+    height: {type: "int32"},
     historical: {type: "boolean"},
     capabilities: {
       elements: {
@@ -78,6 +116,36 @@ const V1_STATION = {
               "multi_annual",
             ],
           },
+          availableFrom: {type: "string"},
+          availableUntil: {type: "string"},
+        },
+      },
+    },
+  },
+} as const;
+
+const V1_STATIONS = {
+  elements: V1_STATION,
+} as const;
+
+const V1_DATA = {
+  properties: {
+    timeseries: {
+      elements: {
+        properties: {
+          // we don't have int64
+          ts: {type: "string"},
+        },
+        additionalProperties: true,
+      },
+      nullable: true,
+    },
+    metadata: {
+      elements: {
+        properties: {
+          name: {type: "string"},
+          description: {type: "string"},
+          unit: {type: "string"},
           availableFrom: {type: "string"},
           availableUntil: {type: "string"},
         },
