@@ -148,9 +148,8 @@ const RESULT = {
         },
         optionalProperties: {
           uncertainty: {
-            properties: {
-              0: {type: "float64"},
-              1: {type: "float64"},
+            elements: {
+              type: "float64",
             },
           },
         },
