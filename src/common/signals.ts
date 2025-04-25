@@ -1,9 +1,19 @@
-import {effect, inject, signal, Signal, WritableSignal} from "@angular/core";
+import {
+  computed,
+  effect,
+  inject,
+  signal,
+  Signal,
+  WritableSignal,
+} from "@angular/core";
 import {toSignal} from "@angular/core/rxjs-interop";
 import {FormControl} from "@angular/forms";
+import dayjs, {Dayjs, ConfigType, OptionType} from "dayjs";
 import {Duration} from "dayjs/plugin/duration";
 
 import {injections} from "./injections";
+
+const makeDayjs = dayjs;
 
 /**
  * Custom signal extensions.
@@ -305,5 +315,61 @@ export namespace signals {
         inner.setValue(value);
       },
     });
+  }
+
+  /**
+   * Creates a signal that produces a `Dayjs` object from a reactive config source.
+   *
+   * Similar to `computed`, this function takes a reactive getter.
+   * But instead of returning a `Dayjs` object directly, you return a
+   * config value (like a date string or timestamp), which will be
+   * parsed into a `Dayjs` instance.
+   *
+   * If the config is `null` or `undefined`, the signal returns `undefined`.
+   *
+   * @param loader A function returning a `dayjs`-compatible config (`string`, `Date`, etc.)
+   * @param format Optional format to use when parsing
+   *
+   * @example
+   * const birthday = signals.dayjs(() => user().birthday);
+   * console.log(birthday()); // Dayjs or undefined
+   *
+   * @see https://day.js.org/docs/en/parse/parse for supported input types and formats
+   */
+  export function dayjs(
+    loader: () => ConfigType,
+    format?: OptionType,
+  ): Signal<undefined | Dayjs> {
+    let configSignal = computed(loader);
+    return computed(() => {
+      let config = configSignal();
+      if (!config) return undefined;
+      return makeDayjs(config, format);
+    });
+  }
+
+  /**
+   * Like `signals.dayjs`, but config must never be `null` or `undefined`.
+   *
+   * You give it a reactive function returning a valid config,
+   * and it gives back a signal with a guaranteed `Dayjs` object.
+   *
+   * @param loader A function returning a non-null Dayjs config
+   * @param format Optional format to use when parsing
+   *
+   * @example
+   * const createdAt = signals.dayjs.required(() => record().created);
+   * console.log(createdAt()); // Always a Dayjs
+   *
+   * @see https://day.js.org/docs/en/parse/parse for supported input types and formats
+   */
+  export namespace dayjs {
+    export function required(
+      loader: () => Exclude<ConfigType, null | undefined>,
+      format?: OptionType,
+    ): Signal<Dayjs> {
+      let configSignal = computed(loader);
+      return computed(() => makeDayjs(configSignal(), format));
+    }
   }
 }
