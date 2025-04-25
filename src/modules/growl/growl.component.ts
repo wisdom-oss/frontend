@@ -97,7 +97,7 @@ export class GrowlComponent {
   protected averageWithdrawals = signal<{
     name: string;
     key: string;
-    withdrawals: Signal<WaterRightsServiceService.AverageWithdrawals | null>;
+    withdrawals: Signal<WaterRightsService.AverageWithdrawals | null>;
   } | null>(null);
 
   protected lang = signals.lang();
@@ -182,7 +182,7 @@ export class GrowlComponent {
           name: body.properties.name ?? body.properties.key,
           key: body.properties.key,
           withdrawals:
-            signal<WaterRightsServiceService.AverageWithdrawals | null>(null),
+            signal<WaterRightsService.AverageWithdrawals | null>(null),
         };
 
         this.waterRightsService

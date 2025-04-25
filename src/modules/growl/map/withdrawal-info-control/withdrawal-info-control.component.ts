@@ -14,7 +14,7 @@ export class WithdrawalInfoControlComponent {
   readonly in = input.required<{
     name: string;
     key: string;
-    withdrawals: Signal<WaterRightsServiceService.AverageWithdrawals | null>;
+    withdrawals: Signal<WaterRightsService.AverageWithdrawals | null>;
   }>();
 
   protected lang = signals.lang();

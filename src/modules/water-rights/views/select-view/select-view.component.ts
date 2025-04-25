@@ -39,7 +39,7 @@ export class SelectViewComponent {
 
   protected usageLocations: Signal<
     | undefined
-    | FeatureCollection<Point, WaterRightsServiceService.UsageLocations[0]>
+    | FeatureCollection<Point, WaterRightsService.UsageLocations[0]>
   >;
 
   protected hover = computed(() => {
