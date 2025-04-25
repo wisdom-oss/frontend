@@ -1,8 +1,10 @@
+import {inject} from "@angular/core";
 import {Routes} from "@angular/router";
 
 import {CallbackComponent} from "./core/auth/callback/callback.component";
 import {CoreComponent} from "./core/core.component";
 import {permissionsGuard} from "./core/auth/permissions.guard";
+import {AuthService} from "./core/auth/auth.service";
 import {GreeterComponent} from "./core/greeter/greeter.component";
 import {BeWaterSmartComponent} from "./modules/be-water-smart/be-water-smart.component";
 import {GrowlComponent} from "./modules/growl/growl.component";
@@ -12,8 +14,6 @@ import {OowvActionMapComponent} from "./modules/oowv/action-map/action-map.compo
 import {PumpModelsComponent} from "./modules/pump-models/pump-models.component";
 import {WaterRightsComponent} from "./modules/water-rights/water-rights.component";
 import {waterRightsRoutes} from "./modules/water-rights/routes";
-import { AuthService } from "./core/auth/auth.service";
-import { inject } from "@angular/core";
 
 export const routes: Routes = [
   {path: "callback", component: CallbackComponent},

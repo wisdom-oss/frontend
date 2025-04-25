@@ -1,1 +1,36 @@
-<p>select-view works!</p>
+<div class="card block is-fullheight">
+  <div class="card-content p-0 is-clipped is-fullheight">
+    <mgl-map
+      class="is-fullheight"
+      [style]="style"
+      [zoom]="[6.8]"
+      [center]="{lat: 52.8, lon: 9.2}"
+    >
+      <mgl-control position="top-left" mglNavigation [showCompass]="false">
+      </mgl-control>
+      <mgl-geojson-source
+        id="water-rights-source"
+        [data]="usageLocations() ?? {type: 'FeatureCollection', features: []}"
+        [cluster]="true"
+      ></mgl-geojson-source>
+      <mgl-layer
+        id="water-rights-symbol"
+        type="symbol"
+        source="water-rights-source"
+        [filter]="['!=', ['get', 'cluster'], true]"
+        [layout]="{
+          'icon-image': 'remixicon:map-pin-2-line',
+        }"
+      ></mgl-layer>
+      <mgl-layer
+        id="water-rights-cluster-symbol"
+        type="symbol"
+        source="water-rights-source"
+        [filter]="['==', ['get', 'cluster'], true]"
+        [layout]="{
+          'icon-image': 'remixicon:pin-distance-line',
+        }"
+      ></mgl-layer>
+    </mgl-map>
+  </div>
+</div>
