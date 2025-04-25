@@ -181,8 +181,9 @@ export class GrowlComponent {
         let withdrawalData = {
           name: body.properties.name ?? body.properties.key,
           key: body.properties.key,
-          withdrawals:
-            signal<WaterRightsService.AverageWithdrawals | null>(null),
+          withdrawals: signal<WaterRightsService.AverageWithdrawals | null>(
+            null,
+          ),
         };
 
         this.waterRightsService

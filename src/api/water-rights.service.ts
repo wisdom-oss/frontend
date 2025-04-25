@@ -26,13 +26,15 @@ export class WaterRightsService {
     );
   }
 
-  fetchWaterRightDetails(no: number): Promise<WaterRightsService.WaterRightDetails> {
+  fetchWaterRightDetails(
+    no: number,
+  ): Promise<WaterRightsService.WaterRightDetails> {
     let url = `${URL}/details/${no}`;
     return firstValueFrom(
       this.http.get<WaterRightsService.WaterRightDetails>(url, {
         context: new HttpContext()
           .set(httpContexts.validateSchema, WATER_RIGHT_DETAILS)
-          .set(httpContexts.cache, [url, dayjs.duration(3, "days")])
+          .set(httpContexts.cache, [url, dayjs.duration(3, "days")]),
       }),
     );
   }
@@ -46,11 +48,9 @@ export class WaterRightsService {
       AVERAGE_WITHDRAWALS,
     );
     return firstValueFrom(
-      this.http.post<WaterRightsService.AverageWithdrawals>(
-        url,
-        geometries,
-        {context},
-      ),
+      this.http.post<WaterRightsService.AverageWithdrawals>(url, geometries, {
+        context,
+      }),
     );
   }
 }
@@ -187,14 +187,14 @@ const WATER_RIGHT_DETAILS = {
         address: {type: "string"},
         legalDepartments: {
           elements: {
-            enum: ["A", "B", "C", "D", "E", "F", "K", "L"]
-          }
+            enum: ["A", "B", "C", "D", "E", "F", "K", "L"],
+          },
         },
         annotation: {type: "string"},
-      }
+      },
     },
     "usage-locations": USAGE_LOCATIONS,
-  }
+  },
 } as const;
 
 const AVERAGE_WITHDRAWALS = {

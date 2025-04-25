@@ -38,8 +38,7 @@ export class SelectViewComponent {
   protected fitBounds = signal<undefined | BBox>(undefined);
 
   protected usageLocations: Signal<
-    | undefined
-    | FeatureCollection<Point, WaterRightsService.UsageLocations[0]>
+    undefined | FeatureCollection<Point, WaterRightsService.UsageLocations[0]>
   >;
 
   protected hover = computed(() => {
