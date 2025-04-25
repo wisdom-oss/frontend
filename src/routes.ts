@@ -12,6 +12,8 @@ import {OowvActionMapComponent} from "./modules/oowv/action-map/action-map.compo
 import {PumpModelsComponent} from "./modules/pump-models/pump-models.component";
 import {WaterRightsComponent} from "./modules/water-rights/water-rights.component";
 import {waterRightsRoutes} from "./modules/water-rights/routes";
+import { AuthService } from "./core/auth/auth.service";
+import { inject } from "@angular/core";
 
 export const routes: Routes = [
   {path: "callback", component: CallbackComponent},
@@ -26,6 +28,8 @@ export const routes: Routes = [
         path: "water-rights",
         component: WaterRightsComponent,
         children: waterRightsRoutes,
+        // TODO: use proper auth guard here
+        canActivate: [() => !!inject(AuthService).accessToken()],
       },
       {
         path: "long-term-forecast",

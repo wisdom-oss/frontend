@@ -15,7 +15,7 @@
           <span>GroWL</span>
         </a>
       </li>
-      <li>
+      <li [class.unauthorized]="!authorized.waterRights()">
         <a class="icon-text" routerLink="/water-rights">
           <span class="icon">
             <ng-icon name="remixFilePaper2Fill"></ng-icon>
