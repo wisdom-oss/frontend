@@ -10,6 +10,7 @@ import {LongTermForecastComponent} from "./modules/long-term-forecast/long-term-
 import {longTermForecastRoutes} from "./modules/long-term-forecast/routes";
 import {OowvActionMapComponent} from "./modules/oowv/action-map/action-map.component";
 import {PumpModelsComponent} from "./modules/pump-models/pump-models.component";
+import {WeatherDataComponent} from "./modules/weather-data/weather-data.component";
 
 export const routes: Routes = [
   {path: "callback", component: CallbackComponent},
@@ -18,6 +19,7 @@ export const routes: Routes = [
     component: CoreComponent,
     children: [
       {path: "", component: GreeterComponent}, // Default child route
+      {path: "weather-data", component: WeatherDataComponent},
       {path: "be-water-smart", component: BeWaterSmartComponent},
       {path: "growl", component: GrowlComponent},
       {
