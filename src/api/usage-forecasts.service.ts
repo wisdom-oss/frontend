@@ -143,7 +143,7 @@ const RESULT = {
       elements: {
         properties: {
           label: {type: "string"},
-          x: {type: "uint32"},
+          x: {}, // we don't know if the service responds correctly
           y: {type: "float64"},
         },
         optionalProperties: {
