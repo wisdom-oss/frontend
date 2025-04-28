@@ -1,7 +1,7 @@
 import {HttpClient, HttpContext} from "@angular/common/http";
 import {Injectable} from "@angular/core";
-import {JTDDataType} from "ajv/dist/core";
 import {firstValueFrom} from "rxjs";
+import typia from "typia";
 
 import {httpContexts} from "../common/http-contexts";
 
@@ -19,8 +19,8 @@ export class BeWaterSmartService {
         `${URL}/physical-meters`,
         {
           context: new HttpContext().set(
-            httpContexts.validateSchema,
-            PHYSICAL_METERS,
+            httpContexts.validateType,
+            typia.createValidate<BeWaterSmartService.PhysicalMeters>(),
           ),
         },
       ),
@@ -33,8 +33,8 @@ export class BeWaterSmartService {
         `${URL}/virtual-meters`,
         {
           context: new HttpContext().set(
-            httpContexts.validateSchema,
-            VIRTUAL_METERS,
+            httpContexts.validateType,
+            typia.createValidate<BeWaterSmartService.VirtualMeters>(),
           ),
         },
       ),
@@ -44,7 +44,10 @@ export class BeWaterSmartService {
   fetchAlgorithms(): Promise<BeWaterSmartService.Algorithms> {
     return firstValueFrom(
       this.http.get<BeWaterSmartService.Algorithms>(`${URL}/algorithms`, {
-        context: new HttpContext().set(httpContexts.validateSchema, ALGORITHMS),
+        context: new HttpContext().set(
+          httpContexts.validateType,
+          typia.createValidate<BeWaterSmartService.Algorithms>(),
+        ),
       }),
     );
   }
@@ -52,7 +55,10 @@ export class BeWaterSmartService {
   fetchModels(): Promise<BeWaterSmartService.Models> {
     return firstValueFrom(
       this.http.get<BeWaterSmartService.Models>(`${URL}/models`, {
-        context: new HttpContext().set(httpContexts.validateSchema, MODELS),
+        context: new HttpContext().set(
+          httpContexts.validateType,
+          typia.createValidate<BeWaterSmartService.Models>(),
+        ),
       }),
     );
   }
@@ -60,14 +66,14 @@ export class BeWaterSmartService {
   getCreateForecast(
     meterId: string,
     algId: string,
-  ): Promise<BeWaterSmartService.ForeCasts> {
+  ): Promise<BeWaterSmartService.Forecasts> {
     return firstValueFrom(
-      this.http.get<BeWaterSmartService.ForeCasts>(
+      this.http.get<BeWaterSmartService.Forecasts>(
         `${URL}/meters/${meterId}/forecast?algorithm=${algId}`,
         {
           context: new HttpContext().set(
-            httpContexts.validateSchema,
-            FORECASTS,
+            httpContexts.validateType,
+            typia.createValidate<BeWaterSmartService.Forecasts>(),
           ),
         },
       ),
@@ -111,195 +117,114 @@ export class BeWaterSmartService {
 }
 
 export namespace BeWaterSmartService {
-  export type PhysicalMeter = JTDDataType<typeof PHYSICAL_METER>;
-  export type PhysicalMeters = JTDDataType<typeof PHYSICAL_METERS>;
-  export type VirtualMeter = JTDDataType<typeof VIRTUAL_METER>;
-  export type VirtualMeters = JTDDataType<typeof VIRTUAL_METERS>;
-  export type Algorithm = JTDDataType<typeof ALGORITHM>;
-  export type Algorithms = JTDDataType<typeof ALGORITHMS>;
-  export type Model = JTDDataType<typeof MODEL>;
-  export type Models = JTDDataType<typeof MODELS>;
-  export type ForeCast = JTDDataType<typeof FORECAST>;
-  export type ForeCasts = JTDDataType<typeof FORECASTS>;
-}
-
-const PHYSICAL_METER = {
-  properties: {
+  export type PhysicalMeter = {
     address: {
-      properties: {
-        addressCountry: {type: "string"},
-        addressLocality: {type: "string"},
-        streetAddress: {type: "string"},
-      },
-    },
-    category: {type: "string"},
-    date: {type: "string"},
-    description: {type: "string"},
-    id: {type: "string"},
-    type: {type: "string"},
-  },
-} as const;
+      addressCountry: string;
+      addressLocality: string;
+      streetAddress: string;
+    };
+    category: string;
+    date: string;
+    description: string;
+    id: string;
+    type: string;
+  };
 
-const PHYSICAL_METERS = {
-  properties: {
-    meters: {
-      elements: PHYSICAL_METER,
-    },
-  },
-} as const;
+  export type PhysicalMeters = {
+    meters: PhysicalMeter[];
+  };
 
-const VIRTUAL_METER = {
-  properties: {
-    dateCreated: {type: "string"},
-    description: {type: "string"},
-    id: {type: "string"},
-    submeterIds: {
-      elements: {type: "string"},
-    },
-    supermeterIds: {
-      elements: {type: "string"},
-    },
-  },
-} as const;
+  export type VirtualMeter = {
+    dateCreated: string;
+    description: string;
+    id: string;
+    submeterIds: string[];
+    supermeterIds: string[];
+  };
 
-const VIRTUAL_METERS = {
-  properties: {
-    virtualMeters: {
-      elements: VIRTUAL_METER,
-    },
-  },
-} as const;
+  export type VirtualMeters = {
+    virtualMeters: VirtualMeter[];
+  };
 
-const ALGORITHM = {
-  properties: {
-    description: {type: "string"},
-    estimatedTrainingTime: {type: "int32", nullable: true},
-    name: {type: "string"},
-  },
-} as const;
+  export type Algorithm = {
+    description: string;
+    estimatedTrainingTime: (number & typia.tags.Type<"uint32">) | null;
+    name: string;
+  };
 
-const ALGORITHMS = {
-  properties: {
-    algorithms: {
-      elements: ALGORITHM,
-    },
-  },
-} as const;
+  export type Algorithms = {
+    algorithms: Algorithm[];
+  };
 
-const MODEL = {
-  properties: {
-    algorithm: {type: "string"},
-    comment: {type: "string"},
-    dateCreated: {type: "string"},
-    dateModified: {type: "string"},
-    description: {type: "string"},
+  export type Model = {
+    algorithm: string;
+    comment: string;
+    dateCreated: string;
+    dateModified: string;
+    description: string;
     evaluation: {
-      properties: {
-        actualTestConsumption: {
-          elements: {type: "float32"},
-        },
-        metrics: {
-          properties: {
-            mape: {type: "float32"},
-            mse: {type: "float32"},
-            rmse: {type: "float32"},
-            smape: {type: "float32"},
-          },
-        },
-        predictedTestConsumption: {
-          elements: {type: "float32"},
-        },
-        testCovariates: {
-          properties: {
-            day: {
-              elements: {type: "float32"},
-            },
-            is_holiday: {
-              elements: {type: "int32"},
-            },
-            is_weekend: {
-              elements: {type: "int32"},
-            },
-            month: {
-              elements: {type: "float32"},
-            },
-            "precipitation (mm)": {
-              elements: {type: "float32"},
-            },
-            year: {
-              elements: {type: "int32"},
-            },
-          },
-        },
-        testTimestamps: {
-          elements: {type: "string"},
-        },
-      },
-    },
+      actualTestConsumption: (number & typia.tags.Type<"float">)[];
+      metrics: Record<
+        "mape" | "mse" | "rmse" | "smape",
+        number & typia.tags.Type<"float">
+      >;
+      predictedTestConsumption: (number & typia.tags.Type<"float">)[];
+      testCovariates: {
+        day: (number & typia.tags.Type<"float">)[];
+        is_holiday: (number & typia.tags.Type<"int32">)[];
+        is_weekend: (number & typia.tags.Type<"int32">)[];
+        month: (number & typia.tags.Type<"float">)[];
+        "precipitation (mm)": (number & typia.tags.Type<"float">)[];
+        year: (number & typia.tags.Type<"int32">)[];
+      };
+      testTimestamps: string[];
+    };
     hyperparameters: {
-      optionalProperties: {
-        country_holidays: {type: "string"},
-        daily_seasonality: {type: "int32"},
-        weekly_seasonality: {type: "int32"},
-        yearly_seasonality: {type: "int32"},
-        colsample_bytree: {type: "float32"},
-        eval_metric: {type: "string"},
-        gamma: {type: "int32"},
-        lags: {type: "int32"},
-        lags_future_covariates: {
-          elements: {type: "int32"},
-        },
-        learning_rate: {type: "float32"},
-        max_depth: {type: "int32"},
-        min_child_weight: {type: "int32"},
-        objective: {type: "string"},
-        verbose: {type: "int32"},
-        verbosity: {type: "int32"},
-      },
-    },
-    id: {type: "string"},
-    inputAttributes: {
-      elements: {type: "string"},
-    },
-    isModelValid: {type: "boolean"},
-    mlFramework: {type: "string"},
-    refMeter: {type: "string"},
-  },
-  optionalProperties: {
-    isDefault: {type: "boolean"},
-  },
-} as const;
+      country_holidays: string;
+      daily_seasonality: number & typia.tags.Type<"int32">;
+      weekly_seasonality: number & typia.tags.Type<"int32">;
+      yearly_seasonality: number & typia.tags.Type<"int32">;
+      colsample_bytree: number & typia.tags.Type<"float">;
+      eval_metric: string;
+      gamma: number & typia.tags.Type<"int32">;
+      lags: number & typia.tags.Type<"int32">;
+      lags_future_covariates: (number & typia.tags.Type<"int32">)[];
+      learning_rate: number & typia.tags.Type<"float">;
+      max_depth: number & typia.tags.Type<"int32">;
+      min_child_weight: number & typia.tags.Type<"int32">;
+      objective: string;
+      verbose: number & typia.tags.Type<"int32">;
+      verbosity: number & typia.tags.Type<"int32">;
+    };
+    id: string;
+    inputAttributes: string[];
+    isModelValid: boolean;
+    mlFramework: string;
+    refMeter: string;
+    isDefault?: boolean;
+  };
 
-const MODELS = {
-  properties: {
-    MLModels: {
-      elements: MODEL,
-    },
-  },
-} as const;
+  export type Models = {
+    MLModels: Model[];
+  };
 
-const FORECAST = {
-  properties: {
+  export type Forecast = {
     covariateValues: {
-      properties: {
-        day: {type: "int32"},
-        is_holiday: {type: "int32"},
-        is_weekend: {type: "int32"},
-        month: {type: "float32"},
-        "precipitation (mm)": {type: "int32"},
-        year: {type: "int32"},
-      },
-    },
-    datePredicted: {type: "string"},
-    histRefValues: {},
-    id: {type: "string"},
-    numValue: {type: "float32"},
-    refDevice: {type: "string"},
-    type: {type: "string"},
-    unit: {type: "string"},
-  },
-} as const;
+      day: number & typia.tags.Type<"int32">;
+      is_holiday: number & typia.tags.Type<"int32">;
+      is_weekend: number & typia.tags.Type<"int32">;
+      month: number & typia.tags.Type<"float">;
+      "precipitation (mm)": number & typia.tags.Type<"int32">;
+      year: number & typia.tags.Type<"int32">;
+    };
+    datePredicted: string;
+    histRefValues: {};
+    id: string;
+    numValue: number & typia.tags.Type<"float">;
+    refDevice: string;
+    type: string;
+    unit: string;
+  };
 
-const FORECASTS = {
-  elements: FORECAST,
-} as const;
+  export type Forecasts = Forecast[];
+}
