@@ -1,3 +1,3 @@
 const {default: typia} = require("@ryoppippi/unplugin-typia/esbuild");
 
-module.exports = [typia()];
+module.exports = [typia({log: false})];
