@@ -50,8 +50,12 @@ export class WaterDemandPredictionService {
     ) as Observable<T>;
   }
 
-  fetchMeterInformation(): Observable<any> {
+  fetchMeterNames(): Observable<any> {
     return this.sendRequest("get", "/meterNames");
+  }
+
+  fetchWeatherCapabilities(): Observable<any> {
+    return this.sendRequest("get", "/weatherCapabilities");
   }
 
   fetchSingleSmartmeter(
@@ -97,17 +101,6 @@ export class WaterDemandPredictionService {
       timeframe: timeframe,
       resolution: resolution,
       weatherCapability: weatherCapability,
-    });
-  }
-
-  /**
-   * creates an Observable with an error to subscribe to it and logs the information in the console.
-   * @param msg error meesage
-   * @returns observable with contained error.
-   */
-  handleError(msg: string): Observable<any> {
-    return new Observable(observer => {
-      observer.error(new Error(msg));
     });
   }
 }

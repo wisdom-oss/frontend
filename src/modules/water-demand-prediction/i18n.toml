@@ -74,6 +74,18 @@ de = "Wähle Auflösung"
 en = "Select Weather"
 de = "Wähle Wetter"
 
+[choice.startpoint]
+en = "Start Point"
+de = "Startpunkt"
+
+[choice.weatherColumns]
+en = "Select Column"
+de = "Wähle Spalte aus"
+
+[choice.loadingScreen]
+en = "Wait for Data Fetching"
+de = "Warte auf Daten"
+
 [request.realdata]
 en = "Display Data"
 de = "Zeige Daten an"
@@ -93,10 +105,6 @@ de = "Liniendiagramm"
 [graph.mode.bar]
 en = "Bar Chart"
 de = "Balkendiagramm"
-
-[startpoint.menu]
-en = "Start Point"
-de = "Startpunkt"
 
 [startpoint.options.a]
 en = "Start of Timeseries"
@@ -134,13 +142,57 @@ de = "Wurzel des mittleren quadratischen Fehlers"
 en = "Temperature"
 de = "Temperatur"
 
-[weather.precipitation]
-en = "Precipitation"
-de = "Niederschlag"
+[weather.cloud_type]
+en = "Cloud Type"
+de = "Wolkentyp"
+
+[weather.cloudiness]
+en = "Cloudiness"
+de = "Bewölkung"
+
+[weather.dew_point]
+en = "Dew Point"
+de = "Taupunkt"
+
+[weather.extreme_wind]
+en = "Extreme Wind"
+de = "Extremer Wind"
 
 [weather.moisture]
 en = "Moisture"
 de = "Feuchtigkeit"
+
+[weather.precipitation]
+en = "Precipitation"
+de = "Niederschlag"
+
+[weather.pressure]
+en = "Pressure"
+de = "Luftdruck"
+
+[weather.soil_temperature]
+en = "Soil Temperature"
+de = "Bodentemperatur"
+
+[weather.sun]
+en = "Sun"
+de = "Sonne"
+
+[weather.visibility]
+en = "Visibility"
+de = "Sichtbarkeit"
+
+[weather.weather_phenomena]
+en = "Weather Phenomena"
+de = "Wetterphenomäne"
+
+[weather.wind]
+en = "Wind"
+de = "Wind"
+
+[weather.wind_synop]
+en = "Wind Synop"
+de = "Wind Synop"
 
 [weather.plain]
 en = "No Weather"

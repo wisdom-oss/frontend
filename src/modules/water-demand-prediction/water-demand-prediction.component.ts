@@ -1,14 +1,18 @@
 import {CommonModule} from "@angular/common";
 import {
+  inject,
   signal,
   ViewChildren,
   Component,
   OnInit,
   QueryList,
+  Signal,
 } from "@angular/core";
+import {toSignal} from "@angular/core/rxjs-interop";
 import {TranslatePipe} from "@ngx-translate/core";
 import {ChartConfiguration, ChartData, ChartDataset, ChartType} from "chart.js";
 import {BaseChartDirective} from "ng2-charts";
+import {map} from "rxjs";
 
 import {
   PredictedSmartmeterDataset,
@@ -26,15 +30,18 @@ import {DropdownComponent} from "../../common/components/dropdown/dropdown.compo
   styles: ``,
 })
 export class WaterDemandPredictionComponent implements OnInit {
-  /** the displayed resolution in the charts of real data */
-  displayedResolution = signal<string>("hourly");
+  private waterDemandService = inject(WaterDemandPredictionService);
 
-  /** DROP DOWN MENUS                                     */
+  /** DROP DOWN MENUS */
 
-  /** variables name dropdown */
-  menuSmartmeter = "water-demand-prediction.choice.smartmeter";
-  optionsSmartmeter: Record<string, string> = {};
-  choiceSmartmeter = signal<string>(Object.keys(this.optionsSmartmeter)[0]);
+  /** variables resolution dropdown */
+  menuResolution = "water-demand-prediction.choice.resolution";
+  optionsResolution: Record<string, string> = {
+    hourly: "water-demand-prediction.resolution.hourly",
+    daily: "water-demand-prediction.resolution.daily",
+    weekly: "water-demand-prediction.resolution.weekly",
+  };
+  choiceResolution = signal<string>(this.optionsResolution["Initial"]);
 
   /** variables timeframe dropdown */
   menuTime = "water-demand-prediction.choice.timeframe";
@@ -47,34 +54,70 @@ export class WaterDemandPredictionComponent implements OnInit {
     "one year": "water-demand-prediction.timeframe.one-year",
     all: "water-demand-prediction.timeframe.all",
   };
-  choiceTime = signal<string>(Object.keys(this.optionsTime)[0]);
+  choiceTime = signal<string>(this.optionsTime["Initial"]);
 
-  /** variables resolution dropdown */
-  menuResolution = "water-demand-prediction.choice.resolution";
-  optionsResolution: Record<string, string> = {
-    hourly: "water-demand-prediction.resolution.hourly",
-    daily: "water-demand-prediction.resolution.daily",
-    weekly: "water-demand-prediction.resolution.weekly",
-  };
-  choiceResolution = signal<string>(Object.keys(this.optionsResolution)[0]);
+  /** variables smartmetername dropdown */
+  menuSmartmeter = "water-demand-prediction.choice.smartmeter";
+  optionsSmartmeter: Signal<Record<string, string>> = toSignal(
+    this.waterDemandService
+      .fetchMeterNames()
+      .pipe(map(response => response["names"] as Record<string, string>)),
+    {initialValue: {}},
+  );
+  choiceSmartmeter = signal(this.optionsSmartmeter()["Initial"]);
 
   /** variables startpoint dropdown */
-  menuStartPoint = "water-demand-prediction.startpoint.menu";
+  menuStartPoint = "water-demand-prediction.choice.startpoint";
   optionsStartPoint: Record<string, string> = {
     "2021-05-26T00:00:00": "water-demand-prediction.startpoint.options.a",
     "2021-06-01T00:00:00": "water-demand-prediction.startpoint.options.b",
     "2022-01-01T00:00:00": "water-demand-prediction.startpoint.options.c",
   };
-  choiceStartPoint = signal<string>(Object.keys(this.optionsStartPoint)[0]);
+  choiceStartPoint = signal<string>(this.optionsStartPoint["Initial"]);
 
   menuWeather = "water-demand-prediction.choice.weather";
   optionsWeather: Record<string, string> = {
     plain: "water-demand-prediction.weather.plain",
     air_temperature: "water-demand-prediction.weather.air_temperature",
-    precipitation: "water-demand-prediction.weather.precipitation",
+    cloud_type: "water-demand-prediction.weather.cloud_type",
+    cloudiness: "water-demand-prediction.weather.cloudiness",
+    dew_point: "water-demand-prediction.weather.dew_point",
+    extreme_wind: "water-demand-prediction.weather.extreme_wind",
     moisture: "water-demand-prediction.weather.moisture",
+    precipitation: "water-demand-prediction.weather.precipitation",
+    pressure: "water-demand-prediction.weather.pressure",
+    soil_temperature: "water-demand-prediction.weather.soil_temperature",
+    sun: "water-demand-prediction.weather.sun",
+    visibility: "water-demand-prediction.weather.visibility",
+    weather_phenomena: "water-demand-prediction.weather.weather_phenomena",
+    wind: "water-demand-prediction.weather.wind",
+    wind_synop: "water-demand-prediction.weather.wind_synop",
   };
-  choiceWeather = signal<string>(Object.keys(this.optionsWeather)[0]);
+  choiceWeather = signal<string>(this.optionsWeather["Initial"]);
+
+  menuWeatherColumns = "water-demand-prediction.choice.weatherColumns";
+  optionsColumns: Signal<Record<string, string>> = toSignal(
+    this.waterDemandService.fetchWeatherCapabilities().pipe(
+      map(response => {
+        // Cast response to the correct shape
+        const typedResponse = response as Record<string, string[]>;
+
+        // Now we can safely flatten the values
+        const flattened: string[] = Object.values(typedResponse).flat();
+
+        // Turn the array into a Record<string, string>
+        return flattened.reduce((acc: Record<string, string>, item: string) => {
+          acc[item] = item;
+          return acc;
+        }, {});
+      }),
+    ),
+    {initialValue: {Loading: "water-demand-prediction.choice.loadingScreen"}},
+  );
+  choiceColumns = signal(this.optionsSmartmeter()["Initial"]);
+
+  /** the displayed resolution in the charts of real data */
+  displayedResolution = signal<string>("hourly");
 
   /** EXPLAIN STRINGS */
   explainMAE: string =
@@ -174,10 +217,9 @@ export class WaterDemandPredictionComponent implements OnInit {
     | QueryList<BaseChartDirective>
     | undefined;
 
-  constructor(public waterDemandService: WaterDemandPredictionService) {}
+  constructor() {}
 
   ngOnInit() {
-    this.fetchMeterInformation();
     //this.fetchDataSmartmeter();
     this.chartDataPredictedValues.labels = this.chartDataCurrentValues.labels;
   }
@@ -305,21 +347,6 @@ export class WaterDemandPredictionComponent implements OnInit {
       fill: fillOption,
     };
     return newDataset;
-  }
-
-  /**
-   * fetches all smartmeter names
-   */
-  fetchMeterInformation(): void {
-    this.waterDemandService.fetchMeterInformation().subscribe({
-      next: response => {
-        this.optionsSmartmeter = response["names"];
-      },
-      error: error => {
-        console.error(error);
-      },
-      complete: () => {},
-    });
   }
 
   /**

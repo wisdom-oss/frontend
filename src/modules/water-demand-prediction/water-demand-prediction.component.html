@@ -110,7 +110,7 @@
               ></dropdown>
               <dropdown
                 [menuName]="menuSmartmeter"
-                [options]="optionsSmartmeter"
+                [options]="optionsSmartmeter()"
                 [changeMenuName]="true"
                 kind="hover"
                 [(choice)]="choiceSmartmeter"
@@ -128,6 +128,13 @@
                 [changeMenuName]="true"
                 kind="hover"
                 [(choice)]="choiceWeather"
+              ></dropdown>
+              <dropdown
+                [menuName]="menuWeatherColumns"
+                [options]="optionsColumns()"
+                [changeMenuName]="true"
+                kind="hover"
+                [(choice)]="choiceColumns"
               ></dropdown>
             </div>
           </div>
