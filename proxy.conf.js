@@ -15,7 +15,7 @@
  * `ng serve`.
  *
  * @example
- * WISDOM_FRONTEND_DEV_PROXIES=bws,geo ng serve
+ * WISDOM_FRONTEND_DEV_PROXIES=bws,ge ng serve
  */
 
 const didYouMean = require("didyoumean");
@@ -62,6 +62,18 @@ const PROXY_CONFIG = {
     secure: false,
     changeOrigin: true,
     rewrite: path => path.replace(/^\/api/, ""),
+  },
+  "/local/**": {
+    target: "http://localhost:8090",
+    secure: false,
+    changeOrigin: true,
+    rewrite: path => path.replace(/^\/local/, ""),
+  },
+  "/dev/training/**": {
+    target: "http://wisdom-dev.vlba.uni-oldenburg.de:9120",
+    secure: false,
+    changeOrigin: true,
+    rewrite: path => path.replace(/^\/dev\/training/, ""),
   },
 };
 
