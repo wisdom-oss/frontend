@@ -48,7 +48,8 @@
               {
                 "path": "scripts/esbuild/prebuild.cjs",
                 "options": {}
-              }
+              },
+              "scripts/esbuild/unplugin.cjs"
             ],
             "outputPath": "dist/wisdom-oss/frontend",
             "index": "src/index.html",
