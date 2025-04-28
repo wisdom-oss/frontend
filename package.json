@@ -43,7 +43,6 @@
     "@turf/turf": "^7.2.0",
     "@twemoji/svg": "^15.0.0",
     "@wisdom-oss/brand": "github:wisdom-oss/brand",
-    "ajv": "^8.17.1",
     "bulma": "github:jgthms/bulma",
     "bulma-slider": "github:fatcarter/bulma-slider#slider-js",
     "bulma-switch": "github:deather/bulma-switch",
