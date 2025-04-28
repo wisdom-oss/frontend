@@ -1,14 +1,13 @@
 import {HttpClient, HttpContext, HttpParams} from "@angular/common/http";
 import {computed, signal, Injectable} from "@angular/core";
 import {Router} from "@angular/router";
-import {JTDDataType} from "ajv/dist/core";
 import {jwtDecode} from "jwt-decode";
 import {firstValueFrom} from "rxjs";
+import typia from "typia";
 
 import {Scopes} from "./scopes";
 import {StorageService} from "../../common/storage.service";
 import {httpContexts} from "../../common/http-contexts";
-import typia from "typia";
 
 const API_URL = "/api/auth";
 
@@ -31,8 +30,7 @@ export class AuthService {
   readonly decodedAccessToken = computed(() => {
     let accessToken = this.accessToken();
     if (!accessToken) return null;
-    let decoded =
-      jwtDecode<JwtPayload>(accessToken);
+    let decoded = jwtDecode<JwtPayload>(accessToken);
     return typia.assert<JwtPayload>(decoded);
   });
 
@@ -159,15 +157,11 @@ export class AuthService {
     }
 
     let response = await firstValueFrom(
-      this.http.post<RawTokenSet>(
-        `${API_URL}/token`,
-        params,
-        {
-          context: new HttpContext()
-            .set(httpContexts.validateType, typia.createValidate<RawTokenSet>())
-            .set(httpContexts.authenticate, false),
-        },
-      ),
+      this.http.post<RawTokenSet>(`${API_URL}/token`, params, {
+        context: new HttpContext()
+          .set(httpContexts.validateType, typia.createValidate<RawTokenSet>())
+          .set(httpContexts.authenticate, false),
+      }),
     );
 
     if (response.token_type.trim().toLowerCase() !== "bearer") {
@@ -184,22 +178,22 @@ export class AuthService {
 }
 
 type RawTokenSet = {
-  access_token: string,
-  expires_in: number & typia.tags.Type<"int32">,
-  token_type: string,
-  refresh_token: string,
-}
+  access_token: string;
+  expires_in: number & typia.tags.Type<"int32">;
+  token_type: string;
+  refresh_token: string;
+};
 
 type JwtPayload = {
-  aud: string[],
-  exp: number & typia.tags.Type<"uint32">,
-  iss: string,
-  nbf: number & typia.tags.Type<"uint32">,
-  scopes: string[],
-  sub: string,
-  iat?: number & typia.tags.Type<"uint32">,
-  jti?: string,
-}
+  aud: string[];
+  exp: number & typia.tags.Type<"uint32">;
+  iss: string;
+  nbf: number & typia.tags.Type<"uint32">;
+  scopes: string[];
+  sub: string;
+  iat?: number & typia.tags.Type<"uint32">;
+  jti?: string;
+};
 
 export namespace AuthService {
   export interface TokenSet {

@@ -2,7 +2,6 @@ import {
   provideHttpClient,
   withInterceptors,
   withInterceptorsFromDi,
-  HTTP_INTERCEPTORS,
 } from "@angular/common/http";
 import {provideZoneChangeDetection, ApplicationConfig} from "@angular/core";
 import {provideRouter} from "@angular/router";
