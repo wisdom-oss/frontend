@@ -179,7 +179,7 @@ export namespace BeWaterSmartService {
       };
       testTimestamps: string[];
     };
-    hyperparameters: {
+    hyperparameters: Partial<{
       country_holidays: string;
       daily_seasonality: number & typia.tags.Type<"int32">;
       weekly_seasonality: number & typia.tags.Type<"int32">;
@@ -195,7 +195,7 @@ export namespace BeWaterSmartService {
       objective: string;
       verbose: number & typia.tags.Type<"int32">;
       verbosity: number & typia.tags.Type<"int32">;
-    };
+    }>;
     id: string;
     inputAttributes: string[];
     isModelValid: boolean;

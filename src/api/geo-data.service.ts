@@ -126,7 +126,7 @@ export namespace GeoDataService {
     id: number & typia.tags.Type<"uint32">;
     key: string;
     geometry: Geometry;
-    additionalProperties: Record<string, any>;
+    additionalProperties: Record<string, any> | null;
   };
 
   export type LayerContents = {
