@@ -8,7 +8,7 @@ import {firstValueFrom} from "rxjs";
 import {Scopes} from "./scopes";
 import {StorageService} from "../../common/storage.service";
 import {httpContexts} from "../../common/http-contexts";
-import {SchemaValidationService} from "../schema/schema-validation.service";
+import typia from "typia";
 
 const API_URL = "/api/auth";
 
@@ -32,8 +32,8 @@ export class AuthService {
     let accessToken = this.accessToken();
     if (!accessToken) return null;
     let decoded =
-      jwtDecode<JTDDataType<typeof JWT_PAYLOAD_SCHEMA>>(accessToken);
-    return this.schema.validate(JWT_PAYLOAD_SCHEMA, decoded);
+      jwtDecode<JwtPayload>(accessToken);
+    return typia.assert<JwtPayload>(decoded);
   });
 
   readonly scopes = computed(() => {
@@ -45,7 +45,6 @@ export class AuthService {
     private http: HttpClient,
     private router: Router,
     storage: StorageService,
-    private schema: SchemaValidationService,
   ) {
     this.storage = storage.instance(AuthService);
     this.loadTokens();
@@ -160,12 +159,12 @@ export class AuthService {
     }
 
     let response = await firstValueFrom(
-      this.http.post<JTDDataType<typeof TOKEN_SET_SCHEMA>>(
+      this.http.post<RawTokenSet>(
         `${API_URL}/token`,
         params,
         {
           context: new HttpContext()
-            .set(httpContexts.validateSchema, TOKEN_SET_SCHEMA)
+            .set(httpContexts.validateType, typia.createValidate<RawTokenSet>())
             .set(httpContexts.authenticate, false),
         },
       ),
@@ -184,29 +183,23 @@ export class AuthService {
   }
 }
 
-const TOKEN_SET_SCHEMA = {
-  properties: {
-    access_token: {type: "string"},
-    expires_in: {type: "int32"},
-    token_type: {type: "string"},
-    refresh_token: {type: "string"},
-  },
-} as const;
+type RawTokenSet = {
+  access_token: string,
+  expires_in: number & typia.tags.Type<"int32">,
+  token_type: string,
+  refresh_token: string,
+}
 
-const JWT_PAYLOAD_SCHEMA = {
-  properties: {
-    aud: {elements: {type: "string"}},
-    exp: {type: "uint32"},
-    iss: {type: "string"},
-    nbf: {type: "uint32"},
-    scopes: {elements: {type: "string"}},
-    sub: {type: "string"},
-  },
-  optionalProperties: {
-    iat: {type: "uint32"},
-    jti: {type: "string"},
-  },
-} as const;
+type JwtPayload = {
+  aud: string[],
+  exp: number & typia.tags.Type<"uint32">,
+  iss: string,
+  nbf: number & typia.tags.Type<"uint32">,
+  scopes: string[],
+  sub: string,
+  iat?: number & typia.tags.Type<"uint32">,
+  jti?: string,
+}
 
 export namespace AuthService {
   export interface TokenSet {
