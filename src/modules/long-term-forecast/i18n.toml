@@ -1,0 +1,31 @@
+[display.module]
+en = "Long-Term Forecast"
+de = "Langzeitprognose"
+
+[layer.municipals]
+en = "Municipals"
+de = "Kommunen"
+
+[layer.counties]
+en = "Counties"
+de = "Landkreise"
+
+[calc-forecast]
+en = "Calculate Forecast"
+de = "Berechne Prognose"
+
+[config-forecast]
+en = "Configure Forecast"
+de = "Konfiguriere Prognose"
+
+[parameters]
+en = "Parameters"
+de = "Parameter"
+
+[chart.legend.year]
+en = "Year"
+de = "Jahr"
+
+[chart.legend.water-usage]
+en = "Water Usage [m³]"
+de = "Wasserverbrauch [m³]"

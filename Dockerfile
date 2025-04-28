@@ -3,7 +3,7 @@ ARG DUFS_VERSION=0.43.0
 
 
 # build the app via volta to use the correct node version
-FROM debian:bookworm AS build-app
+FROM --platform=$BUILDPLATFORM debian:bookworm AS build-app
 RUN apt update -y && apt upgrade -y
 RUN apt install -y curl
 WORKDIR /app
@@ -33,4 +33,4 @@ FROM sigoden/dufs:v${DUFS_VERSION}
 WORKDIR /wisdom-oss
 COPY --from=build-app /app/dist/wisdom-oss/frontend/browser /wisdom-oss/app
 EXPOSE 5000
-ENTRYPOINT [ "dufs", "--render-index", "-b0.0.0.0", "-p5000", "app" ]
+ENTRYPOINT [ "dufs", "--render-spa", "-b0.0.0.0", "-p5000", "app" ]

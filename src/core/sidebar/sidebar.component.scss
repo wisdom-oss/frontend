@@ -12,6 +12,7 @@ nav {
   max-width: 20em;
   width: 20em;
   background-color: color-mix(in lab, $light-primary, black 5%);
+  overflow-y: auto;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,4 +23,22 @@ nav {
       var(--bulma-box-background-color)
     );
   }
+}
+
+.menu-list .unauthorized {
+  a,
+  a:hover {
+    cursor: not-allowed;
+    color: color-mix(in srgb, black 60%, var(--bulma-text));
+    --bulma-menu-item-background-l-delta: -5%;
+
+    @media (prefers-color-scheme: light) {
+      color: color-mix(in srgb, white 20%, var(--bulma-text));
+      --bulma-menu-item-background-l-delta: -25%;
+    }
+  }
+}
+
+.menu-list li:not(:last-child) {
+  padding-bottom: calc(var(--bulma-box-padding) / 2);
 }

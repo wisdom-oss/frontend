@@ -1,0 +1,27 @@
+<div class="maplibregl-ctrl-group p-1 pl-2 pr-2">
+  @let input = in();
+  <p class="has-text-weight-bold is-size-6">{{ input.name }}</p>
+  <p class="has-text-weight-semi-bold is-size-7">{{ input.key }}</p>
+  <div style="height: 5em">
+    @let displayValue = value();
+    <p class="level is-justify-content-center" style="height: 100%">
+      <span
+        class="level-item is-size-1"
+        style="flex-grow: unset; margin-bottom: 0.5rem"
+      >
+        &#8721;
+      </span>
+      <span
+        class="level-item"
+        style="flex-grow: unset"
+        [class.is-skeleton]="!displayValue"
+      >
+        @if (displayValue) {
+          {{ displayValue | number: "1.0-0" : lang() }}&ThinSpace;m³/a
+        } @else {
+          123.456.789 U
+        }
+      </span>
+    </p>
+  </div>
+</div>

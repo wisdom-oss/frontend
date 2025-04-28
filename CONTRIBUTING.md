@@ -54,6 +54,25 @@ out the `.vscode` directory for helpful preconfigured settings.
 - `cSpell.language`: Set to `en` and `de` for mixed English-German strings.
 - `typescript.tsdk`: Uses workspace TypeScript for TOML support.
 
+## Local Development Proxy
+
+We use `proxy.conf.js` (in the root directory) to handle API requests during
+local development.
+By default, it sends any `/api/` request to the main server.
+
+While developing you might need more or different proxies.
+To enable such proxies, add a new entry `OPTIONAL_PROXY_CONFIGS` and enable it
+by setting the env variable `WISDOM_FRONTEND_DEV_PROXIES` to your new
+configuration before running `npm start`.
+
+```sh
+WISDOM_FRONTEND_DEV_PROXIES=bws npm start
+```
+
+Multiple proxies can be selected by passing a comma-separated list.
+If you specify a proxy name that doesn’t exist, you’ll get a
+warning (with a suggestion if there’s a close match).
+
 ## NPM Scripts
 
 Run scripts via `npm run`.
@@ -71,21 +90,22 @@ The [CI](https://github.com/wisdom-oss/frontend/actions) enforces this.
 ## Git Pre-Commit Hooks
 
 In order to automatically format and lint the codebase,
-you can use husky (https://typicode.github.io/husky/get-started.html)
-install via
+you can use [husky](https://typicode.github.io/husky/get-started.html).
+
+Install via:
 
 ```sh
 npm install --global husky
 ```
 
-and make sure npm still functions with repeating
+And make sure `npm` still functions with repeating:
 
 ```sh
 npm install
 ```
 
-Then, whenever you commit anything via git or GitHub Desktop, both scripts get executed
-before the commit happens and you don't have to do so manually
+Then, whenever you commit anything via git or GitHub Desktop, both scripts get
+executed before the commit happens and you don't have to do so manually.
 
 ## Code Organization
 
@@ -104,7 +124,6 @@ Key directories:
     - `config.ts`: App configuration.
     - `i18n.ts`: Configures translation files and namespaces for the application.
     - `routes.ts`: Application routes.
-    - `proxy.conf.json`: Local API proxy for development.
     - `styles.scss`: Global styles.
     - `variables.scss`: Shared Bulma variables.
 
