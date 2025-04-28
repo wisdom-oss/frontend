@@ -49,7 +49,7 @@ export class UsageForecastsService {
     let context = new HttpContext()
       .set(httpContexts.validateSchema, RESULT)
       .set(httpContexts.cache, [
-        JSON.stringify({URL, key, options}),
+        JSON.stringify({URL, key, scriptIdentifier, options}),
         dayjs.duration(1, "day"),
       ]);
 
@@ -143,14 +143,13 @@ const RESULT = {
       elements: {
         properties: {
           label: {type: "string"},
-          x: {type: "uint32"},
+          x: {}, // we don't know if the service responds correctly
           y: {type: "float64"},
         },
         optionalProperties: {
           uncertainty: {
-            properties: {
-              0: {type: "float64"},
-              1: {type: "float64"},
+            elements: {
+              type: "float64",
             },
           },
         },

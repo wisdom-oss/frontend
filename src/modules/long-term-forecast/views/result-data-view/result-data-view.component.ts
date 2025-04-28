@@ -9,8 +9,8 @@ import {
 } from "@angular/core";
 import {FormsModule} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
-import {provideIcons, NgIcon} from "@ng-icons/core";
-import {remixBarChartBoxAiLine} from "@ng-icons/remixicon";
+import {provideIcons, NgIconComponent, NgIcon} from "@ng-icons/core";
+import {remixBarChartBoxAiLine, remixLoader5Fill} from "@ng-icons/remixicon";
 import {TranslateDirective, TranslatePipe} from "@ngx-translate/core";
 import {ScriptableContext, ChartDataset, ChartOptions} from "chart.js";
 import {BaseChartDirective} from "ng2-charts";
@@ -36,12 +36,15 @@ type ChartDatasets = ChartDataset<"bar", {x: string; y: number}[]>[];
     TitleCasePipe,
     TranslateDirective,
     TranslatePipe,
+    NgIconComponent,
   ],
   templateUrl: "./result-data-view.component.html",
+  styleUrl: "./result-data-view.component.scss",
   styles: ``,
   providers: [
     provideIcons({
       remixBarChartBoxAiLine,
+      remixLoader5Fill,
     }),
   ],
 })
