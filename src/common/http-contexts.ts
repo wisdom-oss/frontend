@@ -1,6 +1,7 @@
 import {HttpContextToken} from "@angular/common/http";
 import {Schema} from "ajv";
 import {Duration} from "dayjs/plugin/duration";
+import typia from "typia";
 
 /**
  * Centralized collection of HTTP context tokens used in the frontend.
@@ -26,6 +27,8 @@ export const httpContexts = {
    * An error will be thrown if the response does not match the schema.
    */
   validateSchema: new HttpContextToken<Schema | undefined>(() => undefined),
+
+  assertType: new HttpContextToken<undefined | typia.AssertionGuard<any>>(() => undefined),
 
   /**
    * Indicates whether a response should be cached in the IndexedDB.
