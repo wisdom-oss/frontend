@@ -12,6 +12,7 @@ nav {
   max-width: 20em;
   width: 20em;
   background-color: color-mix(in lab, $light-primary, black 5%);
+  overflow-y: auto;
 }
 
 @media (prefers-color-scheme: dark) {
