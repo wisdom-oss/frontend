@@ -1,5 +1,4 @@
 import {HttpContextToken} from "@angular/common/http";
-import {Schema} from "ajv";
 import {Duration} from "dayjs/plugin/duration";
 import typia from "typia";
 
@@ -19,16 +18,6 @@ export const httpContexts = {
    * behavior.
    */
   authenticate: new HttpContextToken<undefined | boolean>(() => undefined),
-
-  /**
-   * Specifies a schema to validate the response data.
-   *
-   * Uses AJV to validate the response data against a JSON Type Definition (JTD).
-   * An error will be thrown if the response does not match the schema.
-   *
-   * @deprecated
-   */
-  validateSchema: new HttpContextToken<Schema | undefined>(() => undefined),
 
   /**
    * Validates response data using a Typia validator.
