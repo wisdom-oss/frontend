@@ -146,8 +146,8 @@ Key directories:
    - Add new services in `src/api`.
    - Use `src/common/http-contexts.ts` for
      [HTTP contexts](https://angular.dev/api/common/http/HttpContext).
-   - Validate responses using [AJV](https://ajv.js.org) and
-     `httpContexts.validateSchema`.
+   - Validate responses using [typia](https://typia.io) ans
+     `httpContexts.validateType`.
 
 3. **Components**:
 
