@@ -1,6 +1,5 @@
 /* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
-/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
-{
+/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */{
   "compileOnSave": false,
   "compilerOptions": {
     "outDir": "./dist/out-tsc",
@@ -19,8 +18,19 @@
     "importHelpers": true,
     "target": "ES2023",
     "module": "ES2022",
-    "lib": ["ES2023", "dom"],
-    "plugins": [{"name": "typescript-plugin-toml"}]
+    "lib": [
+      "ES2023",
+      "dom"
+    ],
+    "plugins": [
+      {
+        "name": "typescript-plugin-toml"
+      },
+      {
+        "transform": "typia/lib/transform"
+      }
+    ],
+    "strictNullChecks": true
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
