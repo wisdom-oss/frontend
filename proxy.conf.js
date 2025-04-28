@@ -15,7 +15,7 @@
  * `ng serve`.
  *
  * @example
- * WISDOM_FRONTEND_DEV_PROXIES=bws,ge ng serve
+ * WISDOM_FRONTEND_DEV_PROXIES=bws,geo ng serve
  */
 
 const didYouMean = require("didyoumean");
