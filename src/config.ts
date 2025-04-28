@@ -17,6 +17,7 @@ import {errorInterceptor} from "./core/error.interceptor";
 import {cacheInterceptor} from "./core/cache/cache.interceptor";
 import {provideLangSignal} from "./core/providers/lang-signal.provider";
 import {provideMaplibreSettings} from "./core/providers/maplibre-settings.provider";
+import {validateTypeInterceptor} from "./core/validate-type.interceptor";
 
 export const wisdomAppConfig: ApplicationConfig = {
   providers: [
@@ -29,7 +30,7 @@ export const wisdomAppConfig: ApplicationConfig = {
     provideHttpClient(
       withInterceptors([cacheInterceptor, apiInterceptor, authInterceptor]),
       withInterceptorsFromDi(),
-      withInterceptors([errorInterceptor]),
+      withInterceptors([errorInterceptor, validateTypeInterceptor]),
     ),
     {
       provide: HTTP_INTERCEPTORS,

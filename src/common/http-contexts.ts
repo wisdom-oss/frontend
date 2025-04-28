@@ -25,10 +25,25 @@ export const httpContexts = {
    *
    * Uses AJV to validate the response data against a JSON Type Definition (JTD).
    * An error will be thrown if the response does not match the schema.
+   *
+   * @deprecated
    */
   validateSchema: new HttpContextToken<Schema | undefined>(() => undefined),
 
-  assertType: new HttpContextToken<undefined | typia.AssertionGuard<any>>(() => undefined),
+  /**
+   * Validates response data using a Typia validator.
+   *
+   * Set this token to a validator function created by `typia.createValidate<T>()`.
+   * The function will be called with the response data and must return a Typia
+   * validation result.
+   *
+   * @danger
+   * Always call `typia.createValidate<T>()` with a type parameter.
+   * If you forget it, the interceptor might hang.
+   */
+  validateType: new HttpContextToken<
+    undefined | ((input: unknown) => typia.IValidation<any>)
+  >(() => undefined),
 
   /**
    * Indicates whether a response should be cached in the IndexedDB.
