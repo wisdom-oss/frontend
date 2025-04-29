@@ -1,0 +1,29 @@
+<div class="tags has-addons are-large">
+  <span
+    class="tag"
+    [class.has-text-primary]="flavor() == 'lean'"
+    [class.is-primary]="flavor() == 'bold'"
+  >
+    <span class="icon">
+      <ng-icon name="remixCalendarLine"></ng-icon>
+    </span>
+  </span>
+  <button class="tag px-3" [class.is-flex-grow-1]="fullWidth()">
+    2025-04-28
+  </button>
+  @if (ranged()) {
+    <span class="tag px-1" style="user-select: none">&#9135;</span>
+    <button class="tag px-3" [class.is-flex-grow-1]="fullWidth()">
+      2025-04-29
+    </button>
+  }
+  <button
+    class="tag"
+    [class.has-text-danger]="flavor() == 'lean'"
+    [class.is-danger]="flavor() == 'bold'"
+  >
+    <span class="icon">
+      <ng-icon name="remixResetLeftLine"></ng-icon>
+    </span>
+  </button>
+</div>
