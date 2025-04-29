@@ -1,5 +1,6 @@
 import {CommonModule} from "@angular/common";
 import {
+  computed,
   inject,
   signal,
   ViewChildren,
@@ -8,11 +9,11 @@ import {
   QueryList,
   Signal,
 } from "@angular/core";
-import {toSignal} from "@angular/core/rxjs-interop";
+import {toObservable, toSignal} from "@angular/core/rxjs-interop";
 import {TranslatePipe} from "@ngx-translate/core";
 import {ChartConfiguration, ChartData, ChartDataset, ChartType} from "chart.js";
 import {BaseChartDirective} from "ng2-charts";
-import {map} from "rxjs";
+import {map, switchMap} from "rxjs";
 
 import {
   PredictedSmartmeterDataset,
@@ -41,7 +42,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     daily: "water-demand-prediction.resolution.daily",
     weekly: "water-demand-prediction.resolution.weekly",
   };
-  choiceResolution = signal<string>(this.optionsResolution["Initial"]);
+  choiceResolution = signal<string>(this.optionsResolution[""]);
 
   /** variables timeframe dropdown */
   menuTime = "water-demand-prediction.choice.timeframe";
@@ -54,17 +55,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     "one year": "water-demand-prediction.timeframe.one-year",
     all: "water-demand-prediction.timeframe.all",
   };
-  choiceTime = signal<string>(this.optionsTime["Initial"]);
-
-  /** variables smartmetername dropdown */
-  menuSmartmeter = "water-demand-prediction.choice.smartmeter";
-  optionsSmartmeter: Signal<Record<string, string>> = toSignal(
-    this.waterDemandService
-      .fetchMeterNames()
-      .pipe(map(response => response["names"] as Record<string, string>)),
-    {initialValue: {}},
-  );
-  choiceSmartmeter = signal(this.optionsSmartmeter()["Initial"]);
+  choiceTime = signal<string>(this.optionsTime[""]);
 
   /** variables startpoint dropdown */
   menuStartPoint = "water-demand-prediction.choice.startpoint";
@@ -73,7 +64,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     "2021-06-01T00:00:00": "water-demand-prediction.startpoint.options.b",
     "2022-01-01T00:00:00": "water-demand-prediction.startpoint.options.c",
   };
-  choiceStartPoint = signal<string>(this.optionsStartPoint["Initial"]);
+  choiceStartPoint = signal<string>(this.optionsStartPoint[""]);
 
   menuWeather = "water-demand-prediction.choice.weather";
   optionsWeather: Record<string, string> = {
@@ -93,28 +84,33 @@ export class WaterDemandPredictionComponent implements OnInit {
     wind: "water-demand-prediction.weather.wind",
     wind_synop: "water-demand-prediction.weather.wind_synop",
   };
-  choiceWeather = signal<string>(this.optionsWeather["Initial"]);
+  choiceWeather = signal<string>("air_temperature");
 
-  menuWeatherColumns = "water-demand-prediction.choice.weatherColumns";
-  optionsColumns: Signal<Record<string, string>> = toSignal(
-    this.waterDemandService.fetchWeatherCapabilities().pipe(
-      map(response => {
-        // Cast response to the correct shape
-        const typedResponse = response as Record<string, string[]>;
-
-        // Now we can safely flatten the values
-        const flattened: string[] = Object.values(typedResponse).flat();
-
-        // Turn the array into a Record<string, string>
-        return flattened.reduce((acc: Record<string, string>, item: string) => {
-          acc[item] = item;
-          return acc;
-        }, {});
-      }),
-    ),
+  /** variables smartmetername dropdown */
+  menuSmartmeter = "water-demand-prediction.choice.smartmeter";
+  optionsSmartmeter: Signal<Record<string, string>> = toSignal(
+    this.waterDemandService
+      .fetchMeterNames()
+      .pipe(map(response => response["names"] as Record<string, string>)),
     {initialValue: {Loading: "water-demand-prediction.choice.loadingScreen"}},
   );
-  choiceColumns = signal(this.optionsSmartmeter()["Initial"]);
+  choiceSmartmeter = signal(this.optionsSmartmeter()[""]);
+
+  menuWeatherColumns = "water-demand-prediction.choice.weatherColumns";
+  optionsColumns = toSignal(
+    toObservable(this.choiceWeather).pipe(
+      switchMap(choice =>
+        this.waterDemandService
+          .fetchWeatherColumns(choice)
+          .pipe(map(response => response["columns"] as Record<string, string>)),
+      ),
+    ),
+    {
+      initialValue: {
+        Loading: "water-demand-prediction.choice.loadingScreen",
+      },
+    },
+  );
 
   /** the displayed resolution in the charts of real data */
   displayedResolution = signal<string>("hourly");

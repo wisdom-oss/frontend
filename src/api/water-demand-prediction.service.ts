@@ -58,6 +58,10 @@ export class WaterDemandPredictionService {
     return this.sendRequest("get", "/weatherCapabilities");
   }
 
+  fetchWeatherColumns(capability: string): Observable<any> {
+    return this.sendRequest("post", "/weatherColumn", {capability: capability});
+  }
+
   fetchSingleSmartmeter(
     startpoint: string,
     nameOfSmartmeter: string,
@@ -78,6 +82,7 @@ export class WaterDemandPredictionService {
     timeframe: string,
     resolution: string,
     weatherCapability: string,
+    weatherColumn?: string,
   ): Observable<any> {
     return this.sendRequest("post", "/loadModelAndPredict", {
       startpoint: startpoint,
@@ -85,6 +90,7 @@ export class WaterDemandPredictionService {
       timeframe: timeframe,
       resolution: resolution,
       weatherCapability: weatherCapability,
+      weatherColumn: weatherColumn,
     });
   }
 
@@ -94,6 +100,7 @@ export class WaterDemandPredictionService {
     timeframe: string,
     resolution: string,
     weatherCapability: string,
+    weatherColumn?: string,
   ): Observable<any> {
     return this.sendRequest("post", "/trainModel", {
       startpoint: startpoint,
@@ -101,6 +108,7 @@ export class WaterDemandPredictionService {
       timeframe: timeframe,
       resolution: resolution,
       weatherCapability: weatherCapability,
+      weatherColumn: weatherColumn,
     });
   }
 }
