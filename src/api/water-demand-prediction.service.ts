@@ -1,13 +1,13 @@
-import {HttpClient} from "@angular/common/http";
+import {httpResource, HttpClient} from "@angular/common/http";
 import {Injectable} from "@angular/core";
 import {Router} from "@angular/router";
 import {Observable} from "rxjs";
 
+const API_PREFIX = "/waterdemand";
+
 const PREFIX = "/local"; /** local development */
 //const PREFIX = "/dev/development" /** development on wisdom.dev */
 //const PREFIX = "/dev/training"; /** training container on wisdom.dev */
-
-const API_PREFIX = "/waterdemand";
 
 /**
  * injects the service to be singleton throughout project.
@@ -51,6 +51,8 @@ export class WaterDemandPredictionService {
   }
 
   fetchMeterNames(): Observable<any> {
+    return httpResource(() => "/waterdemand/local/meterNames}");
+
     return this.sendRequest("get", "/meterNames");
   }
 

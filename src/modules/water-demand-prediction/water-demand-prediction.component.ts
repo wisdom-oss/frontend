@@ -111,6 +111,7 @@ export class WaterDemandPredictionComponent implements OnInit {
       },
     },
   );
+  choiceColumns: string = "Hallo";
 
   /** the displayed resolution in the charts of real data */
   displayedResolution = signal<string>("hourly");
