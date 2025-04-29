@@ -1,0 +1,19 @@
+<div class="card is-fullheight is-flex is-flex-direction-column">
+  <div class="card-header">
+    <div class="card-header-title">
+      <p>Playground</p>
+    </div>
+  </div>
+
+  <div class="card-content is-flex-grow-1" style="overflow: auto;">
+    @for (layout of layout; track layout) {
+      <div class="block">
+        <date-time 
+          [ranged]="layout.ranged"
+          [fullWidth]="layout.fullWidth"
+          [flavor]="layout.flavor"
+        ></date-time>
+      </div>
+    }
+  </div>
+</div>

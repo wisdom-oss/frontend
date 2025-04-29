@@ -4,6 +4,7 @@ import {CallbackComponent} from "./core/auth/callback/callback.component";
 import {CoreComponent} from "./core/core.component";
 import {permissionsGuard} from "./core/auth/permissions.guard";
 import {GreeterComponent} from "./core/greeter/greeter.component";
+import {PlaygroundComponent} from "./core/playground/playground.component";
 import {BeWaterSmartComponent} from "./modules/be-water-smart/be-water-smart.component";
 import {GrowlComponent} from "./modules/growl/growl.component";
 import {LongTermForecastComponent} from "./modules/long-term-forecast/long-term-forecast.component";
@@ -37,6 +38,7 @@ export const routes: Routes = [
         component: OowvActionMapComponent,
         canActivate: [permissionsGuard(...OowvActionMapComponent.SCOPES)],
       },
+      {path: "playground", component: PlaygroundComponent},
     ],
   },
   {path: "**", redirectTo: ""}, // Wildcard fallback
