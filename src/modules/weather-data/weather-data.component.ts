@@ -295,11 +295,15 @@ export class WeatherDataComponent {
     }
 
     let features = stations.features.filter(feature => {
-      for (let product in feature.properties.products) {
-        if (activeLayers.has(product)) return true;
+      let productKeys = Object.keys(feature.properties.products);
+      if (productKeys.length < activeLayers.size) return false;
+
+      let products = new Set(productKeys);
+      for (let layer of activeLayers) {
+        if (!products.has(layer)) return false;
       }
 
-      return false;
+      return true;
     });
 
     return {type: "FeatureCollection", features};
