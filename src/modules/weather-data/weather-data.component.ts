@@ -106,6 +106,7 @@ const MAPPING = {
 export class WeatherDataComponent {
   protected lang = signals.lang();
   protected document = inject(DOCUMENT);
+  private selectDiv = viewChild<ElementRef<HTMLDivElement>>("select");
   private downloadAnchor =
     viewChild.required<ElementRef<HTMLAnchorElement>>("downloadAnchor");
 
@@ -201,17 +202,19 @@ export class WeatherDataComponent {
       let selected = this.selectedStation();
       if (!selected) return;
 
+      // only update bounds if select div is rendered
+      let selectDiv = this.selectDiv();
+      if (!selectDiv) return;
+
       let bbox = turf.bbox(selected.geometry);
       let padding = 0.01;
       bbox[0] -= padding;
       bbox[1] -= padding;
       bbox[2] += padding;
       bbox[3] += padding;
+
       // update map after selector appeared
       setTimeout(() => this.fitBounds.set(bbox));
-
-      // force update again when info loaded
-      this.stationInfo();
     });
 
     effect(() => {
