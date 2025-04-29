@@ -8,8 +8,8 @@
       "schematics": {
         "@schematics/angular:component": {
           "skipTests": true,
-          "inlineStyle": true,
-          "style": "scss"
+          "style": "none",
+          "skipSelector": true
         },
         "@schematics/angular:class": {
           "skipTests": true
@@ -44,6 +44,10 @@
               {
                 "path": "node_modules/esbuild-plugin-toml/index.js",
                 "options": {}
+              },
+              {
+                "path": "scripts/esbuild/prebuild.cjs",
+                "options": {}
               }
             ],
             "outputPath": "dist/wisdom-oss/frontend",
@@ -64,16 +68,32 @@
                 "output": "twemoji"
               },
               {
+                "glob": "**/*.wasm",
+                "input": "node_modules/web-ifc",
+                "output": "web-ifc"
+              },
+              {
                 "glob": "**/*",
-                "input": "public"
+                "input": "public",
+                "output": "public"
               }
             ],
             "styles": ["src/styles.scss"],
             "scripts": [],
-            "allowedCommonJsDependencies": ["ajv", "dayjs"],
+            "allowedCommonJsDependencies": [
+              "ajv",
+              "dayjs",
+              "maplibre-gl",
+              "@turf/jsts",
+              "rbush",
+              "skmeans",
+              "concaveman",
+              "fast-deep-equal",
+              "earcut"
+            ],
             "stylePreprocessorOptions": {
               "sass": {
-                "silenceDeprecations": ["global-builtin"]
+                "silenceDeprecations": ["global-builtin", "import"]
               }
             }
           },
@@ -82,8 +102,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "1500kB",
-                  "maximumError": "3MB"
+                  "maximumWarning": "5MB",
+                  "maximumError": "10MB"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -113,7 +133,7 @@
           },
           "defaultConfiguration": "development",
           "options": {
-            "proxyConfig": "src/proxy.conf.json"
+            "proxyConfig": "proxy.conf.js"
           }
         },
         "test": {

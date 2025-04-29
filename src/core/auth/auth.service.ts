@@ -5,8 +5,10 @@ import {JTDDataType} from "ajv/dist/core";
 import {jwtDecode} from "jwt-decode";
 import {firstValueFrom} from "rxjs";
 
+import {Scopes} from "./scopes";
 import {StorageService} from "../../common/storage.service";
 import {httpContexts} from "../../common/http-contexts";
+import {SchemaValidationService} from "../schema/schema-validation.service";
 
 const API_URL = "/api/auth";
 
@@ -29,13 +31,21 @@ export class AuthService {
   readonly decodedAccessToken = computed(() => {
     let accessToken = this.accessToken();
     if (!accessToken) return null;
-    return jwtDecode(accessToken);
+    let decoded =
+      jwtDecode<JTDDataType<typeof JWT_PAYLOAD_SCHEMA>>(accessToken);
+    return this.schema.validate(JWT_PAYLOAD_SCHEMA, decoded);
+  });
+
+  readonly scopes = computed(() => {
+    let scopes = this.decodedAccessToken()?.["scopes"] ?? [];
+    return new Scopes(scopes as Scopes.Scope[]);
   });
 
   constructor(
     private http: HttpClient,
     private router: Router,
     storage: StorageService,
+    private schema: SchemaValidationService,
   ) {
     this.storage = storage.instance(AuthService);
     this.loadTokens();
@@ -93,6 +103,8 @@ export class AuthService {
 
     this.accessToken.set(null);
     this.refreshToken.set(null);
+
+    this.router.navigateByUrl("/");
   }
 
   async refresh() {
@@ -178,6 +190,21 @@ const TOKEN_SET_SCHEMA = {
     expires_in: {type: "int32"},
     token_type: {type: "string"},
     refresh_token: {type: "string"},
+  },
+} as const;
+
+const JWT_PAYLOAD_SCHEMA = {
+  properties: {
+    aud: {elements: {type: "string"}},
+    exp: {type: "uint32"},
+    iss: {type: "string"},
+    nbf: {type: "uint32"},
+    scopes: {elements: {type: "string"}},
+    sub: {type: "string"},
+  },
+  optionalProperties: {
+    iat: {type: "uint32"},
+    jti: {type: "string"},
   },
 } as const;
 

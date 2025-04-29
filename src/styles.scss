@@ -1,8 +1,14 @@
 @use "./variables.scss";
+@use "../node_modules/bulma/sass/components/navbar.scss" with (
+  $navbar-breakpoint: 690px
+);
 @use "../node_modules/bulma/sass/" as bulma;
 
+@use "../node_modules/bulma-slider/src/sass/" as bulma-slider;
 @use "../node_modules/bulma-switch/src/sass" as bulma-switch;
 @use "../node_modules/@creativebulma/bulma-tooltip/src/sass" as bulma-tooltip;
+
+@import "../node_modules/maplibre-gl/dist/maplibre-gl.css";
 
 html {
   // override bulma's default behavior
@@ -21,4 +27,25 @@ html {
 .is-fullheight {
   height: 100%;
   max-height: 100%;
+}
+
+.no-main-padding {
+  margin: calc(var(--bulma-column-gap) * -1);
+
+  &.is-fullheight {
+    $height: calc(100% + 2 * var(--bulma-column-gap));
+    height: $height;
+    max-height: $height;
+  }
+}
+
+.maplibregl-map {
+  // avoid inherited colors from outer components for the map
+  color: bulma.$text;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
 }

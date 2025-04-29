@@ -1,20 +1,75 @@
-import {ViewChildren, Component, AfterViewInit, QueryList} from "@angular/core";
+import {HttpClient} from "@angular/common/http";
+import {
+  computed,
+  inject,
+  ViewChildren,
+  Component,
+  AfterViewInit,
+  QueryList,
+} from "@angular/core";
 import {NavigationEnd, RouterLink, Router} from "@angular/router";
-import {provideIcons, NgIconComponent} from "@ng-icons/core";
-import {remixBookLine, remixBookShelfLine} from "@ng-icons/remixicon";
+import {
+  provideIcons,
+  provideNgIconLoader,
+  NgIconComponent,
+  NgIconStack,
+} from "@ng-icons/core";
+import {
+  remixBarChartFill,
+  remixBookLine,
+  remixBookShelfLine,
+  remixBuilding3Fill,
+  remixDatabase2Fill,
+  remixDrizzleFill,
+  remixInstanceLine,
+  remixLineChartLine,
+  remixMap2Fill,
+  remixMapLine,
+  remixRfidLine,
+  remixSunCloudyFill,
+  remixWaterPercentFill,
+} from "@ng-icons/remixicon";
+import {TranslateDirective} from "@ngx-translate/core";
 import {filter} from "rxjs";
 
 import {SidebarLinkDirective} from "./sidebar-link.directive";
+import {OowvActionMapComponent} from "../../modules/oowv/action-map/action-map.component";
+import {PumpModelsComponent} from "../../modules/pump-models/pump-models.component";
+import {AuthService} from "../auth/auth.service";
 
 @Component({
   selector: "sidebar",
-  imports: [NgIconComponent, RouterLink, SidebarLinkDirective],
+  imports: [
+    NgIconComponent,
+    NgIconStack,
+    RouterLink,
+    SidebarLinkDirective,
+    TranslateDirective,
+  ],
   templateUrl: "./sidebar.component.html",
   styleUrl: "./sidebar.component.scss",
   providers: [
     provideIcons({
-      remixBookShelfLine,
+      remixBarChartFill,
       remixBookLine,
+      remixBookShelfLine,
+      remixBuilding3Fill,
+      remixDatabase2Fill,
+      remixDrizzleFill,
+      remixInstanceLine,
+      remixLineChartLine,
+      remixMap2Fill,
+      remixMapLine,
+      remixRfidLine,
+      remixSunCloudyFill,
+      remixWaterPercentFill,
+    }),
+    provideNgIconLoader(name => {
+      if (name != "oowv") return "";
+      const http = inject(HttpClient);
+      return http.get("https://www.oowv.de/favicons/favicon.svg", {
+        responseType: "text",
+      });
     }),
   ],
 })
@@ -22,7 +77,19 @@ export class SidebarComponent implements AfterViewInit {
   @ViewChildren(SidebarLinkDirective)
   routerLinks?: QueryList<SidebarLinkDirective>;
 
-  constructor(private router: Router) {}
+  protected authorized = {
+    oowvActionMap: computed(() =>
+      this.auth.scopes().has(...OowvActionMapComponent.SCOPES),
+    ),
+    pumpModels: computed(() =>
+      this.auth.scopes().has(...PumpModelsComponent.SCOPES),
+    ),
+  };
+
+  constructor(
+    private router: Router,
+    private auth: AuthService,
+  ) {}
 
   ngAfterViewInit(): void {
     this.highlightCurrentRoute();
@@ -38,7 +105,7 @@ export class SidebarComponent implements AfterViewInit {
         this.router.isActive(link, {
           matrixParams: "ignored",
           queryParams: "ignored",
-          paths: "exact",
+          paths: "subset",
           fragment: "ignored",
         }),
       );

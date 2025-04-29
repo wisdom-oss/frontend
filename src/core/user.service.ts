@@ -45,7 +45,13 @@ export class UserService {
 }
 
 export namespace UserService {
-  export type UserDetails = JTDDataType<typeof USER_DETAILS_SCHEMA>;
+  export type UserDetails = Omit<
+    JTDDataType<typeof USER_DETAILS_SCHEMA>,
+    "permissions"
+  > & {
+    /** @deprecated Use {@link AuthService.scopes()} instead. */
+    permissions: Record<string, string[]>;
+  };
 }
 
 const USER_DETAILS_SCHEMA = {

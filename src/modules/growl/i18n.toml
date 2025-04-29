@@ -1,0 +1,67 @@
+[measurement-classification."Höchstwert überschritten"]
+en = "maximum exceeded"
+de = "Höchstwert überschritten"
+
+[measurement-classification."sehr hoch"]
+en = "very high"
+de = "sehr hoch"
+
+[measurement-classification."hoch"]
+en = "high"
+de = "hoch"
+
+[measurement-classification."normal"]
+en = "normal"
+de = "normal"
+
+[measurement-classification."niedrig"]
+en = "low"
+de = "niedrig"
+
+[measurement-classification."sehr niedrig"]
+en = "very low"
+de = "sehr niedrig"
+
+[measurement-classification."Niedrigstwert unterschritten"]
+en = "minimum undershot"
+de = "Niedrigstwert unterschritten"
+
+[measurement-classification.null]
+en = "no current data"
+de = "Keine aktuellen Daten"
+
+[display.station]
+en = "Station"
+de = "Messstation"
+
+[display.date]
+en = "Date"
+de = "Datum"
+
+[display.waterLevelNHN]
+en = "Water Level NHN"
+de = "Wasserstand NHN"
+
+[display.waterLevelGOK]
+en = "Water Level GOK"
+de = "Wasserstand GOK"
+
+[layer.groundwaterBodies]
+en = "NLWKN Groundwater Bodies"
+de = "NLWKN Grundwasserkörper"
+
+[layer.groundwaterLevelStations]
+en = "NLWKN Groundwater Level Stations"
+de = "NLWKN Grundwasser Messstationen"
+
+[layer.ndsMunicipals]
+en = "Lower-Saxony Municipals"
+de = "Niedersachen Kommunen"
+
+[layer.waterRightUsageLocations]
+en = "NLWKN Water Right Usage Locations"
+de = "NLWKN Nutzungsorte der Wasserrechte"
+
+[layer.oldWaterRightUsageLocations]
+en = "NLWKN Water Right Usage Locations (old)"
+de = "NLWKN Nutzungsorte der Wasserrechte (alt)"

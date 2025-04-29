@@ -1,0 +1,176 @@
+<div class="card block is-fullheight is-flex is-flex-direction-column">
+  <div class="card-content p-0 is-clipped is-flex-grow-1 is-fullheight">
+    <mgl-map
+      class="is-fullheight"
+      [style]="style"
+      [zoom]="[12.5]"
+      [center]="{lat: 53.14, lon: 8.21}"
+      [canvasContextAttributes]="{preserveDrawingBuffer: true}"
+    >
+      <mgl-image
+        id="hatching"
+        url="/public/map/patterns/hatching.png"
+        [options]="{
+          sdf: true,
+          pixelRatio: 5,
+        }"
+      ></mgl-image>
+      <ng-container controls>
+        <mgl-control position="top-right">
+          <map-layer-selection-control
+            translatePrefix="oowv-action-map.layer."
+            [layers]="selectedLayers"
+          ></map-layer-selection-control>
+        </mgl-control>
+        <mgl-control
+          mglNavigation
+          [showCompass]="false"
+          position="top-left"
+        ></mgl-control>
+      </ng-container>
+      <ng-container sources>
+        <mgl-geojson-source
+          id="infiltration-areas-source"
+          [data]="geoData.infiltration_areas()"
+        ></mgl-geojson-source>
+        <mgl-geojson-source
+          id="trench-register-source"
+          [data]="geoData.trench_register()"
+        ></mgl-geojson-source>
+        <mgl-geojson-source
+          id="heavy-rain-simulation-source"
+          [data]="geoData.heavy_rain_simulation()"
+        ></mgl-geojson-source>
+        <mgl-geojson-source
+          id="emergency-flow-ways-source"
+          [data]="geoData.emergency_flow_ways()"
+        ></mgl-geojson-source>
+        <mgl-geojson-source
+          id="heavy-rain-flooded-streets-source"
+          [data]="geoData.heavy_rain_flooded_streets()"
+        ></mgl-geojson-source>
+        <mgl-geojson-source
+          id="greenable-roofs-source"
+          [data]="geoData.greenable_roofs()"
+        ></mgl-geojson-source>
+        <mgl-geojson-source
+          id="heavy-rain-traffic-control-source"
+          [data]="geoData.heavy_rain_traffic_control()"
+        ></mgl-geojson-source>
+        <mgl-geojson-source
+          id="heavy-rain-flooded-bus-stops-source"
+          [data]="geoData.heavy_rain_flooded_bus_stops()"
+        ></mgl-geojson-source>
+      </ng-container>
+      <ng-container layers *ngIf="selectedLayersUpdate()">
+        @if (selectedLayers.infiltration_areas()) {
+          <mgl-layer
+            id="infiltration-areas-layer-fill-pattern"
+            type="fill"
+            source="infiltration-areas-source"
+            [paint]="{
+              'fill-pattern': 'hatching',
+              'fill-opacity': 0.7,
+            }"
+          ></mgl-layer>
+          <mgl-layer
+            id="infiltration-areas-layer-fill-color"
+            type="fill"
+            source="infiltration-areas-source"
+            [paint]="{
+              'fill-color': 'black',
+              'fill-opacity': 0.15,
+            }"
+          ></mgl-layer>
+          <mgl-layer
+            id="infiltration-areas-layer-line"
+            type="line"
+            source="infiltration-areas-source"
+            [paint]="{
+              'line-color': 'black',
+              'line-width': 2,
+            }"
+          ></mgl-layer>
+        }
+        @if (selectedLayers.trench_register()) {
+          <mgl-layer
+            id="trench-register-layer-file"
+            type="fill"
+            source="trench-register-source"
+            [paint]="{
+              'fill-color': '#945834',
+              'fill-opacity': 0.5,
+            }"
+          ></mgl-layer>
+        }
+        @if (selectedLayers.heavy_rain_simulation()) {
+          <mgl-layer
+            id="heavy-rain-simulation-layer-fill"
+            type="fill"
+            source="heavy-rain-simulation-source"
+            [paint]="{
+              'fill-color': '#ff691a',
+              'fill-opacity': 0.5,
+            }"
+          ></mgl-layer>
+        }
+        @if (selectedLayers.emergency_flow_ways()) {
+          <mgl-layer
+            id="emergency-flow-ways-layer-fill"
+            type="fill"
+            source="emergency-flow-ways-source"
+            [paint]="{
+              'fill-color': '#e1b336',
+              'fill-opacity': 0.5,
+            }"
+          ></mgl-layer>
+        }
+        @if (selectedLayers.heavy_rain_flooded_streets()) {
+          <mgl-layer
+            id="heavy-rain-flooded-streets-layer-fill"
+            type="fill"
+            source="heavy-rain-flooded-streets-source"
+            [paint]="{
+              'fill-color': '#222222',
+              'fill-opacity': 0.5,
+            }"
+          ></mgl-layer>
+        }
+        @if (selectedLayers.greenable_roofs()) {
+          <mgl-layer
+            id="greenable-roofs-layer-fill"
+            type="fill"
+            source="greenable-roofs-source"
+            [paint]="{
+              'fill-color': 'green',
+              'fill-opacity': 0.5,
+            }"
+          ></mgl-layer>
+        }
+        @if (selectedLayers.heavy_rain_traffic_control()) {
+          <mgl-layer
+            id="heavy-rain-traffic-control-layer-fill"
+            type="fill"
+            source="heavy-rain-traffic-control-source"
+            [paint]="{
+              'fill-color': '#da1320',
+              'fill-opacity': 0.5,
+            }"
+          ></mgl-layer>
+        }
+        @if (selectedLayers.heavy_rain_flooded_bus_stops()) {
+          <mgl-layer
+            id="heavy-rain-flooded-bus-stops-layer-symbol"
+            type="symbol"
+            source="heavy-rain-flooded-bus-stops-source"
+            [layout]="{
+              'icon-image': 'remixicon:bus-fill',
+              'icon-ignore-placement': true,
+              'icon-size': 1.2,
+            }"
+          ></mgl-layer>
+        }
+      </ng-container>
+    </mgl-map>
+  </div>
+</div>

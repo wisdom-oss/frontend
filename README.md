@@ -31,7 +31,16 @@ workflows, services, and data in the water industry:
   information management, as well as creative laboratory approaches, in
   collaboration with the [Oldenburgisch-Ostfriesischen Wasserverband (OOWV)](OOWV).
 
-The frontend is built with [Angular] and styled using [Bulma], providing users with a modern and intuitive interface.
+- **AWARD**[^3]:  
+  The third phase of the project, building upon the foundations of WISdoM and
+  WISdoM 2.0.
+  AWARD aims to enhance data-driven decision-making in the water industry,
+  focusing on resilience and sustainability.
+  The platform continues to be developed in collaboration with OOWV and other
+  partners.
+
+The frontend is built with [Angular] and styled using [Bulma], providing users
+with a modern and intuitive interface.
 
 <div align="center">
   <img src="media/screenshot.png" alt="screenshot of WISdoM frontend">
@@ -40,7 +49,7 @@ The frontend is built with [Angular] and styled using [Bulma], providing users w
 ## Live Demo
 
 The `main` branch is hosted at:  
-[🔗 wisdom-demo.uni-oldenburg.de](https://wisdom-demo.uni-oldenburg.de)
+[🔗 wisdom.uol.de](https://wisdom.uol.de)
 
 > [!NOTE]
 > A user account in our management system is required for full access, but most
@@ -64,3 +73,5 @@ This project is licensed under the terms of the
 [^1]: https://uol.de/vlba/projekte/wisdom
 
 [^2]: https://uol.de/vlba/wisdom20
+
+[^3]: https://uol.de/vlba/projekte/award

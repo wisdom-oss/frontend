@@ -1,0 +1,35 @@
+[display.module]
+en = "Action Map"
+de = "Handlungskarte"
+
+[layer.infiltration_areas]
+en = "Infiltration Areas"
+de = "Versickerungsflächen"
+
+[layer.trench_register]
+en = "Trench Register"
+de = "Grabenregister"
+
+[layer.heavy_rain_simulation]
+en = "Heavy Rain Simulation"
+de = "Starkregensimulation"
+
+[layer.emergency_flow_ways]
+en = "Emergency Flow Ways"
+de = "Notabflusswege"
+
+[layer.heavy_rain_flooded_streets]
+en = "Heavy Rain Flooded Streets"
+de = "Überflutete Straßen bei Starkregen"
+
+[layer.greenable_roofs]
+en = "Greenable Roofs"
+de = "Begrünbare Dächer"
+
+[layer.heavy_rain_traffic_control]
+en = "Heavy Rain Traffic Control"
+de = "Starkregen-Verkehrssteuerung"
+
+[layer.heavy_rain_flooded_bus_stops]
+en = "Heavy Rain Flooded Bus Stops"
+de = "Überflutete Bushaltestellen bei Starkregen"

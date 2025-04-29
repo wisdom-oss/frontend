@@ -1,0 +1,21 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    assignees:
+      - cptpiepmatz
+    labels: []
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: thursday
+      time: "12:00"
+      timezone: "Europe/Berlin"
+    allow:
+      - dependency-type: direct
+    groups:
+      angular:
+        patterns:
+          - "@angular/*"
+      ng-icons:
+        patterns:
+          - "@ng-icons/*"

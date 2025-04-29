@@ -33,3 +33,19 @@ de = "Wenn das nicht funktioniert:"
 [callback.home]
 en = "Back to Home"
 de = "Zurück zur Startseite"
+
+[sidebar.category.groundwater]
+en = "Groundwater"
+de = "Grundwasser"
+
+[sidebar.category.precipitation]
+en = "Precipitation"
+de = "Niederschlag"
+
+[sidebar.category.water-usage]
+en = "Water Usage"
+de = "Wasserverbrauch"
+
+[sidebar.category.waterworks]
+en = "Waterworks"
+de = "Wasserwerke"
