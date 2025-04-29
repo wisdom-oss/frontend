@@ -18,6 +18,7 @@
   "typescript.tsdk": "./node_modules/typescript/lib",
   "cSpell.words": [
     "bbox",
+    "cartesian",
     "greenable",
     "oowv"
   ]
