@@ -107,6 +107,7 @@ export class WeatherDataComponent {
   protected lang = signals.lang();
   protected document = inject(DOCUMENT);
   private selectDiv = viewChild<ElementRef<HTMLDivElement>>("select");
+  protected selectDivWidth = signal(0);
   private downloadAnchor =
     viewChild.required<ElementRef<HTMLAnchorElement>>("downloadAnchor");
 
@@ -204,7 +205,8 @@ export class WeatherDataComponent {
 
       // only update bounds if select div is rendered
       let selectDiv = this.selectDiv();
-      if (!selectDiv) return;
+      let selectDivWidth = this.selectDivWidth();
+      if (!selectDiv || !selectDivWidth) return;
 
       let bbox = turf.bbox(selected.geometry);
       let padding = 0.01;
