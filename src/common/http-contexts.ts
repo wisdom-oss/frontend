@@ -1,6 +1,6 @@
 import {HttpContextToken} from "@angular/common/http";
-import {Schema} from "ajv";
 import {Duration} from "dayjs/plugin/duration";
+import typia from "typia";
 
 /**
  * Centralized collection of HTTP context tokens used in the frontend.
@@ -20,12 +20,19 @@ export const httpContexts = {
   authenticate: new HttpContextToken<undefined | boolean>(() => undefined),
 
   /**
-   * Specifies a schema to validate the response data.
+   * Validates response data using a Typia validator.
    *
-   * Uses AJV to validate the response data against a JSON Type Definition (JTD).
-   * An error will be thrown if the response does not match the schema.
+   * Set this token to a validator function created by `typia.createValidate<T>()`.
+   * The function will be called with the response data and must return a Typia
+   * validation result.
+   *
+   * @danger
+   * Always call `typia.createValidate<T>()` with a type parameter.
+   * If you forget it, the interceptor might hang.
    */
-  validateSchema: new HttpContextToken<Schema | undefined>(() => undefined),
+  validateType: new HttpContextToken<
+    undefined | ((input: unknown) => typia.IValidation<any>)
+  >(() => undefined),
 
   /**
    * Indicates whether a response should be cached in the IndexedDB.
