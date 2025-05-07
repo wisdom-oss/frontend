@@ -74,7 +74,13 @@ const RATES = {
     properties: {
       value: {type: "float64"},
       unit: {type: "string"},
-      per: {type: "float64"},
+      per: {properties: {
+        // numbers here should be 64 bit, but ajv can't, so floats
+        Microseconds: {type: "float64"},
+        Days: {type: "float64"},
+        Months: {type: "float64"},
+        Valid: {type: "boolean"}
+      }},
     },
   },
 } as const;
@@ -157,7 +163,7 @@ const USAGE_LOCATIONS = {
       location: {
         properties: {
           type: {enum: ["Point"]},
-          coordinates: {elements: {type: "uint32"}},
+          coordinates: {elements: {type: "float64"}},
         },
       },
     },
