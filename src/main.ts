@@ -7,9 +7,13 @@ import {RouterOutlet} from "@angular/router";
 import {TranslateService} from "@ngx-translate/core";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
+import isoWeek from "dayjs/plugin/isoWeek";
+import localizedFormat from "dayjs/plugin/localizedFormat";
 
 import {wisdomAppConfig} from "./config";
 import {configureTranslations} from "./i18n";
+
+import "dayjs/locale/de";
 
 @Component({
   selector: "app",
@@ -21,6 +25,8 @@ export class AppComponent {
 
   constructor(translate: TranslateService) {
     dayjs.extend(duration);
+    dayjs.extend(isoWeek);
+    dayjs.extend(localizedFormat);
     configureTranslations(translate);
     registerLocaleData(localeDe, "de", localeDeExtra);
   }

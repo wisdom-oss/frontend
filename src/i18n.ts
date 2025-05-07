@@ -4,6 +4,7 @@ import {
 } from "@ngx-translate/core";
 
 import {asserts} from "./common/asserts";
+import common from "./common/i18n.toml";
 import core from "./core/i18n.toml";
 import beWaterSmart from "./modules/be-water-smart/i18n.toml";
 import growl from "./modules/growl/i18n.toml";
@@ -15,6 +16,7 @@ import weatherData from "./modules/weather-data/i18n.toml";
 // add translations to this record
 const modules: NestedStringRecord = {
   core,
+  common,
   growl,
   "be-water-smart": beWaterSmart,
   "long-term-forecast": longTermForecast,

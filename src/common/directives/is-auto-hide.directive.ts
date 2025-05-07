@@ -41,6 +41,7 @@ export class IsAutoHideDirective {
   ) {
     effect(() => {
       let element = service.trigger();
+      if (!element) return;
       if (!elementRef.nativeElement.contains(element)) {
         this.isActive.set(false);
       }

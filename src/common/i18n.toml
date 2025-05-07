@@ -1,0 +1,27 @@
+[components.date-time-picker.day.monday]
+en = "Mo"
+de = "Mo"
+
+[components.date-time-picker.day.tuesday]
+en = "Tu"
+de = "Di"
+
+[components.date-time-picker.day.wednesday]
+en = "We"
+de = "Mi"
+
+[components.date-time-picker.day.thursday]
+en = "Th"
+de = "Do"
+
+[components.date-time-picker.day.friday]
+en = "Fr"
+de = "Fr"
+
+[components.date-time-picker.day.saturday]
+en = "Sa"
+de = "Sa"
+
+[components.date-time-picker.day.sunday]
+en = "Su"
+de = "So"

@@ -1,4 +1,4 @@
-<div style="position: relative">
+<div style="position: relative" is-auto-hide [is-active-signal]="isActive">
   <div
     class="tags has-addons mb-0"
     [class.are-normal]="size() == 'small'"
@@ -17,9 +17,17 @@
     <button
       class="tag px-3"
       [class.is-flex-grow-1]="fullWidth()"
-      (click)="collapsed.toggle()"
+      (click)="isActive.toggle()"
     >
-      2025-04-28
+      <span>
+        @let day = selected()[0] ?? util.dayjs();
+        @let content = day.locale(lang()).format("L");
+        @if (selected()[0]) {
+          {{ content }}
+        } @else {
+          {{ content.replaceAll(matchDigits, "0") }}
+        }
+      </span>
     </button>
     @if (ranged()) {
       <span class="tag px-1" style="user-select: none">&#9135;</span>
@@ -31,6 +39,7 @@
       class="tag"
       [class.has-text-danger]="flavor() == 'lean'"
       [class.is-danger]="flavor() == 'bold'"
+      (click)="selected.set(placeholder())"
     >
       <span class="icon">
         <ng-icon name="remixResetLeftLine"></ng-icon>
@@ -39,16 +48,64 @@
   </div>
   <div
     style="position: absolute; z-index: 1"
-    [style.display]="collapsed() ? 'none' : 'unset'"
+    [style.display]="isActive() ? 'unset' : 'none'"
   >
     <div class="card">
       <div class="card-content">
-        <div style="display: grid; grid-template-columns: repeat(7, 1fr); grid-template-rows: repeat(7, 1fr);">
-          @for (day of ["mo", "di", "mi", "do", "fr", "sa", "so"]; track day) {
-            <div>{{day}}</div>
+        <div class="level mb-2">
+          <div class="level-left is-flex-grow-1">
+            <button
+              class="button is-small pl-1 is-fullwidth is-justify-content-flex-start"
+              style="border-style: none; box-shadow: none"
+            >
+              <span class="is-size-5">{{
+                viewMonthStart().locale(lang()).format("MMMM YYYY")
+              }}</span>
+            </button>
+          </div>
+          <div class="level-right">
+            <button
+              class="button is-small"
+              style="border-style: none; box-shadow: none"
+              (click)="previousMonth()"
+            >
+              <span class="icon is-size-5">
+                <ng-icon name="remixArrowUpSFill"></ng-icon>
+              </span>
+            </button>
+            <button
+              class="button is-small"
+              style="border-style: none; box-shadow: none"
+              (click)="nextMonth()"
+            >
+              <span class="icon is-size-5">
+                <ng-icon name="remixArrowDownSFill"></ng-icon>
+              </span>
+            </button>
+          </div>
+        </div>
+        <div class="date-grid">
+          @for (day of days; track day) {
+            <div
+              [translate]="'common.components.date-time-picker.day.' + day"
+            ></div>
           }
           @for (i of util.range(42); track i) {
-            <div>{{i}}</div>
+            @let day = viewDay().add(i, "days");
+            @let isBefore = day.isBefore(viewMonthStart());
+            @let isAfter = day.isAfter(viewMonthEnd());
+            <a
+              class="button"
+              [class.is-outside-month]="isBefore || isAfter"
+              [class.is-primary]="
+                selected()[0] && day.isSame(selected()[0], 'day')
+              "
+              (click)="selected.set([day, undefined])"
+              (click)="isBefore && previousMonth()"
+              (click)="isAfter && nextMonth()"
+              (click)="!ranged() && isActive.set(false)"
+              >{{ day.date() }}</a
+            >
           }
         </div>
       </div>
