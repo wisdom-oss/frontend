@@ -6,13 +6,14 @@
   </div>
 
   <div class="card-content is-flex-grow-1" style="overflow: auto">
-    @for (layout of layout; track layout) {
+    @for (layout of layout; track layout; let first = $first) {
       <div class="block">
         <date-time
           [ranged]="layout.ranged"
           [fullWidth]="layout.fullWidth"
           [flavor]="layout.flavor"
           [size]="layout.size"
+          [collapsed]="!$first"
         ></date-time>
       </div>
     }

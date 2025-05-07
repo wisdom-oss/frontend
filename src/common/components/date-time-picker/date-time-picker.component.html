@@ -1,34 +1,57 @@
-<div 
-  class="tags has-addons"
-  [class.are-normal]="size() == 'small'"
-  [class.are-medium]="size() == 'medium'"
-  [class.are-large]="size() == 'large'"
->
-  <span
-    class="tag"
-    [class.has-text-primary]="flavor() == 'lean'"
-    [class.is-primary]="flavor() == 'bold'"
+<div style="position: relative">
+  <div
+    class="tags has-addons mb-0"
+    [class.are-normal]="size() == 'small'"
+    [class.are-medium]="size() == 'medium'"
+    [class.are-large]="size() == 'large'"
   >
-    <span class="icon">
-      <ng-icon name="remixCalendarLine"></ng-icon>
+    <span
+      class="tag"
+      [class.has-text-primary]="flavor() == 'lean'"
+      [class.is-primary]="flavor() == 'bold'"
+    >
+      <span class="icon">
+        <ng-icon name="remixCalendarLine"></ng-icon>
+      </span>
     </span>
-  </span>
-  <button class="tag px-3" [class.is-flex-grow-1]="fullWidth()">
-    2025-04-28
-  </button>
-  @if (ranged()) {
-    <span class="tag px-1" style="user-select: none">&#9135;</span>
-    <button class="tag px-3" [class.is-flex-grow-1]="fullWidth()">
-      2025-04-29
+    <button
+      class="tag px-3"
+      [class.is-flex-grow-1]="fullWidth()"
+      (click)="collapsed.toggle()"
+    >
+      2025-04-28
     </button>
-  }
-  <button
-    class="tag"
-    [class.has-text-danger]="flavor() == 'lean'"
-    [class.is-danger]="flavor() == 'bold'"
+    @if (ranged()) {
+      <span class="tag px-1" style="user-select: none">&#9135;</span>
+      <button class="tag px-3" [class.is-flex-grow-1]="fullWidth()">
+        2025-04-29
+      </button>
+    }
+    <button
+      class="tag"
+      [class.has-text-danger]="flavor() == 'lean'"
+      [class.is-danger]="flavor() == 'bold'"
+    >
+      <span class="icon">
+        <ng-icon name="remixResetLeftLine"></ng-icon>
+      </span>
+    </button>
+  </div>
+  <div
+    style="position: absolute; z-index: 1"
+    [style.display]="collapsed() ? 'none' : 'unset'"
   >
-    <span class="icon">
-      <ng-icon name="remixResetLeftLine"></ng-icon>
-    </span>
-  </button>
+    <div class="card">
+      <div class="card-content">
+        <div style="display: grid; grid-template-columns: repeat(7, 1fr); grid-template-rows: repeat(7, 1fr);">
+          @for (day of ["mo", "di", "mi", "do", "fr", "sa", "so"]; track day) {
+            <div>{{day}}</div>
+          }
+          @for (i of util.range(42); track i) {
+            <div>{{i}}</div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
