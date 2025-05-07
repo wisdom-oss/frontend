@@ -28,8 +28,6 @@ export const routes: Routes = [
         path: "water-rights",
         component: WaterRightsComponent,
         children: waterRightsRoutes,
-        // TODO: use proper auth guard here
-        canActivate: [() => !!inject(AuthService).accessToken()],
       },
       {
         path: "long-term-forecast",

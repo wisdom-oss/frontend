@@ -76,8 +76,6 @@ export class SidebarComponent implements AfterViewInit {
   routerLinks?: QueryList<SidebarLinkDirective>;
 
   protected authorized = {
-    // TODO: use proper access here
-    waterRights: computed(() => !!this.auth.accessToken()),
     oowvActionMap: computed(() =>
       this.auth.scopes().has(...OowvActionMapComponent.SCOPES),
     ),
