@@ -372,4 +372,29 @@ export namespace signals {
       return computed(() => makeDayjs(configSignal(), format));
     }
   }
+
+  /**
+   * Creates a writable signal that mirrors the negation of another boolean signal.
+   *
+   * The returned signal always reflects the opposite of the `inner` signal.
+   * Setting it will invert the given value and update the original signal.
+   *
+   * Useful when you want a toggled view of some state (e.g. `!isVisible`).
+   *
+   * @param inner A `WritableSignal<boolean>` to mirror in inverted form.
+   * @returns A writable signal with inverted logic.
+   *
+   * @example
+   * const visible = signal(true);
+   * const hidden = signals.not(visible);
+   *
+   * hidden(); // false
+   * hidden.set(true); // sets visible to false
+   * console.log(visible()); // false
+   */
+  export function not(inner: WritableSignal<boolean>): WritableSignal<boolean> {
+    let get = () => !inner();
+    let set = (value: boolean) => inner.set(!value);
+    return Object.assign(get, inner, {set});
+  }
 }

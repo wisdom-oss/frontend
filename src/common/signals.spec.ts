@@ -84,3 +84,27 @@ describe("signals.dayjs.required", () => {
     expect(d().format("YYYY-MM-DD")).toBe("2025-02-01");
   });
 });
+
+describe("signals.not", () => {
+  it("should return the opposite value of the inner signal", () => {
+    const inner = signal(true);
+    const inverted = signals.not(inner);
+
+    expect(inverted()).toBe(false);
+    inner.set(false);
+    expect(inverted()).toBe(true);
+  });
+
+  it("should update the inner signal with the negated value when set", () => {
+    const inner = signal(true);
+    const inverted = signals.not(inner);
+
+    inverted.set(true); // this means inner should now be false
+    expect(inner()).toBe(false);
+    expect(inverted()).toBe(true);
+
+    inverted.set(false); // inner should now be true again
+    expect(inner()).toBe(true);
+    expect(inverted()).toBe(false);
+  });
+});
