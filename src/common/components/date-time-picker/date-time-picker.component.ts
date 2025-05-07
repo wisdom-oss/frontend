@@ -17,4 +17,5 @@ export class DateTimePickerComponent {
   readonly ranged = input(false);
   readonly fullWidth = input(false);
   readonly flavor = input<"lean" | "bold">("bold");
+  readonly size = input<"small" | "medium" | "large">("large");
 }

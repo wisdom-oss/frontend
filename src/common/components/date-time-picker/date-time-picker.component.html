@@ -1,4 +1,9 @@
-<div class="tags has-addons are-large">
+<div 
+  class="tags has-addons"
+  [class.are-normal]="size() == 'small'"
+  [class.are-medium]="size() == 'medium'"
+  [class.are-large]="size() == 'large'"
+>
   <span
     class="tag"
     [class.has-text-primary]="flavor() == 'lean'"

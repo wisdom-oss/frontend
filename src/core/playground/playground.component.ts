@@ -12,5 +12,6 @@ export class PlaygroundComponent {
     flavor: ["lean", "bold"],
     ranged: [false, true],
     fullWidth: [false, true],
+    size: ["large", "medium", "small"],
   } as const);
 }
