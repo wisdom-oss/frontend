@@ -37,18 +37,14 @@ export class WaterRightsService {
       .get<WaterRightsService.UsageLocations>(url, {
         observe: "events",
         reportProgress: true,
-        context: new HttpContext().set(
-          httpContexts.validateSchema,
-          USAGE_LOCATIONS,
-        ),
-        // TODO: insert cache again when content length is done
-        // .set(httpContexts.cache, [url, dayjs.duration(3, "days")]),
+        context: new HttpContext()
+          .set(httpContexts.validateSchema, USAGE_LOCATIONS)
+          .set(httpContexts.cache, [url, dayjs.duration(3, "days")]),
       })
       .subscribe(event => {
         console.debug(event);
         switch (event.type) {
           case HttpEventType.ResponseHeader:
-            // TODO: check if content-length needs to be check or total of progress event is enough
             event as HttpHeaderResponse;
             let contentLengthHeader =
               event.headers.get("content-length") ??
