@@ -1,12 +1,4 @@
-import {
-  computed,
-  effect,
-  signal,
-  viewChild,
-  Component,
-  Signal,
-} from "@angular/core";
-import {toSignal} from "@angular/core/rxjs-interop";
+import {computed, effect, signal, Component, Signal} from "@angular/core";
 import {ActivatedRoute, Router} from "@angular/router";
 import {
   ControlComponent,
@@ -15,28 +7,30 @@ import {
   GeoJSONSourceComponent,
   NavigationControlDirective,
 } from "@maplibre/ngx-maplibre-gl";
-import {TranslateDirective} from "@ngx-translate/core";
 import {BBox, FeatureCollection, Point} from "geojson";
 import {StyleSpecification} from "maplibre-gl";
 
-import {WaterRightsService} from "../../../../api/water-rights.service";
+import {GeoDataService} from "../../../../api/geo-data.service";
 import colorful from "../../../../assets/map/styles/colorful.json";
 import {signals} from "../../../../common/signals";
+import {LayerSelectionControlComponent} from "../../../../common/components/map/layer-selection-control/layer-selection-control.component";
 import {ResizeMapOnLoadDirective} from "../../../../common/directives/resize-map-on-load.directive";
 import {ClusterPolygonSourceDirective} from "../../../../common/directives/cluster-polygon-source.directive";
 import {MapCursorDirective} from "../../../../common/directives/map-cursor.directive";
 
+type LegalDepartment = "A" | "B" | "C" | "D" | "E" | "F" | "K" | "L";
+
 @Component({
   imports: [
+    ClusterPolygonSourceDirective,
     ControlComponent,
     GeoJSONSourceComponent,
+    LayerComponent,
+    LayerSelectionControlComponent,
     MapComponent,
+    MapCursorDirective,
     NavigationControlDirective,
     ResizeMapOnLoadDirective,
-    LayerComponent,
-    ClusterPolygonSourceDirective,
-    MapCursorDirective,
-    TranslateDirective,
   ],
   templateUrl: "./select-view.component.html",
 })
@@ -46,27 +40,46 @@ export class SelectViewComponent {
   protected clusterHoverId = signal<undefined | number>(undefined);
   protected hoverId = signal<undefined | number>(undefined);
   protected fitBounds = signal<undefined | BBox>(undefined);
-  protected waterRightsSource =
-    viewChild.required<GeoJSONSourceComponent>("waterRightsSource");
 
-  protected usageLocationSize: Signal<number | null | undefined>;
-  protected usageLocationProgress: Signal<number>;
   protected usageLocations: Signal<
-    undefined | FeatureCollection<Point, WaterRightsService.UsageLocations[0]>
+    | undefined
+    | FeatureCollection<
+        Point,
+        {
+          id: number;
+          name: string;
+          legalDepartment: LegalDepartment;
+          waterRight: number;
+        }
+      >
   >;
 
-  protected mapLoadStatus = signal<
-    "receiving" | "downloading" | "rendering" | "done"
-  >("receiving");
-  protected mapLoadStatusIndex = computed(() => {
-    // prettier-ignore
-    switch (this.mapLoadStatus()) {
-      case "receiving": return 1;
-      case "downloading": return 2;
-      case "rendering": return 3;
-      case "done": return 4;
-    }
-  });
+  protected selectLegalDepartments: Record<
+    LegalDepartment,
+    signals.ToggleableSignal
+  > = {
+    A: signals.toggleable(false),
+    B: signals.toggleable(false),
+    C: signals.toggleable(false),
+    D: signals.toggleable(false),
+    E: signals.toggleable(true),
+    F: signals.toggleable(false),
+    K: signals.toggleable(false),
+    L: signals.toggleable(false),
+  };
+
+  protected filteredUsageLocations: SelectViewComponent["usageLocations"] =
+    computed(() => {
+      let usageLocations = this.usageLocations();
+      if (!usageLocations) return undefined;
+      return {
+        type: "FeatureCollection",
+        features: usageLocations.features.filter(
+          ({properties: {legalDepartment}}) =>
+            this.selectLegalDepartments[legalDepartment](),
+        ),
+      };
+    });
 
   protected hover = computed(() => {
     let locations = this.usageLocations();
@@ -78,45 +91,35 @@ export class SelectViewComponent {
   protected util = {log: console.log};
 
   constructor(
-    private service: WaterRightsService,
+    geo: GeoDataService,
     private router: Router,
     private route: ActivatedRoute,
   ) {
-    let fetchUsageLocation = this.service.fetchUsageLocations();
-    this.usageLocationSize = signals.fromPromise(fetchUsageLocation.total);
-    this.usageLocationProgress = toSignal(fetchUsageLocation.progress, {
-      initialValue: 0,
-    });
     this.usageLocations = signals.fromPromise(
-      fetchUsageLocation.data,
+      geo.fetchLayerContents("water_right_usage_locations"),
       locations => ({
         type: "FeatureCollection",
-        features: locations
-          .filter(location => !!location.location)
-          .map(location => ({
-            type: "Feature",
+        features: (locations?.data ?? []).map(location => ({
+          type: "Feature",
+          id: location.id,
+          geometry: location.geometry as Point,
+          properties: {
             id: location.id,
-            geometry: location.location!,
-            properties: location,
-          })),
+            name: location.name as string,
+            legalDepartment: location.additionalProperties![
+              "legalDepartment"
+            ]! as LegalDepartment,
+            waterRight: location.additionalProperties!["waterRight"]! as number,
+          },
+        })),
       }),
     );
 
-    effect(() => {
-      if (this.mapLoadStatus() != "receiving") return;
-      if (this.usageLocationSize() === undefined) return;
-      this.mapLoadStatus.set("downloading");
-    });
+    effect(() => console.log(this.hover()));
 
-    effect(() => {
-      if (!this.usageLocations()) return;
-      this.mapLoadStatus.set("rendering");
-    });
-  }
-
-  protected onMapIdle() {
-    if (this.mapLoadStatus() != "rendering") return;
-    this.mapLoadStatus.set("done");
+    geo
+      .fetchLayerContents("water_right_usage_locations")
+      .then(data => console.log(data));
   }
 
   protected openDetails(no: number) {

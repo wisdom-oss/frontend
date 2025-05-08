@@ -20,7 +20,9 @@ export namespace signals {
    *
    * @template S A WritableSignal type holding a boolean value.
    */
-  export type ToggleableSignal<S extends WritableSignal<boolean>> = S & {
+  export type ToggleableSignal<
+    S extends WritableSignal<boolean> = WritableSignal<boolean>,
+  > = S & {
     /**
      * Toggles the boolean value of the signal.
      */

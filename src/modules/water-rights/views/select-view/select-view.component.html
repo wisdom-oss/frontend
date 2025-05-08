@@ -3,66 +3,34 @@
     class="card-content p-0 is-clipped is-fullheight"
     style="position: relative"
   >
-    @if (mapLoadStatus() != "done") {
-      <div
-        loader
-        style="position: absolute; z-index: 1"
-        class="is-fullheight is-fullwidth is-flex is-justify-content-center is-align-items-center"
-      >
-        <div class="message" style="width: 60%">
-          <div
-            class="message-body content"
-            style="border-color: var(--bulma-primary)"
-          >
-            <div class="level">
-              <div class="level-left">
-                <p
-                  class="is-size-4"
-                  [translate]="'water-rights.loading.map.' + mapLoadStatus()"
-                ></p>
-              </div>
-              <div class="level-right">
-                <p>[{{ mapLoadStatusIndex() }}/3]</p>
-              </div>
-            </div>
-            <progress
-              [attr.value]="
-                mapLoadStatus() == 'downloading' && usageLocationSize()
-                  ? usageLocationProgress()
-                  : null
-              "
-              [attr.max]="
-                mapLoadStatus() == 'downloading' && usageLocationSize()
-                  ? usageLocationSize()
-                  : null
-              "
-              class="progress is-primary"
-            ></progress>
-          </div>
-        </div>
-      </div>
-    }
-
     <mgl-map
-      class="is-fullheight skeleton-block"
-      [class.skeleton-block]="mapLoadStatus() != 'done'"
+      class="is-fullheight"
       [style]="style"
       [zoom]="[6.8]"
       [center]="{lat: 52.8, lon: 9.2}"
-      [cursor]="clusterHoverId() || hover()?.no ? 'pointer' : 'grab'"
+      [cursor]="clusterHoverId() || hover()?.waterRight ? 'pointer' : 'grab'"
       [fitBounds]="$any(fitBounds())"
       (click)="clusterHoverId() && fitBounds.set(outlineSource.polygon().bbox)"
-      (click)="hover()?.no && openDetails(hover()!.waterRight!)"
-      (idle)="onMapIdle()"
+      (click)="hover()?.waterRight && openDetails(hover()!.waterRight!)"
     >
       <ng-container controls>
         <mgl-control position="top-left" mglNavigation [showCompass]="false">
+        </mgl-control>
+        <mgl-control position="top-right">
+          <map-layer-selection-control
+            [layers]="selectLegalDepartments"
+          ></map-layer-selection-control>
         </mgl-control>
       </ng-container>
       <ng-container sources>
         <mgl-geojson-source
           id="water-rights-source"
-          [data]="usageLocations() ?? {type: 'FeatureCollection', features: []}"
+          [data]="
+            filteredUsageLocations() ?? {
+              type: 'FeatureCollection',
+              features: [],
+            }
+          "
           [cluster]="true"
           #waterRightsSource
         ></mgl-geojson-source>

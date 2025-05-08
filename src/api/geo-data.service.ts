@@ -37,7 +37,7 @@ export class GeoDataService {
     try {
       return await firstValueFrom(
         this.http.get<GeoDataService.LayerInformation>(
-          `${URL}/v2/${layerRef}`,
+          `${URL}/v1/${layerRef}`,
           {
             context: new HttpContext().set(
               httpContexts.validateSchema,
@@ -127,7 +127,7 @@ const LAYER_INFORMATION = {
   optionalProperties: {
     description: {type: "string"},
     attribution: {type: "string"},
-    attributionURL: {type: "string"},
+    attributionURL: {type: "string", nullable: true},
     crs: {type: "uint32"},
     private: {type: "boolean"},
   },
