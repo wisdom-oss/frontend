@@ -1,1 +1,40 @@
-<p>detail-view works!</p>
+@let waterRight = data()?.waterRight;
+<!-- @let usageLocations = data()?.usageLocations; -->
+
+@if (waterRight) {
+  <div class="card is-fullheight" style="overflow: auto">
+    <div class="card-header">
+      <div class="card-header-title">
+        {{ waterRight.subject }}
+      </div>
+    </div>
+    <div class="card-image" style="height: 20rem">
+      <mgl-map
+        class="is-fullheight"
+        [style]="style"
+        [zoom]="[6.8]"
+        [center]="{lat: 52.8, lon: 9.2}"
+      ></mgl-map>
+      @if (usageLocationPoints()) {
+        <mgl-geojson-source
+          id="usage-locations-source"
+          [data]="{type: 'FeatureCollection', features: []}"
+        ></mgl-geojson-source>
+        <mgl-layer
+          id="usage-locations-symbol"
+          type="symbol"
+          source="usage-locations-source"
+          [layout]="{
+            'icon-image': 'remixicon:map-pin-2-line',
+            'icon-anchor': 'bottom',
+            'icon-overlap': 'always',
+            'text-field': ['get', 'name'],
+            'text-font': ['noto_sans_regular'],
+            'text-anchor': 'top',
+          }"
+        ></mgl-layer>
+      }
+    </div>
+    <div class="card-content"></div>
+  </div>
+}
