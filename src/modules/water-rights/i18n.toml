@@ -1,3 +1,35 @@
 [display.module]
 en = "Water Rights"
 de = "Wasserrechte"
+
+[legal-department.A]
+en = "[A] Withdrawal of water or solid substances from surface waters"
+de = "[A] Entnahme von Wasser oder Entnahmen fester Stoffe aus oberirdischen Gewässern"
+
+[legal-department.B]
+en = "[B] Introduction and discharge of substances into surface waters"
+de = "[B] Einbringen und Einleiten von Stoffen in oberirdische und Küstengewässer"
+
+[legal-department.C]
+en = "[C] Damming and lowering of surface waters"
+de = "[C] Aufstauen und Absenken oberirdischer Gewässer"
+
+[legal-department.D]
+en = "[D] Other impacts on surface waters"
+de = "[D] Andere Einwirkung auf oberirdische Gewässer"
+
+[legal-department.E]
+en = "[E] Withdrawal, extraction, conveyance and discharge of groundwater"
+de = "[E] Entnahme, Zutageförderung, Zutageleiten und Ableiten von Grundwasser"
+
+[legal-department.F]
+en = "[F] Other uses and impacts on groundwater"
+de = "[F] Andere Nutzungen und Einwirkungen auf das Grundwasser"
+
+[legal-department.K]
+en = "[K] Compulsory rights"
+de = "[K] Zwangsrechte"
+
+[legal-department.L]
+en = "[L] Fishing Rights"
+de = "[L] Fischereirechte"
