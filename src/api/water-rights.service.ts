@@ -6,7 +6,7 @@ import {
   HttpResponse,
   HttpEventType,
 } from "@angular/common/http";
-import {signal, Injectable} from "@angular/core";
+import {Injectable} from "@angular/core";
 import {JTDDataType} from "ajv/dist/core";
 import dayjs from "dayjs";
 import {GeoJsonObject} from "geojson";
@@ -25,11 +25,11 @@ export class WaterRightsService {
 
   fetchUsageLocations(): {
     progress: Observable<number>;
-    total: PromiseLike<number | undefined>;
+    total: PromiseLike<number | null>;
     data: PromiseLike<WaterRightsService.UsageLocations>;
   } {
     let progress = new BehaviorSubject(0);
-    let total = new Once<number | undefined>();
+    let total = new Once<number | null>();
     let data = new Once<WaterRightsService.UsageLocations>();
 
     let url = `${URL}/`;
@@ -41,6 +41,8 @@ export class WaterRightsService {
           httpContexts.validateSchema,
           USAGE_LOCATIONS,
         ),
+        // TODO: insert cache again when content length is done
+        // .set(httpContexts.cache, [url, dayjs.duration(3, "days")]),
       })
       .subscribe(event => {
         console.debug(event);
@@ -48,10 +50,12 @@ export class WaterRightsService {
           case HttpEventType.ResponseHeader:
             // TODO: check if content-length needs to be check or total of progress event is enough
             event as HttpHeaderResponse;
-            let contentLengthHeader = event.headers.get("content-length");
-            if (!contentLengthHeader) return total.set(undefined);
+            let contentLengthHeader =
+              event.headers.get("content-length") ??
+              event.headers.get("x-content-length");
+            if (!contentLengthHeader) return total.set(null);
             let contentLength = parseInt(contentLengthHeader);
-            if (Number.isNaN(contentLength)) return total.set(undefined);
+            if (Number.isNaN(contentLength)) return total.set(null);
             total.set(contentLength);
             break;
           case HttpEventType.DownloadProgress:

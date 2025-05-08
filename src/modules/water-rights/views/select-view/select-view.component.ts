@@ -1,4 +1,12 @@
-import {computed, signal, Component, Signal} from "@angular/core";
+import {
+  computed,
+  effect,
+  signal,
+  viewChild,
+  Component,
+  Signal,
+} from "@angular/core";
+import {toSignal} from "@angular/core/rxjs-interop";
 import {ActivatedRoute, Router} from "@angular/router";
 import {
   ControlComponent,
@@ -7,6 +15,7 @@ import {
   GeoJSONSourceComponent,
   NavigationControlDirective,
 } from "@maplibre/ngx-maplibre-gl";
+import {TranslateDirective} from "@ngx-translate/core";
 import {BBox, FeatureCollection, Point} from "geojson";
 import {StyleSpecification} from "maplibre-gl";
 
@@ -27,6 +36,7 @@ import {MapCursorDirective} from "../../../../common/directives/map-cursor.direc
     LayerComponent,
     ClusterPolygonSourceDirective,
     MapCursorDirective,
+    TranslateDirective,
   ],
   templateUrl: "./select-view.component.html",
 })
@@ -36,10 +46,27 @@ export class SelectViewComponent {
   protected clusterHoverId = signal<undefined | number>(undefined);
   protected hoverId = signal<undefined | number>(undefined);
   protected fitBounds = signal<undefined | BBox>(undefined);
+  protected waterRightsSource =
+    viewChild.required<GeoJSONSourceComponent>("waterRightsSource");
 
+  protected usageLocationSize: Signal<number | null | undefined>;
+  protected usageLocationProgress: Signal<number>;
   protected usageLocations: Signal<
     undefined | FeatureCollection<Point, WaterRightsService.UsageLocations[0]>
   >;
+
+  protected mapLoadStatus = signal<
+    "receiving" | "downloading" | "rendering" | "done"
+  >("receiving");
+  protected mapLoadStatusIndex = computed(() => {
+    // prettier-ignore
+    switch (this.mapLoadStatus()) {
+      case "receiving": return 1;
+      case "downloading": return 2;
+      case "rendering": return 3;
+      case "done": return 4;
+    }
+  });
 
   protected hover = computed(() => {
     let locations = this.usageLocations();
@@ -48,12 +75,18 @@ export class SelectViewComponent {
       ?.properties;
   });
 
+  protected util = {log: console.log};
+
   constructor(
     private service: WaterRightsService,
     private router: Router,
     private route: ActivatedRoute,
   ) {
     let fetchUsageLocation = this.service.fetchUsageLocations();
+    this.usageLocationSize = signals.fromPromise(fetchUsageLocation.total);
+    this.usageLocationProgress = toSignal(fetchUsageLocation.progress, {
+      initialValue: 0,
+    });
     this.usageLocations = signals.fromPromise(
       fetchUsageLocation.data,
       locations => ({
@@ -68,6 +101,22 @@ export class SelectViewComponent {
           })),
       }),
     );
+
+    effect(() => {
+      if (this.mapLoadStatus() != "receiving") return;
+      if (this.usageLocationSize() === undefined) return;
+      this.mapLoadStatus.set("downloading");
+    });
+
+    effect(() => {
+      if (!this.usageLocations()) return;
+      this.mapLoadStatus.set("rendering");
+    });
+  }
+
+  protected onMapIdle() {
+    if (this.mapLoadStatus() != "rendering") return;
+    this.mapLoadStatus.set("done");
   }
 
   protected openDetails(no: number) {

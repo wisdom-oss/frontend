@@ -1,3 +1,15 @@
 [display.module]
 en = "Water Rights"
 de = "Wasserrechte"
+
+[loading.map.receiving]
+en = "Receiving server headers..."
+de = "Warte auf Serverantwort..."
+
+[loading.map.downloading]
+en = "Downloading usage locations..."
+de = "Lade Standortdaten herunter..."
+
+[loading.map.rendering]
+en = "Rendering usage locations..."
+de = "Rendere Standortdaten..."
