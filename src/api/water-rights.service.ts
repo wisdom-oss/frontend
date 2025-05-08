@@ -7,6 +7,7 @@ import {
   HttpEventType,
 } from "@angular/common/http";
 import {Injectable} from "@angular/core";
+import {parseMultipart} from "@mjackson/multipart-parser";
 import {JTDDataType} from "ajv/dist/core";
 import dayjs from "dayjs";
 import {GeoJsonObject} from "geojson";
@@ -14,6 +15,7 @@ import {firstValueFrom, Observable, BehaviorSubject} from "rxjs";
 
 import {httpContexts} from "../common/http-contexts";
 import {Once} from "../common/utils/once";
+import {SchemaValidationService} from "../core/schema/schema-validation.service";
 
 const URL = "/api/water-rights" as const;
 
@@ -21,7 +23,10 @@ const URL = "/api/water-rights" as const;
   providedIn: "root",
 })
 export class WaterRightsService {
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private schema: SchemaValidationService,
+  ) {}
 
   fetchUsageLocations(): {
     progress: Observable<number>;
@@ -68,17 +73,53 @@ export class WaterRightsService {
     return {data, progress, total};
   }
 
-  fetchWaterRightDetails(
+  async fetchWaterRightDetails(
     no: number,
   ): Promise<WaterRightsService.WaterRightDetails> {
     let url = `${URL}/details/${no}`;
-    return firstValueFrom(
-      this.http.get<WaterRightsService.WaterRightDetails>(url, {
-        context: new HttpContext()
-          .set(httpContexts.validateSchema, WATER_RIGHT_DETAILS)
-          .set(httpContexts.cache, [url, dayjs.duration(3, "days")]),
-      }),
+    let res = await firstValueFrom(
+      this.http.get(url, {responseType: "text", observe: "response"}),
     );
+
+    let contentType = res.headers.get("content-type")?.split("; ");
+    if (contentType?.[0] !== "multipart/form-data") {
+      throw new Error("expected multipart/form-data");
+    }
+
+    let boundary = contentType[1].split("boundary=")[1];
+    let content = res.body!;
+    let endBoundary = `\r\n--${boundary}--\r\n`;
+    if (!content.endsWith(endBoundary)) content += endBoundary;
+
+    let waterRight: object | undefined = undefined;
+    let usageLocations: object[] | undefined = undefined;
+    let uint8Array = new TextEncoder().encode(content);
+    await parseMultipart(uint8Array, {boundary}, async part => {
+      switch (part.name) {
+        case "water-right":
+          return (waterRight = JSON.parse(await part.text()));
+        case "usage-locations":
+          return (usageLocations = JSON.parse(await part.text()));
+        default:
+          throw new Error("unexpected multipart name: " + part.name);
+      }
+    });
+
+    if (!waterRight) throw new Error("did not get water rights");
+    if (!usageLocations) throw new Error("did not get usage locations");
+
+    let data = {waterRight, usageLocations};
+    try {
+      return this.schema.validate<WaterRightsService.WaterRightDetails>(
+        WATER_RIGHT_DETAILS,
+        data,
+      );
+    } catch (e) {
+      if (e instanceof SchemaValidationService.Error) {
+        console.error("expected response type is invalid", data, e.errors);
+      }
+      throw e;
+    }
   }
 
   fetchAverageWithdrawals(
@@ -216,11 +257,11 @@ const USAGE_LOCATIONS = {
 
 const WATER_RIGHT_DETAILS = {
   properties: {
-    "water-right": {
+    waterRight: {
       properties: {},
       optionalProperties: {
         id: {type: "uint32"},
-        waterRightNumber: {type: "uint32"},
+        water_right_number: {type: "uint32"},
         holder: {type: "string"},
         validFrom: {type: "string"},
         validUntil: {type: "string"},
@@ -243,7 +284,7 @@ const WATER_RIGHT_DETAILS = {
         annotation: {type: "string"},
       },
     },
-    "usage-locations": USAGE_LOCATIONS,
+    usageLocations: USAGE_LOCATIONS,
   },
 } as const;
 
