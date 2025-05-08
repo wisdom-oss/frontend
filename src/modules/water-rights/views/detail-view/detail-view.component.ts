@@ -1,48 +1,47 @@
-import {NgIf} from "@angular/common";
-import {computed, effect, signal, Component, Signal} from "@angular/core";
+import {computed, effect, Component, Signal} from "@angular/core";
 import {ActivatedRoute} from "@angular/router";
 import {
+  ControlComponent,
   LayerComponent,
   MapComponent,
   GeoJSONSourceComponent,
+  NavigationControlDirective,
 } from "@maplibre/ngx-maplibre-gl";
-import {TranslatePipe} from "@ngx-translate/core";
 import dayjs from "dayjs";
-import {FeatureCollection, Point} from "geojson";
+import {BBox, FeatureCollection, Point} from "geojson";
 import {StyleSpecification} from "maplibre-gl";
+
+import * as turf from "@turf/turf";
 
 import {WaterRightsService} from "../../../../api/water-rights.service";
 import {GeoDataService} from "../../../../api/geo-data.service";
 import colorful from "../../../../assets/map/styles/colorful.json";
 import {signals} from "../../../../common/signals";
 
+type UsageLocations = FeatureCollection<
+  Point,
+  {id: number; name: string; waterRight: number}
+>;
+
 @Component({
-  imports: [MapComponent, GeoJSONSourceComponent, LayerComponent],
+  imports: [
+    MapComponent,
+    GeoJSONSourceComponent,
+    LayerComponent,
+    ControlComponent,
+    NavigationControlDirective,
+  ],
   templateUrl: "./detail-view.component.html",
 })
 export class DetailViewComponent {
   protected data: Signal<undefined | WaterRightsService.WaterRightDetails>;
-  private allUsageLocations: Signal<
-    | undefined
-    | FeatureCollection<Point, {id: number; name: string; waterRight: number}>
-  >;
-  protected usageLocationPoints: DetailViewComponent["allUsageLocations"] =
-    computed(() => {
-      let data = this.data();
-      let allUsageLocations = this.allUsageLocations();
-      if (!data || !allUsageLocations) return undefined;
 
-      let usageLocationIds = data.usageLocations.map(({id}) => id);
-
-      return {
-        type: "FeatureCollection",
-        features: allUsageLocations.features.filter(({properties: {id}}) =>
-          usageLocationIds.includes(id),
-        ),
-      };
-    });
-
-  protected style = colorful as any as StyleSpecification;
+  // prettier-ignore
+  protected mapData: {
+    style: StyleSpecification;
+    usageLocations: ReturnType<typeof DetailViewComponent["buildUsageLocations"]>;
+    fitBounds: Signal<undefined | BBox>,
+  };
 
   constructor(
     route: ActivatedRoute,
@@ -53,7 +52,27 @@ export class DetailViewComponent {
       service.fetchWaterRightDetails(+route.snapshot.queryParams["no"]!),
     );
 
-    this.allUsageLocations = signals.fromPromise(
+    let usageLocations = DetailViewComponent.buildUsageLocations(
+      geo,
+      this.data,
+    );
+
+    let fitBounds = DetailViewComponent.buildFitBounds(usageLocations);
+
+    this.mapData = {
+      style: colorful as any as StyleSpecification,
+      usageLocations,
+      fitBounds,
+    };
+
+    effect(() => console.log(this.data()));
+  }
+
+  private static buildUsageLocations(
+    geo: GeoDataService,
+    dataSignal: DetailViewComponent["data"],
+  ): Signal<undefined | UsageLocations> {
+    let allUsageLocations = signals.fromPromise(
       geo.fetchLayerContents(
         "water_right_usage_locations",
         undefined,
@@ -62,7 +81,7 @@ export class DetailViewComponent {
       locations => ({
         type: "FeatureCollection",
         features: (locations?.data ?? []).map(location => ({
-          type: "Feature",
+          type: "Feature" as const,
           id: location.id,
           geometry: location.geometry as Point,
           properties: {
@@ -74,7 +93,39 @@ export class DetailViewComponent {
       }),
     );
 
-    effect(() => console.log(this.data()));
-    effect(() => console.log(this.usageLocationPoints()));
+    return computed(() => {
+      let data = dataSignal();
+      let usageLocations = allUsageLocations();
+      if (!data || !usageLocations) return undefined;
+
+      let usageLocationIds = data.usageLocations.map(({id}) => id);
+
+      return {
+        type: "FeatureCollection",
+        features: usageLocations.features.filter(({properties: {id}}) =>
+          usageLocationIds.includes(id),
+        ),
+      };
+    });
+  }
+
+  private static buildFitBounds(
+    usageLocationsSignal: Signal<undefined | UsageLocations>,
+  ): Signal<undefined | BBox> {
+    return computed(() => {
+      let usageLocations = usageLocationsSignal();
+      if (!usageLocations) return undefined;
+
+      let bbox = turf.bbox(usageLocations);
+      let [minX, minY, maxX, maxY] = bbox;
+      let padding = 0.002;
+      let paddedBbox = [
+        minX - padding,
+        minY - padding,
+        maxX + padding,
+        maxY + padding,
+      ];
+      return paddedBbox as BBox;
+    });
   }
 }
