@@ -7,6 +7,7 @@ import {
   GeoJSONSourceComponent,
   NavigationControlDirective,
 } from "@maplibre/ngx-maplibre-gl";
+import dayjs from "dayjs";
 import {BBox, FeatureCollection, Point} from "geojson";
 import {StyleSpecification} from "maplibre-gl";
 
@@ -96,7 +97,11 @@ export class SelectViewComponent {
     private route: ActivatedRoute,
   ) {
     this.usageLocations = signals.fromPromise(
-      geo.fetchLayerContents("water_right_usage_locations"),
+      geo.fetchLayerContents(
+        "water_right_usage_locations",
+        undefined,
+        dayjs.duration(1, "day"),
+      ),
       locations => ({
         type: "FeatureCollection",
         features: (locations?.data ?? []).map(location => ({

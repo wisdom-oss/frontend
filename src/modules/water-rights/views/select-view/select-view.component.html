@@ -5,6 +5,7 @@
   >
     <mgl-map
       class="is-fullheight"
+      [class.skeleton-block]="!usageLocations()"
       [style]="style"
       [zoom]="[6.8]"
       [center]="{lat: 52.8, lon: 9.2}"
