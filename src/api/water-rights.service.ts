@@ -1,11 +1,19 @@
-import {HttpClient, HttpContext} from "@angular/common/http";
-import {Injectable} from "@angular/core";
+import {
+  HttpClient,
+  HttpContext,
+  HttpDownloadProgressEvent,
+  HttpHeaderResponse,
+  HttpResponse,
+  HttpEventType,
+} from "@angular/common/http";
+import {signal, Injectable} from "@angular/core";
 import {JTDDataType} from "ajv/dist/core";
 import dayjs from "dayjs";
 import {GeoJsonObject} from "geojson";
-import {firstValueFrom} from "rxjs";
+import {firstValueFrom, Observable, BehaviorSubject} from "rxjs";
 
 import {httpContexts} from "../common/http-contexts";
+import {Once} from "../common/utils/once";
 
 const URL = "/api/water-rights" as const;
 
@@ -15,15 +23,49 @@ const URL = "/api/water-rights" as const;
 export class WaterRightsService {
   constructor(private http: HttpClient) {}
 
-  fetchUsageLocations(): Promise<WaterRightsService.UsageLocations> {
+  fetchUsageLocations(): {
+    progress: Observable<number>;
+    total: PromiseLike<number | undefined>;
+    data: PromiseLike<WaterRightsService.UsageLocations>;
+  } {
+    let progress = new BehaviorSubject(0);
+    let total = new Once<number | undefined>();
+    let data = new Once<WaterRightsService.UsageLocations>();
+
     let url = `${URL}/`;
-    return firstValueFrom(
-      this.http.get<WaterRightsService.UsageLocations>(url, {
-        context: new HttpContext()
-          .set(httpContexts.validateSchema, USAGE_LOCATIONS)
-          .set(httpContexts.cache, [url, dayjs.duration(3, "days")]),
-      }),
-    );
+    this.http
+      .get<WaterRightsService.UsageLocations>(url, {
+        observe: "events",
+        reportProgress: true,
+        context: new HttpContext().set(
+          httpContexts.validateSchema,
+          USAGE_LOCATIONS,
+        ),
+      })
+      .subscribe(event => {
+        console.debug(event);
+        switch (event.type) {
+          case HttpEventType.ResponseHeader:
+            // TODO: check if content-length needs to be check or total of progress event is enough
+            event as HttpHeaderResponse;
+            let contentLengthHeader = event.headers.get("content-length");
+            if (!contentLengthHeader) return total.set(undefined);
+            let contentLength = parseInt(contentLengthHeader);
+            if (Number.isNaN(contentLength)) return total.set(undefined);
+            total.set(contentLength);
+            break;
+          case HttpEventType.DownloadProgress:
+            event as HttpDownloadProgressEvent;
+            progress.next(event.loaded);
+            break;
+          case HttpEventType.Response:
+            event as HttpResponse<WaterRightsService.UsageLocations>;
+            data.set(event.body ?? []);
+            break;
+        }
+      });
+
+    return {data, progress, total};
   }
 
   fetchWaterRightDetails(
@@ -74,13 +116,15 @@ const RATES = {
     properties: {
       value: {type: "float64"},
       unit: {type: "string"},
-      per: {properties: {
-        // numbers here should be 64 bit, but ajv can't, so floats
-        Microseconds: {type: "float64"},
-        Days: {type: "float64"},
-        Months: {type: "float64"},
-        Valid: {type: "boolean"}
-      }},
+      per: {
+        properties: {
+          // numbers here should be 64 bit, but ajv can't, so floats
+          Microseconds: {type: "float64"},
+          Days: {type: "float64"},
+          Months: {type: "float64"},
+          Valid: {type: "boolean"},
+        },
+      },
     },
   },
 } as const;

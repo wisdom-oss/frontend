@@ -53,8 +53,9 @@ export class SelectViewComponent {
     private router: Router,
     private route: ActivatedRoute,
   ) {
+    let fetchUsageLocation = this.service.fetchUsageLocations();
     this.usageLocations = signals.fromPromise(
-      this.service.fetchUsageLocations(),
+      fetchUsageLocation.data,
       locations => ({
         type: "FeatureCollection",
         features: locations
