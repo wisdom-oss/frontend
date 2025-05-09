@@ -32,11 +32,11 @@ export class WaterDemandPredictionComponent implements OnInit {
   /** variables startpoint dropdown */
   menuStartPoint = "water-demand-prediction.startpoint.menu";
   optionsStartPoint: Record<string, string> = {
-    "2021-05-26T00:00:00": "water-demand-prediction.startpoint.options.a",
-    "2021-06-01T00:00:00": "water-demand-prediction.startpoint.options.b",
-    "2022-01-01T00:00:00": "water-demand-prediction.startpoint.options.c",
+    "2021-05-26 00:00:00": "water-demand-prediction.startpoint.options.a",
+    "2021-06-01 00:00:00": "water-demand-prediction.startpoint.options.b",
+    "2022-01-01 00:00:00": "water-demand-prediction.startpoint.options.c",
   };
-  choiceStartPoint = signal<string>("2022-01-01T00:00:00");
+  choiceStartPoint = signal<string>("2022-01-01 00:00:00");
 
   /** variables resolution dropdown */
   menuResolution = "water-demand-prediction.choice.resolution";
@@ -308,7 +308,7 @@ export class WaterDemandPredictionComponent implements OnInit {
   fetchMeterInformation(): void {
     this.waterDemandService.fetchMeterInformation().subscribe({
       next: response => {
-        this.optionsSmartmeter = response;
+        this.optionsSmartmeter = response.names;
       },
       error: error => {
         console.error(error);
@@ -404,6 +404,8 @@ export class WaterDemandPredictionComponent implements OnInit {
           this.currentSmartmeterData = undefined;
         },
       });
+
+    console.log(this.savedDatasets);
   }
 
   /**

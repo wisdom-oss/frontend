@@ -53,7 +53,7 @@ export class WaterDemandPredictionService {
   }
 
   fetchMeterInformation(): Observable<any> {
-    return this.sendRequest("get", "/meterInformation");
+    return this.sendRequest("get", "/meterNames");
   }
 
   fetchSingleSmartmeter(
