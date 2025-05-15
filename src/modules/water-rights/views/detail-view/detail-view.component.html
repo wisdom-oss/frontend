@@ -4,11 +4,11 @@
 @if (waterRight) {
   <div class="card is-fullheight" style="overflow: auto">
     <div class="card-header">
-      <div class="card-header-title">
-        {{ waterRight.subject }}
+      <div class="card-header-title p-2">
+        <p class="is-size-4 pl-3" translate="water-rights.water-right"></p>
       </div>
     </div>
-    <div class="card-image" style="height: 20rem">
+    <div class="card-image" style="height: min(20rem, 40vh)">
       <mgl-map
         class="is-fullheight"
         [style]="mapData.style"
@@ -41,6 +41,145 @@
         }
       </mgl-map>
     </div>
-    <div class="card-content"></div>
+    <div class="card-content">
+      <div class="columns">
+        <div class="column">
+          <p class="is-size-5 has-text-weight-bold icon-text">
+            <span
+              *ngIf="waterRight.legalTitle"
+              [title]="'water-rights.legal-title' | translate"
+              >{{ waterRight.legalTitle }}</span
+            >
+            @if (waterRight.status) {
+              @switch (waterRight.status) {
+                @case ("aktiv") {
+                  <span
+                    class="icon"
+                    [title]="'water-rights.status.active' | translate"
+                  >
+                    <ng-icon name="remixCheckboxCircleLine"></ng-icon>
+                  </span>
+                }
+                @case ("inaktiv") {
+                  <span
+                    class="icon"
+                    [title]="'water-rights.status.inactive' | translate"
+                  >
+                    <ng-icon name="remixCloseCircleLine"></ng-icon>
+                  </span>
+                }
+                @case ("Wasserbuchblatt") {
+                  <span
+                    class="icon"
+                    [title]="
+                      'water-rights.status.water-register-entry' | translate
+                    "
+                  >
+                    <ng-icon name="remixArticleLine"></ng-icon>
+                  </span>
+                }
+              }
+            }
+          </p>
+          <p
+            class="is-size-6 has-text-weight-bold"
+            [title]="'water-rights.subject' | translate"
+          >
+            {{ waterRight.subject }}
+          </p>
+          <table>
+            @for (
+              entry of [
+                ["water-rights.holder", waterRight.holder],
+                ["water-rights.address", waterRight.address],
+                ["water-rights.water-authority", waterRight.waterAuthority],
+                [
+                  "water-rights.granting-authority",
+                  waterRight.grantingAuthority,
+                ],
+                [
+                  "water-rights.registering-authority",
+                  waterRight.registeringAuthority,
+                ],
+              ];
+              track entry[0]
+            ) {
+              <tr *ngIf="entry[1]">
+                <th class="has-text-weight-medium">
+                  {{ entry[0]! | translate }}:
+                </th>
+                <td class="pl-2">{{ entry[1] }}</td>
+              </tr>
+            }
+          </table>
+        </div>
+        <div class="column is-narrow">
+          <div class="is-flex is-align-items-flex-end is-flex-direction-column">
+            <p
+              *ngIf="waterRight.validFrom && waterRight.validUntil"
+              class="tag is-medium mb-2"
+              [title]="'water-rights.valid' | translate"
+            >
+              <span class="icon-text">
+                <span class="icon">
+                  <ng-icon name="remixTimeLine"></ng-icon>
+                </span>
+                <span [title]="'water-rights.valid-from' | translate">{{
+                  waterRight.validFrom
+                }}</span>
+                <span>-</span>
+                <span [title]="'water-rights.valid-until' | translate">{{
+                  waterRight.validUntil
+                }}</span>
+              </span>
+            </p>
+            <p
+              *ngIf="waterRight.initiallyGranted"
+              class="tag is-medium mb-2"
+              [title]="'water-rights.initially-granted' | translate"
+            >
+              <span class="icon-text">
+                <span class="icon">
+                  <ng-icon name="remixQuillPenLine"></ng-icon>
+                </span>
+                <span>{{ waterRight.initiallyGranted }}</span>
+              </span>
+            </p>
+            <p
+              *ngIf="waterRight.lastChange"
+              class="tag is-medium mb-2"
+              [title]="'water-rights.last-change' | translate"
+            >
+              <span class="icon-text">
+                <span class="icon">
+                  <ng-icon name="remixHistoryFill"></ng-icon>
+                </span>
+                <span>{{ waterRight.lastChange }}</span>
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="level">
+        <div class="level-left">
+          @for (
+            tag of [
+              ["water-rights.internal-id", waterRight.id],
+              ["water-rights.water-right-no", waterRight.water_right_number],
+              ["water-rights.external-id", waterRight.externalIdentifier],
+              ["water-rights.file-reference", waterRight.fileReference],
+            ];
+            track tag[0]
+          ) {
+            <div class="level-item">
+              <div class="tags has-addons">
+                <div class="tag is-primary">{{ $any(tag[0]) | translate }}</div>
+                <div class="tag">{{ tag[1] }}</div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
   </div>
 }

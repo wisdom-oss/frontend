@@ -1,3 +1,4 @@
+import {NgIf} from "@angular/common";
 import {computed, effect, Component, Signal} from "@angular/core";
 import {ActivatedRoute} from "@angular/router";
 import {
@@ -7,6 +8,16 @@ import {
   GeoJSONSourceComponent,
   NavigationControlDirective,
 } from "@maplibre/ngx-maplibre-gl";
+import {provideIcons, NgIconComponent} from "@ng-icons/core";
+import {
+  remixArticleLine,
+  remixCheckboxCircleLine,
+  remixCloseCircleLine,
+  remixHistoryFill,
+  remixQuillPenLine,
+  remixTimeLine,
+} from "@ng-icons/remixicon";
+import {TranslateDirective, TranslatePipe} from "@ngx-translate/core";
 import dayjs from "dayjs";
 import {BBox, FeatureCollection, Point} from "geojson";
 import {StyleSpecification} from "maplibre-gl";
@@ -25,13 +36,27 @@ type UsageLocations = FeatureCollection<
 
 @Component({
   imports: [
-    MapComponent,
+    ControlComponent,
     GeoJSONSourceComponent,
     LayerComponent,
-    ControlComponent,
+    MapComponent,
     NavigationControlDirective,
+    NgIconComponent,
+    TranslateDirective,
+    TranslatePipe,
+    NgIf,
   ],
   templateUrl: "./detail-view.component.html",
+  providers: [
+    provideIcons({
+      remixCheckboxCircleLine,
+      remixCloseCircleLine,
+      remixArticleLine,
+      remixHistoryFill,
+      remixQuillPenLine,
+      remixTimeLine,
+    }),
+  ],
 })
 export class DetailViewComponent {
   protected data: Signal<undefined | WaterRightsService.WaterRightDetails>;

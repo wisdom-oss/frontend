@@ -33,3 +33,87 @@ de = "[K] Zwangsrechte"
 [legal-department.L]
 en = "[L] Fishing Rights"
 de = "[L] Fischereirechte"
+
+[water-right]
+en = "Water Right"
+de = "Wasserrecht"
+
+[subject]
+en = "Subject"
+de = "Betreff"
+
+[valid]
+en = "validness"
+de = "Gültigkeit"
+
+[valid-from]
+en = "valid from"
+de = "gültig seit"
+
+[valid-until]
+en = "valid until"
+de = "gültig bis"
+
+[last-change]
+en = "last change"
+de = "Änderungsdatum"
+
+[status.active]
+en = "active"
+de = "aktiv"
+
+[status.inactive]
+en = "inactive"
+de = "inaktiv"
+
+[status.water-register-entry]
+en = "Water Register Entry"
+de = "Wasserbuchblatt"
+
+[legal-title]
+en = "Legal Title"
+de = "Rechtstitel"
+
+[granting-authority]
+en = "Granting Authority"
+de = "erteilt durch"
+
+[registering-authority]
+en = "Registering Authority"
+de = "eingetragen durch"
+
+[water-authority]
+en = "Water Authority"
+de = "Wasserbuchbehörde"
+
+[initially-granted]
+en = "initially granted"
+de = "erstmalig erstellt am"
+
+[address]
+en = "Address"
+de = "Adresse"
+
+[holder]
+en = "Holder"
+de = "Rechtsinhaber"
+
+[internal-id]
+en = "Internal ID"
+de = "Interne ID"
+
+[water-right-no]
+en = "Water Right No."
+de = "Wasserrecht Nr."
+
+[external-id]
+en = "External ID"
+de = "Externe ID"
+
+[file-reference]
+en = "File Reference"
+de = "Aktenzeichen"
+
+[locations]
+en = "Locations"
+de = "Standorte"

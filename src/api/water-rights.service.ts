@@ -265,7 +265,7 @@ const WATER_RIGHT_DETAILS = {
         holder: {type: "string", nullable: true},
         validFrom: {type: "string", nullable: true},
         validUntil: {type: "string", nullable: true},
-        status: {type: "string", nullable: true},
+        status: {enum: ["aktiv", "inaktiv", "Wasserbuchblatt"], nullable: true},
         legalTitle: {type: "string", nullable: true},
         waterAuthority: {type: "string", nullable: true},
         registeringAuthority: {type: "string", nullable: true},
