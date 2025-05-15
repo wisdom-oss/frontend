@@ -1,8 +1,9 @@
 import {HttpClient, HttpContext, HttpParams} from "@angular/common/http";
 import {Injectable} from "@angular/core";
-import {JTDDataType} from "ajv/dist/core";
 import dayjs, {Dayjs} from "dayjs";
+import {FeatureCollection, Point} from "geojson";
 import {firstValueFrom} from "rxjs";
+import typia from "typia";
 
 import {httpContexts} from "../common/http-contexts";
 
@@ -22,7 +23,10 @@ export class DwdService {
       return firstValueFrom(
         this.http.get<DwdService.V2.Stations>(url, {
           context: new HttpContext()
-            .set(httpContexts.validateSchema, V2_STATIONS)
+            .set(
+              httpContexts.validateType,
+              typia.createValidate<DwdService.V2.Stations>(),
+            )
             .set(httpContexts.cache, [url, this.cacheTtl]),
         }),
       );
@@ -35,7 +39,10 @@ export class DwdService {
       return firstValueFrom(
         this.http.get<DwdService.V1.Stations>(url, {
           context: new HttpContext()
-            .set(httpContexts.validateSchema, V1_STATIONS)
+            .set(
+              httpContexts.validateType,
+              typia.createValidate<DwdService.V1.Stations>(),
+            )
             .set(httpContexts.cache, [url, this.cacheTtl]),
         }),
       );
@@ -46,7 +53,10 @@ export class DwdService {
       return firstValueFrom(
         this.http.get<DwdService.V1.Station>(url, {
           context: new HttpContext()
-            .set(httpContexts.validateSchema, V1_STATION)
+            .set(
+              httpContexts.validateType,
+              typia.createValidate<DwdService.V1.Station>(),
+            )
             .set(httpContexts.cache, [url, this.cacheTtl]),
         }),
       );
@@ -68,7 +78,10 @@ export class DwdService {
         this.http.get<DwdService.V1.Data>(url, {
           params,
           context: new HttpContext()
-            .set(httpContexts.validateSchema, V1_DATA)
+            .set(
+              httpContexts.validateType,
+              typia.createValidate<DwdService.V1.Data>(),
+            )
             .set(httpContexts.cache, [url + params.toString(), this.cacheTtl]),
         }),
       );
@@ -78,160 +91,70 @@ export class DwdService {
 
 export namespace DwdService {
   export namespace V1 {
-    export type Station = JTDDataType<typeof V1_STATION>;
-    export type Stations = JTDDataType<typeof V1_STATIONS>;
-    export type Data = JTDDataType<typeof V1_DATA>;
+    export type Station = {
+      id: string;
+      name: string;
+      state: string;
+      location: Record<string, unknown>;
+      height: number;
+      historical: boolean;
+      capabilities: Array<{
+        dataType: string;
+        resolution:
+          | "1_minute"
+          | "5_minutes"
+          | "10_minutes"
+          | "hourly"
+          | "subdaily"
+          | "daily"
+          | "monthly"
+          | "annual"
+          | "multi_annual";
+        availableFrom: string;
+        availableUntil: string;
+      }>;
+    };
+
+    export type Stations = DwdService.V1.Station[];
+
+    export type Data = {
+      timeseries: Array<{
+        ts: string;
+        [key: string]: any;
+      }> | null;
+      metadata: Array<{
+        name: string;
+        description: string;
+        unit: string;
+        availableFrom: string;
+        availableUntil: string;
+      }>;
+    };
   }
 
   export namespace V2 {
-    export type Stations = JTDDataType<typeof V2_STATIONS>;
+    export type Stations = FeatureCollection<
+      Point,
+      {
+        id: string;
+        name: string;
+        products: Record<
+          string,
+          Partial<
+            Record<
+              | "annual"
+              | "monthly"
+              | "daily"
+              | "subDaily"
+              | "hourly"
+              | "every10Minutes"
+              | "every5Minutes"
+              | "everyMinute",
+              {from: string; until: string}
+            >
+          >
+        >;
+      }
+    >;
   }
 }
-
-const V1_STATION = {
-  properties: {
-    id: {type: "string"},
-    name: {type: "string"},
-    state: {type: "string"},
-    location: {
-      properties: {},
-      additionalProperties: true,
-    },
-    height: {type: "int32"},
-    historical: {type: "boolean"},
-    capabilities: {
-      elements: {
-        properties: {
-          dataType: {type: "string"},
-          resolution: {
-            enum: [
-              "1_minute",
-              "5_minutes",
-              "10_minutes",
-              "hourly",
-              "subdaily",
-              "daily",
-              "monthly",
-              "annual",
-              "multi_annual",
-            ],
-          },
-          availableFrom: {type: "string"},
-          availableUntil: {type: "string"},
-        },
-      },
-    },
-  },
-} as const;
-
-const V1_STATIONS = {
-  elements: V1_STATION,
-} as const;
-
-const V1_DATA = {
-  properties: {
-    timeseries: {
-      elements: {
-        properties: {
-          // we don't have int64
-          ts: {type: "string"},
-        },
-        additionalProperties: true,
-      },
-      nullable: true,
-    },
-    metadata: {
-      elements: {
-        properties: {
-          name: {type: "string"},
-          description: {type: "string"},
-          unit: {type: "string"},
-          availableFrom: {type: "string"},
-          availableUntil: {type: "string"},
-        },
-      },
-    },
-  },
-} as const;
-
-const V2_STATIONS = {
-  properties: {
-    type: {enum: ["FeatureCollection"]},
-    features: {
-      elements: {
-        properties: {
-          type: {enum: ["Feature"]},
-          id: {type: "string"},
-          geometry: {
-            properties: {
-              type: {enum: ["Point"]},
-              coordinates: {
-                elements: {type: "float64"},
-              },
-            },
-          },
-          properties: {
-            properties: {
-              id: {type: "string"},
-              name: {type: "string"},
-              products: {
-                values: {
-                  optionalProperties: {
-                    annual: {
-                      properties: {
-                        from: {type: "string"},
-                        until: {type: "string"},
-                      },
-                    },
-                    monthly: {
-                      properties: {
-                        from: {type: "string"},
-                        until: {type: "string"},
-                      },
-                    },
-                    daily: {
-                      properties: {
-                        from: {type: "string"},
-                        until: {type: "string"},
-                      },
-                    },
-                    subDaily: {
-                      properties: {
-                        from: {type: "string"},
-                        until: {type: "string"},
-                      },
-                    },
-                    hourly: {
-                      properties: {
-                        from: {type: "string"},
-                        until: {type: "string"},
-                      },
-                    },
-                    every10Minutes: {
-                      properties: {
-                        from: {type: "string"},
-                        until: {type: "string"},
-                      },
-                    },
-                    every5Minutes: {
-                      properties: {
-                        from: {type: "string"},
-                        until: {type: "string"},
-                      },
-                    },
-                    everyMinute: {
-                      properties: {
-                        from: {type: "string"},
-                        until: {type: "string"},
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-} as const;
