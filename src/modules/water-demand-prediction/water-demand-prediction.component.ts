@@ -63,7 +63,7 @@ export class WaterDemandPredictionComponent implements OnInit {
   /** variables name dropdown */
   menuSmartmeter = "water-demand-prediction.choice.smartmeter";
   optionsSmartmeter: Record<string, string> = {};
-  choiceSmartmeter = signal<string>("urn:ngsi-ld:Device:retired-household");
+  choiceSmartmeter = signal<string>("retired-household");
 
   menuWeather = "water-demand-prediction.choice.weather";
   optionsWeather: Record<string, string> = {
@@ -299,6 +299,7 @@ export class WaterDemandPredictionComponent implements OnInit {
       backgroundColor: color,
       fill: fillOption,
     };
+
     return newDataset;
   }
 
@@ -374,16 +375,17 @@ export class WaterDemandPredictionComponent implements OnInit {
         },
         complete: () => {
           let newDataset = this.createNewDataset(
-            this.currentSmartmeterData?.numValue!,
+            this.currentSmartmeterData?.value!,
             this.currentSmartmeterData?.name!,
             this.currentSmartmeterData?.resolution!,
             this.currentSmartmeterData?.timeframe!,
             false,
             this.chartType(),
           );
+
           let smartmeterdata: SmartmeterDataset = {
             dataset: newDataset,
-            labels: this.currentSmartmeterData?.dateObserved!,
+            labels: this.currentSmartmeterData?.date!,
           };
 
           if (!this.savedDatasets[this.currentSmartmeterData?.resolution!]) {
@@ -404,8 +406,6 @@ export class WaterDemandPredictionComponent implements OnInit {
           this.currentSmartmeterData = undefined;
         },
       });
-
-    console.log(this.savedDatasets);
   }
 
   /**
@@ -439,7 +439,7 @@ export class WaterDemandPredictionComponent implements OnInit {
         },
         complete: () => {
           let newDataset = this.createNewDataset(
-            this.currentPredictedSmartmeterData()!.numValue,
+            this.currentPredictedSmartmeterData()!.value,
             this.currentPredictedSmartmeterData()!.name,
             this.currentPredictedSmartmeterData()!.resolution,
             this.currentPredictedSmartmeterData()!.timeframe,
@@ -479,7 +479,7 @@ export class WaterDemandPredictionComponent implements OnInit {
             dataset: newDataset,
             realValue_dataset: realDataset,
             lower_conf_interval_dataset: lower_conf_int,
-            labels: this.currentPredictedSmartmeterData()!.dateObserved,
+            labels: this.currentPredictedSmartmeterData()!.date,
           };
           if (
             !this.predictedDatasets[

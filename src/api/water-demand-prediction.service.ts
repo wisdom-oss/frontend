@@ -41,8 +41,6 @@ export class WaterDemandPredictionService {
       body: requestBody,
     };
 
-    console.log(requestBody);
-
     let final_url = this.router.parseUrl(PREFIX + API_PREFIX + url).toString();
 
     return this.http.request<T>(

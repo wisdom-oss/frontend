@@ -7,8 +7,8 @@ export interface SingleSmartmeter {
   name: string;
   resolution: string;
   timeframe: string;
-  numValue: number[];
-  dateObserved: string[];
+  value: number[];
+  date: string[];
 }
 
 export interface PredictionSingleSmartmeter extends SingleSmartmeter {
