@@ -309,12 +309,14 @@ export class WaterDemandPredictionComponent implements OnInit {
   fetchMeterInformation(): void {
     this.waterDemandService.fetchMeterInformation().subscribe({
       next: response => {
-        this.optionsSmartmeter = response.names;
+        this.optionsSmartmeter = response;
       },
       error: error => {
         console.error(error);
       },
-      complete: () => {},
+      complete: () => {
+        console.log(this.optionsSmartmeter);
+      },
     });
   }
 
@@ -369,6 +371,7 @@ export class WaterDemandPredictionComponent implements OnInit {
       .subscribe({
         next: (response: SingleSmartmeter) => {
           this.currentSmartmeterData = response;
+          console.log(this.currentSmartmeterData);
         },
         error: error => {
           console.log(error);
