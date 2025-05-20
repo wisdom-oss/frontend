@@ -1,4 +1,4 @@
-import {computed, effect, signal, Component, Signal} from "@angular/core";
+import {computed, signal, Component, Signal} from "@angular/core";
 import {ActivatedRoute, Router} from "@angular/router";
 import {
   ControlComponent,
@@ -119,12 +119,6 @@ export class SelectViewComponent {
         })),
       }),
     );
-
-    effect(() => console.log(this.hover()));
-
-    geo
-      .fetchLayerContents("water_right_usage_locations")
-      .then(data => console.log(data));
   }
 
   protected openDetails(no: number) {

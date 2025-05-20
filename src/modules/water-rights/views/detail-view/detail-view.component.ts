@@ -1,5 +1,15 @@
-import {NgIf} from "@angular/common";
-import {computed, effect, Component, Signal} from "@angular/core";
+import {NgIf, DOCUMENT} from "@angular/common";
+import {
+  computed,
+  effect,
+  inject,
+  signal,
+  Component,
+  Pipe,
+  Signal,
+  WritableSignal,
+  PipeTransform,
+} from "@angular/core";
 import {ActivatedRoute} from "@angular/router";
 import {
   ControlComponent,
@@ -15,7 +25,9 @@ import {
   remixCloseCircleLine,
   remixHistoryFill,
   remixQuillPenLine,
+  remixSparkling2Line,
   remixTimeLine,
+  remixVerifiedBadgeLine,
 } from "@ng-icons/remixicon";
 import {TranslateDirective, TranslatePipe} from "@ngx-translate/core";
 import dayjs from "dayjs";
@@ -28,11 +40,28 @@ import {WaterRightsService} from "../../../../api/water-rights.service";
 import {GeoDataService} from "../../../../api/geo-data.service";
 import colorful from "../../../../assets/map/styles/colorful.json";
 import {signals} from "../../../../common/signals";
+import {MapCursorDirective} from "../../../../common/directives/map-cursor.directive";
 
 type UsageLocations = FeatureCollection<
   Point,
   {id: number; name: string; waterRight: number}
 >;
+
+@Pipe({name: "kvfmt"})
+export class KeyValueFormatPipe implements PipeTransform {
+  transform(keyValue?: {key?: number; value?: string}): string | undefined {
+    if (!keyValue) return undefined;
+    let {key, value} = keyValue;
+
+    if (key) {
+      if (value) return `${key} ${value}`;
+      return "" + key;
+    }
+
+    if (value) return value;
+    return undefined;
+  }
+}
 
 @Component({
   imports: [
@@ -45,6 +74,8 @@ type UsageLocations = FeatureCollection<
     TranslateDirective,
     TranslatePipe,
     NgIf,
+    KeyValueFormatPipe,
+    MapCursorDirective,
   ],
   templateUrl: "./detail-view.component.html",
   providers: [
@@ -55,17 +86,21 @@ type UsageLocations = FeatureCollection<
       remixHistoryFill,
       remixQuillPenLine,
       remixTimeLine,
+      remixVerifiedBadgeLine,
+      remixSparkling2Line,
     }),
   ],
 })
 export class DetailViewComponent {
   protected data: Signal<undefined | WaterRightsService.WaterRightDetails>;
+  protected document = inject(DOCUMENT);
 
   // prettier-ignore
   protected mapData: {
     style: StyleSpecification;
     usageLocations: ReturnType<typeof DetailViewComponent["buildUsageLocations"]>;
     fitBounds: Signal<undefined | BBox>,
+    hover: WritableSignal<undefined | number>,
   };
 
   constructor(
@@ -82,15 +117,15 @@ export class DetailViewComponent {
       this.data,
     );
 
-    let fitBounds = DetailViewComponent.buildFitBounds(usageLocations);
-
     this.mapData = {
       style: colorful as any as StyleSpecification,
       usageLocations,
-      fitBounds,
+      fitBounds: DetailViewComponent.buildFitBounds(usageLocations),
+      hover: signal(undefined),
     };
 
     effect(() => console.log(this.data()));
+    effect(() => console.log(this.mapData.hover()));
   }
 
   private static buildUsageLocations(
