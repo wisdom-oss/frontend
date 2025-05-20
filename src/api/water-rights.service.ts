@@ -142,6 +142,8 @@ export namespace WaterRightsService {
   export type AverageWithdrawals = JTDDataType<typeof AVERAGE_WITHDRAWALS>;
   export type UsageLocations = JTDDataType<typeof USAGE_LOCATIONS>;
   export type WaterRightDetails = JTDDataType<typeof WATER_RIGHT_DETAILS>;
+
+  export type Rates = JTDDataType<typeof RATES>;
 }
 
 const KEY_VALUE = {

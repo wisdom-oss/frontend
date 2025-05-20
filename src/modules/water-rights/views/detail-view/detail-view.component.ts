@@ -41,6 +41,7 @@ import {GeoDataService} from "../../../../api/geo-data.service";
 import colorful from "../../../../assets/map/styles/colorful.json";
 import {signals} from "../../../../common/signals";
 import {MapCursorDirective} from "../../../../common/directives/map-cursor.directive";
+import {EmptyPipe} from "../../../../common/pipes/empty.pipe";
 
 type UsageLocations = FeatureCollection<
   Point,
@@ -76,6 +77,7 @@ export class KeyValueFormatPipe implements PipeTransform {
     NgIf,
     KeyValueFormatPipe,
     MapCursorDirective,
+    EmptyPipe,
   ],
   templateUrl: "./detail-view.component.html",
   providers: [
@@ -102,6 +104,13 @@ export class DetailViewComponent {
     fitBounds: Signal<undefined | BBox>,
     hover: WritableSignal<undefined | number>,
   };
+
+  // prettier-ignore
+  private asT<T>(value: T): T { return value }
+  protected asTable = this.asT<[string, undefined | string][]>;
+  protected asRates = this.asT<
+    [string, undefined | WaterRightsService.Rates][]
+  >;
 
   constructor(
     route: ActivatedRoute,
