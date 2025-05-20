@@ -106,6 +106,8 @@ const MAPPING = {
 export class WeatherDataComponent {
   protected lang = signals.lang();
   protected document = inject(DOCUMENT);
+  private selectDiv = viewChild<ElementRef<HTMLDivElement>>("select");
+  protected selectDivWidth = signal(0);
   private downloadAnchor =
     viewChild.required<ElementRef<HTMLAnchorElement>>("downloadAnchor");
 
@@ -201,17 +203,20 @@ export class WeatherDataComponent {
       let selected = this.selectedStation();
       if (!selected) return;
 
+      // only update bounds if select div is rendered
+      let selectDiv = this.selectDiv();
+      let selectDivWidth = this.selectDivWidth();
+      if (!selectDiv || !selectDivWidth) return;
+
       let bbox = turf.bbox(selected.geometry);
       let padding = 0.01;
       bbox[0] -= padding;
       bbox[1] -= padding;
       bbox[2] += padding;
       bbox[3] += padding;
+
       // update map after selector appeared
       setTimeout(() => this.fitBounds.set(bbox));
-
-      // force update again when info loaded
-      this.stationInfo();
     });
 
     effect(() => {
@@ -295,11 +300,15 @@ export class WeatherDataComponent {
     }
 
     let features = stations.features.filter(feature => {
-      for (let product in feature.properties.products) {
-        if (activeLayers.has(product)) return true;
+      let productKeys = Object.keys(feature.properties.products);
+      if (productKeys.length < activeLayers.size) return false;
+
+      let products = new Set(productKeys);
+      for (let layer of activeLayers) {
+        if (!products.has(layer)) return false;
       }
 
-      return false;
+      return true;
     });
 
     return {type: "FeatureCollection", features};

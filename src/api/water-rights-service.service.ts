@@ -1,8 +1,8 @@
 import {HttpClient, HttpContext} from "@angular/common/http";
 import {Injectable} from "@angular/core";
-import {JTDDataType} from "ajv/dist/core";
 import {GeoJsonObject} from "geojson";
 import {firstValueFrom} from "rxjs";
+import typia from "typia";
 
 import {httpContexts} from "../common/http-contexts";
 
@@ -19,8 +19,8 @@ export class WaterRightsServiceService {
   ): Promise<WaterRightsServiceService.AverageWithdrawals> {
     let url = `${URL}/average-withdrawals`;
     let context = new HttpContext().set(
-      httpContexts.validateSchema,
-      AVERAGE_WITHDRAWALS,
+      httpContexts.validateType,
+      typia.createValidate<WaterRightsServiceService.AverageWithdrawals>(),
     );
     return firstValueFrom(
       this.http.post<WaterRightsServiceService.AverageWithdrawals>(
@@ -33,12 +33,8 @@ export class WaterRightsServiceService {
 }
 
 export namespace WaterRightsServiceService {
-  export type AverageWithdrawals = JTDDataType<typeof AVERAGE_WITHDRAWALS>;
+  export type AverageWithdrawals = {
+    minimalWithdrawal: number & typia.tags.Type<"double">;
+    maximalWithdrawal: number & typia.tags.Type<"double">;
+  };
 }
-
-const AVERAGE_WITHDRAWALS = {
-  properties: {
-    minimalWithdrawal: {type: "float64"},
-    maximalWithdrawal: {type: "float64"},
-  },
-} as const;

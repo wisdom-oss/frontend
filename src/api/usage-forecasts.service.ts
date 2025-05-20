@@ -1,8 +1,8 @@
 import {HttpClient, HttpContext, HttpParams} from "@angular/common/http";
 import {Injectable} from "@angular/core";
-import {JTDDataType} from "ajv/dist/core";
 import dayjs from "dayjs";
 import {firstValueFrom} from "rxjs";
+import typia from "typia";
 
 import {httpContexts} from "../common/http-contexts";
 
@@ -19,7 +19,10 @@ export class UsageForecastsService {
       this.http.get<AvailableAlgorithms>(`${URL}/`, {
         context: new HttpContext()
           .set(httpContexts.cache, [URL, dayjs.duration(1, "day")])
-          .set(httpContexts.validateSchema, AVAILABLE_ALGORITHMS),
+          .set(
+            httpContexts.validateType,
+            typia.createValidate<AvailableAlgorithms>(),
+          ),
       }),
     );
   }
@@ -47,7 +50,7 @@ export class UsageForecastsService {
     }
 
     let context = new HttpContext()
-      .set(httpContexts.validateSchema, RESULT)
+      .set(httpContexts.validateType, typia.createValidate<Result>())
       .set(httpContexts.cache, [
         JSON.stringify({URL, key, scriptIdentifier, options}),
         dayjs.duration(1, "day"),
@@ -62,9 +65,11 @@ export class UsageForecastsService {
   }
 }
 
+type ConsumerGroup = UsageForecastsService.ConsumerGroup;
+type AvailableAlgorithms = UsageForecastsService.AvailableAlgorithms;
+type Result = UsageForecastsService.Result;
+
 export namespace UsageForecastsService {
-  export type AvailableAlgorithms = JTDDataType<typeof AVAILABLE_ALGORITHMS>;
-  export type Result = JTDDataType<typeof RESULT>;
   export type ConsumerGroup =
     | "businesses"
     | "households"
@@ -74,86 +79,47 @@ export namespace UsageForecastsService {
     | "standpipes"
     | "tourism"
     | "resellers";
-}
 
-type AvailableAlgorithms = UsageForecastsService.AvailableAlgorithms;
-type Result = UsageForecastsService.Result;
-type ConsumerGroup = UsageForecastsService.ConsumerGroup;
+  export type AvailableAlgorithms = Array<{
+    identifier: string;
+    displayName: string;
+    description: string;
+    parameter: Record<
+      string,
+      | {
+          type: "str";
+          default: string;
+          description: string;
+          enums?: string[];
+        }
+      | {
+          type: "int";
+          default: number & typia.tags.Type<"int32">;
+          description: string;
+          max?: number & typia.tags.Type<"int32">;
+          min?: number & typia.tags.Type<"int32">;
+        }
+      | {
+          type: "float";
+          default: number & typia.tags.Type<"double">;
+          description: string;
+          max?: number & typia.tags.Type<"double">;
+          min?: number & typia.tags.Type<"double">;
+        }
+    >;
+  }>;
 
-const AVAILABLE_ALGORITHMS = {
-  elements: {
-    properties: {
-      identifier: {type: "string"},
-      displayName: {type: "string"},
-      description: {type: "string"},
-      parameter: {
-        values: {
-          discriminator: "type",
-          mapping: {
-            str: {
-              properties: {
-                default: {type: "string"},
-                description: {type: "string"},
-              },
-              optionalProperties: {
-                enums: {
-                  elements: {type: "string"},
-                },
-              },
-            },
-            int: {
-              properties: {
-                default: {type: "int32"},
-                description: {type: "string"},
-              },
-              optionalProperties: {
-                max: {type: "int32"},
-                min: {type: "int32"},
-              },
-            },
-            float: {
-              properties: {
-                default: {type: "float64"},
-                description: {type: "string"},
-              },
-              optionalProperties: {
-                max: {type: "float64"},
-                min: {type: "float64"},
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-} as const;
-
-const RESULT = {
-  properties: {
+  export type Result = {
     meta: {
-      properties: {
-        rScores: {values: {type: "float64"}},
-        realDataUntil: {values: {type: "uint32"}},
-      },
-      optionalProperties: {
-        curves: {values: {type: "string"}},
-      },
-    },
-    data: {
-      elements: {
-        properties: {
-          label: {type: "string"},
-          x: {}, // we don't know if the service responds correctly
-          y: {type: "float64"},
-        },
-        optionalProperties: {
-          uncertainty: {
-            elements: {
-              type: "float64",
-            },
-          },
-        },
-      },
-    },
-  },
-} as const;
+      rScores: Record<string, number & typia.tags.Type<"double">>;
+      realDataUntil: Record<string, number & typia.tags.Type<"uint32">>;
+      curves?: Record<string, string>;
+    };
+    data: Array<{
+      label: string;
+      x: string | number;
+      y: number & typia.tags.Type<"double">;
+      uncertainty?: (number & typia.tags.Type<"double">)[];
+    }>;
+  };
+}

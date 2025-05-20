@@ -1,11 +1,10 @@
 import {HttpClient, HttpContext} from "@angular/common/http";
 import {Injectable} from "@angular/core";
-import {JTDDataType} from "ajv/dist/core";
 import dayjs, {Dayjs} from "dayjs";
 import {Point} from "geojson";
 import {firstValueFrom} from "rxjs";
+import typia from "typia";
 
-import {typeUtils} from "../common/utils/type-utils";
 import {httpContexts} from "../common/http-contexts";
 
 const URL = "/api/groundwater-levels" as const;
@@ -24,8 +23,8 @@ export class GroundwaterLevelsService {
         `${URL}/${stationId}`,
         {
           context: new HttpContext().set(
-            httpContexts.validateSchema,
-            RECORDER_LOCATION,
+            httpContexts.validateType,
+            typia.createValidate<GroundwaterLevelsService.RecorderLocation>(),
           ),
         },
       ),
@@ -36,8 +35,8 @@ export class GroundwaterLevelsService {
     return firstValueFrom(
       this.http.get<GroundwaterLevelsService.RecorderLocations>(`${URL}/`, {
         context: new HttpContext().set(
-          httpContexts.validateSchema,
-          RECORDER_LOCATIONS,
+          httpContexts.validateType,
+          typia.createValidate<GroundwaterLevelsService.RecorderLocations>(),
         ),
       }),
     );
@@ -61,11 +60,15 @@ export class GroundwaterLevelsService {
     }`;
 
     let context = new HttpContext()
-      .set(httpContexts.validateSchema, MEASUREMENT_CLASSIFICATIONS_RESPONSE)
+      .set(
+        httpContexts.validateType,
+        typia.createValidate<MeasurementClassificationResponse>(),
+      )
+
       .set(httpContexts.cache, [`${url}:${query}`, dayjs.duration(8, "hours")]);
 
     let response = await firstValueFrom(
-      this.http.post<JTDDataType<typeof MEASUREMENT_CLASSIFICATIONS_RESPONSE>>(
+      this.http.post<MeasurementClassificationResponse>(
         url,
         {query},
         {context},
@@ -84,23 +87,19 @@ export class GroundwaterLevelsService {
   }
 }
 
-export namespace GroundwaterLevelsService {
-  export type RecorderLocation = Omit<
-    JTDDataType<typeof RECORDER_LOCATION>,
-    "location"
-  > & {location: Point};
-  export type RecorderLocations = typeUtils.UpdateElements<
-    JTDDataType<typeof RECORDER_LOCATIONS>,
-    "location",
-    {location: Point}
-  >;
-  export type Measurement = Omit<
-    JTDDataType<
-      (typeof MEASUREMENT_CLASSIFICATIONS_RESPONSE)["properties"]["data"]["properties"]["measurements"]["elements"]
-    >,
-    "classification" | "date"
-  > & {classification: MeasurementClassification | null; date: Dayjs};
+type MeasurementClassificationResponse = {
+  data: {
+    measurements: Array<{
+      station: string;
+      date: string & typia.tags.Format<"date-time">;
+      classification: GroundwaterLevelsService.MeasurementClassification | "";
+      waterLevelNHN?: (number & typia.tags.Type<"double">) | null;
+      waterLevelGOK?: (number & typia.tags.Type<"double">) | null;
+    }>;
+  };
+};
 
+export namespace GroundwaterLevelsService {
   /**
    * Measurement classifications according to NLWKN.
    *
@@ -115,55 +114,19 @@ export namespace GroundwaterLevelsService {
     VERY_LOW = "sehr niedrig",
     MIN_UNDERSHOT = "Niedrigstwert unterschritten",
   }
+
+  export type RecorderLocation = {
+    websiteID: string;
+    publicID: string;
+    name: string;
+    operator: string;
+    location: Point;
+  };
+
+  export type RecorderLocations = RecorderLocation[];
+
+  export type Measurement = Omit<
+    MeasurementClassificationResponse["data"]["measurements"][0],
+    "classification" | "date"
+  > & {classification: MeasurementClassification | null; date: Dayjs};
 }
-
-const RECORDER_LOCATION = {
-  properties: {
-    websiteID: {type: "string"},
-    publicID: {type: "string"},
-    name: {type: "string"},
-    operator: {type: "string"},
-    location: {
-      optionalProperties: {},
-      additionalProperties: true,
-    },
-  },
-} as const;
-
-const RECORDER_LOCATIONS = {
-  elements: RECORDER_LOCATION,
-} as const;
-
-const MC = GroundwaterLevelsService.MeasurementClassification;
-const MEASUREMENT_CLASSIFICATIONS_RESPONSE = {
-  properties: {
-    data: {
-      properties: {
-        measurements: {
-          elements: {
-            properties: {
-              station: {type: "string"},
-              date: {type: "timestamp"},
-              classification: {
-                enum: [
-                  MC.MAX_EXCEEDED,
-                  MC.VERY_HIGH,
-                  MC.HIGH,
-                  MC.NORMAL,
-                  MC.LOW,
-                  MC.VERY_LOW,
-                  MC.MIN_UNDERSHOT,
-                  "",
-                ],
-              },
-            },
-            optionalProperties: {
-              waterLevelNHN: {type: "float64", nullable: true},
-              waterLevelGOK: {type: "float64", nullable: true},
-            },
-          },
-        },
-      },
-    },
-  },
-} as const;
