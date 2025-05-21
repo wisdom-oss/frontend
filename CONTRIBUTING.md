@@ -165,20 +165,26 @@ Key directories:
 
    - Check `src/common/signals.ts` for existing signals before creating new ones.
 
-6. **Styling**:
+6. **Dates**:
+
+   - We use [Day.js](https://day.js.org) for dates on all public API.
+     So use `dayjs()` and `dayjs.duration()` for dates and durations.
+   - We also have some custom plugins, see [`src/core/dayjs`](./src/core/dayjs/).
+
+7. **Styling**:
 
    - Use Bulma for consistency.
    - Import `variables.scss` if you need
      [Bulma variables](https://bulma.io/documentation/customize/list-of-sass-variables/)
      or shared styles.
 
-7. **Exports**:
+8. **Exports**:
 
    - Each file should export a single symbol for better namespace management.
    - Use the [`namespace`](https://www.typescriptlang.org/docs/handbook/namespaces.html)
      keyword to group multiple symbols under one export.
 
-8. **Routing**:
+9. **Routing**:
 
 - Add routes to `src/routes.ts`, usually as a child for the `""` route.
 - Make the route accessible by adding a `routerLink` to
