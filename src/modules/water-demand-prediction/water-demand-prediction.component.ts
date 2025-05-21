@@ -1,5 +1,7 @@
 import {CommonModule} from "@angular/common";
 import {
+  computed,
+  effect,
   signal,
   ViewChildren,
   Component,
@@ -36,7 +38,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     "2021-06-01 00:00:00": "water-demand-prediction.startpoint.options.b",
     "2022-01-01 00:00:00": "water-demand-prediction.startpoint.options.c",
   };
-  choiceStartPoint = signal<string>("2022-01-01 00:00:00");
+  choiceStartPoint = signal<string>("");
 
   /** variables resolution dropdown */
   menuResolution = "water-demand-prediction.choice.resolution";
@@ -45,7 +47,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     daily: "water-demand-prediction.resolution.daily",
     weekly: "water-demand-prediction.resolution.weekly",
   };
-  choiceResolution = signal<string>("hourly");
+  choiceResolution = signal<string>("");
 
   /** variables timeframe dropdown */
   menuTime = "water-demand-prediction.choice.timeframe";
@@ -58,12 +60,12 @@ export class WaterDemandPredictionComponent implements OnInit {
     "one year": "water-demand-prediction.timeframe.one-year",
     all: "water-demand-prediction.timeframe.all",
   };
-  choiceTime = signal<string>("one week");
+  choiceTime = signal<string>("");
 
   /** variables name dropdown */
   menuSmartmeter = "water-demand-prediction.choice.smartmeter";
   optionsSmartmeter: Record<string, string> = {};
-  choiceSmartmeter = signal<string>("retired-household");
+  choiceSmartmeter = signal<string>("");
 
   menuWeather = "water-demand-prediction.choice.weather";
   optionsWeather: Record<string, string> = {
@@ -72,7 +74,18 @@ export class WaterDemandPredictionComponent implements OnInit {
     precipitation: "water-demand-prediction.weather.precipitation",
     moisture: "water-demand-prediction.weather.moisture",
   };
-  choiceWeather = signal<string>("plain");
+  choiceWeather = signal<string>("");
+
+  /** variables weather column dropdown */
+  /** effect to fetch the weather columns based on the selected weather */
+  weatherEffect = effect(() => {
+    const weather = this.choiceWeather();
+    this.fetchWeatherColumns(weather);
+  });
+
+  menuWeatherColumn = "water-demand-prediction.choice.weatherColumn";
+  optionsWeatherColumn: Record<string, string> = {};
+  choiceWeatherColumn = signal<string>("");
 
   /** data object of current requested Smartmeterdata */
   currentSmartmeterData?: SingleSmartmeter;
@@ -173,8 +186,6 @@ export class WaterDemandPredictionComponent implements OnInit {
 
   ngOnInit() {
     this.fetchMeterInformation();
-    this.fetchDataSmartmeter();
-    this.chartDataPredictedValues.labels = this.chartDataCurrentValues.labels;
   }
 
   /** set the displayed resolution and update the chart to mirror that
@@ -314,9 +325,19 @@ export class WaterDemandPredictionComponent implements OnInit {
       error: error => {
         console.error(error);
       },
-      complete: () => {
-        console.log(this.optionsSmartmeter);
+      complete: () => {},
+    });
+  }
+
+  fetchWeatherColumns(param: any): void {
+    this.waterDemandService.fetchWeatherColumns(param).subscribe({
+      next: response => {
+        this.optionsWeatherColumn = response;
       },
+      error: error => {
+        console.error(error);
+      },
+      complete: () => {},
     });
   }
 
@@ -337,6 +358,7 @@ export class WaterDemandPredictionComponent implements OnInit {
         this.choiceTime(),
         this.choiceResolution(),
         this.choiceWeather(),
+        this.choiceWeatherColumn(),
       )
       .subscribe({
         next: response => {
@@ -371,7 +393,6 @@ export class WaterDemandPredictionComponent implements OnInit {
       .subscribe({
         next: (response: SingleSmartmeter) => {
           this.currentSmartmeterData = response;
-          console.log(this.currentSmartmeterData);
         },
         error: error => {
           console.log(error);
@@ -427,15 +448,12 @@ export class WaterDemandPredictionComponent implements OnInit {
         this.choiceTime(),
         this.choiceResolution(),
         this.choiceWeather(),
+        this.choiceWeatherColumn(),
       )
       .subscribe({
         next: (response: PredictionSingleSmartmeter) => {
           this.currentPredictedSmartmeterData.set(null);
           this.currentPredictedSmartmeterData.set(response);
-          console.log(
-            "Updated signal value:",
-            this.currentPredictedSmartmeterData(),
-          );
         },
         error: error => {
           console.log(error);
@@ -484,6 +502,7 @@ export class WaterDemandPredictionComponent implements OnInit {
             lower_conf_interval_dataset: lower_conf_int,
             labels: this.currentPredictedSmartmeterData()!.date,
           };
+
           if (
             !this.predictedDatasets[
               this.currentPredictedSmartmeterData()!.resolution

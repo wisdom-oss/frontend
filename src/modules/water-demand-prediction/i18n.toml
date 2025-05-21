@@ -74,6 +74,10 @@ de = "Wähle Auflösung"
 en = "Select Weather"
 de = "Wähle Wetter"
 
+[choice.weatherColumn]
+en = "Select Column"
+de = "Wähle Spalte"
+
 [request.realdata]
 en = "Display Data"
 de = "Zeige Daten an"
