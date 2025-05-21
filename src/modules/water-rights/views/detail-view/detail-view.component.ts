@@ -64,20 +64,41 @@ export class KeyValueFormatPipe implements PipeTransform {
   }
 }
 
+@Pipe({name: "ratefmt"})
+export class RateFormatPipe implements PipeTransform {
+  transform(rate: {
+    value: number;
+    unit: string;
+    per: {Microseconds: number; Days: number; Months: number};
+  }): string {
+    let {value, unit} = rate;
+    let per = dayjs
+      .duration({
+        milliseconds: rate.per.Microseconds * 1000,
+        days: rate.per.Days,
+        months: rate.per.Months,
+      })
+      .formatUnit();
+
+    return `${value} ${unit}/${per}`;
+  }
+}
+
 @Component({
   imports: [
     ControlComponent,
+    EmptyPipe,
     GeoJSONSourceComponent,
+    KeyValueFormatPipe,
     LayerComponent,
     MapComponent,
+    MapCursorDirective,
     NavigationControlDirective,
     NgIconComponent,
+    NgIf,
+    RateFormatPipe,
     TranslateDirective,
     TranslatePipe,
-    NgIf,
-    KeyValueFormatPipe,
-    MapCursorDirective,
-    EmptyPipe,
   ],
   templateUrl: "./detail-view.component.html",
   providers: [

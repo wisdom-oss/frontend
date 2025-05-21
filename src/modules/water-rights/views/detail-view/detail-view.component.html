@@ -259,9 +259,16 @@
                   }
                 </div>
               </div>
-              <div rates>
+              <div rates class="block">
                 @for (
-                  rates of asRates([["withdrawal", location.withdrawalRates]]);
+                  rates of asRates([
+                    ["withdrawal", location.withdrawalRates],
+                    ["pumping", location.pumpingRates],
+                    ["injection", location.injectionRates],
+                    ["wasteWaterFlowVolume", location.wasteWaterFlowVolume],
+                    ["fluidDischarge", location.fluidDischarge],
+                    ["rainSupplement", location.rainSupplement],
+                  ]);
                   track rates[0]
                 ) {
                   @if (rates[1] && !(rates[1] | empty)) {
@@ -279,7 +286,7 @@
                                 );
                               "
                             >
-                              {{ rate.value }} {{ rate.unit }}
+                              {{ rate | ratefmt }}
                             </div>
                           </div>
                         </div>
@@ -288,6 +295,10 @@
                   }
                 }
               </div>
+              <!-- TODO: damTargetLevels -->
+              <!-- TODO: irrigationArea -->
+              <!-- TODO: phValues -->
+              <!-- TODO: injectionLimits -->
               <table class="table is-hoverable is-striped is-fullwidth">
                 @for (
                   entry of asTable([
