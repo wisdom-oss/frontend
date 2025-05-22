@@ -46,7 +46,7 @@
     "bulma": "github:jgthms/bulma",
     "bulma-slider": "github:fatcarter/bulma-slider#slider-js",
     "bulma-switch": "github:deather/bulma-switch",
-    "chart.js": "^4.4.8",
+    "chart.js": "^4.4.9",
     "dayjs": "^1.11.13",
     "dexie": "^4.0.11",
     "gravatar-gen": "^1.0.2",
