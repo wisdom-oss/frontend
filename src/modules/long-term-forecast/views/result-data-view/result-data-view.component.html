@@ -31,7 +31,24 @@
       };
 
     <div class="column" style="min-width: 25em">
-      <div class="card is-fullheight">
+      <div class="card is-fullheight" style="position: relative">
+        <div
+          *ngIf="datasets.value() | empty"
+          style="
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+          "
+          class="is-flex is-justify-content-center is-align-items-center"
+        >
+          <ng-icon
+            class="spinner"
+            size="20em"
+            name="remixLoader5Fill"
+          ></ng-icon>
+        </div>
         <div
           class="card-content skeleton-block is-fullheight"
           [class.skeleton-block]="datasets.value() | empty"

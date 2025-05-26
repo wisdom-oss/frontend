@@ -17,7 +17,9 @@
   "cSpell.language": "en,de-DE",
   "typescript.tsdk": "./node_modules/typescript/lib",
   "cSpell.words": [
+    "bbox",
     "greenable",
-    "oowv"
+    "oowv",
+    "typia"
   ]
 }

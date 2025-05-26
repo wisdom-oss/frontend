@@ -1,0 +1,247 @@
+<div class="is-fullwidth is-fullheight is-flex is-flex-direction-column">
+  <p class="title" translate="weather-data.title.dwd"></p>
+  <div
+    class="is-flex-grow-1 is-flex"
+    [class.is-flex-direction-row]="layout() == 'row'"
+    [class.is-flex-direction-column]="layout() == 'column'"
+    style="gap: var(--bulma-column-gap)"
+    resize-observer
+    (resize)="onColumnsResize($event)"
+  >
+    <div map class="is-fullheight is-fullwidth">
+      <div class="card is-fullheight">
+        <div class="card-content p-0 is-fullheight is-clipped">
+          <mgl-map
+            class="is-fullheight"
+            [style]="colorful"
+            [zoom]="[5.3]"
+            [center]="{
+              lat: 51.16,
+              lon: 10.45,
+            }"
+            [fitBounds]="$any(fitBounds())"
+            [fitBoundsOptions]="{
+              animate: true,
+              duration: 500,
+              essential: true,
+            }"
+            (click)="fitBounds.set(clusterPolygonSource().polygon().bbox)"
+            (click)="hoverStationClusterId.set(undefined)"
+            (click)="selectedStationId.set(hoverStationId())"
+            [cursor]="cursor()"
+          >
+            <ng-container controls>
+              <mgl-control
+                mglNavigation
+                [showCompass]="false"
+                position="top-left"
+              ></mgl-control>
+              <mgl-control position="top-right">
+                <map-layer-selection-control
+                  [layers]="layers()"
+                  translatePrefix="weather-data.station.property.product.key."
+                ></map-layer-selection-control>
+              </mgl-control>
+            </ng-container>
+            <ng-container sources>
+              <mgl-geojson-source
+                id="stations-source"
+                [data]="filteredStations()"
+                [cluster]="true"
+                [clusterMinPoints]="2"
+                [clusterRadius]="100"
+                #stationsSource
+              ></mgl-geojson-source>
+              <mgl-geojson-source
+                mglClusterPolygon
+                [source]="stationsSource"
+                [clusterId]="hoverStationClusterId()"
+                [data]="clusterPolygonSource().polygon()"
+                id="stations-cluster-source"
+              ></mgl-geojson-source>
+            </ng-container>
+            <ng-container layers>
+              <mgl-layer
+                id="stations-symbol"
+                type="symbol"
+                source="stations-source"
+                [filter]="['!=', ['get', 'cluster'], true]"
+                [layout]="{
+                  'icon-image': 'remixicon:map-pin-2-line',
+                  'icon-anchor': 'bottom',
+                  'icon-overlap': 'always',
+                  'text-field': ['get', 'name'],
+                  'text-font': ['noto_sans_regular'],
+                  'text-optional': true,
+                  'text-anchor': 'top',
+                }"
+                [paint]="{
+                  'icon-color': [
+                    'case',
+                    [
+                      '==',
+                      ['get', 'id'],
+                      ['string', selectedStation()?.id, ''],
+                    ],
+                    '#0088AA',
+                    '#000000',
+                  ],
+                }"
+                (layerMouseLeave)="hoverStationId.set(undefined)"
+                (layerMouseMove)="
+                  hoverStationId.set($event.features![0].properties['id'])
+                "
+              ></mgl-layer>
+              <mgl-layer
+                id="stations-cluster-symbol"
+                type="symbol"
+                source="stations-source"
+                [filter]="['==', ['get', 'cluster'], true]"
+                [layout]="{
+                  'icon-image': 'remixicon:pin-distance-line',
+                }"
+                (layerMouseLeave)="hoverStationClusterId.set(undefined)"
+                (layerMouseMove)="
+                  hoverStationClusterId.set(
+                    util.cast($event.features![0].id, 'number')
+                  )
+                "
+              ></mgl-layer>
+              <mgl-layer
+                id="stations-cluster-fill"
+                type="fill"
+                source="stations-cluster-source"
+                [paint]="{
+                  'fill-color': '#000000',
+                  'fill-opacity': 0.2,
+                }"
+              ></mgl-layer>
+              <mgl-layer
+                id="stations-cluster-line"
+                type="line"
+                source="stations-cluster-source"
+                [paint]="{
+                  'line-color': '#000000',
+                  'line-width': 2,
+                }"
+              ></mgl-layer>
+            </ng-container>
+          </mgl-map>
+        </div>
+      </div>
+    </div>
+    @let selected = selectedStation();
+    @let info = stationInfo();
+    @if (selected && info) {
+      <div
+        select
+        class="is-fullheight is-fullwidth"
+        #select
+        resize-observer
+        (resize)="selectDivWidth.set($event[0].borderBoxSize[0].inlineSize)"
+      >
+        <div class="card is-fullheight is-flex is-flex-direction-column">
+          <div class="card-header has-background-primary">
+            <p
+              class="card-header-title has-text-light"
+              translate="weather-data.selector.title"
+            ></p>
+          </div>
+          <div
+            class="card-content pb-0"
+            style="overflow-y: auto; flex-basis: 0; flex-grow: 1"
+          >
+            <div class="is-flex is-flex-direction-column is-fullheight">
+              <div class="menu is-flex-grow-1">
+                <ul class="menu-list">
+                  @for (
+                    product of selected.properties.products | keyvalue;
+                    track product.key
+                  ) {
+                    <li>
+                      <a
+                        (click)="selectedProduct.set($any(product.key))"
+                        [translate]="
+                          'weather-data.station.property.product.key.' +
+                          product.key
+                        "
+                      ></a>
+                      @if (product.key == selectedProduct()) {
+                        <ul>
+                          @for (
+                            resolution of product.value | keyvalue;
+                            track resolution.key
+                          ) {
+                            <li>
+                              <a
+                                [class.is-active]="
+                                  selectedResolution() == resolution.key
+                                "
+                                (click)="
+                                  selectedResolution.set($any(resolution.key))
+                                "
+                                [translate]="
+                                  'weather-data.station.property.product.resolution.' +
+                                  resolution.key
+                                "
+                              ></a>
+                            </li>
+                          }
+                        </ul>
+                      }
+                    </li>
+                  }
+                </ul>
+              </div>
+              <div class="is-flex" style="gap: 0.5em">
+                <input
+                  class="p-1 my-2 is-flex-grow-1"
+                  type="date"
+                  [min]="productAvailableFrom()?.format('YYYY-MM-DD')"
+                  [max]="productAvailableUntil()?.format('YYYY-MM-DD')"
+                  [disabled]="!productInfo()"
+                  [style.cursor]="productInfo() ? 'auto' : 'not-allowed'"
+                  [(ngModel)]="productFromRaw"
+                />
+                <input
+                  class="p-1 my-2 is-flex-grow-1"
+                  type="date"
+                  [min]="productAvailableFrom()?.format('YYYY-MM-DD')"
+                  [max]="productAvailableUntil()?.format('YYYY-MM-DD')"
+                  [disabled]="!productInfo()"
+                  [style.cursor]="productInfo() ? 'auto' : 'not-allowed'"
+                  [(ngModel)]="productUntilRaw"
+                />
+              </div>
+              <button
+                class="button is-primary"
+                [disabled]="
+                  !productFromRaw() || !productUntilRaw() || downloading()
+                "
+                (click)="
+                  download({
+                    stationId: info.id,
+                    product: $any(productInfo()!.dataType),
+                    resolution: $any(productInfo()!.resolution),
+                    from: productFrom()!,
+                    until: productUntil()!,
+                  })
+                "
+              >
+                @if (downloading()) {
+                  <span class="spinner">
+                    <ng-icon name="remixLoader4Fill"></ng-icon>
+                  </span>
+                } @else {
+                  {{ "weather-data.selector.download" | translate }}
+                }
+              </button>
+              <a #downloadAnchor></a>
+              <div class="p-3"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

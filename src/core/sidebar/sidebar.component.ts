@@ -21,11 +21,13 @@ import {
   remixBuilding3Fill,
   remixDatabase2Fill,
   remixFilePaper2Fill,
+  remixDrizzleFill,
   remixInstanceLine,
   remixLineChartLine,
   remixMap2Fill,
   remixMapLine,
   remixRfidLine,
+  remixSunCloudyFill,
   remixWaterPercentFill,
 } from "@ng-icons/remixicon";
 import {TranslateDirective} from "@ngx-translate/core";
@@ -55,11 +57,10 @@ import {AuthService} from "../auth/auth.service";
       remixBuilding3Fill,
       remixDatabase2Fill,
       remixFilePaper2Fill,
-      remixInstanceLine,
       remixLineChartLine,
-      remixMap2Fill,
       remixMapLine,
       remixRfidLine,
+      remixSunCloudyFill,
       remixWaterPercentFill,
     }),
     provideNgIconLoader(name => {

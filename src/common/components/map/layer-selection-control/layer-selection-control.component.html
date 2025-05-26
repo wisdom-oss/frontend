@@ -16,7 +16,7 @@
               [id]="layer[0]"
               type="checkbox"
               class="switch is-thin"
-              (click)="layer[1].toggle()"
+              (click)="onClick($event, layer[0], layer[1])"
               [checked]="layer[1]()"
             />
             <label [for]="layer[0]" class="is-size-7" style="height: 1.5em">{{

@@ -38,6 +38,10 @@ de = "Zurück zur Startseite"
 en = "Groundwater"
 de = "Grundwasser"
 
+[sidebar.category.precipitation]
+en = "Precipitation"
+de = "Niederschlag"
+
 [sidebar.category.water-usage]
 en = "Water Usage"
 de = "Wasserverbrauch"

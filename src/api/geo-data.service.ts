@@ -5,10 +5,10 @@ import {
   HttpErrorResponse,
 } from "@angular/common/http";
 import {Injectable} from "@angular/core";
-import {JTDDataType} from "ajv/dist/core";
 import dayjs from "dayjs";
-import {GeoJSON} from "geojson";
+import {Geometry} from "geojson";
 import {firstValueFrom} from "rxjs";
+import typia from "typia";
 
 import {httpContexts} from "../common/http-contexts";
 
@@ -24,8 +24,8 @@ export class GeoDataService {
     return firstValueFrom(
       this.http.get<GeoDataService.AvailableLayers>(`${URL}/v2/`, {
         context: new HttpContext().set(
-          httpContexts.validateSchema,
-          AVAILABLE_LAYERS_SCHEMA,
+          httpContexts.validateType,
+          typia.createValidate<GeoDataService.AvailableLayers>(),
         ),
       }),
     );
@@ -40,8 +40,8 @@ export class GeoDataService {
           `${URL}/v1/${layerRef}`,
           {
             context: new HttpContext().set(
-              httpContexts.validateSchema,
-              LAYER_INFORMATION,
+              httpContexts.validateType,
+              typia.createValidate<GeoDataService.LayerInformation>(),
             ),
           },
         ),
@@ -76,7 +76,10 @@ export class GeoDataService {
       }
 
       let context = new HttpContext()
-        .set(httpContexts.validateSchema, LAYER_CONTENTS)
+        .set(
+          httpContexts.validateType,
+          typia.createValidate<GeoDataService.LayerContents>(),
+        )
         .set(httpContexts.cache, [url, cacheTtl]);
 
       return await firstValueFrom(
@@ -96,8 +99,8 @@ export class GeoDataService {
     return firstValueFrom(
       this.http.get<GeoDataService.IdentifiedObjects>(url, {
         context: new HttpContext().set(
-          httpContexts.validateSchema,
-          IDENTIFIED_OBJECTS,
+          httpContexts.validateType,
+          typia.createValidate<GeoDataService.IdentifiedObjects>(),
         ),
       }),
     );
@@ -105,17 +108,34 @@ export class GeoDataService {
 }
 
 export namespace GeoDataService {
-  export type LayerInformation = JTDDataType<typeof LAYER_INFORMATION>;
-  export type AvailableLayers = JTDDataType<typeof AVAILABLE_LAYERS_SCHEMA>;
-  export type LayerContent = Omit<
-    JTDDataType<typeof LAYER_CONTENT>,
-    "geometry"
-  > & {geometry: GeoJSON};
-  export type LayerContents = Omit<
-    JTDDataType<typeof LAYER_CONTENTS>,
-    "data"
-  > & {data: LayerContent[]};
-  export type IdentifiedObjects = JTDDataType<typeof IDENTIFIED_OBJECTS>;
+  export type LayerInformation = {
+    id: string;
+    name: string;
+    key: string;
+    description?: string;
+    attribution?: string;
+    attributionURL?: string;
+    crs?: number & typia.tags.Type<"uint32">;
+    private?: boolean;
+  };
+
+  export type AvailableLayers = LayerInformation[];
+
+  export type LayerContent = {
+    name: string | null;
+    id: number & typia.tags.Type<"uint32">;
+    key: string;
+    geometry: Geometry;
+    additionalProperties: Record<string, any> | null;
+  };
+
+  export type LayerContents = {
+    data: LayerContent[];
+    attribution?: string | null;
+    attributionURL?: string | null;
+  };
+
+  export type IdentifiedObjects = Record<string, Record<string, LayerContent>>;
 }
 
 const LAYER_INFORMATION = {
