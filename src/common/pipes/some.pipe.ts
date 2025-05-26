@@ -1,4 +1,4 @@
-import {inject, Pipe, PipeTransform} from "@angular/core";
+import {Pipe, PipeTransform} from "@angular/core";
 
 import {EmptyPipe} from "./empty.pipe";
 

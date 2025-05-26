@@ -41,7 +41,6 @@ import {GeoDataService} from "../../../../api/geo-data.service";
 import colorful from "../../../../assets/map/styles/colorful.json";
 import {signals} from "../../../../common/signals";
 import {MapCursorDirective} from "../../../../common/directives/map-cursor.directive";
-import {EmptyPipe} from "../../../../common/pipes/empty.pipe";
 import {SomePipe} from "../../../../common/pipes/some.pipe";
 
 type UsageLocations = FeatureCollection<
