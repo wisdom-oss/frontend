@@ -10,7 +10,7 @@ import {Pipe, PipeTransform} from "@angular/core";
  * * an empty array (`[]`)
  * * an object with no own values (`{}`)
  *
- * Returns **false** for any other value.  
+ * Returns **false** for any other value.
  * If the type is not covered above, it falls back to **null**.
  *
  * @example

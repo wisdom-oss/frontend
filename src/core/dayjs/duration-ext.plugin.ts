@@ -50,15 +50,14 @@ const durationExt: PluginFunc = (option, Dayjs, dayjs) => {
   function inner(
     duration: Duration,
   ): Record<
-      | "years"
-      | "months"
-      | "weeks"
-      | "days"
-      | "hours"
-      | "minutes"
-      | "seconds"
-      | "milliseconds"
-    ,
+    | "years"
+    | "months"
+    | "weeks"
+    | "days"
+    | "hours"
+    | "minutes"
+    | "seconds"
+    | "milliseconds",
     undefined | number
   > {
     return (duration as any).$d;
