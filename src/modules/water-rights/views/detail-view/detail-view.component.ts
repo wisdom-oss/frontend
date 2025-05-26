@@ -78,6 +78,7 @@ export class RateFormatPipe implements PipeTransform {
         days: rate.per.Days,
         months: rate.per.Months,
       })
+      .fuzzy()
       .formatUnit();
 
     return `${value} ${unit}/${per}`;

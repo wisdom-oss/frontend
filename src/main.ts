@@ -11,7 +11,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 
 import {wisdomAppConfig} from "./config";
 import {configureTranslations} from "./i18n";
-import formatUnit from "./core/dayjs/format-unit.plugin";
+import durationExt from "./core/dayjs/duration-ext.plugin";
 
 @Component({
   selector: "app",
@@ -24,7 +24,7 @@ export class AppComponent {
   constructor(translate: TranslateService) {
     dayjs.extend(duration);
     dayjs.extend(relativeTime);
-    dayjs.extend(formatUnit);
+    dayjs.extend(durationExt);
     configureTranslations(translate);
     registerLocaleData(localeDe, "de", localeDeExtra);
   }
