@@ -42,6 +42,7 @@ import colorful from "../../../../assets/map/styles/colorful.json";
 import {signals} from "../../../../common/signals";
 import {MapCursorDirective} from "../../../../common/directives/map-cursor.directive";
 import {EmptyPipe} from "../../../../common/pipes/empty.pipe";
+import {SomePipe} from "../../../../common/pipes/some.pipe";
 
 type UsageLocations = FeatureCollection<
   Point,
@@ -88,7 +89,6 @@ export class RateFormatPipe implements PipeTransform {
 @Component({
   imports: [
     ControlComponent,
-    EmptyPipe,
     GeoJSONSourceComponent,
     KeyValueFormatPipe,
     LayerComponent,
@@ -98,20 +98,21 @@ export class RateFormatPipe implements PipeTransform {
     NgIconComponent,
     NgIf,
     RateFormatPipe,
+    SomePipe,
     TranslateDirective,
     TranslatePipe,
   ],
   templateUrl: "./detail-view.component.html",
   providers: [
     provideIcons({
+      remixArticleLine,
       remixCheckboxCircleLine,
       remixCloseCircleLine,
-      remixArticleLine,
       remixHistoryFill,
       remixQuillPenLine,
+      remixSparkling2Line,
       remixTimeLine,
       remixVerifiedBadgeLine,
-      remixSparkling2Line,
     }),
   ],
 })

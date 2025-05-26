@@ -194,43 +194,60 @@
         </div>
       </div>
     </div>
-    <hr class="my-0" />
-    <div class="card-content">
-      <p id="usage-locations" class="title is-size-4 mt-0">Standorte</p>
-      <div class="grid is-col-min-16">
-        @for (location of usageLocations; track location) {
-          <div [id]="location.id" class="message">
-            <div
-              class="message-body"
-              style="border-color: var(--bulma-primary)"
-            >
-              <p class="title is-size-5 icon-text">
-                <span>{{ location.name }}</span>
-                @if (location.active) {
-                  <span class="icon">
-                    <ng-icon name="remixCheckboxCircleLine"></ng-icon>
+    @if (usageLocations | some) {
+      <hr class="my-0" />
+      <div class="card-content">
+        <p
+          id="usage-locations"
+          class="title is-size-4 mt-0"
+          translate="water-rights.locations"
+        ></p>
+        <div class="grid is-col-min-16 is-column-gap-2 is-row-gap-3">
+          @for (location of usageLocations; track location) {
+            <div [id]="location.id" class="message mb-0">
+              <div
+                class="message-body"
+                style="border-color: var(--bulma-primary)"
+              >
+                <p class="title is-size-5 icon-text">
+                  <span>{{ location.name }}</span>
+                  @let locationActiveIcon =
+                    location.active
+                      ? "remixCheckboxCircleLine"
+                      : "remixCloseCircleLine";
+                  <span
+                    class="icon"
+                    [title]="
+                      'water-rights.usage-location.active.' + location.active
+                        | translate
+                    "
+                  >
+                    <ng-icon [name]="locationActiveIcon"></ng-icon>
                   </span>
-                } @else {
-                  <span class="icon">
-                    <ng-icon name="remixCloseCircleLine"></ng-icon>
+                  @let locationRealIcon =
+                    location.real
+                      ? "remixVerifiedBadgeLine"
+                      : "remixSparkling2Line";
+                  <span
+                    class="icon"
+                    [title]="
+                      'water-rights.usage-location.real.' + location.real
+                        | translate
+                    "
+                  >
+                    <ng-icon [name]="locationRealIcon"></ng-icon>
                   </span>
-                }
-                @if (location.real) {
-                  <span class="icon">
-                    <ng-icon name="remixVerifiedBadgeLine"></ng-icon>
-                  </span>
-                } @else {
-                  <span class="icon">
-                    <ng-icon name="remixSparkling2Line"></ng-icon>
-                  </span>
-                }
-              </p>
-              <p class="subtitle is-size-6">
-                {{ location.legalPurpose?.[0] }}
-                {{ location.legalPurpose?.[1] }}
-              </p>
-              <div class="level">
-                <div class="level-left">
+                </p>
+                <p
+                  class="subtitle is-size-6"
+                  [title]="
+                    'water-rights.usage-location.legal-purpose' | translate
+                  "
+                >
+                  {{ location.legalPurpose?.[0] }}
+                  {{ location.legalPurpose?.[1] }}
+                </p>
+                <div class="field is-grouped is-grouped-multiline mb-5">
                   @for (
                     tag of [
                       ["id", location.id],
@@ -239,10 +256,12 @@
                     ];
                     track tag[0]
                   ) {
-                    <div class="level-item">
+                    <div>
                       <div class="tags has-addons">
                         <div class="tag is-primary">
-                          {{ $any(tag[0]) | translate }}
+                          {{
+                            "water-rights.usage-location." + tag[0] | translate
+                          }}
                         </div>
                         <div
                           class="tag"
@@ -258,79 +277,102 @@
                     </div>
                   }
                 </div>
-              </div>
-              <div rates class="block">
-                @for (
-                  rates of asRates([
-                    ["withdrawal", location.withdrawalRates],
-                    ["pumping", location.pumpingRates],
-                    ["injection", location.injectionRates],
-                    ["wasteWaterFlowVolume", location.wasteWaterFlowVolume],
-                    ["fluidDischarge", location.fluidDischarge],
-                    ["rainSupplement", location.rainSupplement],
-                  ]);
-                  track rates[0]
-                ) {
-                  @if (rates[1] && !(rates[1] | empty)) {
-                    <p>{{ rates[0] }}</p>
-                    <div class="columns">
-                      @for (rate of rates[1]; track rate) {
-                        <div class="column">
-                          <div class="message">
-                            <div
-                              class="message-body"
-                              style="
-                                border-color: var(--bulma-primary);
-                                background-color: var(
-                                  --bulma-body-background-color
-                                );
-                              "
-                            >
-                              {{ rate | ratefmt }}
+                <div rates class="block">
+                  @for (
+                    rates of asRates([
+                      ["withdrawal-rates", location.withdrawalRates],
+                      ["pumping-rates", location.pumpingRates],
+                      ["injection-rates", location.injectionRates],
+                      [
+                        "waste-water-flow-volume",
+                        location.wasteWaterFlowVolume,
+                      ],
+                      ["fluid-discharge", location.fluidDischarge],
+                      ["rain-supplement", location.rainSupplement],
+                    ]);
+                    track rates[0]
+                  ) {
+                    @if (rates[1] && (rates[1] | some)) {
+                      <p class="title is-size-6 mb-2">
+                        {{
+                          "water-rights.usage-location." + rates[0] | translate
+                        }}
+                      </p>
+                      <div class="columns">
+                        @for (rate of rates[1]; track rate) {
+                          <div class="column">
+                            <div class="message">
+                              <div
+                                class="message-body"
+                                style="
+                                  border-color: var(--bulma-primary);
+                                  background-color: var(
+                                    --bulma-body-background-color
+                                  );
+                                "
+                              >
+                                {{ rate | ratefmt }}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      }
-                    </div>
+                        }
+                      </div>
+                    }
                   }
-                }
-              </div>
-              <!-- TODO: damTargetLevels -->
-              <!-- TODO: irrigationArea -->
-              <!-- TODO: phValues -->
-              <!-- TODO: injectionLimits -->
-              <table class="table is-hoverable is-striped is-fullwidth">
-                @for (
-                  entry of asTable([
-                  ["mapExcerpt", location.mapExcerpt | kvfmt],
-                  ["municipalArea", location.municipalArea | kvfmt],
+                </div>
+                <!-- TODO: damTargetLevels -->
+                <!-- TODO: irrigationArea -->
+                <!-- TODO: phValues -->
+                <!-- TODO: injectionLimits -->
+                <table class="table is-hoverable is-striped is-fullwidth">
+                  @for (
+                    entry of asTable([
+                  ["map-excerpt", location.mapExcerpt | kvfmt],
+                  ["municipal-area", location.municipalArea | kvfmt],
                   ["county", location.county],
-                  ["landRecord", location.landRecord?.district ? `${location.landRecord!.district} ${location.landRecord!.field}` : location.landRecord?.fallback],
+                  ["land-record", location.landRecord?.district ? `${location.landRecord!.district} ${location.landRecord!.field}` : location.landRecord?.fallback],
                   ["plot", location.plot],
-                  ["maintenanceAssociation", location.maintenanceAssociation | kvfmt],
-                  ["euSurveyArea", location.euSurveyArea | kvfmt],
-                  ["catchmentAreaCode", location.catchmentAreaCode | kvfmt],
-                  ["regulationCitation", location.regulationCitation],
-                  ["riverBasin", location.riverBasin],
-                  ["groundwaterBody", location.groundwaterBody],
-                  ["waterBody", location.waterBody],
-                  ["floodArea", location.floodArea],
-                  ["waterProtectionArea", location.waterProtectionArea]
+                  ["maintenance-association", location.maintenanceAssociation | kvfmt],
+                  ["eu-survey-area", location.euSurveyArea | kvfmt],
+                  ["catchment-area-code", location.catchmentAreaCode | kvfmt],
+                  ["regulation-citation", location.regulationCitation],
+                  ["river-basin", location.riverBasin],
+                  ["groundwater-body", location.groundwaterBody],
+                  ["water-body", location.waterBody],
+                  ["flood-area", location.floodArea],
+                  ["water-protection-area", location.waterProtectionArea]
                 ]);
-                  track entry[0]
-                ) {
-                  @if (entry[1]) {
-                    <tr>
-                      <th>{{ entry[0] }}</th>
-                      <td>{{ entry[1] }}</td>
-                    </tr>
+                    track entry[0]
+                  ) {
+                    @if (entry[1]) {
+                      <tr>
+                        <th>
+                          {{
+                            "water-rights.usage-location." + entry[0]
+                              | translate
+                          }}
+                        </th>
+                        <td>{{ entry[1] }}</td>
+                      </tr>
+                    }
                   }
-                }
-              </table>
+                </table>
+              </div>
             </div>
-          </div>
-        }
+          }
+        </div>
       </div>
-    </div>
+    }
+    @if (waterRight.annotation) {
+      <hr class="my-0" />
+      <div class="card-content">
+        <p
+          id="annotation"
+          class="title is-size-4 mt-0 mb-2"
+          translate="water-rights.annotation"
+        ></p>
+        <p>{{ waterRight.annotation }}</p>
+      </div>
+    }
   </div>
 }
