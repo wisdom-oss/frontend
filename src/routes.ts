@@ -9,6 +9,8 @@ import {GrowlComponent} from "./modules/growl/growl.component";
 import {longTermForecastRoutes} from "./modules/long-term-forecast/routes";
 import {OowvActionMapComponent} from "./modules/oowv/action-map/action-map.component";
 import {PumpModelsComponent} from "./modules/pump-models/pump-models.component";
+import {WaterRightsComponent} from "./modules/water-rights/water-rights.component";
+import {waterRightsRoutes} from "./modules/water-rights/routes";
 import {WeatherDataComponent} from "./modules/weather-data/weather-data.component";
 
 export const routes: Routes = [
@@ -21,6 +23,11 @@ export const routes: Routes = [
       {path: "weather-data", component: WeatherDataComponent},
       {path: "be-water-smart", component: BeWaterSmartComponent},
       {path: "growl", component: GrowlComponent},
+      {
+        path: "water-rights",
+        component: WaterRightsComponent,
+        children: waterRightsRoutes,
+      },
       {
         path: "long-term-forecast",
         children: longTermForecastRoutes,

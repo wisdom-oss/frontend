@@ -28,7 +28,7 @@ import {DisplayInfoControlComponent} from "./map/display-info-control/display-in
 import {LegendControlComponent} from "./map/legend-control/legend-control.component";
 import {GrowlService} from "./growl.service";
 import {WithdrawalInfoControlComponent} from "./map/withdrawal-info-control/withdrawal-info-control.component";
-import {WaterRightsServiceService} from "../../api/water-rights-service.service";
+import {WaterRightsService} from "../../api/water-rights.service";
 import nlwknMeasurementClassificationColors from "../../assets/nlwkn-measurement-classification-colors.toml";
 import colorful from "../../assets/map/styles/colorful.json";
 import {LayerSelectionControlComponent} from "../../common/components/map/layer-selection-control/layer-selection-control.component";
@@ -97,7 +97,7 @@ export class GrowlComponent {
   protected averageWithdrawals = signal<{
     name: string;
     key: string;
-    withdrawals: Signal<WaterRightsServiceService.AverageWithdrawals | null>;
+    withdrawals: Signal<WaterRightsService.AverageWithdrawals | null>;
   } | null>(null);
 
   protected lang = signals.lang();
@@ -110,7 +110,7 @@ export class GrowlComponent {
 
   constructor(
     protected service: GrowlService,
-    private waterRightsService: WaterRightsServiceService,
+    private waterRightsService: WaterRightsService,
   ) {
     effect(() => {
       // force layer order by redrawing them on every update
@@ -181,8 +181,9 @@ export class GrowlComponent {
         let withdrawalData = {
           name: body.properties.name ?? body.properties.key,
           key: body.properties.key,
-          withdrawals:
-            signal<WaterRightsServiceService.AverageWithdrawals | null>(null),
+          withdrawals: signal<WaterRightsService.AverageWithdrawals | null>(
+            null,
+          ),
         };
 
         this.waterRightsService
