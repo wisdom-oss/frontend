@@ -174,7 +174,7 @@ export class DetailViewComponent {
     geo: GeoDataService,
     dataSignal: DetailViewComponent["data"],
   ): Signal<undefined | UsageLocations> {
-    let allUsageLocations = signals.fromPromise(
+    let allUsageLocations = signals.map(
       geo.fetchLayerContents(
         "water_right_usage_locations",
         undefined,
