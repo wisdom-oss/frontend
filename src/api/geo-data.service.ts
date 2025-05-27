@@ -49,7 +49,7 @@ export class GeoDataService {
       key: string[],
     }>,
     cacheTtl = dayjs.duration(1, "week")
-  ): api.Signal<GeoDataService.LayerContents | null> {
+  ): api.Signal<GeoDataService.LayerContents | null, null> {
     let url = computed(() => {
       let url = `${URL}/v2/content/${api.maybe(layerRef)()}`;
       if (filter) {
@@ -64,6 +64,7 @@ export class GeoDataService {
       url, 
       validate: typia.createValidate<GeoDataService.LayerContents>(),
       cache: cacheTtl,
+      defaultValue: null,
       onError: {[HttpStatusCode.NotFound]: () => null}
     })
   }
