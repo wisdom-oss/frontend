@@ -88,8 +88,6 @@ export class WaterRightsService {
 
     let boundary = contentType[1].split("boundary=")[1];
     let content = res.body!;
-    let endBoundary = `\r\n--${boundary}--\r\n`;
-    if (!content.endsWith(endBoundary)) content += endBoundary;
 
     let waterRight: object | undefined = undefined;
     let usageLocations: object[] | undefined = undefined;
