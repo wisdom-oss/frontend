@@ -18,9 +18,11 @@ ENV PATH="$VOLTA_HOME/bin:$PATH"
 # install node
 COPY --link package.json .
 RUN volta run node --version
+RUN volta run npm --version
 
 # install dependencies
 COPY --link package-lock.json .
+COPY --link .npmrc .
 RUN volta run npm ci
 
 # build the app
