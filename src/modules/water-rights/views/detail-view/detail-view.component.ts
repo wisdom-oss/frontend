@@ -9,7 +9,7 @@ import {
   WritableSignal,
   PipeTransform,
 } from "@angular/core";
-import {ActivatedRoute} from "@angular/router";
+import {RouterLink, ActivatedRoute} from "@angular/router";
 import {
   ControlComponent,
   LayerComponent,
@@ -19,6 +19,7 @@ import {
 } from "@maplibre/ngx-maplibre-gl";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {
+  remixArrowGoBackFill,
   remixArticleLine,
   remixCheckboxCircleLine,
   remixCloseCircleLine,
@@ -103,6 +104,7 @@ export class LandRecordPipe implements PipeTransform {
     ControlComponent,
     GeoJSONSourceComponent,
     KeyValueFormatPipe,
+    LandRecordPipe,
     LayerComponent,
     MapComponent,
     MapCursorDirective,
@@ -110,14 +112,15 @@ export class LandRecordPipe implements PipeTransform {
     NgIconComponent,
     NgIf,
     RateFormatPipe,
+    RouterLink,
     SomePipe,
     TranslateDirective,
     TranslatePipe,
-    LandRecordPipe,
   ],
   templateUrl: "./detail-view.component.html",
   providers: [
     provideIcons({
+      remixArrowGoBackFill,
       remixArticleLine,
       remixCheckboxCircleLine,
       remixCloseCircleLine,
