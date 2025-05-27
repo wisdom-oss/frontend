@@ -8,14 +8,14 @@ import {
 } from "@angular/common/http";
 import {Injectable} from "@angular/core";
 import {parseMultipart} from "@mjackson/multipart-parser";
-import {JTDDataType} from "ajv/dist/core";
 import dayjs from "dayjs";
-import {GeoJsonObject} from "geojson";
+import {GeoJsonObject, Point} from "geojson";
 import {firstValueFrom, Observable, BehaviorSubject} from "rxjs";
+import typia from "typia";
 
 import {httpContexts} from "../common/http-contexts";
 import {Once} from "../common/utils/once";
-import {SchemaValidationService} from "../core/schema/schema-validation.service";
+import {typeUtils} from "../common/utils/type-utils";
 
 const URL = "/api/water-rights" as const;
 
@@ -23,27 +23,27 @@ const URL = "/api/water-rights" as const;
   providedIn: "root",
 })
 export class WaterRightsService {
-  constructor(
-    private http: HttpClient,
-    private schema: SchemaValidationService,
-  ) {}
+  constructor(private http: HttpClient) {}
 
   fetchUsageLocations(): {
     progress: Observable<number>;
     total: PromiseLike<number | null>;
-    data: PromiseLike<WaterRightsService.UsageLocations>;
+    data: PromiseLike<WaterRightsService.UsageLocation[]>;
   } {
     let progress = new BehaviorSubject(0);
     let total = new Once<number | null>();
-    let data = new Once<WaterRightsService.UsageLocations>();
+    let data = new Once<WaterRightsService.UsageLocation[]>();
 
     let url = `${URL}/`;
     this.http
-      .get<WaterRightsService.UsageLocations>(url, {
+      .get<WaterRightsService.UsageLocation[]>(url, {
         observe: "events",
         reportProgress: true,
         context: new HttpContext()
-          .set(httpContexts.validateSchema, USAGE_LOCATIONS)
+          .set(
+            httpContexts.validateType,
+            typia.createValidate<WaterRightsService.UsageLocation[]>(),
+          )
           .set(httpContexts.cache, [url, dayjs.duration(3, "days")]),
       })
       .subscribe(event => {
@@ -64,7 +64,7 @@ export class WaterRightsService {
             progress.next(event.loaded);
             break;
           case HttpEventType.Response:
-            event as HttpResponse<WaterRightsService.UsageLocations>;
+            event as HttpResponse<WaterRightsService.UsageLocation[]>;
             data.set(event.body ?? []);
             break;
         }
@@ -109,17 +109,12 @@ export class WaterRightsService {
     if (!usageLocations) throw new Error("did not get usage locations");
 
     let data = {waterRight, usageLocations};
-    try {
-      return this.schema.validate<WaterRightsService.WaterRightDetails>(
-        WATER_RIGHT_DETAILS,
-        data,
-      );
-    } catch (e) {
-      if (e instanceof SchemaValidationService.Error) {
-        console.error("expected response type is invalid", data, e.errors);
-      }
-      throw e;
+    let valid = typia.validate<WaterRightsService.WaterRightDetails>(data);
+    if (!valid.success) {
+      console.error(valid.errors);
+      throw new Error("type validation failed");
     }
+    return data;
   }
 
   fetchAverageWithdrawals(
@@ -127,8 +122,8 @@ export class WaterRightsService {
   ): Promise<WaterRightsService.AverageWithdrawals> {
     let url = `${URL}/average-withdrawals`;
     let context = new HttpContext().set(
-      httpContexts.validateSchema,
-      AVERAGE_WITHDRAWALS,
+      httpContexts.validateType,
+      typia.createValidate<WaterRightsService.AverageWithdrawals>(),
     );
     return firstValueFrom(
       this.http.post<WaterRightsService.AverageWithdrawals>(url, geometries, {
@@ -139,160 +134,96 @@ export class WaterRightsService {
 }
 
 export namespace WaterRightsService {
-  export type AverageWithdrawals = JTDDataType<typeof AVERAGE_WITHDRAWALS>;
-  export type UsageLocations = JTDDataType<typeof USAGE_LOCATIONS>;
-  export type WaterRightDetails = JTDDataType<typeof WATER_RIGHT_DETAILS>;
+  export type AverageWithdrawals = {
+    minimalWithdrawal: number & typia.tags.Type<"double">;
+    maximalWithdrawal: number & typia.tags.Type<"double">;
+  };
 
-  export type Rates = JTDDataType<typeof RATES>;
-}
+  export namespace Helper {
+    export type KeyValue = {
+      key: number;
+      value?: string;
+    };
 
-const KEY_VALUE = {
-  properties: {},
-  optionalProperties: {
-    key: {type: "uint32"},
-    value: {type: "string"},
-  },
-} as const;
+    export type Quantity = {
+      value: number;
+      unit: string;
+    };
 
-const RATES = {
-  elements: {
-    properties: {
-      value: {type: "float64"},
-      unit: {type: "string"},
+    export type Rate = Quantity & {
       per: {
-        properties: {
-          // numbers here should be 64 bit, but ajv can't, so floats
-          Microseconds: {type: "float64"},
-          Days: {type: "float64"},
-          Months: {type: "float64"},
-          Valid: {type: "boolean"},
-        },
-      },
-    },
-  },
-} as const;
+        Microseconds: number & typia.tags.Type<"uint64">;
+        Days: number & typia.tags.Type<"uint32">;
+        Months: number & typia.tags.Type<"uint32">;
+        Valid: boolean;
+      };
+    };
+  }
 
-const QUANTITY = {
-  properties: {
-    value: {type: "float64"},
-    unit: {type: "string"},
-  },
-} as const;
+  export type UsageLocation = {
+    id: number & typia.tags.Type<"uint32">;
+    legalDepartment: "A" | "B" | "C" | "D" | "E" | "F" | "K" | "L";
+  } & typeUtils.Uncertain<{
+    no: number & typia.tags.Type<"uint32">;
+    serial: string;
+    waterRight: number & typia.tags.Type<"uint32">;
+    active: boolean;
+    real: boolean;
+    name: string;
+    legalPurpose: [string, string];
+    mapExcerpt: Helper.KeyValue;
+    municipalArea: Helper.KeyValue;
+    county: string;
+    landRecord: {district: string; field: number} | {fallback: string};
+    plot: string;
+    maintenanceAssociation: Helper.KeyValue;
+    euSurveyArea: Helper.KeyValue;
+    catchmentAreaCode: Helper.KeyValue;
+    regulationCitation: string;
+    withdrawalRates: Helper.Rate[];
+    pumpingRates: Helper.Rate[];
+    injectionRates: Helper.Rate[];
+    wasteWaterFlowVolume: Helper.Rate[];
+    riverBasin: string;
+    groundwaterBody: string;
+    waterBody: string;
+    floodArea: string;
+    waterProtectionArea: string;
+    damTargetLevel: {
+      default?: Helper.Quantity;
+      steady?: Helper.Quantity;
+      max?: Helper.Quantity;
+    };
+    fluidDischarge: Helper.Rate[];
+    rainSupplement: Helper.Rate[];
+    irrigationArea: Helper.Quantity;
+    phValue: Record<string, number>;
+    injectionLimits: {substance: string; quantity: Helper.Quantity}[];
+    location: Point;
+  }>;
 
-const USAGE_LOCATIONS = {
-  elements: {
-    properties: {
-      id: {type: "uint32"},
-      legalDepartment: {enum: ["A", "B", "C", "D", "E", "F", "K", "L"]},
-    },
-    optionalProperties: {
-      no: {type: "uint32"},
-      serial: {type: "string"},
-      waterRight: {type: "uint32"},
-      active: {type: "boolean"},
-      real: {type: "boolean"},
-      name: {type: "string"},
-      legalPurpose: {elements: {type: "string"}},
-      mapExcerpt: KEY_VALUE,
-      municipalArea: KEY_VALUE,
-      county: {type: "string"},
-      landRecord: {
-        properties: {},
-        optionalProperties: {
-          district: {type: "string"},
-          field: {type: "uint32"},
-          fallback: {type: "string"},
-        },
-      },
-      plot: {type: "string"},
-      maintenanceAssociation: KEY_VALUE,
-      euSurveyArea: KEY_VALUE,
-      catchmentAreaCode: KEY_VALUE,
-      regulationCitation: {type: "string"},
-      withdrawalRates: RATES,
-      pumpingRates: RATES,
-      injectionRates: RATES,
-      wasteWaterFlowVolume: RATES,
-      riverBasin: {type: "string"},
-      groundwaterBody: {type: "string"},
-      waterBody: {type: "string"},
-      floodArea: {type: "string"},
-      waterProtectionArea: {type: "string"},
-      damTargetLevels: {
-        properties: {},
-        optionalProperties: {
-          default: QUANTITY,
-          steady: QUANTITY,
-          max: QUANTITY,
-        },
-      },
-      fluidDischarge: RATES,
-      rainSupplement: RATES,
-      irrigationArea: QUANTITY,
-      phValues: {
-        values: {
-          type: "float64",
-        },
-      },
-      injectionLimits: {
-        elements: {
-          properties: {
-            substance: {type: "string"},
-            quantity: {
-              properties: {
-                value: {type: "float64"},
-                unit: {type: "string"},
-              },
-            },
-          },
-        },
-      },
-      location: {
-        properties: {
-          type: {enum: ["Point"]},
-          coordinates: {elements: {type: "float64"}},
-        },
-      },
-    },
-  },
-} as const;
-
-const WATER_RIGHT_DETAILS = {
-  properties: {
-    waterRight: {
-      properties: {},
-      optionalProperties: {
-        id: {type: "uint32", nullable: true},
-        water_right_number: {type: "uint32", nullable: true},
-        holder: {type: "string", nullable: true},
-        validFrom: {type: "string", nullable: true},
-        validUntil: {type: "string", nullable: true},
-        status: {enum: ["aktiv", "inaktiv", "Wasserbuchblatt"], nullable: true},
-        legalTitle: {type: "string", nullable: true},
-        waterAuthority: {type: "string", nullable: true},
-        registeringAuthority: {type: "string", nullable: true},
-        grantingAuthority: {type: "string", nullable: true},
-        initiallyGranted: {type: "string", nullable: true},
-        lastChange: {type: "string", nullable: true},
-        fileReference: {type: "string", nullable: true},
-        externalIdentifier: {type: "string", nullable: true},
-        subject: {type: "string", nullable: true},
-        address: {type: "string", nullable: true},
-        legalDepartments: {
-          elements: {
-            enum: ["A", "B", "C", "D", "E", "F", "K", "L"],
-          },
-        },
-        annotation: {type: "string", nullable: true},
-      },
-    },
-    usageLocations: USAGE_LOCATIONS,
-  },
-} as const;
-
-const AVERAGE_WITHDRAWALS = {
-  properties: {
-    minimalWithdrawal: {type: "float64"},
-    maximalWithdrawal: {type: "float64"},
-  },
-} as const;
+  export type WaterRightDetails = {
+    waterRight: typeUtils.Uncertain<{
+      id: number & typia.tags.Type<"uint32">;
+      water_right_number: number & typia.tags.Type<"uint32">;
+      holder: string;
+      validFrom: string;
+      validUntil: string;
+      status: "aktiv" | "inaktiv" | "Wasserbuchblatt";
+      legalTitle: string;
+      waterAuthority: string;
+      registeringAuthority: string;
+      grantingAuthority: string;
+      initiallyGranted: string;
+      lastChange: string;
+      fileReference: string;
+      externalIdentifier: string;
+      subject: string;
+      address: string;
+      legalDepartments: UsageLocation["legalDepartment"][] &
+        typia.tags.UniqueItems;
+      annotation: string;
+    }>;
+    usageLocations: UsageLocation[];
+  };
+}

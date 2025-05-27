@@ -12,6 +12,7 @@ import {BBox, FeatureCollection, Point} from "geojson";
 import {StyleSpecification} from "maplibre-gl";
 
 import {GeoDataService} from "../../../../api/geo-data.service";
+import {WaterRightsService} from "../../../../api/water-rights.service";
 import colorful from "../../../../assets/map/styles/colorful.json";
 import {signals} from "../../../../common/signals";
 import {LayerSelectionControlComponent} from "../../../../common/components/map/layer-selection-control/layer-selection-control.component";
@@ -19,7 +20,7 @@ import {ResizeMapOnLoadDirective} from "../../../../common/directives/resize-map
 import {ClusterPolygonSourceDirective} from "../../../../common/directives/cluster-polygon-source.directive";
 import {MapCursorDirective} from "../../../../common/directives/map-cursor.directive";
 
-type LegalDepartment = "A" | "B" | "C" | "D" | "E" | "F" | "K" | "L";
+type LegalDepartment = WaterRightsService.UsageLocation["legalDepartment"];
 
 @Component({
   imports: [

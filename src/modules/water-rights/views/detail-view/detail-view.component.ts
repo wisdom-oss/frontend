@@ -1,7 +1,6 @@
 import {NgIf, DOCUMENT} from "@angular/common";
 import {
   computed,
-  effect,
   inject,
   signal,
   Component,
@@ -36,8 +35,8 @@ import {StyleSpecification} from "maplibre-gl";
 
 import * as turf from "@turf/turf";
 
-import {WaterRightsService} from "../../../../api/water-rights.service";
 import {GeoDataService} from "../../../../api/geo-data.service";
+import {WaterRightsService} from "../../../../api/water-rights.service";
 import colorful from "../../../../assets/map/styles/colorful.json";
 import {signals} from "../../../../common/signals";
 import {MapCursorDirective} from "../../../../common/directives/map-cursor.directive";
@@ -50,7 +49,9 @@ type UsageLocations = FeatureCollection<
 
 @Pipe({name: "kvfmt"})
 export class KeyValueFormatPipe implements PipeTransform {
-  transform(keyValue?: {key?: number; value?: string}): string | undefined {
+  transform(
+    keyValue?: {key?: number; value?: string} | null,
+  ): string | undefined {
     if (!keyValue) return undefined;
     let {key, value} = keyValue;
 
@@ -85,6 +86,18 @@ export class RateFormatPipe implements PipeTransform {
   }
 }
 
+@Pipe({name: "landrecordfmt"})
+export class LandRecordPipe implements PipeTransform {
+  transform(
+    landRecord?: WaterRightsService.UsageLocation["landRecord"],
+  ): undefined | string {
+    if (!landRecord) return undefined;
+    if ("district" in landRecord)
+      return `${landRecord.district} ${landRecord.field}`;
+    return landRecord.fallback;
+  }
+}
+
 @Component({
   imports: [
     ControlComponent,
@@ -100,6 +113,7 @@ export class RateFormatPipe implements PipeTransform {
     SomePipe,
     TranslateDirective,
     TranslatePipe,
+    LandRecordPipe,
   ],
   templateUrl: "./detail-view.component.html",
   providers: [
@@ -129,9 +143,9 @@ export class DetailViewComponent {
 
   // prettier-ignore
   private asT<T>(value: T): T { return value }
-  protected asTable = this.asT<[string, undefined | string][]>;
+  protected asTable = this.asT<[string, undefined | null | string][]>;
   protected asRates = this.asT<
-    [string, undefined | WaterRightsService.Rates][]
+    [string, undefined | null | WaterRightsService.Helper.Rate[]][]
   >;
 
   constructor(
@@ -154,9 +168,6 @@ export class DetailViewComponent {
       fitBounds: DetailViewComponent.buildFitBounds(usageLocations),
       hover: signal(undefined),
     };
-
-    effect(() => console.log(this.data()));
-    effect(() => console.log(this.mapData.hover()));
   }
 
   private static buildUsageLocations(

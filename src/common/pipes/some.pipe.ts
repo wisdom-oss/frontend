@@ -31,13 +31,11 @@ export class SomePipe implements PipeTransform {
   transform(value?: object): boolean;
   transform(value: unknown, ..._args: unknown[]): unknown {
     let empty = this.empty.transform(value as any) as boolean | null;
+    // prettier-ignore
     switch (empty) {
-      case true:
-        return false;
-      case false:
-        return true;
-      case null:
-        return null;
+      case true: return false;
+      case false: return true;
+      case null: return null;
     }
   }
 }
