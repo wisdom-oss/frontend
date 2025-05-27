@@ -53,7 +53,7 @@ export namespace api {
           Record<HttpStatusCode, (err: HttpErrorResponse) => TResult>
         >;
       },
-  ): Signal<TResult, TDefault> {
+  ): Signal<TResult, NoInfer<TDefault>> {
     let {
       url,
       method,
