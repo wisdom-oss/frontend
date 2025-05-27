@@ -1,16 +1,20 @@
 import {
+  httpResource,
   HttpClient,
   HttpStatusCode,
   HttpContext,
+  HttpResourceRef,
   HttpErrorResponse,
 } from "@angular/common/http";
-import {Injectable} from "@angular/core";
+import {Injectable, Signal} from "@angular/core";
 import dayjs from "dayjs";
 import {Geometry} from "geojson";
 import {firstValueFrom} from "rxjs";
 import typia from "typia";
 
 import {httpContexts} from "../common/http-contexts";
+import {s} from "../common/s.tag";
+import { api } from "../common/api";
 
 const URL = "/api/geodata" as const;
 
@@ -20,37 +24,17 @@ const URL = "/api/geodata" as const;
 export class GeoDataService {
   constructor(private http: HttpClient) {}
 
-  fetchAvailableLayers(): Promise<GeoDataService.AvailableLayers> {
-    return firstValueFrom(
-      this.http.get<GeoDataService.AvailableLayers>(`${URL}/v2/`, {
-        context: new HttpContext().set(
-          httpContexts.validateType,
-          typia.createValidate<GeoDataService.AvailableLayers>(),
-        ),
-      }),
-    );
+  fetchAvailableLayers(): api.Signal<GeoDataService.AvailableLayers> {
+    return api.resource<GeoDataService.AvailableLayers>({url: `${URL}/v2/`});
   }
 
-  async fetchLayerInformation(
-    layerRef: string,
-  ): Promise<GeoDataService.LayerInformation | null> {
-    try {
-      return await firstValueFrom(
-        this.http.get<GeoDataService.LayerInformation>(
-          `${URL}/v1/${layerRef}`,
-          {
-            context: new HttpContext().set(
-              httpContexts.validateType,
-              typia.createValidate<GeoDataService.LayerInformation>(),
-            ),
-          },
-        ),
-      );
-    } catch (error) {
-      if (!(error instanceof HttpErrorResponse)) throw error;
-      if (error.status === HttpStatusCode.NotFound) return null;
-      throw error;
-    }
+  fetchLayerInformation(
+    layerRef: api.MaybeSignal<string>,
+  ): api.Signal<GeoDataService.LayerInformation> {
+    return api.resource<GeoDataService.LayerInformation>({
+      url: s`${URL}/v1/${layerRef}`,
+      // onError: {[HttpStatusCode.NotFound]: () => null},
+    });
   }
 
   async fetchLayerContents(
@@ -114,7 +98,7 @@ export namespace GeoDataService {
     key: string;
     description?: string;
     attribution?: string;
-    attributionURL?: string;
+    attributionURL?: string | null;
     crs?: number & typia.tags.Type<"uint32">;
     private?: boolean;
   };
