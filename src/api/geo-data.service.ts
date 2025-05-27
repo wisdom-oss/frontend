@@ -6,7 +6,7 @@ import {
   HttpResourceRef,
   HttpErrorResponse,
 } from "@angular/common/http";
-import {Injectable, Signal} from "@angular/core";
+import {computed, Injectable, Signal} from "@angular/core";
 import dayjs from "dayjs";
 import {Geometry} from "geojson";
 import {firstValueFrom} from "rxjs";
@@ -25,55 +25,47 @@ export class GeoDataService {
   constructor(private http: HttpClient) {}
 
   fetchAvailableLayers(): api.Signal<GeoDataService.AvailableLayers> {
-    return api.resource<GeoDataService.AvailableLayers>({url: `${URL}/v2/`});
+    return api.resource({
+      url: `${URL}/v2/`,
+      validate: typia.createValidate<GeoDataService.AvailableLayers>()
+    });
   }
 
   fetchLayerInformation(
     layerRef: api.MaybeSignal<string>,
-  ): api.Signal<GeoDataService.LayerInformation> {
-    return api.resource<GeoDataService.LayerInformation>({
+  ): api.Signal<GeoDataService.LayerInformation | null> {
+    return api.resource({
       url: s`${URL}/v1/${layerRef}`,
-      // onError: {[HttpStatusCode.NotFound]: () => null},
+      validate: typia.createValidate<GeoDataService.LayerInformation>(),
+      onError: {[HttpStatusCode.NotFound]: () => null},
     });
   }
 
-  async fetchLayerContents(
-    layerRef: string,
-    filter?: {
-      relation: "within" | "overlaps" | "contains";
-      otherLayer: string;
-      key: string[];
-    },
-    cacheTtl = dayjs.duration(1, "week"),
-  ): Promise<GeoDataService.LayerContents | null> {
-    try {
-      let url = `${URL}/v2/content/${layerRef}`;
+  fetchLayerContents(
+    layerRef: api.MaybeSignal<string>,
+    filter?: api.MaybeSignal<{
+      relation: "within" | "overlaps" | "contains",
+      otherLayer: string,
+      key: string[],
+    }>,
+    cacheTtl = dayjs.duration(1, "week")
+  ): api.Signal<GeoDataService.LayerContents | null> {
+    let url = computed(() => {
+      let url = `${URL}/v2/content/${api.maybe(layerRef)()}`;
       if (filter) {
-        let queryParams = [];
-        for (let [key, value] of Object.entries({
-          relation: filter.relation,
-          other_layer: filter.otherLayer,
-          key: filter.key,
-        }))
-          queryParams.push(`${key}=${value}`);
-        url += `/filtered?${queryParams.join("&")}`;
+        let {relation, otherLayer, key} = api.maybe(filter)();
+        url += `/filtered?relation=${relation}&other_layer=${otherLayer}&key=${key}`;
       }
 
-      let context = new HttpContext()
-        .set(
-          httpContexts.validateType,
-          typia.createValidate<GeoDataService.LayerContents>(),
-        )
-        .set(httpContexts.cache, [url, cacheTtl]);
+      return url;
+    });
 
-      return await firstValueFrom(
-        this.http.get<GeoDataService.LayerContents>(url, {context}),
-      );
-    } catch (error) {
-      if (!(error instanceof HttpErrorResponse)) throw error;
-      if (error.status === HttpStatusCode.NotFound) return null;
-      throw error;
-    }
+    return api.resource({
+      url, 
+      validate: typia.createValidate<GeoDataService.LayerContents>(),
+      cache: cacheTtl,
+      onError: {[HttpStatusCode.NotFound]: () => null}
+    })
   }
 
   identify(keys: Iterable<string>): Promise<GeoDataService.IdentifiedObjects> {

@@ -14,11 +14,16 @@ import typia from "typia";
 import {httpContexts} from "./http-contexts";
 
 export namespace api {
+  export type MaybeSignal<T> = T | CoreSignal<T>;
+
+  export function maybe<T>(input: MaybeSignal<T>): CoreSignal<T> {
+    if (isSignal(input)) return input;
+    return computed(() => input);
+  }
+
   export type Signal<T, D = undefined> = CoreSignal<T | D> & {
     resource: HttpResourceRef<T | D>;
   };
-
-  export type MaybeSignal<T> = T | CoreSignal<T>;
 
   type Request = {
     [K in keyof Omit<
@@ -39,11 +44,13 @@ export namespace api {
   >(
     options: Request &
       Options<TResult, TRaw> & {
+        validate: (input: unknown) => typia.IValidation<TResult>,
+        validateRaw?: (input: unknown) => typia.IValidation<TRaw>,
         defaultValue?: TDefault;
         authenticate?: boolean;
         cache?: Duration;
         onError?: Partial<
-          Record<HttpStatusCode, (err: HttpErrorResponse) => TDefault>
+          Record<HttpStatusCode, (err: HttpErrorResponse) => TResult>
         >;
       },
   ): Signal<TResult, TDefault> {
@@ -55,6 +62,8 @@ export namespace api {
       headers,
       reportProgress,
       equal,
+      validate,
+      validateRaw,
       defaultValue,
       authenticate,
       cache,
@@ -86,18 +95,18 @@ export namespace api {
     let parse = (raw: TRaw): TResult => {
       let result = raw as unknown as TResult;
       if (options.parse) {
-        let validRaw = typia.validate<TRaw>(raw);
-        if (!validRaw.success) {
-          console.error(validRaw.errors);
-          throw new Error("Invalid type on raw response");
+        if (validateRaw) {
+          let validRaw = validateRaw(raw);
+          if (!validRaw.success) {
+            console.error(validRaw.errors);
+            throw new Error("Invalid type on raw response");
+          }
         }
 
         result = options.parse(raw);
       }
 
-      console.log("before validate");
-      let validResult = typia.validate<TResult>(result);
-      console.log("after validate");
+      let validResult = validate(result);
       if (!validResult.success) {
         console.error(validResult.errors);
         throw new Error("Invalid type on response");
@@ -129,4 +138,6 @@ export namespace api {
 
     return Object.assign(value, {resource: resourceRef});
   }
+
+
 }
