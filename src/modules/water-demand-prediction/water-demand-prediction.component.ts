@@ -74,7 +74,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     precipitation: "water-demand-prediction.weather.precipitation",
     moisture: "water-demand-prediction.weather.moisture",
   };
-  choiceWeather = signal<string>("");
+  choiceWeather = signal<string>("plain");
 
   /** variables weather column dropdown */
   /** effect to fetch the weather columns based on the selected weather */
@@ -102,7 +102,7 @@ export class WaterDemandPredictionComponent implements OnInit {
   predictedDatasets: Record<string, PredictedSmartmeterDataset[]> = {};
 
   /**allows multiple records over all charts if true */
-  allowCheckMultiple = signal<boolean>(true);
+  allowCheckMultiple = signal<boolean>(false);
 
   /**
    * data skeleton for the line graph
@@ -351,6 +351,8 @@ export class WaterDemandPredictionComponent implements OnInit {
       return;
     }
 
+    alert("Training model, this may take a while...");
+
     this.waterDemandService
       .trainModelOnSingleSmartmeter(
         this.choiceStartPoint(),
@@ -536,6 +538,7 @@ export class WaterDemandPredictionComponent implements OnInit {
    * @param pred flag im request is for real or predicted data
    * @returns true if request unique, false else
    */
+  /* deprecated */
   checkParameters(pred: boolean): boolean {
     if (this.allowCheckMultiple()) {
       return true;
@@ -544,7 +547,8 @@ export class WaterDemandPredictionComponent implements OnInit {
     if (
       !this.choiceSmartmeter() ||
       !this.choiceResolution() ||
-      !this.choiceTime()
+      !this.choiceTime() ||
+      !this.choiceStartPoint()
     ) {
       alert("Not every parameter for request is set.");
     }
@@ -566,7 +570,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     let colorToCheck = this.createColorFromParameter(
       this.choiceSmartmeter(),
       this.choiceResolution(),
-      this.choiceTime(),
+      this.choiceTime()
     );
 
     let errormsg: string =
