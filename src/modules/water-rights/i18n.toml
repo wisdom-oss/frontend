@@ -1,0 +1,275 @@
+[display.module]
+en = "Water Rights"
+de = "Wasserrechte"
+
+[back]
+en = "Back to Overview"
+de = "Zurück zur Übersicht"
+
+[legal-department.A]
+en = "[A] Withdrawal of water or solid substances from surface waters"
+de = "[A] Entnahme von Wasser oder Entnahmen fester Stoffe aus oberirdischen Gewässern"
+
+[legal-department.B]
+en = "[B] Introduction and discharge of substances into surface waters"
+de = "[B] Einbringen und Einleiten von Stoffen in oberirdische und Küstengewässer"
+
+[legal-department.C]
+en = "[C] Damming and lowering of surface waters"
+de = "[C] Aufstauen und Absenken oberirdischer Gewässer"
+
+[legal-department.D]
+en = "[D] Other impacts on surface waters"
+de = "[D] Andere Einwirkung auf oberirdische Gewässer"
+
+[legal-department.E]
+en = "[E] Withdrawal, extraction, conveyance and discharge of groundwater"
+de = "[E] Entnahme, Zutageförderung, Zutageleiten und Ableiten von Grundwasser"
+
+[legal-department.F]
+en = "[F] Other uses and impacts on groundwater"
+de = "[F] Andere Nutzungen und Einwirkungen auf das Grundwasser"
+
+[legal-department.K]
+en = "[K] Compulsory rights"
+de = "[K] Zwangsrechte"
+
+[legal-department.L]
+en = "[L] Fishing Rights"
+de = "[L] Fischereirechte"
+
+[water-right]
+en = "Water Right"
+de = "Wasserrecht"
+
+[subject]
+en = "Subject"
+de = "Betreff"
+
+[valid]
+en = "validness"
+de = "Gültigkeit"
+
+[valid-from]
+en = "valid from"
+de = "gültig seit"
+
+[valid-until]
+en = "valid until"
+de = "gültig bis"
+
+[last-change]
+en = "last change"
+de = "Änderungsdatum"
+
+[status.active]
+en = "active"
+de = "aktiv"
+
+[status.inactive]
+en = "inactive"
+de = "inaktiv"
+
+[status.water-register-entry]
+en = "Water Register Entry"
+de = "Wasserbuchblatt"
+
+[legal-title]
+en = "Legal Title"
+de = "Rechtstitel"
+
+[granting-authority]
+en = "Granting Authority"
+de = "erteilt durch"
+
+[registering-authority]
+en = "Registering Authority"
+de = "eingetragen durch"
+
+[water-authority]
+en = "Water Authority"
+de = "Wasserbuchbehörde"
+
+[initially-granted]
+en = "initially granted"
+de = "erstmalig erstellt am"
+
+[address]
+en = "Address"
+de = "Adresse"
+
+[holder]
+en = "Holder"
+de = "Rechtsinhaber"
+
+[internal-id]
+en = "Internal ID"
+de = "Interne ID"
+
+[water-right-no]
+en = "Water Right No."
+de = "Wasserrecht Nr."
+
+[external-id]
+en = "External ID"
+de = "Externe ID"
+
+[file-reference]
+en = "File Reference"
+de = "Aktenzeichen"
+
+[locations]
+en = "Locations"
+de = "Standorte"
+
+[annotation]
+en = "Annotation"
+de = "Anmerkung"
+
+[usage-location.id]
+en = "Internal ID"
+de = "Interne ID"
+
+[usage-location.no]
+en = "Usage Location No."
+de = "Nutzungsort Nr."
+
+[usage-location.serial]
+en = "Usage Location Serial No."
+de = "Nutzungsort Lfd. Nr."
+
+[usage-location.active.true]
+en = "active"
+de = "aktiv"
+
+[usage-location.active.false]
+en = "inactive"
+de = "inaktiv"
+
+[usage-location.real.true]
+en = "real"
+de = "real"
+
+[usage-location.real.false]
+en = "virtual"
+de = "virtuell"
+
+[usage-location.name]
+en = "Name"
+de = "Nutzungsort/Bezeichnung"
+
+[usage-location.legal-purpose]
+en = "Legal Purpose"
+de = "Rechtszweck"
+
+[usage-location.map-excerpt]
+en = "Map Excerpt"
+de = "Top. Karte 1:25.000"
+
+[usage-location.municipal-area]
+en = "Municipal Area"
+de = "Gemeindegebiet"
+
+[usage-location.county]
+en = "County"
+de = "Landkreis"
+
+[usage-location.land-record]
+en = "District, Field"
+de = "Gemarkung, Flur"
+
+[usage-location.plot]
+en = "Plot"
+de = "Flurstück"
+
+[usage-location.maintenance-association]
+en = "Maintenance Association"
+de = "Unterhaltungsverband"
+
+[usage-location.eu-survey-area]
+en = "EU Survey Area"
+de = "EU-Bearbeitungsgebiet"
+
+[usage-location.catchment-area-code]
+en = "Catchment Area Code"
+de = "Einzugsgebietskennzahl"
+
+[usage-location.regulation-citation]
+en = "Regulation Citation"
+de = "Verordnungszitat"
+
+[usage-location.withdrawal-rates]
+en = "Withdrawal Rates"
+de = "Entnahmemenge"
+
+[usage-location.pumping-rates]
+en = "Pumping Rates"
+de = "Förderleistung"
+
+[usage-location.injection-rates]
+en = "Injection Rates"
+de = "Einleitungsmenge"
+
+[usage-location.waste-water-flow-volume]
+en = "Waste Water Flow Volume"
+de = "Abwasservolumenstrom"
+
+[usage-location.river-basin]
+en = "River Basin"
+de = "Flussgebiet"
+
+[usage-location.groundwater-body]
+en = "Groundwater Body"
+de = "Grundwasserkörper"
+
+[usage-location.water-body]
+en = "Water Body"
+de = "Gewässer"
+
+[usage-location.flood-area]
+en = "Flood Area"
+de = "Überschwemmungsgebiet"
+
+[usage-location.water-protection-area]
+en = "Water Protection Area"
+de = "Wasserschutzgebiet"
+
+[usage-location.dam-target-levels.default]
+en = "Default Dam Target Level"
+de = "Stauziel (default)"
+
+[usage-location.dam-target-levels.steady]
+en = "Steady Dam Target Level"
+de = "Stauziel (steady)"
+
+[usage-location.dam-target-levels.max]
+en = "Max Dam Target Level"
+de = "Stauziel (max)"
+
+[usage-location.fluid-discharge]
+en = "Fluid Discharge"
+de = "Ableitungsmenge"
+
+[usage-location.rain-supplement]
+en = "Rain Supplement"
+de = "Zusatzregen"
+
+[usage-location.irrigation-area]
+en = "Irrigation Area"
+de = "Beregnungsfläche"
+
+[usage-location.ph-values]
+en = "pH Values"
+de = "pH-Werte"
+
+[usage-location.injection-limits]
+en = "Injection Limits"
+de = "Erlaubniswert"
+
+[usage-location.location.type]
+en = "Location Type"
+de = "Lagetyp"
+
+[usage-location.location.coordinates]
+en = "Coordinates"
+de = "Koordinaten"

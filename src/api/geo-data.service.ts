@@ -37,7 +37,7 @@ export class GeoDataService {
     try {
       return await firstValueFrom(
         this.http.get<GeoDataService.LayerInformation>(
-          `${URL}/v2/${layerRef}`,
+          `${URL}/v1/${layerRef}`,
           {
             context: new HttpContext().set(
               httpContexts.validateType,

@@ -1,0 +1,399 @@
+@let waterRight = data()?.waterRight;
+@let usageLocations = data()?.usageLocations;
+
+@if (waterRight) {
+  <div class="card is-fullheight" style="overflow: auto">
+    <div class="card-header">
+      <div class="card-header-title p-2">
+        <div class="level is-fullwidth">
+          <div class="level-left">
+            <p
+              id="water-right"
+              class="level-item is-size-4 pl-3"
+              translate="water-rights.water-right"
+            ></p>
+          </div>
+          <div class="level-right">
+            <button
+              class="level-item button"
+              [title]="'water-rights.back' | translate"
+              routerLink="/water-rights"
+            >
+              <span class="icon">
+                <ng-icon name="remixArrowGoBackFill"></ng-icon>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-image" style="height: min(20rem, 40vh)">
+      <mgl-map
+        class="is-fullheight"
+        [style]="mapData.style"
+        [fitBounds]="$any(mapData.fitBounds())"
+        [cursor]="mapData.hover() ? 'pointer' : 'grab'"
+        (click)="
+          mapData.hover() &&
+            document
+              .getElementById('' + mapData.hover())
+              ?.scrollIntoView({behavior: 'smooth'})
+        "
+      >
+        <mgl-control
+          position="top-left"
+          mglNavigation
+          [showCompass]="false"
+        ></mgl-control>
+        @if (mapData.usageLocations()) {
+          <mgl-geojson-source
+            id="usage-locations-source"
+            [data]="mapData.usageLocations()!"
+          ></mgl-geojson-source>
+          <mgl-layer
+            id="usage-locations-symbol"
+            type="symbol"
+            source="usage-locations-source"
+            [layout]="{
+              'icon-image': 'remixicon:map-pin-2-line',
+              'icon-anchor': 'bottom',
+              'icon-overlap': 'always',
+              'text-field': ['get', 'name'],
+              'text-font': ['noto_sans_regular'],
+              'text-anchor': 'top',
+              'text-optional': true,
+            }"
+            (layerMouseMove)="mapData.hover.set($any($event.features![0]!.id))"
+            (layerMouseLeave)="mapData.hover.set(undefined)"
+          ></mgl-layer>
+        }
+      </mgl-map>
+    </div>
+    <div class="card-content">
+      <div class="columns">
+        <div class="column">
+          <p class="is-size-5 has-text-weight-bold icon-text">
+            <span
+              *ngIf="waterRight.legalTitle"
+              [title]="'water-rights.legal-title' | translate"
+              >{{ waterRight.legalTitle }}</span
+            >
+            @if (waterRight.status) {
+              @switch (waterRight.status) {
+                @case ("aktiv") {
+                  <span
+                    class="icon"
+                    [title]="'water-rights.status.active' | translate"
+                  >
+                    <ng-icon name="remixCheckboxCircleLine"></ng-icon>
+                  </span>
+                }
+                @case ("inaktiv") {
+                  <span
+                    class="icon"
+                    [title]="'water-rights.status.inactive' | translate"
+                  >
+                    <ng-icon name="remixCloseCircleLine"></ng-icon>
+                  </span>
+                }
+                @case ("Wasserbuchblatt") {
+                  <span
+                    class="icon"
+                    [title]="
+                      'water-rights.status.water-register-entry' | translate
+                    "
+                  >
+                    <ng-icon name="remixArticleLine"></ng-icon>
+                  </span>
+                }
+              }
+            }
+          </p>
+          <p
+            class="is-size-6 has-text-weight-bold"
+            [title]="'water-rights.subject' | translate"
+          >
+            {{ waterRight.subject }}
+          </p>
+          <table>
+            @for (
+              entry of [
+                ["water-rights.holder", waterRight.holder],
+                ["water-rights.address", waterRight.address],
+                ["water-rights.water-authority", waterRight.waterAuthority],
+                [
+                  "water-rights.granting-authority",
+                  waterRight.grantingAuthority,
+                ],
+                [
+                  "water-rights.registering-authority",
+                  waterRight.registeringAuthority,
+                ],
+              ];
+              track entry[0]
+            ) {
+              <tr *ngIf="entry[1]">
+                <th class="has-text-weight-medium">
+                  {{ entry[0]! | translate }}:
+                </th>
+                <td class="pl-2">{{ entry[1] }}</td>
+              </tr>
+            }
+          </table>
+        </div>
+        <div class="column is-narrow">
+          <div class="is-flex is-align-items-flex-end is-flex-direction-column">
+            <p
+              *ngIf="waterRight.validFrom && waterRight.validUntil"
+              class="tag is-medium mb-2"
+              [title]="'water-rights.valid' | translate"
+            >
+              <span class="icon-text">
+                <span class="icon">
+                  <ng-icon name="remixTimeLine"></ng-icon>
+                </span>
+                <span [title]="'water-rights.valid-from' | translate">{{
+                  waterRight.validFrom
+                }}</span>
+                <span>-</span>
+                <span [title]="'water-rights.valid-until' | translate">{{
+                  waterRight.validUntil
+                }}</span>
+              </span>
+            </p>
+            <p
+              *ngIf="waterRight.initiallyGranted"
+              class="tag is-medium mb-2"
+              [title]="'water-rights.initially-granted' | translate"
+            >
+              <span class="icon-text">
+                <span class="icon">
+                  <ng-icon name="remixQuillPenLine"></ng-icon>
+                </span>
+                <span>{{ waterRight.initiallyGranted }}</span>
+              </span>
+            </p>
+            <p
+              *ngIf="waterRight.lastChange"
+              class="tag is-medium mb-2"
+              [title]="'water-rights.last-change' | translate"
+            >
+              <span class="icon-text">
+                <span class="icon">
+                  <ng-icon name="remixHistoryFill"></ng-icon>
+                </span>
+                <span>{{ waterRight.lastChange }}</span>
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="level">
+        <div class="level-left">
+          @for (
+            tag of [
+              ["water-rights.internal-id", waterRight.id],
+              ["water-rights.water-right-no", waterRight.water_right_number],
+              ["water-rights.external-id", waterRight.externalIdentifier],
+              ["water-rights.file-reference", waterRight.fileReference],
+            ];
+            track tag[0]
+          ) {
+            <div class="level-item">
+              <div class="tags has-addons">
+                <div class="tag is-primary">{{ $any(tag[0]) | translate }}</div>
+                <div class="tag">{{ tag[1] }}</div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+    @if (usageLocations | some) {
+      <hr class="my-0" />
+      <div class="card-content">
+        <p
+          id="usage-locations"
+          class="title is-size-4 mt-0"
+          translate="water-rights.locations"
+        ></p>
+        <div class="grid is-col-min-16 is-column-gap-2 is-row-gap-3">
+          @for (location of usageLocations; track location) {
+            <div [id]="location.id" class="message mb-0">
+              <div
+                class="message-body"
+                style="border-color: var(--bulma-primary)"
+              >
+                <p class="title is-size-5 icon-text">
+                  <span>{{ location.name }}</span>
+                  @let locationActiveIcon =
+                    location.active
+                      ? "remixCheckboxCircleLine"
+                      : "remixCloseCircleLine";
+                  <span
+                    class="icon"
+                    [title]="
+                      'water-rights.usage-location.active.' + location.active
+                        | translate
+                    "
+                  >
+                    <ng-icon [name]="locationActiveIcon"></ng-icon>
+                  </span>
+                  @let locationRealIcon =
+                    location.real
+                      ? "remixVerifiedBadgeLine"
+                      : "remixSparkling2Line";
+                  <span
+                    class="icon"
+                    [title]="
+                      'water-rights.usage-location.real.' + location.real
+                        | translate
+                    "
+                  >
+                    <ng-icon [name]="locationRealIcon"></ng-icon>
+                  </span>
+                </p>
+                <p
+                  class="subtitle is-size-6"
+                  [title]="
+                    'water-rights.usage-location.legal-purpose' | translate
+                  "
+                >
+                  {{ location.legalPurpose?.[0] }}
+                  {{ location.legalPurpose?.[1] }}
+                </p>
+                <div class="field is-grouped is-grouped-multiline mb-5">
+                  @for (
+                    tag of [
+                      ["id", location.id],
+                      ["no", location.no],
+                      ["serial", location.serial],
+                    ];
+                    track tag[0]
+                  ) {
+                    <div>
+                      <div class="tags has-addons">
+                        <div class="tag is-primary">
+                          {{
+                            "water-rights.usage-location." + tag[0] | translate
+                          }}
+                        </div>
+                        <div
+                          class="tag"
+                          style="
+                            background-color: var(
+                              --bulma-body-background-color
+                            );
+                          "
+                        >
+                          {{ tag[1] }}
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
+                <div rates class="block">
+                  @for (
+                    rates of asRates([
+                      ["withdrawal-rates", location.withdrawalRates],
+                      ["pumping-rates", location.pumpingRates],
+                      ["injection-rates", location.injectionRates],
+                      [
+                        "waste-water-flow-volume",
+                        location.wasteWaterFlowVolume,
+                      ],
+                      ["fluid-discharge", location.fluidDischarge],
+                      ["rain-supplement", location.rainSupplement],
+                    ]);
+                    track rates[0]
+                  ) {
+                    @if (rates[1] && (rates[1] | some)) {
+                      <p class="title is-size-6 mb-2">
+                        {{
+                          "water-rights.usage-location." + rates[0] | translate
+                        }}
+                      </p>
+                      <div class="columns">
+                        @for (rate of rates[1]; track rate) {
+                          <div class="column">
+                            <div class="message">
+                              <div
+                                class="message-body"
+                                style="
+                                  border-color: var(--bulma-primary);
+                                  background-color: var(
+                                    --bulma-body-background-color
+                                  );
+                                "
+                              >
+                                {{ rate | ratefmt }}
+                              </div>
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    }
+                  }
+                </div>
+                <!-- TODO: damTargetLevels -->
+                <!-- TODO: irrigationArea -->
+                <!-- TODO: phValues -->
+                <!-- TODO: injectionLimits -->
+                <table class="table is-hoverable is-striped is-fullwidth">
+                  @for (
+                    entry of asTable([
+                      ["map-excerpt", location.mapExcerpt | kvfmt],
+                      ["municipal-area", location.municipalArea | kvfmt],
+                      ["county", location.county],
+                      ["land-record", location.landRecord | landrecordfmt],
+                      ["plot", location.plot],
+                      [
+                        "maintenance-association",
+                        location.maintenanceAssociation | kvfmt,
+                      ],
+                      ["eu-survey-area", location.euSurveyArea | kvfmt],
+                      [
+                        "catchment-area-code",
+                        location.catchmentAreaCode | kvfmt,
+                      ],
+                      ["regulation-citation", location.regulationCitation],
+                      ["river-basin", location.riverBasin],
+                      ["groundwater-body", location.groundwaterBody],
+                      ["water-body", location.waterBody],
+                      ["flood-area", location.floodArea],
+                      ["water-protection-area", location.waterProtectionArea],
+                    ]);
+                    track entry[0]
+                  ) {
+                    @if (entry[1]) {
+                      <tr>
+                        <th>
+                          {{
+                            "water-rights.usage-location." + entry[0]
+                              | translate
+                          }}
+                        </th>
+                        <td>{{ entry[1] }}</td>
+                      </tr>
+                    }
+                  }
+                </table>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+    @if (waterRight.annotation) {
+      <hr class="my-0" />
+      <div class="card-content">
+        <p
+          id="annotation"
+          class="title is-size-4 mt-0 mb-2"
+          translate="water-rights.annotation"
+        ></p>
+        <p>{{ waterRight.annotation }}</p>
+      </div>
+    }
+  </div>
+}

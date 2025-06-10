@@ -570,7 +570,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     let colorToCheck = this.createColorFromParameter(
       this.choiceSmartmeter(),
       this.choiceResolution(),
-      this.choiceTime()
+      this.choiceTime(),
     );
 
     let errormsg: string =

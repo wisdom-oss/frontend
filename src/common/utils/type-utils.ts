@@ -43,4 +43,31 @@ export namespace typeUtils {
    * ```
    */
   export type Signaled<T> = T extends Signal<infer U> ? U : never;
+
+  /**
+   * Makes all properties of a type optional and allows them to be `null` or
+   * `undefined`.
+   *
+   * Useful when dealing with data where presence or completeness is not
+   * guaranteed.
+   *
+   * @template T The base type to make uncertain.
+   *
+   * @example
+   * ```ts
+   * interface User {
+   *   id: number;
+   *   name: string;
+   * }
+   *
+   * type MaybeUser = Uncertain<User>;
+   * // {
+   * //   id?: number | null | undefined;
+   * //   name?: string | null | undefined;
+   * // }
+   * ```
+   */
+  export type Uncertain<T> = {
+    [K in keyof T]?: T[K] | null | undefined;
+  };
 }
