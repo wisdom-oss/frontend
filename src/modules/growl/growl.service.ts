@@ -85,13 +85,13 @@ export class GrowlService {
     measurementClassifications: WritableSignal<MeasurementClassifications>;
     lastWeek: {
       // today minus <index> days
-      0: [Dayjs, WritableSignal<MeasurementClassifications>];
-      1: [Dayjs, WritableSignal<MeasurementClassifications>];
-      2: [Dayjs, WritableSignal<MeasurementClassifications>];
-      3: [Dayjs, WritableSignal<MeasurementClassifications>];
-      4: [Dayjs, WritableSignal<MeasurementClassifications>];
-      5: [Dayjs, WritableSignal<MeasurementClassifications>];
-      6: [Dayjs, WritableSignal<MeasurementClassifications>];
+      0: [Dayjs, Signal<MeasurementClassifications>];
+      1: [Dayjs, Signal<MeasurementClassifications>];
+      2: [Dayjs, Signal<MeasurementClassifications>];
+      3: [Dayjs, Signal<MeasurementClassifications>];
+      4: [Dayjs, Signal<MeasurementClassifications>];
+      5: [Dayjs, Signal<MeasurementClassifications>];
+      6: [Dayjs, Signal<MeasurementClassifications>];
     };
   };
 
@@ -174,28 +174,18 @@ export class GrowlService {
   private static constructGlDataSignals(
     service: GroundwaterLevelsService,
   ): GrowlService["gl"] {
-    function dateMeasurements(
-      day: Dayjs,
-    ): WritableSignal<Record<string, Measurement>> {
-      let measurementsSignal = signal({});
-      service
-        .fetchMeasurementClassifications(day)
-        .then(data => measurementsSignal.set(data));
-      return measurementsSignal;
-    }
-
     let today = dayjs();
     let week = range(7);
     let measurements = Object.fromEntries(
       week.map(i => {
         let day = today.subtract(dayjs.duration(i, "day"));
-        return [i, [day, dateMeasurements(day)]];
+        return [i, [day, signals.map(service.fetchMeasurementClassifications(day), data => data || {})]];
       }),
     ) as GrowlService["gl"]["lastWeek"];
 
     return {
       service,
-      measurementClassifications: measurements[0][1],
+      measurementClassifications: signal(measurements[0][1]()),
       lastWeek: measurements,
     };
   }

@@ -1,11 +1,14 @@
 import {HttpClient, HttpContext} from "@angular/common/http";
-import {Injectable} from "@angular/core";
+import {signal, Injectable} from "@angular/core";
 import dayjs, {Dayjs} from "dayjs";
 import {Point} from "geojson";
 import {firstValueFrom} from "rxjs";
 import typia from "typia";
 
 import {httpContexts} from "../common/http-contexts";
+import {api} from "../common/api";
+import {s} from "../common/s.tag";
+import {signals} from "../common/signals";
 
 const URL = "/api/groundwater-levels" as const;
 
@@ -16,40 +19,29 @@ export class GroundwaterLevelsService {
   constructor(private http: HttpClient) {}
 
   fetchRecorderLocation(
-    stationId: string,
-  ): Promise<GroundwaterLevelsService.RecorderLocation> {
-    return firstValueFrom(
-      this.http.get<GroundwaterLevelsService.RecorderLocation>(
-        `${URL}/${stationId}`,
-        {
-          context: new HttpContext().set(
-            httpContexts.validateType,
-            typia.createValidate<GroundwaterLevelsService.RecorderLocation>(),
-          ),
-        },
-      ),
-    );
+    stationId: api.MaybeSignal<string>,
+  ): api.Signal<Self.RecorderLocation> {
+    return api.resource({
+      url: s`${URL}/${stationId}`,
+      validate: typia.createValidate<Self.RecorderLocation>(),
+    });
   }
 
-  fetchRecorderLocations(): Promise<GroundwaterLevelsService.RecorderLocations> {
-    return firstValueFrom(
-      this.http.get<GroundwaterLevelsService.RecorderLocations>(`${URL}/`, {
-        context: new HttpContext().set(
-          httpContexts.validateType,
-          typia.createValidate<GroundwaterLevelsService.RecorderLocations>(),
-        ),
-      }),
-    );
+  fetchRecorderLocations(): api.Signal<Self.RecorderLocations> {
+    return api.resource({
+      url: `${URL}/`,
+      validate: typia.createValidate<Self.RecorderLocations>(),
+    });
   }
 
-  async fetchMeasurementClassifications(
-    date: Dayjs = dayjs(),
-  ): Promise<Record<string, GroundwaterLevelsService.Measurement>> {
-    let url = `${URL}/graphql`;
-    let query = `{
+  fetchMeasurementClassifications(
+    date: api.MaybeSignal<Dayjs> = dayjs(),
+  ): api.Signal<Record<string, Self.Measurement>> {
+    let dateIso = signals.map(api.toSignal(date), date => date.toISOString());
+    let query = s`{
       measurements(
-        from: "${date.toISOString()}"
-        until: "${date.toISOString()}"
+        from: "${dateIso}"
+        until: "${dateIso}"
       ) {
         station
         date
@@ -59,31 +51,31 @@ export class GroundwaterLevelsService {
       }
     }`;
 
-    let context = new HttpContext()
-      .set(
-        httpContexts.validateType,
-        typia.createValidate<MeasurementClassificationResponse>(),
-      )
+    let parse = ({
+      data: {measurements},
+    }: MeasurementClassificationResponse): Record<string, Self.Measurement> => {
+      return Object.fromEntries(
+        measurements.map(m => [
+          m.station,
+          {
+            station: m.station,
+            date: dayjs(m.date),
+            classification: m.classification || null,
+            waterLevelNHN: m.waterLevelNHN,
+            waterLevelGOK: m.waterLevelGOK,
+          },
+        ]),
+      );
+    };
 
-      .set(httpContexts.cache, [`${url}:${query}`, dayjs.duration(8, "hours")]);
-
-    let response = await firstValueFrom(
-      this.http.post<MeasurementClassificationResponse>(
-        url,
-        {query},
-        {context},
-      ),
-    );
-
-    let measurements = response.data.measurements.map(m => ({
-      station: m.station,
-      date: dayjs(m.date),
-      classification: m.classification || null,
-      waterLevelNHN: m.waterLevelNHN,
-      waterLevelGOK: m.waterLevelGOK,
-    }));
-
-    return Object.fromEntries(measurements.map(m => [m.station, m]));
+    return api.resource({
+      url: `${URL}/graphql`,
+      body: signal({query}),
+      cache: dayjs.duration(8, "hours"),
+      parse,
+      validateRaw: typia.createValidate<MeasurementClassificationResponse>(),
+      validate: typia.createValidate<Record<string, Self.Measurement>>(),
+    });
   }
 }
 
@@ -130,3 +122,5 @@ export namespace GroundwaterLevelsService {
     "classification" | "date"
   > & {classification: MeasurementClassification | null; date: Dayjs};
 }
+
+import Self = GroundwaterLevelsService;
