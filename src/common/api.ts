@@ -16,7 +16,7 @@ import {httpContexts} from "./http-contexts";
 export namespace api {
   export type MaybeSignal<T> = T | CoreSignal<T>;
 
-  export function maybe<T>(input: MaybeSignal<T>): CoreSignal<T> {
+  export function toSignal<T>(input: MaybeSignal<T>): CoreSignal<T> {
     if (isSignal(input)) return input;
     return computed(() => input);
   }
@@ -44,8 +44,8 @@ export namespace api {
   >(
     options: Request &
       Options<TResult, TRaw> & {
-        validate: (input: unknown) => typia.IValidation<TResult>,
-        validateRaw?: (input: unknown) => typia.IValidation<TRaw>,
+        validate: (input: unknown) => typia.IValidation<TResult>;
+        validateRaw?: (input: unknown) => typia.IValidation<TRaw>;
         defaultValue?: TDefault;
         authenticate?: boolean;
         cache?: Duration;
@@ -138,6 +138,4 @@ export namespace api {
 
     return Object.assign(value, {resource: resourceRef});
   }
-
-
 }

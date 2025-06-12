@@ -90,7 +90,8 @@
               "skmeans",
               "concaveman",
               "fast-deep-equal",
-              "earcut"
+              "earcut",
+              "typia/lib/internal"
             ],
             "stylePreprocessorOptions": {
               "sass": {

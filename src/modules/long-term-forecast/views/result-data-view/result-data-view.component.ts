@@ -117,7 +117,7 @@ export class ResultDataViewComponent {
 
     let labels = new Set<string>();
     for (let date of result.data) labels.add(date.label);
-    let identities = await this.geoDataService.identify(labels);
+    let identities = await signals.first(this.geoDataService.identify(labels));
     let names: Record<string, string | null> = {};
     for (let [key, entry] of Object.entries(identities["nds_municipals"])) {
       names[key] = entry.name;

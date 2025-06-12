@@ -15,11 +15,13 @@ import {
   Point,
   MultiPolygon,
 } from "geojson";
+import {Properties} from "web-ifc";
 
 import {GroundwaterLevelsService} from "../../api/groundwater-levels.service";
 import {GeoDataService} from "../../api/geo-data.service";
 import nlwknMeasurementClassificationColors from "../../assets/nlwkn-measurement-classification-colors.toml";
 import {range} from "../../common/utils/range";
+import {signals} from "../../common/signals";
 
 export namespace GrowlService {
   // geo data
@@ -148,45 +150,25 @@ export class GrowlService {
     type: G["type"],
     cacheTtl: Duration,
   ): Signal<FeatureCollection<G, GeoProperties>> {
-    let geoSignal: WritableSignal<FeatureCollection<G, GeoProperties>> = signal(
-      {
+    return signals.map(
+      service.fetchLayerContents(layerName, undefined, cacheTtl),
+      contents => ({
         type: "FeatureCollection",
-        features: [],
-      },
+        features: (contents?.data ?? [])
+          .filter(({geometry, ...content}) => {
+            let isExpectedType = geometry.type === type;
+            let msg = `expected "${type}, got "${geometry.type}"`;
+            if (!isExpectedType) console.warn(msg, content);
+            return isExpectedType;
+          })
+          .map(({geometry, id, name, key, additionalProperties}) => ({
+            type: "Feature",
+            geometry: geometry as G,
+            id,
+            properties: {name, key, ...additionalProperties},
+          })),
+      }),
     );
-
-    (async () => {
-      let contents =
-        (await service.fetchLayerContents(layerName, undefined, cacheTtl))
-          ?.data ?? [];
-
-      let features: Feature<G, GeoProperties>[] = [];
-      for (let content of contents) {
-        if (content.geometry.type !== type) {
-          let msg = `expected "${type}", got "${content.geometry.type}"`;
-          console.warn(msg, content);
-          continue;
-        }
-
-        features.push({
-          type: "Feature",
-          geometry: content.geometry as G,
-          id: content.id,
-          properties: {
-            name: content.name,
-            key: content.key,
-            ...content.additionalProperties,
-          },
-        });
-
-        geoSignal.set({
-          type: "FeatureCollection",
-          features,
-        });
-      }
-    })();
-
-    return geoSignal;
   }
 
   private static constructGlDataSignals(
