@@ -179,7 +179,16 @@ export class GrowlService {
     let measurements = Object.fromEntries(
       week.map(i => {
         let day = today.subtract(dayjs.duration(i, "day"));
-        return [i, [day, signals.map(service.fetchMeasurementClassifications(day), data => data || {})]];
+        return [
+          i,
+          [
+            day,
+            signals.map(
+              service.fetchMeasurementClassifications(day),
+              data => data || {},
+            ),
+          ],
+        ];
       }),
     ) as GrowlService["gl"]["lastWeek"];
 
