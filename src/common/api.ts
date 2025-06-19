@@ -14,9 +14,11 @@ import typia from "typia";
 import {httpContexts} from "./http-contexts";
 
 export namespace api {
-  export type MaybeSignal<T> = T | CoreSignal<T>;
+  export type RequestSignal<T> = T | CoreSignal<T | undefined>;
 
-  export function toSignal<T>(input: MaybeSignal<T>): CoreSignal<T> {
+  export function toSignal<T>(
+    input: RequestSignal<T>,
+  ): CoreSignal<T | undefined> {
     if (isSignal(input)) return input;
     return computed(() => input);
   }
@@ -29,7 +31,7 @@ export namespace api {
     [K in keyof Omit<
       HttpResourceRequest,
       "context" | "withCredentials" | "transferCache"
-    >]: MaybeSignal<HttpResourceRequest[K]>;
+    >]: RequestSignal<HttpResourceRequest[K]>;
   };
 
   type Options<TResult, TRaw> = Omit<
@@ -55,12 +57,6 @@ export namespace api {
       },
   ): Signal<TResult, NoInfer<TDefault>> {
     let {
-      url,
-      method,
-      body,
-      params,
-      headers,
-      reportProgress,
       equal,
       validate,
       validateRaw,
@@ -75,22 +71,44 @@ export namespace api {
       authenticate,
     );
     if (cache !== undefined) {
+      let {url, params, body} = options;
       let cacheKey = JSON.stringify({url, params, body});
       context = context.set(httpContexts.cache, [cacheKey, cache]);
     }
 
-    let resourceRequest = computed(
-      (): HttpResourceRequest => ({
-        url: isSignal(url) ? url() : url,
-        method: isSignal(method) ? method() : method,
-        body: isSignal(body) ? body() : body,
-        params: isSignal(params) ? params() : params,
-        headers: isSignal(headers) ? headers() : headers,
-        reportProgress: isSignal(reportProgress)
-          ? reportProgress()
-          : reportProgress,
-      }),
-    );
+    // Heads up: this signal is subtle and a bit delicate.
+    // The key idea is that the caller stays in control of the request.
+    // If a value is passed directly (even undefined), we use it as-is.
+    // But if a signal is passed and *its value* is undefined, we bail out early.
+    // That way, signals that aren't ready yet (like async data) delay the request,
+    // while static undefineds just fall through and let the resource use defaults.
+    // Once all signal values are ready, we build the request.
+    let resourceRequest = computed((): HttpResourceRequest | undefined => {
+      let url = isSignal(options.url) ? options.url() : options.url;
+      if (url === undefined) return undefined;
+
+      let request: HttpResourceRequest = {url};
+      for (let key of [
+        "method",
+        "body",
+        "params",
+        "headers",
+        "reportProgress",
+      ] as const) {
+        if (isSignal(options[key])) {
+          let value = options[key]();
+          if (value === undefined) return undefined;
+          // @ts-ignore that type inference here is too complex
+          request[key] = value;
+          continue;
+        }
+
+        // @ts-ignore here too
+        request[key] = options[key];
+      }
+
+      return request;
+    });
 
     let parse = (raw: TRaw): TResult => {
       let result = raw as unknown as TResult;
@@ -137,5 +155,20 @@ export namespace api {
     });
 
     return Object.assign(value, {resource: resourceRef});
+  }
+
+  export function url(
+    template: TemplateStringsArray,
+    ...args: RequestSignal<string | number | boolean>[]
+  ): CoreSignal<string | undefined> {
+    return computed(() => {
+      let url = template[0];
+      for (let i in args) {
+        let arg = toSignal(args[i])();
+        if (arg === undefined) return undefined;
+        url += arg + template[+i + 1];
+      }
+      return url;
+    });
   }
 }

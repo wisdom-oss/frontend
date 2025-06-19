@@ -33,36 +33,33 @@ export class GeoDataService {
   }
 
   fetchLayerInformation(
-    layerRef: api.MaybeSignal<string>,
+    layerRef: api.RequestSignal<string>,
   ): api.Signal<GeoDataService.LayerInformation | null> {
     return api.resource({
-      url: s`${URL}/v1/${layerRef}`,
+      url: api.url`${URL}/v1/${layerRef}`,
       validate: typia.createValidate<GeoDataService.LayerInformation>(),
       onError: {[HttpStatusCode.NotFound]: () => null},
     });
   }
 
   fetchLayerContents(
-    layerRef: api.MaybeSignal<string>,
-    filter?: api.MaybeSignal<{
+    layerRef: api.RequestSignal<string>,
+    filter?: api.RequestSignal<{
       relation: "within" | "overlaps" | "contains";
       otherLayer: string;
       key: string[];
     }>,
     cacheTtl = dayjs.duration(1, "week"),
   ): api.Signal<GeoDataService.LayerContents | null, null> {
-    let url = computed(() => {
-      let url = `${URL}/v2/content/${api.toSignal(layerRef)()}`;
-      if (filter) {
-        let {relation, otherLayer, key} = api.toSignal(filter)();
-        url += `/filtered?relation=${relation}&other_layer=${otherLayer}&key=${key}`;
-      }
-
-      return url;
+    let filterParam = computed(() => {
+      let filterOptions = api.toSignal(filter)();
+      if (!filterOptions) return "";
+      let {relation, otherLayer, key} = filterOptions;
+      return `/filtered?relation=${relation}&other_layer=${otherLayer}&key=${key}`;
     });
 
     return api.resource({
-      url,
+      url: api.url`${URL}/v2/content/${layerRef}${filterParam}`,
       validate: typia.createValidate<GeoDataService.LayerContents>(),
       cache: cacheTtl,
       defaultValue: null,
@@ -71,11 +68,13 @@ export class GeoDataService {
   }
 
   identify(
-    keys: api.MaybeSignal<Iterable<string>>,
+    keys: api.RequestSignal<Iterable<string>>,
   ): api.Signal<GeoDataService.IdentifiedObjects> {
     let url = computed(() => {
       let queryParams = [];
-      for (let key of api.toSignal(keys)()) queryParams.push(`key=${key}`);
+      let iter = api.toSignal(keys)();
+      if (iter === undefined) return undefined;
+      for (let key of iter) queryParams.push(`key=${key}`);
       return `${URL}/v1/identify?${queryParams}`;
     });
 

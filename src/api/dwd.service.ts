@@ -4,8 +4,10 @@ import dayjs, {Dayjs} from "dayjs";
 import {FeatureCollection, Point} from "geojson";
 import {firstValueFrom} from "rxjs";
 import typia from "typia";
-import {api} from "../common/api";import { parameter } from "typia/lib/http";
-import { s } from "../common/s.tag";
+import {parameter} from "typia/lib/http";
+
+import {api} from "../common/api";
+import {s} from "../common/s.tag";
 import {httpContexts} from "../common/http-contexts";
 
 const URL = "/api/dwd" as const;
@@ -34,19 +36,28 @@ export class DwdService {
         cache: this.cacheTtl,
       }),
 
+    fetchStation: (
+      stationId: api.RequestSignal<string>,
+    ): api.Signal<Self.V1.Station> =>
+      api.resource({
+        url: api.url`${URL}/v1/${stationId}`,
+        validate: typia.createValidate<Self.V1.Station>(),
+        cache: this.cacheTtl,
+      }),
+
     fetchData: (parameters: {
-      stationId: api.MaybeSignal<string>,
-      dataType: api.MaybeSignal<string>,
-      granularity: api.MaybeSignal<string>,
-      from?: api.MaybeSignal<Dayjs | undefined>,
-      until?: api.MaybeSignal<Dayjs | undefined>,
+      stationId: api.RequestSignal<string>;
+      dataType: api.RequestSignal<string>;
+      granularity: api.RequestSignal<string>;
+      from?: api.RequestSignal<Dayjs | undefined>;
+      until?: api.RequestSignal<Dayjs | undefined>;
     }): api.Signal<Self.V1.Data> => {
       let {stationId, dataType, granularity} = parameters;
-      let url = s`${URL}/v1/${stationId}/${dataType}/${granularity}`;
+      let url = api.url`${URL}/v1/${stationId}/${dataType}/${granularity}`;
       let params = computed(() => {
         let params = new HttpParams();
         let from = api.toSignal(parameters.from)();
-        if (from) params = params.set("from", from.unix())
+        if (from) params = params.set("from", from.unix());
         let until = api.toSignal(parameters.until)();
         if (until) params = params.set("until", until.unix());
         return params;

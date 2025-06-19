@@ -104,6 +104,10 @@ const MAPPING = {
   ],
 })
 export class WeatherDataComponent {
+  private service = inject(DwdService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
   protected lang = signals.lang();
   protected document = inject(DOCUMENT);
   private selectDiv = viewChild<ElementRef<HTMLDivElement>>("select");
@@ -138,10 +142,7 @@ export class WeatherDataComponent {
     );
   });
 
-  protected stationInfo = resource({
-    request: () => this.selectedStationId(),
-    loader: ({request: stationId}) => this.service.v1.fetchStation(stationId),
-  }).value.asReadonly();
+  protected stationInfo = this.service.v1.fetchStation(this.selectedStationId);
 
   protected selectedProduct = signal<
     undefined | keyof (typeof MAPPING)["product"]
@@ -184,12 +185,8 @@ export class WeatherDataComponent {
     log: (...args: any[]) => console.log(...args),
   };
 
-  constructor(
-    private service: DwdService,
-    private route: ActivatedRoute,
-    private router: Router,
-  ) {
-    this.selectedStationId.set(route.snapshot.queryParams["station"]);
+  constructor() {
+    this.selectedStationId.set(this.route.snapshot.queryParams["station"]);
     effect(() =>
       this.router.navigate([], {
         relativeTo: this.route,
@@ -197,7 +194,7 @@ export class WeatherDataComponent {
       }),
     );
 
-    this.stations = signals.fromPromise(this.service.v2.fetchStations());
+    this.stations = this.service.v2.fetchStations();
 
     effect(() => {
       let selected = this.selectedStation();

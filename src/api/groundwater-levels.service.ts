@@ -19,10 +19,10 @@ export class GroundwaterLevelsService {
   constructor(private http: HttpClient) {}
 
   fetchRecorderLocation(
-    stationId: api.MaybeSignal<string>,
+    stationId: api.RequestSignal<string>,
   ): api.Signal<Self.RecorderLocation> {
     return api.resource({
-      url: s`${URL}/${stationId}`,
+      url: api.url`${URL}/${stationId}`,
       validate: typia.createValidate<Self.RecorderLocation>(),
     });
   }
@@ -35,10 +35,10 @@ export class GroundwaterLevelsService {
   }
 
   fetchMeasurementClassifications(
-    date: api.MaybeSignal<Dayjs> = dayjs(),
+    date: api.RequestSignal<Dayjs> = dayjs(),
   ): api.Signal<Record<string, Self.Measurement>> {
-    let dateIso = signals.map(api.toSignal(date), date => date.toISOString());
-    let query = s`{
+    let dateIso = signals.map(api.toSignal(date), date => date?.toISOString());
+    let query = api.url`{
       measurements(
         from: "${dateIso}"
         until: "${dateIso}"
