@@ -6,7 +6,7 @@ import {
   HttpResourceRef,
   HttpErrorResponse,
 } from "@angular/common/http";
-import {computed, Injectable, Signal} from "@angular/core";
+import {computed, inject, Injectable, Signal} from "@angular/core";
 import dayjs from "dayjs";
 import {Geometry} from "geojson";
 import {firstValueFrom} from "rxjs";
@@ -23,8 +23,8 @@ const URL = "/api/geodata" as const;
   providedIn: "root",
 })
 export class GeoDataService {
-  constructor(private http: HttpClient) {}
-
+  private http = inject(HttpClient);
+  
   fetchAvailableLayers(): api.Signal<GeoDataService.AvailableLayers> {
     return api.resource({
       url: `${URL}/v2/`,

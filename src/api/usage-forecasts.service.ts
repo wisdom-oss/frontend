@@ -1,10 +1,12 @@
 import {HttpClient, HttpContext, HttpParams} from "@angular/common/http";
-import {Injectable} from "@angular/core";
+import {computed, inject, Injectable} from "@angular/core";
 import dayjs from "dayjs";
 import {firstValueFrom} from "rxjs";
 import typia from "typia";
 
 import {httpContexts} from "../common/http-contexts";
+import { api } from "../common/api";
+import { signals } from "../common/signals";
 
 const URL = "/api/water-usage-forecasts" as const;
 
@@ -12,62 +14,57 @@ const URL = "/api/water-usage-forecasts" as const;
   providedIn: "root",
 })
 export class UsageForecastsService {
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
-  fetchAvailableAlgorithms(): Promise<AvailableAlgorithms> {
-    return firstValueFrom(
-      this.http.get<AvailableAlgorithms>(`${URL}/`, {
-        context: new HttpContext()
-          .set(httpContexts.cache, [URL, dayjs.duration(1, "day")])
-          .set(
-            httpContexts.validateType,
-            typia.createValidate<AvailableAlgorithms>(),
-          ),
-      }),
-    );
+  fetchAvailableAlgorithms(): api.Signal<Self.AvailableAlgorithms> {
+    return api.resource({
+      url: `${URL}/`,
+      validate: typia.createValidate<Self.AvailableAlgorithms>(),
+      cache: dayjs.duration(1, "day"),
+    });
   }
 
-  fetchForecast(
+  fetchForecast(options: api.RequestSignal<{
     scriptIdentifier: string,
     key: string | string[],
     options?: {
-      consumerGroup?: null | ConsumerGroup | ConsumerGroup[];
-      parameters?: null | Record<string, any>;
-    } | null,
-  ): Promise<Result> {
-    let params = new HttpParams(); // remember, params operations are always copy
-    for (let paramKey of [key].flat()) params = params.append("key", paramKey);
-    for (let consumerGroupKey of [options?.consumerGroup ?? []].flat()) {
-      params = params.append("consumerGroup", consumerGroupKey);
-    }
+      consumerGroup?: null | Self.ConsumerGroup | Self.ConsumerGroup[],
+      parameters?: null | Record<string, any>,
+    } | null
+  }>): api.Signal<Self.Result> {
+    let params = api.map(options, (options) => {
+      let params = new HttpParams();
+      for (let key of [options.key].flat()) params = params.append("key", key);
+      for (let key of [options?.options?.consumerGroup ?? []].flat()) {
+        params = params.append("consumerGroup", key);
+      }
 
-    let formData: FormData | undefined = undefined;
-    if (options?.parameters && Object.values(options.parameters).length) {
-      formData = new FormData();
+      return params;
+    });
+
+    let formData = api.map(options, ({options}) => {
+      if (!(options?.parameters && Object.values(options.parameters).length)) 
+        return api.NONE;
+
+      let formData = new FormData();
       for (let [key, value] of Object.entries(options.parameters)) {
         formData.append(key, value);
       }
-    }
 
-    let context = new HttpContext()
-      .set(httpContexts.validateType, typia.createValidate<Result>())
-      .set(httpContexts.cache, [
-        JSON.stringify({URL, key, scriptIdentifier, options}),
-        dayjs.duration(1, "day"),
-      ]);
+      return formData;
+    });
 
-    return firstValueFrom(
-      this.http.post<Result>(`${URL}/${scriptIdentifier}`, formData, {
-        params,
-        context,
-      }),
-    );
+    let scriptIdentifier = api.map(options, ({scriptIdentifier}) => scriptIdentifier);
+
+    return api.resource({
+      url: api.url`${URL}/${scriptIdentifier}`,
+      validate: typia.createValidate<Self.Result>(),
+      cache: dayjs.duration(1, "day"),
+      params,
+      body: formData,
+    });
   }
 }
-
-type ConsumerGroup = UsageForecastsService.ConsumerGroup;
-type AvailableAlgorithms = UsageForecastsService.AvailableAlgorithms;
-type Result = UsageForecastsService.Result;
 
 export namespace UsageForecastsService {
   export type ConsumerGroup =
@@ -123,3 +120,5 @@ export namespace UsageForecastsService {
     }>;
   };
 }
+
+import Self = UsageForecastsService;

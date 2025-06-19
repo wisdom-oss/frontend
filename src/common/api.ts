@@ -27,6 +27,10 @@ export namespace api {
     resource: HttpResourceRef<T | D>;
   };
 
+  /** DOC HERE */
+  export const NONE = Symbol("api.NONE");
+  export type NONE = typeof NONE;
+
   type Request = {
     [K in keyof Omit<
       HttpResourceRequest,
@@ -84,6 +88,7 @@ export namespace api {
     // while static undefineds just fall through and let the resource use defaults.
     // Once all signal values are ready, we build the request.
     let resourceRequest = computed((): HttpResourceRequest | undefined => {
+      // TODO: explain that you can use api.NONE to send undefined
       let url = isSignal(options.url) ? options.url() : options.url;
       if (url === undefined) return undefined;
 
@@ -99,7 +104,7 @@ export namespace api {
           let value = options[key]();
           if (value === undefined) return undefined;
           // @ts-ignore that type inference here is too complex
-          request[key] = value;
+          request[key] = value === NONE ? undefined : value;
           continue;
         }
 
@@ -169,6 +174,15 @@ export namespace api {
         url += arg + template[+i + 1];
       }
       return url;
+    });
+  }
+
+  export function map<T, U>(request: RequestSignal<T>, f: (raw: T) => U): RequestSignal<U> {
+    if (!isSignal(request)) return f(request);
+    return computed(() => {
+      let value = request();
+      if (value === undefined) return undefined;
+      return f(value);
     });
   }
 }
