@@ -2,6 +2,7 @@ import {
   computed,
   effect,
   inject,
+  Injector,
   signal,
   Signal,
   WritableSignal,
@@ -176,6 +177,65 @@ export namespace signals {
         return result;
       },
     });
+  }
+
+  /**
+   * A latch that holds the latest input and only releases it when `trigger()` is called.
+   *
+   * Calling `trigger()` pushes the held value to the output signal if the input changed,
+   * resets the new-value flag, and does nothing otherwise.
+   *
+   * @template T Type of the underlying signal value.
+   */
+  export type LatchSignal<T> = Signal<T> & {
+    /** Pushes the held value to the output signal if it changed. */
+    trigger(): void;
+    /** `true` if the input changed since last trigger, else `false`. */
+    hasNewValue: Signal<boolean>;
+    /** Cleans up internal effects. Call when the latch is no longer needed. */
+    destroy(): void;
+  }
+
+  /**
+   * Creates a LatchSignal from an existing signal.
+   *
+   * @param input The source signal to latch.
+   * @returns A `LatchSignal<T>` controlling when updates pass through.
+   *
+   * @example
+   * const formLatch = signals.latch(formSignal);
+   * // you can call trigger() anytime to emit the latest value
+   * formLatch.trigger();
+   *
+   * // if you need to show in the UI whether a new value is pending:
+   * effect(() => {
+   *   console.log('new value pending:', formLatch.hasNewValue());
+   * });
+   */
+  export function latch<T>(input: Signal<T>, options?: {injector?: Injector}): LatchSignal<T> {
+    let container: {value?: T} = {};
+    let hasNewValue = signal(true);
+    
+    let update = effect(() => {
+      container.value = input();
+      hasNewValue.set(true);
+    }, options);
+
+    // by having `equal` always false, we update every time we can read from 
+    // the container, this should allow any equal function of the original 
+    // signal
+    let output = signal(input(), {equal: () => false});
+    let trigger = () => {
+      // by using `in` and `delete` we can store anything without checking 
+      // specific values
+      if ("value" in container) output.set(container.value!);
+      delete container.value;
+      hasNewValue.set(false);
+    }
+
+    let destroy = () => update.destroy();
+
+    return Object.assign(output, {trigger, hasNewValue, destroy});
   }
 
   /**
