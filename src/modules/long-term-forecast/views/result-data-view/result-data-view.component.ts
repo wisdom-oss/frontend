@@ -6,6 +6,7 @@ import {
   signal,
   viewChild,
   Component,
+  inject,
 } from "@angular/core";
 import {FormsModule} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -49,15 +50,25 @@ type ChartDatasets = ChartDataset<"bar", {x: string; y: number}[]>[];
   ],
 })
 export class ResultDataViewComponent {
+  private service = inject(UsageForecastsService);
+
   protected keys: string[];
   protected parameters: Record<string, Record<string, any>> = defaults({});
-  protected availableAlgorithms;
+  protected availableAlgorithms = this.service.fetchAvailableAlgorithms();
   protected selectedAlgorithmIdentifier = model("exponential");
   protected selectedAlgorithm = computed(() => {
     let available = this.availableAlgorithms() ?? [];
     let id = this.selectedAlgorithmIdentifier();
     return available.find(algo => algo.identifier == id);
   });
+
+  private forecastRequest = computed(() => {
+    let scriptIdentifier = this.selectedAlgorithm()?.identifier;
+    if (!scriptIdentifier) return undefined;
+    return {scriptIdentifier, key: this.keys};
+  });
+  // TODO: use a latch signal to gate this here
+  protected _forecastResult = this.service.fetchForecast(this.forecastRequest);
 
   protected forecastResult = signal<undefined | UsageForecastsService.Result>(
     undefined,
@@ -71,14 +82,11 @@ export class ResultDataViewComponent {
   protected highlights = new Set<number>();
 
   constructor(
-    private service: UsageForecastsService,
     route: ActivatedRoute,
     private geoDataService: GeoDataService,
     private router: Router,
   ) {
-    this.availableAlgorithms = signals.fromPromise(
-      service.fetchAvailableAlgorithms(),
-    );
+    this.availableAlgorithms = service.fetchAvailableAlgorithms();
 
     this.keys = route.snapshot.queryParamMap.getAll("key"); // ensured by query params guard
     let queryAlgorithm = route.snapshot.queryParamMap.get("algorithm");
