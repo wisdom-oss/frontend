@@ -6,6 +6,8 @@ import {
   HttpResourceRef,
   HttpResourceRequest,
   HttpErrorResponse,
+  HttpParams,
+  HttpRequest,
 } from "@angular/common/http";
 import {computed, isSignal, Signal as CoreSignal} from "@angular/core";
 import {Duration} from "dayjs/plugin/duration";
@@ -34,7 +36,7 @@ export namespace api {
   type Request = {
     [K in keyof Omit<
       HttpResourceRequest,
-      "context" | "withCredentials" | "transferCache"
+      "method" | "context" | "withCredentials" | "transferCache"
     >]: RequestSignal<HttpResourceRequest[K]>;
   };
 
@@ -51,6 +53,7 @@ export namespace api {
     options: Request &
       Options<TResult, TRaw> & {
         validate: (input: unknown) => typia.IValidation<TResult>;
+        method?: "GET" | "HEAD" | "POST" | "PUT" | "PATCH" | "DELETE";
         validateRaw?: (input: unknown) => typia.IValidation<TRaw>;
         defaultValue?: TDefault;
         authenticate?: boolean;
@@ -70,15 +73,26 @@ export namespace api {
       onError,
     } = options;
 
-    let context = new HttpContext().set(
-      httpContexts.authenticate,
-      authenticate,
-    );
-    if (cache !== undefined) {
-      let {url, params, body} = options;
-      let cacheKey = JSON.stringify({url, params, body});
-      context = context.set(httpContexts.cache, [cacheKey, cache]);
-    }
+    let httpContext = computed(() => {
+      let context = new HttpContext().set(
+        httpContexts.authenticate,
+        authenticate,
+      );
+      if (cache !== undefined) {
+        let {url, params, body} = options;
+        let cacheKey = JSON.stringify({
+          url: isSignal(url) ? url() : url, 
+          params: isSignal(params) ? params() : params, 
+          body: isSignal(body) ? body() : body,
+        }, (_, value) => {
+          if (value instanceof HttpParams) return value.toString();
+          if (value instanceof FormData) return Array.from(value.entries());
+          return value;
+        });
+        context = context.set(httpContexts.cache, [cacheKey, cache]);
+      }
+      return context;
+    });
 
     // Heads up: this signal is subtle and a bit delicate.
     // The key idea is that the caller stays in control of the request.
@@ -91,6 +105,7 @@ export namespace api {
       // TODO: explain that you can use api.NONE to send undefined
       let url = isSignal(options.url) ? options.url() : options.url;
       if (url === undefined) return undefined;
+      let context = httpContext();
 
       let request: HttpResourceRequest = {url};
       for (let key of [

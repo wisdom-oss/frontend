@@ -57,6 +57,7 @@ export class UsageForecastsService {
     let scriptIdentifier = api.map(options, ({scriptIdentifier}) => scriptIdentifier);
 
     return api.resource({
+      method: "POST",
       url: api.url`${URL}/${scriptIdentifier}`,
       validate: typia.createValidate<Self.Result>(),
       cache: dayjs.duration(1, "day"),
