@@ -1,7 +1,7 @@
-import {Injector, signal} from "@angular/core";
+import {signal, Injector} from "@angular/core";
+import {TestBed} from "@angular/core/testing";
 
 import {signals} from "./signals";
-import { TestBed } from "@angular/core/testing";
 
 describe("signals.fromPromise", () => {
   it("should work without mapping function", async () => {
@@ -89,7 +89,7 @@ describe("signals.dayjs.required", () => {
 describe("signals.latch", () => {
   let injector: Injector;
 
-  beforeEach(() => injector = TestBed.inject(Injector));
+  beforeEach(() => (injector = TestBed.inject(Injector)));
 
   it("should hold the initial value and mark it as new", () => {
     const src = signal("foo");
@@ -116,7 +116,7 @@ describe("signals.latch", () => {
     const src = signal("baz");
     const l = signals.latch(src, {injector});
 
-    l.trigger();              // first clear
+    l.trigger(); // first clear
     expect(l.hasNewValue()).toBe(false);
 
     // call again with no change
@@ -129,7 +129,7 @@ describe("signals.latch", () => {
     const src = signal(1);
     const l = signals.latch(src, {injector});
 
-    l.trigger();              // clear initial
+    l.trigger(); // clear initial
     expect(l.hasNewValue()).toBe(false);
     expect(l()).toBe(1);
 

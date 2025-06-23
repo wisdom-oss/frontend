@@ -5,8 +5,8 @@ import {firstValueFrom} from "rxjs";
 import typia from "typia";
 
 import {httpContexts} from "../common/http-contexts";
-import { api } from "../common/api";
-import { signals } from "../common/signals";
+import {api} from "../common/api";
+import {signals} from "../common/signals";
 
 const URL = "/api/water-usage-forecasts" as const;
 
@@ -24,15 +24,17 @@ export class UsageForecastsService {
     });
   }
 
-  fetchForecast(options: api.RequestSignal<{
-    scriptIdentifier: string,
-    key: string | string[],
-    options?: {
-      consumerGroup?: null | Self.ConsumerGroup | Self.ConsumerGroup[],
-      parameters?: null | Record<string, any>,
-    } | null
-  }>): api.Signal<Self.Result> {
-    let params = api.map(options, (options) => {
+  fetchForecast(
+    options: api.RequestSignal<{
+      scriptIdentifier: string;
+      key: string | string[];
+      options?: {
+        consumerGroup?: null | Self.ConsumerGroup | Self.ConsumerGroup[];
+        parameters?: null | Record<string, any>;
+      } | null;
+    }>,
+  ): api.Signal<Self.Result> {
+    let params = api.map(options, options => {
       let params = new HttpParams();
       for (let key of [options.key].flat()) params = params.append("key", key);
       for (let key of [options?.options?.consumerGroup ?? []].flat()) {
@@ -43,7 +45,7 @@ export class UsageForecastsService {
     });
 
     let formData = api.map(options, ({options}) => {
-      if (!(options?.parameters && Object.values(options.parameters).length)) 
+      if (!(options?.parameters && Object.values(options.parameters).length))
         return api.NONE;
 
       let formData = new FormData();
@@ -54,7 +56,10 @@ export class UsageForecastsService {
       return formData;
     });
 
-    let scriptIdentifier = api.map(options, ({scriptIdentifier}) => scriptIdentifier);
+    let scriptIdentifier = api.map(
+      options,
+      ({scriptIdentifier}) => scriptIdentifier,
+    );
 
     return api.resource({
       method: "POST",

@@ -3,11 +3,11 @@ import {
   HttpStatusCode,
   HttpContext,
   HttpResourceOptions,
+  HttpParams,
   HttpResourceRef,
+  HttpRequest,
   HttpResourceRequest,
   HttpErrorResponse,
-  HttpParams,
-  HttpRequest,
 } from "@angular/common/http";
 import {computed, isSignal, Signal as CoreSignal} from "@angular/core";
 import {Duration} from "dayjs/plugin/duration";
@@ -80,15 +80,18 @@ export namespace api {
       );
       if (cache !== undefined) {
         let {url, params, body} = options;
-        let cacheKey = JSON.stringify({
-          url: isSignal(url) ? url() : url, 
-          params: isSignal(params) ? params() : params, 
-          body: isSignal(body) ? body() : body,
-        }, (_, value) => {
-          if (value instanceof HttpParams) return value.toString();
-          if (value instanceof FormData) return Array.from(value.entries());
-          return value;
-        });
+        let cacheKey = JSON.stringify(
+          {
+            url: isSignal(url) ? url() : url,
+            params: isSignal(params) ? params() : params,
+            body: isSignal(body) ? body() : body,
+          },
+          (_, value) => {
+            if (value instanceof HttpParams) return value.toString();
+            if (value instanceof FormData) return Array.from(value.entries());
+            return value;
+          },
+        );
         context = context.set(httpContexts.cache, [cacheKey, cache]);
       }
       return context;
@@ -192,7 +195,10 @@ export namespace api {
     });
   }
 
-  export function map<T, U>(request: RequestSignal<T>, f: (raw: T) => U): RequestSignal<U> {
+  export function map<T, U>(
+    request: RequestSignal<T>,
+    f: (raw: T) => U,
+  ): RequestSignal<U> {
     if (!isSignal(request)) return f(request);
     return computed(() => {
       let value = request();

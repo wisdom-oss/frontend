@@ -24,7 +24,7 @@ const URL = "/api/geodata" as const;
 })
 export class GeoDataService {
   private http = inject(HttpClient);
-  
+
   fetchAvailableLayers(): api.Signal<GeoDataService.AvailableLayers> {
     return api.resource({
       url: `${URL}/v2/`,

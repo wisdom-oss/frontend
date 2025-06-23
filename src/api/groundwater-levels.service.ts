@@ -1,5 +1,5 @@
 import {HttpClient, HttpContext} from "@angular/common/http";
-import {signal, Injectable, inject} from "@angular/core";
+import {inject, signal, Injectable} from "@angular/core";
 import dayjs, {Dayjs} from "dayjs";
 import {Point} from "geojson";
 import {firstValueFrom} from "rxjs";
@@ -17,7 +17,7 @@ const URL = "/api/groundwater-levels" as const;
 })
 export class GroundwaterLevelsService {
   private http = inject(HttpClient);
-  
+
   fetchRecorderLocation(
     stationId: api.RequestSignal<string>,
   ): api.Signal<Self.RecorderLocation> {

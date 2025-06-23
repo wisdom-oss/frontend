@@ -2,8 +2,8 @@ import {
   computed,
   effect,
   inject,
-  Injector,
   signal,
+  Injector,
   Signal,
   WritableSignal,
 } from "@angular/core";
@@ -194,7 +194,7 @@ export namespace signals {
     hasNewValue: Signal<boolean>;
     /** Cleans up internal effects. Call when the latch is no longer needed. */
     destroy(): void;
-  }
+  };
 
   /**
    * Creates a LatchSignal from an existing signal.
@@ -212,26 +212,29 @@ export namespace signals {
    *   console.log('new value pending:', formLatch.hasNewValue());
    * });
    */
-  export function latch<T>(input: Signal<T>, options?: {injector?: Injector}): LatchSignal<T> {
+  export function latch<T>(
+    input: Signal<T>,
+    options?: {injector?: Injector},
+  ): LatchSignal<T> {
     let container: {value?: T} = {};
     let hasNewValue = signal(true);
-    
+
     let update = effect(() => {
       container.value = input();
       hasNewValue.set(true);
     }, options);
 
-    // by having `equal` always false, we update every time we can read from 
-    // the container, this should allow any equal function of the original 
+    // by having `equal` always false, we update every time we can read from
+    // the container, this should allow any equal function of the original
     // signal
     let output = signal(input(), {equal: () => false});
     let trigger = () => {
-      // by using `in` and `delete` we can store anything without checking 
+      // by using `in` and `delete` we can store anything without checking
       // specific values
       if ("value" in container) output.set(container.value!);
       delete container.value;
       hasNewValue.set(false);
-    }
+    };
 
     let destroy = () => update.destroy();
 
