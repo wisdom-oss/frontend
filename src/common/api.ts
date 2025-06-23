@@ -112,7 +112,7 @@ export namespace api {
         request[key] = options[key];
       }
 
-      return request;
+      return {context, ...request};
     });
 
     let parse = (raw: TRaw): TResult => {

@@ -315,38 +315,6 @@ export namespace signals {
   }
 
   /**
-   * Returns a promise that settles with the first non-undefined value
-   * the given signal emits.
-   *
-   * The effect stops itself after the value is captured, so there is
-   * no extra cleanup needed on your side.
-   *
-   * @template T The value type inside the signal.
-   * @param input A signal that may begin as `undefined`.
-   * @returns A promise-like object that resolves once with that first value.
-   *
-   * @example
-   * const nameSig = signal<string | undefined>(undefined);
-   *
-   * signals.first(nameSig).then(name => {
-   *   console.log('Got name:', name); // logs when name becomes defined
-   * });
-   *
-   * // somewhere later in the app
-   * nameSig.set('Alice'); // promise resolves here
-   */
-  export function first<T>(input: Signal<T | undefined>): PromiseLike<T> {
-    let once = new Once<T>();
-    let updateOnce = effect(() => {
-      let value = input();
-      if (!value) return;
-      once.set(value);
-      updateOnce.destroy();
-    });
-    return once;
-  }
-
-  /**
    * A signal that wraps an Angular `FormControl`.
    *
    * This signal provides reactive access to the form control's value

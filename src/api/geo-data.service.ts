@@ -75,7 +75,7 @@ export class GeoDataService {
       let iter = api.toSignal(keys)();
       if (iter === undefined) return undefined;
       for (let key of iter) queryParams.push(`key=${key}`);
-      return `${URL}/v1/identify?${queryParams}`;
+      return `${URL}/v1/identify?${queryParams.join("&")}`;
     });
 
     return api.resource({

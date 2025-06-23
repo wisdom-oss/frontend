@@ -7,6 +7,8 @@ import {
   viewChild,
   Component,
   inject,
+  effect,
+  Injector,
 } from "@angular/core";
 import {FormsModule} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -22,8 +24,10 @@ import {signals} from "../../../../common/signals";
 import {EmptyPipe} from "../../../../common/pipes/empty.pipe";
 import {RgbaColor} from "../../../../common/utils/rgba-color";
 import {defaults} from "../../../../common/utils/defaults";
+import { typeUtils } from "../../../../common/utils/type-utils";
 
 type ChartDatasets = ChartDataset<"bar", {x: string; y: number}[]>[];
+type ForecastRequest = typeUtils.Signaled<Parameters<UsageForecastsService["fetchForecast"]>[0]>;
 
 @Component({
   imports: [
@@ -51,6 +55,7 @@ type ChartDatasets = ChartDataset<"bar", {x: string; y: number}[]>[];
 })
 export class ResultDataViewComponent {
   private service = inject(UsageForecastsService);
+  private geoDataService = inject(GeoDataService);
 
   protected keys: string[];
   protected parameters: Record<string, Record<string, any>> = defaults({});
@@ -62,70 +67,21 @@ export class ResultDataViewComponent {
     return available.find(algo => algo.identifier == id);
   });
 
-  private forecastRequest = computed(() => {
-    let scriptIdentifier = this.selectedAlgorithm()?.identifier;
-    if (!scriptIdentifier) return undefined;
-    return {scriptIdentifier, key: this.keys};
-  });
-  // TODO: use a latch signal to gate this here
-  protected _forecastResult = this.service.fetchForecast(this.forecastRequest);
-
-  protected forecastResult = signal<undefined | UsageForecastsService.Result>(
-    undefined,
-  );
-  protected datasets = resource({
-    request: () => this.forecastResult(),
-    loader: ({request: result}) => this.formatDatasets(result),
-  });
-
-  private chart = viewChild(BaseChartDirective);
-  protected highlights = new Set<number>();
-
-  constructor(
-    route: ActivatedRoute,
-    private geoDataService: GeoDataService,
-    private router: Router,
-  ) {
-    this.availableAlgorithms = service.fetchAvailableAlgorithms();
-
-    this.keys = route.snapshot.queryParamMap.getAll("key"); // ensured by query params guard
-    let queryAlgorithm = route.snapshot.queryParamMap.get("algorithm");
-    if (queryAlgorithm) this.selectedAlgorithmIdentifier.set(queryAlgorithm);
-    let algorithm = this.selectedAlgorithmIdentifier();
-    let queryParameters = route.snapshot.queryParamMap.get("parameters");
-    if (queryParameters)
-      this.parameters[algorithm] = JSON.parse(queryParameters);
-
-    this.fetchForecast();
-  }
-
-  protected async fetchForecast() {
-    let algorithm = this.selectedAlgorithmIdentifier();
-    // we need to set the value here instead of using signals.fromPromise to
-    // not break reactivity detection
-    this.forecastResult.set(undefined);
-    let parameters = this.parameters[algorithm];
-    this.router.navigate([], {
-      queryParams: {
-        key: this.keys,
-        algorithm: algorithm,
-        parameters: JSON.stringify(parameters),
-      },
-    });
-    let result = await this.service.fetchForecast(algorithm, this.keys, {
-      parameters,
-    });
-    this.forecastResult.set(result);
-  }
-
-  private async formatDatasets(
-    result?: UsageForecastsService.Result,
-  ): Promise<ChartDatasets> {
-    if (!result) return [];
-
+  private forecastRequest = signal<ForecastRequest>(undefined);
+  protected forecastResult = this.service.fetchForecast(this.forecastRequest);
+  private forecastResultLabels = computed(() => {
+    let result = this.forecastResult();
+    if (!result) return undefined;
     let labels = new Set<string>();
     for (let date of result.data) labels.add(date.label);
-    let identities = await signals.first(this.geoDataService.identify(labels));
+    return labels;
+  });
+  private identities = this.geoDataService.identify(this.forecastResultLabels);
+  protected datasets = computed(() => {
+    let result = this.forecastResult();
+    let identities = this.identities();
+    if (!result || !identities) return [];
+
     let names: Record<string, string | null> = {};
     for (let [key, entry] of Object.entries(identities["nds_municipals"])) {
       names[key] = entry.name;
@@ -161,6 +117,41 @@ export class ResultDataViewComponent {
     }
 
     return Object.values(datasets);
+  })
+
+  private chart = viewChild(BaseChartDirective);
+  protected highlights = new Set<number>();
+
+  constructor(
+    route: ActivatedRoute,
+    private router: Router,
+  ) {
+    this.keys = route.snapshot.queryParamMap.getAll("key"); // ensured by query params guard
+    let queryAlgorithm = route.snapshot.queryParamMap.get("algorithm");
+    if (queryAlgorithm) this.selectedAlgorithmIdentifier.set(queryAlgorithm);
+    let algorithm = this.selectedAlgorithmIdentifier();
+    let queryParameters = route.snapshot.queryParamMap.get("parameters");
+    if (queryParameters)
+      this.parameters[algorithm] = JSON.parse(queryParameters);
+
+    this.fetchForecast();
+  }
+
+  protected async fetchForecast() {
+    let algorithm = this.selectedAlgorithmIdentifier();
+    let parameters = this.parameters[algorithm];
+    this.router.navigate([], {
+      queryParams: {
+        key: this.keys,
+        algorithm: algorithm,
+        parameters: JSON.stringify(parameters),
+      },
+    });
+    this.forecastRequest.set({
+      scriptIdentifier: algorithm,
+      key: this.keys,
+      options: {parameters}
+    });
   }
 
   protected onChartClick: ChartOptions<"bar">["onClick"] = (
