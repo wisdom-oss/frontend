@@ -1,3 +1,4 @@
+import {NgIf} from "@angular/common";
 import {HttpClient} from "@angular/common/http";
 import {
   computed,
@@ -21,6 +22,7 @@ import {
   remixBuilding3Fill,
   remixDatabase2Fill,
   remixFilePaper2Fill,
+  remixInstanceLine,
   remixLineChartLine,
   remixMapLine,
   remixRfidLine,
@@ -31,6 +33,7 @@ import {TranslateDirective} from "@ngx-translate/core";
 import {filter} from "rxjs";
 
 import {SidebarLinkDirective} from "./sidebar-link.directive";
+import {SidebarMenuLabelDirective} from "./sidebar-menu-label.directive";
 import {OowvActionMapComponent} from "../../modules/oowv/action-map/action-map.component";
 import {PumpModelsComponent} from "../../modules/pump-models/pump-models.component";
 import {AuthService} from "../auth/auth.service";
@@ -40,8 +43,10 @@ import {AuthService} from "../auth/auth.service";
   imports: [
     NgIconComponent,
     NgIconStack,
+    NgIf,
     RouterLink,
     SidebarLinkDirective,
+    SidebarMenuLabelDirective,
     TranslateDirective,
   ],
   templateUrl: "./sidebar.component.html",
@@ -54,6 +59,7 @@ import {AuthService} from "../auth/auth.service";
       remixBuilding3Fill,
       remixDatabase2Fill,
       remixFilePaper2Fill,
+      remixInstanceLine,
       remixLineChartLine,
       remixMapLine,
       remixRfidLine,

@@ -17,7 +17,7 @@ import {httpContexts} from "../common/http-contexts";
 import {Once} from "../common/utils/once";
 import {typeUtils} from "../common/utils/type-utils";
 
-const URL = "/api/water-rights" as const;
+const URL = "/api/water-rights/v1" as const;
 
 @Injectable({
   providedIn: "root",
