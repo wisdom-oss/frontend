@@ -1,5 +1,5 @@
 import {DecimalPipe} from "@angular/common";
-import {computed, input, Component, Signal} from "@angular/core";
+import {computed, input, Component} from "@angular/core";
 
 import {WaterRightsService} from "../../../../api/water-rights.service";
 import {signals} from "../../../../common/signals";

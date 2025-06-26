@@ -1,12 +1,9 @@
-import {HttpClient, HttpContext, HttpParams} from "@angular/common/http";
-import {computed, inject, Injectable} from "@angular/core";
+import {HttpParams} from "@angular/common/http";
+import {Injectable} from "@angular/core";
 import dayjs from "dayjs";
-import {firstValueFrom} from "rxjs";
 import typia from "typia";
 
-import {httpContexts} from "../common/http-contexts";
 import {api} from "../common/api";
-import {signals} from "../common/signals";
 
 const URL = "/api/water-usage-forecasts" as const;
 
@@ -14,8 +11,6 @@ const URL = "/api/water-usage-forecasts" as const;
   providedIn: "root",
 })
 export class UsageForecastsService {
-  private http = inject(HttpClient);
-
   fetchAvailableAlgorithms(): api.Signal<Self.AvailableAlgorithms> {
     return api.resource({
       url: `${URL}/`,

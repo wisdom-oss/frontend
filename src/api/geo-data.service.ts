@@ -1,21 +1,10 @@
-import {
-  httpResource,
-  HttpClient,
-  HttpStatusCode,
-  HttpContext,
-  HttpResourceRef,
-  HttpErrorResponse,
-} from "@angular/common/http";
-import {computed, inject, Injectable, Signal} from "@angular/core";
+import {HttpClient, HttpStatusCode} from "@angular/common/http";
+import {computed, inject, Injectable} from "@angular/core";
 import dayjs from "dayjs";
 import {Geometry} from "geojson";
-import {firstValueFrom} from "rxjs";
 import typia from "typia";
 
-import {httpContexts} from "../common/http-contexts";
-import {s} from "../common/s.tag";
 import {api} from "../common/api";
-import {signals} from "../common/signals";
 
 const URL = "/api/geodata" as const;
 

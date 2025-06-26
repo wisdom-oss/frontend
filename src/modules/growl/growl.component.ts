@@ -2,13 +2,13 @@ import {NgIf, DatePipe, KeyValuePipe} from "@angular/common";
 import {
   computed,
   effect,
+  inject,
   resource,
   signal,
   viewChild,
   Component,
   ResourceLoaderParams,
   Signal,
-  inject,
 } from "@angular/core";
 import {
   ControlComponent,
@@ -59,7 +59,7 @@ import {signals} from "../../common/signals";
 export class GrowlComponent {
   protected service = inject(GrowlService);
   private waterRightsService = inject(WaterRightsService);
-  
+
   protected style = colorful as any as StyleSpecification;
   protected measurementColors = nlwknMeasurementClassificationColors;
 
@@ -98,7 +98,9 @@ export class GrowlComponent {
   // additional delay to fix angular error for outputting event data of destroyed component
   protected hoverClusterPolygonDelay;
 
-  protected groundwaterBodyRequest = signal<GroundwaterBodyFeature | null>(null);
+  protected groundwaterBodyRequest = signal<GroundwaterBodyFeature | null>(
+    null,
+  );
   protected averageWithdrawalsRequest = computed(() => {
     let groundwaterBody = this.groundwaterBodyRequest();
     if (this.hoverClusterPolygon.hasValue()) return;
@@ -110,24 +112,27 @@ export class GrowlComponent {
     }
 
     return null;
-  })
-  protected averageWithdrawalsResponse = this.waterRightsService.fetchAverageWithdrawals(computed(() => {
-    let geometry = this.averageWithdrawalsRequest()?.geometry;
-    return geometry ? [geometry] : undefined;
-  }));
+  });
+  protected averageWithdrawalsResponse =
+    this.waterRightsService.fetchAverageWithdrawals(
+      computed(() => {
+        let geometry = this.averageWithdrawalsRequest()?.geometry;
+        return geometry ? [geometry] : undefined;
+      }),
+    );
   protected averageWithdrawals = computed(() => {
     let withdrawals = this.averageWithdrawalsResponse();
     if (!withdrawals) return null;
-    
+
     let request = this.averageWithdrawalsRequest();
     if (!request) return null;
-    
+
     return {
       name: request.properties.name ?? request.properties.key,
       key: request.properties.key,
       withdrawals,
-    }
-  })
+    };
+  });
 
   protected lang = signals.lang();
   private initialLoad = computed(() => {

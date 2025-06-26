@@ -8,14 +8,7 @@ import {
 } from "@angular/core";
 import dayjs, {Dayjs} from "dayjs";
 import {Duration} from "dayjs/plugin/duration";
-import {
-  FeatureCollection,
-  Feature,
-  Geometry,
-  Point,
-  MultiPolygon,
-} from "geojson";
-import {Properties} from "web-ifc";
+import {FeatureCollection, Geometry, Point, MultiPolygon} from "geojson";
 
 import {GroundwaterLevelsService} from "../../api/groundwater-levels.service";
 import {GeoDataService} from "../../api/geo-data.service";

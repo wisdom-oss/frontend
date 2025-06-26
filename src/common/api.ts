@@ -5,7 +5,6 @@ import {
   HttpResourceOptions,
   HttpParams,
   HttpResourceRef,
-  HttpRequest,
   HttpResourceRequest,
   HttpErrorResponse,
 } from "@angular/common/http";

@@ -13,7 +13,6 @@ import dayjs, {Dayjs, ConfigType, OptionType} from "dayjs";
 import {Duration} from "dayjs/plugin/duration";
 
 import {injections} from "./injections";
-import {Once} from "./utils/once";
 
 const makeDayjs = dayjs;
 

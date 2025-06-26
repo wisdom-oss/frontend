@@ -1,21 +1,9 @@
-import {
-  HttpClient,
-  HttpContext,
-  HttpDownloadProgressEvent,
-  HttpResourceRef,
-  HttpHeaderResponse,
-  HttpResponse,
-  HttpEventType,
-} from "@angular/common/http";
-import {Injectable, Signal} from "@angular/core";
+import {HttpClient} from "@angular/common/http";
+import {Injectable} from "@angular/core";
 import {parseMultipart} from "@mjackson/multipart-parser";
-import dayjs from "dayjs";
 import {GeoJsonObject, Point} from "geojson";
-import {firstValueFrom, Observable, BehaviorSubject} from "rxjs";
 import typia from "typia";
 
-import {httpContexts} from "../common/http-contexts";
-import {Once} from "../common/utils/once";
 import {typeUtils} from "../common/utils/type-utils";
 import {api} from "../common/api";
 
@@ -41,7 +29,7 @@ export class WaterRightsService {
       let waterRight: any = undefined;
       let usageLocations: any = undefined;
 
-      // usually we get the boundary from the headers, but we cannot access 
+      // usually we get the boundary from the headers, but we cannot access
       // that yet
       let boundary = content.trim().split("\n")[0].trim().split("--")[1];
       let uint8Array = new TextEncoder().encode(content);
@@ -63,7 +51,7 @@ export class WaterRightsService {
       return {waterRight, usageLocations};
     };
 
-    return  api.resource({
+    return api.resource({
       url: api.url`${URL}/details/${no}`,
       responseType: "text",
       validateRaw: typia.createValidate<string>(),

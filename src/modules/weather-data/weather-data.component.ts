@@ -4,7 +4,6 @@ import {
   effect,
   inject,
   model,
-  resource,
   signal,
   viewChild,
   Component,

@@ -1,14 +1,10 @@
-import {HttpClient, HttpContext, HttpParams} from "@angular/common/http";
-import {computed, inject, Injectable} from "@angular/core";
+import {HttpParams} from "@angular/common/http";
+import {computed, Injectable} from "@angular/core";
 import dayjs, {Dayjs} from "dayjs";
 import {FeatureCollection, Point} from "geojson";
-import {firstValueFrom} from "rxjs";
 import typia from "typia";
-import {parameter} from "typia/lib/http";
 
 import {api} from "../common/api";
-import {s} from "../common/s.tag";
-import {httpContexts} from "../common/http-contexts";
 
 const URL = "/api/dwd" as const;
 
@@ -17,7 +13,6 @@ const URL = "/api/dwd" as const;
 })
 export class DwdService {
   private cacheTtl = dayjs.duration(12, "hours");
-  private http = inject(HttpClient);
 
   readonly v2 = {
     fetchStations: (): api.Signal<Self.V2.Stations> =>
