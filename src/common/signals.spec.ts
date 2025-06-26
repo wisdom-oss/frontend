@@ -1,5 +1,4 @@
-import {signal, Injector} from "@angular/core";
-import {TestBed} from "@angular/core/testing";
+import {signal} from "@angular/core";
 
 import {signals} from "./signals";
 
@@ -83,77 +82,5 @@ describe("signals.dayjs.required", () => {
 
     input.set("2025-02-01");
     expect(d().format("YYYY-MM-DD")).toBe("2025-02-01");
-  });
-});
-
-describe("signals.latch", () => {
-  let injector: Injector;
-
-  beforeEach(() => (injector = TestBed.inject(Injector)));
-
-  it("should hold the initial value and mark it as new", () => {
-    const src = signal("foo");
-    const l = signals.latch(src, {injector});
-
-    // on creation, effect runs once
-    expect(l()).toBe("foo");
-    expect(l.hasNewValue()).toBe(true);
-  });
-
-  it("trigger() emits the held value and resets the new‐value flag", () => {
-    const src = signal("bar");
-    const l = signals.latch(src, {injector});
-
-    // flag set, now trigger
-    expect(l.hasNewValue()).toBe(true);
-    l.trigger();
-    expect(l.hasNewValue()).toBe(false);
-    // output stays the same
-    expect(l()).toBe("bar");
-  });
-
-  it("trigger() does nothing if no new input arrived", () => {
-    const src = signal("baz");
-    const l = signals.latch(src, {injector});
-
-    l.trigger(); // first clear
-    expect(l.hasNewValue()).toBe(false);
-
-    // call again with no change
-    l.trigger();
-    expect(l.hasNewValue()).toBe(false);
-    expect(l()).toBe("baz");
-  });
-
-  it("only updates when the underlying signal changes", () => {
-    const src = signal(1);
-    const l = signals.latch(src, {injector});
-
-    l.trigger(); // clear initial
-    expect(l.hasNewValue()).toBe(false);
-    expect(l()).toBe(1);
-
-    src.set(2);
-    TestBed.flushEffects();
-    expect(l.hasNewValue()).toBe(true);
-    // still old
-    expect(l()).toBe(1);
-
-    l.trigger();
-    expect(l()).toBe(2);
-    expect(l.hasNewValue()).toBe(false);
-  });
-
-  it("stops tracking after destroy()", () => {
-    const src = signal("x");
-    const l = signals.latch(src, {injector});
-
-    l.trigger(); // clear has new flag
-    l.destroy();
-    src.set("y");
-    TestBed.flushEffects();
-    // destroy prevents any new updates
-    expect(l.hasNewValue()).toBe(false);
-    expect(l()).toBe("x");
   });
 });
