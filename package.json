@@ -33,7 +33,7 @@
     "@cptpiepmatz/spreet": "npm:@jsr/cptpiepmatz__spreet@^0.1.0-dev.3",
     "@cptpiepmatz/tag-uri": "npm:@jsr/cptpiepmatz__tag-uri@^0.1.2",
     "@creativebulma/bulma-tooltip": "github:deather/bulma-tooltip",
-    "@maplibre/ngx-maplibre-gl": "^19.0.0",
+    "@maplibre/ngx-maplibre-gl": "^19.0.1",
     "@mjackson/multipart-parser": "npm:@jsr/mjackson__multipart-parser@^0.8.2",
     "@ng-icons/core": "^31.4.0",
     "@ng-icons/remixicon": "^31.4.0",
@@ -60,7 +60,7 @@
     "tslib": "^2.8.1",
     "typia": "^9.1.1",
     "web-ifc": "~0.0.66",
-    "zone.js": "~0.15.0"
+    "zone.js": "~0.15.1"
   },
   "devDependencies": {
     "@angular-builders/custom-esbuild": "^19.1.0",
@@ -76,7 +76,7 @@
     "@types/three": "~0.160.0",
     "didyoumean": "^1.2.2",
     "esbuild-plugin-toml": "^0.0.1",
-    "fake-indexeddb": "^6.0.0",
+    "fake-indexeddb": "^6.0.1",
     "fast-xml-parser": "^5.2.3",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",

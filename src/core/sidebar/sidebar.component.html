@@ -71,7 +71,10 @@
       <span translate>core.sidebar.category.waterworks</span>
     </p>
     <ul class="menu-list">
-      <li [class.unauthorized]="!authorized.pumpModels()">
+      <li
+        [class.unauthorized]="!authorized.pumpModels()"
+        *ngIf="authorized.pumpModels()"
+      >
         <a class="icon-text" routerLink="/pump-models">
           <span class="icon">
             <ng-icon name="remixInstanceLine"></ng-icon>
