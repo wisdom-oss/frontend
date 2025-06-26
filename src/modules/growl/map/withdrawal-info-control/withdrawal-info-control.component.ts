@@ -14,7 +14,7 @@ export class WithdrawalInfoControlComponent {
   readonly in = input.required<{
     name: string;
     key: string;
-    withdrawals: Signal<WaterRightsService.AverageWithdrawals | null>;
+    withdrawals: WaterRightsService.AverageWithdrawals | null;
   }>();
 
   protected lang = signals.lang();
@@ -22,7 +22,7 @@ export class WithdrawalInfoControlComponent {
   protected value = computed(() => {
     let input = this.in();
     if (!input) return null;
-    let withdrawal = input.withdrawals();
+    let withdrawal = input.withdrawals;
     if (!withdrawal) return null;
     return Math.floor(withdrawal.minimalWithdrawal);
   });

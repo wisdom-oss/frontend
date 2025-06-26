@@ -1,5 +1,5 @@
 import {HttpClient, HttpContext} from "@angular/common/http";
-import {inject, signal, Injectable} from "@angular/core";
+import {inject, signal, Injectable, computed} from "@angular/core";
 import dayjs, {Dayjs} from "dayjs";
 import {Point} from "geojson";
 import {firstValueFrom} from "rxjs";
@@ -70,7 +70,8 @@ export class GroundwaterLevelsService {
 
     return api.resource({
       url: `${URL}/graphql`,
-      body: signal({query}),
+      method: "POST",
+      body: computed(() => ({query: query()})),
       cache: dayjs.duration(8, "hours"),
       parse,
       validateRaw: typia.createValidate<MeasurementClassificationResponse>(),

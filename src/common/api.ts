@@ -45,25 +45,33 @@ export namespace api {
     "defaultValue" | "injector"
   >;
 
+  type ResourceParams<
+    TResult,
+    TRaw,
+    TDefault extends TResult | undefined,
+  > = Request &
+    Options<TResult, TRaw> & {
+      validate: (input: unknown) => typia.IValidation<TResult>;
+      method?: "GET" | "POST";
+      responseType?: "arrayBuffer" | "blob" | "text";
+      validateRaw?: (input: unknown) => typia.IValidation<TRaw>;
+      defaultValue?: TDefault;
+      authenticate?: boolean;
+      cache?: Duration;
+      onError?: Partial<
+        Record<HttpStatusCode, (err: HttpErrorResponse) => TResult>
+      >;
+    };
+
   export function resource<
     TResult,
     TRaw = TResult,
     TDefault extends TResult | undefined = undefined,
   >(
-    options: Request &
-      Options<TResult, TRaw> & {
-        validate: (input: unknown) => typia.IValidation<TResult>;
-        method?: "GET" | "HEAD" | "POST" | "PUT" | "PATCH" | "DELETE";
-        validateRaw?: (input: unknown) => typia.IValidation<TRaw>;
-        defaultValue?: TDefault;
-        authenticate?: boolean;
-        cache?: Duration;
-        onError?: Partial<
-          Record<HttpStatusCode, (err: HttpErrorResponse) => TResult>
-        >;
-      },
+    options: ResourceParams<TResult, TRaw, TDefault>,
   ): Signal<TResult, NoInfer<TDefault>> {
     let {
+      responseType,
       equal,
       validate,
       validateRaw,
@@ -162,10 +170,33 @@ export namespace api {
       equal,
     };
 
-    let resourceRef = httpResource<TResult>(
-      resourceRequest,
-      resourceOptions as HttpResourceOptions<TResult, unknown>,
-    ) as HttpResourceRef<TResult | TDefault>;
+    let resourceRef: HttpResourceRef<TResult | TDefault>;
+    switch (responseType) {
+      case undefined:
+        resourceRef = httpResource<TResult>(
+          resourceRequest,
+          resourceOptions as HttpResourceOptions<TResult, unknown>,
+        ) as HttpResourceRef<TResult | TDefault>;
+        break;
+      case "text":
+        resourceRef = httpResource.text(
+          resourceRequest,
+          resourceOptions as HttpResourceOptions<TResult, unknown>,
+        ) as HttpResourceRef<TResult | TDefault>;
+        break;
+      case "arrayBuffer":
+        resourceRef = httpResource.arrayBuffer(
+          resourceRequest,
+          resourceOptions as HttpResourceOptions<TResult, unknown>,
+        ) as HttpResourceRef<TResult | TDefault>;
+        break;
+      case "blob":
+        resourceRef = httpResource.blob(
+          resourceRequest,
+          resourceOptions as HttpResourceOptions<TResult, unknown>,
+        ) as HttpResourceRef<TResult | TDefault>;
+        break;
+    }
 
     let value = computed(() => {
       let error = resourceRef.error();

@@ -153,9 +153,7 @@ export class DetailViewComponent {
     service: WaterRightsService,
     geo: GeoDataService,
   ) {
-    this.data = signals.fromPromise(
-      service.fetchWaterRightDetails(+route.snapshot.queryParams["no"]!),
-    );
+    this.data = service.fetchWaterRightDetails(+route.snapshot.queryParams["no"]!);
 
     let usageLocations = DetailViewComponent.buildUsageLocations(
       geo,
