@@ -2,6 +2,7 @@ import {
   httpResource,
   HttpStatusCode,
   HttpContext,
+  HttpResourceFn,
   HttpResourceOptions,
   HttpParams,
   HttpResourceRef,
@@ -15,8 +16,25 @@ import typia from "typia";
 import {httpContexts} from "./http-contexts";
 
 export namespace api {
+  /**
+   * A request signal, this may be any raw value or a signal that may produce 
+   * this value.
+   * 
+   * This should be used in API services for their parameters.
+   * Using them allows callers of API services to provide signal that are 
+   * reactions to user input or otherwise delayed data.
+   * Signals themselves could also be used to update the request without having 
+   * to call the api method again.
+   */
   export type RequestSignal<T> = T | CoreSignal<T | undefined>;
 
+  /**
+   * Function to ensure that a {@link RequestSignal} is actually a signal.
+   * 
+   * It is easier to work with a request signal, if it known that we actually 
+   * have signals.
+   * To accommodate this, we just promote any raw value into a signal.
+   */
   export function toSignal<T>(
     input: RequestSignal<T>,
   ): CoreSignal<T | undefined> {
@@ -24,11 +42,33 @@ export namespace api {
     return computed(() => input);
   }
 
+  /**
+   * The namespaced signal type.
+   * 
+   * This should be the output of any API service method.
+   * It itself is a signal and can be called to the current value while it also 
+   * contains the original {@link HttpResourceRef} that is the underlying 
+   * implementation.
+   * 
+   * Accessing the actual value should *only* be done via calling this signal 
+   * directly and **not** via `.resource.value()`.
+   */
   export type Signal<T, D = undefined> = CoreSignal<T | D> & {
     resource: HttpResourceRef<T | D>;
   };
 
-  /** DOC HERE */
+  /**
+   * An explicit unset value.
+   * 
+   * The options of {@link resource} expect that each provided signal returns 
+   * anything other than `undefined` when it's ready.
+   * This will block the option to provide the `undefined` value as an output 
+   * for a signal.
+   * To alleviate that very specific and niche issue, this symbol should be used 
+   * instead.
+   * It will be converted to an `undefined` but after the initial check if the 
+   * signal provided a value.
+   */
   export const NONE = Symbol("api.NONE");
   export type NONE = typeof NONE;
 
@@ -62,6 +102,49 @@ export namespace api {
       >;
     };
 
+  /**
+   * Our custom extension of the {@link httpResource}.
+   * 
+   * All API services should use this function if possible to define their 
+   * interaction with the http client.
+   * This function abstracts over the Angular provided {@link httpResource} 
+   * function to provide extra care for our typically used options.
+   * Instead of two parameters, we just use one parameter containing everything.
+   * 
+   * @param options
+   * The options that will be extracted into {@link HttpResourceRequest}, 
+   * {@link HttpResourceOptions} and our own fields.
+   * All options that allow passing in an {@link RequestSignal} are expected to 
+   * return anything other than `undefined` when they're ready.
+   * Passing a direct `undefined` or not passing that field into the `options`,
+   * will simply ignore that field.
+   * If you *need* to use an `undefined` in the underlying {@link httpResource}, 
+   * check out {@link NONE}.
+   * 
+   * @param options.url 
+   * The URL of the request, see {@link url} to make building them easier.
+   * 
+   * @param options.validate
+   * A {@link typia}-created type validator that will be used to verify that the 
+   * output type is the expected type.
+   * If the `TResult` type is not what the service responds, use the `parse` 
+   * option to provide a parser from `TRaw` to `TResult`.
+   * 
+   * @param options.method 
+   * The URL method. By default is "GET" used.
+   * 
+   * @param options.parse
+   * A function to parse the `TRaw` into a `TResult`.
+   * The parsed output is still verified via the `validate` option.
+   * If you want to type check the `TRaw` type coming into your parser use the 
+   * `validateRaw` option.
+   * 
+   * @param options.validateRaw
+   * 
+   * 
+   * @returns A request signal which acts like a regular {@link CoreSignal}.
+   */
+   // TODO: continue this doc
   export function resource<
     TResult,
     TRaw = TResult,
@@ -140,6 +223,14 @@ export namespace api {
       return {context, ...request};
     });
 
+    // This is the parse function we throw on every http resource, for all
+    // request it will run the type validator to check if the response has the
+    // correct type.
+    // If the user provided its own parse function, we run that on the original
+    // result as it would be usually the case on http resources.
+    // When a validateRaw is provided we test the raw response type.
+    // This way we can ensure that the parse function acts correctly on its
+    // types.
     let parse = (raw: TRaw): TResult => {
       let result = raw as unknown as TResult;
       if (options.parse) {
@@ -169,33 +260,19 @@ export namespace api {
       equal,
     };
 
-    let resourceRef: HttpResourceRef<TResult | TDefault>;
-    switch (responseType) {
-      case undefined:
-        resourceRef = httpResource<TResult>(
-          resourceRequest,
-          resourceOptions as HttpResourceOptions<TResult, unknown>,
-        ) as HttpResourceRef<TResult | TDefault>;
-        break;
-      case "text":
-        resourceRef = httpResource.text(
-          resourceRequest,
-          resourceOptions as HttpResourceOptions<TResult, unknown>,
-        ) as HttpResourceRef<TResult | TDefault>;
-        break;
-      case "arrayBuffer":
-        resourceRef = httpResource.arrayBuffer(
-          resourceRequest,
-          resourceOptions as HttpResourceOptions<TResult, unknown>,
-        ) as HttpResourceRef<TResult | TDefault>;
-        break;
-      case "blob":
-        resourceRef = httpResource.blob(
-          resourceRequest,
-          resourceOptions as HttpResourceOptions<TResult, unknown>,
-        ) as HttpResourceRef<TResult | TDefault>;
-        break;
-    }
+    let httpResourceF = (() => {
+      // prettier-ignore
+      switch (responseType) {
+        case undefined: return httpResource<TResult>;
+        case "text": return httpResource.text;
+        case "arrayBuffer": return httpResource.arrayBuffer;
+        case "blob": return httpResource.blob;
+      }
+    })() as HttpResourceFn;
+    let resourceRef = httpResourceF(
+      resourceRequest,
+      resourceOptions as HttpResourceOptions<TResult, unknown>,
+    ) as HttpResourceRef<TResult | TDefault>;
 
     let value = computed(() => {
       let error = resourceRef.error();
@@ -225,6 +302,16 @@ export namespace api {
     });
   }
 
+  /**
+   * Map a {@link RequestSignal} via a mapping function.
+   *
+   * This makes it more simple to handle the type union that is a
+   * {@link RequestSignal}.
+   * If you have a value, it will be mapped, no matter if the input is a signal
+   * or not.
+   * The mapping function `f` will *only* not be called if the output of the
+   * signal variant is `undefined`.
+   */
   export function map<T, U>(
     request: RequestSignal<T>,
     f: (raw: T) => U,
