@@ -328,12 +328,30 @@ export namespace api {
     return Object.assign(value, {resource: resourceRef});
   }
 
+  /**
+   * Replaces custom values in the request body or params when generating
+   * the cache key.
+   *
+   * This function is used with `JSON.stringify(...)` to serialize values like
+   * {@link HttpParams} or `FormData` in a meaningful way.
+   * That ensures the generated cache key stays stable and unique to the input.
+   */
   function cacheJSONReplacer(_key: string, value: any): any {
     if (value instanceof HttpParams) return value.toString();
     if (value instanceof FormData) return Array.from(value.entries());
     return value;
   }
 
+  /**
+   * Builds the {@link HttpContext} used for the request.
+   *
+   * This handles both `authenticate` and `cache` options.
+   * The context is computed reactively and will update if any
+   * of the input signals change.
+   *
+   * If caching is enabled, we generate a stable cache key from the
+   * `url`, `params`, and `body`, even if some of them are signals.
+   */
   function buildResourceContext<
     TResult,
     TRaw = TResult,
@@ -368,13 +386,20 @@ export namespace api {
     });
   }
 
-  // Heads up: this signal is subtle and a bit delicate.
-  // The key idea is that the caller stays in control of the request.
-  // If a value is passed directly (even undefined), we use it as-is.
-  // But if a signal is passed and *its value* is undefined, we bail out early.
-  // That way, signals that aren't ready yet (like async data) delay the request,
-  // while static undefineds just fall through and let the resource use defaults.
-  // Once all signal values are ready, we build the request.
+  /**
+   * Builds the request signal used by {@link httpResource}.
+   *
+   * This signal returns `undefined` until all inputs (like `url`, `body`, etc.)
+   * are ready. That means:
+   * - if a signal is passed and it's still `undefined`, the request is delayed.
+   * - if a direct value is passed, even `undefined`, we use it as-is.
+   *
+   * This gives fine-grained control over when a request should start
+   * and lets the caller delay based on reactive inputs.
+   *
+   * Signals are unwrapped, and special values like {@link NONE}
+   * are treated as explicit `undefined`s after the readiness check.
+   */
   function buildResourceRequest<
     TResult,
     TRaw = TResult,
@@ -412,14 +437,17 @@ export namespace api {
     });
   }
 
-  // This is the parse function we throw on every http resource, for all
-  // request it will run the type validator to check if the response has the
-  // correct type.
-  // If the user provided its own parse function, we run that on the original
-  // result as it would be usually the case on http resources.
-  // When a validateRaw is provided we test the raw response type.
-  // This way we can ensure that the parse function acts correctly on its
-  // types.
+  /**
+   * Builds the `parse` function passed to {@link httpResource}.
+   *
+   * This function applies type validation using the provided `validate` function.
+   * If `parse` is defined, it is used to transform the raw server response first.
+   *
+   * If `validateRaw` is set, the raw response is also validated before parsing.
+   * This ensures that both raw and parsed types are safe and match what we expect.
+   *
+   * If any validation fails, an error is thrown and logged to the console.
+   */
   function buildResourceParser<
     TResult,
     TRaw = TResult,
@@ -453,6 +481,18 @@ export namespace api {
     };
   }
 
+  /**
+   * Selects the appropriate variant of {@link httpResource} based on `responseType`.
+   *
+   * Angular provides multiple built-in versions of `httpResource` for different
+   * types of responses:
+   * - JSON (default)
+   * - text
+   * - blob
+   * - arrayBuffer
+   *
+   * This function chooses the correct one depending on what the user has set.
+   */
   function selectHttpResourceFunction<
     TResult,
     TRaw = TResult,
@@ -472,6 +512,17 @@ export namespace api {
     }
   }
 
+  /**
+   * Handles request errors by checking for a matching handler in `onError`.
+   *
+   * If the underlying {@link HttpResourceRef} reports an error and a handler
+   * is defined for the matching {@link HttpStatusCode}, the handler is called
+   * and its return value is used as the result.
+   *
+   * Otherwise, the signal just returns `.value()` from the resource.
+   *
+   * This is useful for treating some errors (like 404) as values, not failures.
+   */
   function buildResourceErrorHandler<
     TResult,
     TRaw = TResult,
