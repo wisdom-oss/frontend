@@ -13,8 +13,6 @@ const URL = "/api/water-rights/v1" as const;
   providedIn: "root",
 })
 export class WaterRightsService {
-  constructor(private http: HttpClient) {}
-
   fetchUsageLocations(): api.Signal<Self.UsageLocation[]> {
     return api.resource({
       url: `${URL}/`,

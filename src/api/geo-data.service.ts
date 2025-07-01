@@ -12,8 +12,6 @@ const URL = "/api/geodata" as const;
   providedIn: "root",
 })
 export class GeoDataService {
-  private http = inject(HttpClient);
-
   fetchAvailableLayers(): api.Signal<GeoDataService.AvailableLayers> {
     return api.resource({
       url: `${URL}/v2/`,
@@ -70,6 +68,7 @@ export class GeoDataService {
     return api.resource({
       url,
       validate: typia.createValidate<GeoDataService.IdentifiedObjects>(),
+      cache: dayjs.duration(6, "months"),
     });
   }
 }
