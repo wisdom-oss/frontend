@@ -169,11 +169,11 @@
               "be-water-smart.model_training.algorithm" | translate
             }}</label>
             <dropdown
-              [buttonSize]="'250px'"
               [menuName]="menuAlgorithm()"
               [options]="optionsAlgorithm()"
               [changeMenuName]="true"
               kind="hover"
+              buttonSize="250px"
               (choice)="choiceAlgorithm.set($event)"
             ></dropdown>
           </div>
@@ -184,11 +184,11 @@
               "be-water-smart.model_training.virtual_meter" | translate
             }}</label>
             <dropdown
-              [buttonSize]="'250px'"
               [menuName]="menuVirtualMeter()"
               [options]="optionsVirtualMeter()"
               [changeMenuName]="true"
               kind="hover"
+              buttonSize="250px"
               (choice)="choiceVirtualMeter.set($event)"
             ></dropdown>
           </div>
