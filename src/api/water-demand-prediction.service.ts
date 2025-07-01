@@ -3,10 +3,6 @@ import {Injectable} from "@angular/core";
 import {Router} from "@angular/router";
 import {Observable} from "rxjs";
 
-const PREFIX = "/local"; /** local development */
-//const PREFIX = "/dev/development" /** development on wisdom.dev */
-//const PREFIX = "/dev/training"; /** training container on wisdom.dev */
-
 const API_PREFIX = "/waterdemand";
 
 /**
@@ -41,7 +37,11 @@ export class WaterDemandPredictionService {
       body: requestBody,
     };
 
-    let final_url = this.router.parseUrl(PREFIX + API_PREFIX + url).toString();
+    const LOCAL = "/local"; /** local development */
+    const LOCAL_DOCKER = "/local_docker"; /** local docker development */
+    const DEV_SERVER = "/dev/training"; /** training container on wisdom.dev */
+
+    let final_url = this.router.parseUrl(LOCAL + API_PREFIX + url).toString();
 
     return this.http.request<T>(
       method,
