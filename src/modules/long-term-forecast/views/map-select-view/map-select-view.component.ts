@@ -61,11 +61,11 @@ export class MapSelectViewComponent {
   });
 
   constructor(geo: GeoDataService) {
-    let counties = signals.fromPromise(
+    let counties = signals.map(
       geo.fetchLayerContents("nds_counties"),
       this.intoFeatureCollection,
     );
-    let municipals = signals.fromPromise(
+    let municipals = signals.map(
       geo.fetchLayerContents("nds_municipals"),
       this.intoFeatureCollection,
     );

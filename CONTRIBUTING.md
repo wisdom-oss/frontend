@@ -144,10 +144,7 @@ Key directories:
 2. **API Integration**:
 
    - Add new services in `src/api`.
-   - Use `src/common/http-contexts.ts` for
-     [HTTP contexts](https://angular.dev/api/common/http/HttpContext).
-   - Validate responses using [typia](https://typia.io) ans
-     `httpContexts.validateType`.
+   - Use `src/common/api.ts` as your toolkit to build services.
 
 3. **Components**:
 

@@ -9,7 +9,7 @@ import {
   WritableSignal,
   PipeTransform,
 } from "@angular/core";
-import {RouterLink, ActivatedRoute} from "@angular/router";
+import {ActivatedRoute} from "@angular/router";
 import {
   ControlComponent,
   LayerComponent,
@@ -19,7 +19,6 @@ import {
 } from "@maplibre/ngx-maplibre-gl";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {
-  remixArrowGoBackFill,
   remixArticleLine,
   remixCheckboxCircleLine,
   remixCloseCircleLine,
@@ -104,7 +103,6 @@ export class LandRecordPipe implements PipeTransform {
     ControlComponent,
     GeoJSONSourceComponent,
     KeyValueFormatPipe,
-    LandRecordPipe,
     LayerComponent,
     MapComponent,
     MapCursorDirective,
@@ -112,15 +110,14 @@ export class LandRecordPipe implements PipeTransform {
     NgIconComponent,
     NgIf,
     RateFormatPipe,
-    RouterLink,
     SomePipe,
     TranslateDirective,
     TranslatePipe,
+    LandRecordPipe,
   ],
   templateUrl: "./detail-view.component.html",
   providers: [
     provideIcons({
-      remixArrowGoBackFill,
       remixArticleLine,
       remixCheckboxCircleLine,
       remixCloseCircleLine,
@@ -156,8 +153,8 @@ export class DetailViewComponent {
     service: WaterRightsService,
     geo: GeoDataService,
   ) {
-    this.data = signals.fromPromise(
-      service.fetchWaterRightDetails(+route.snapshot.queryParams["no"]!),
+    this.data = service.fetchWaterRightDetails(
+      +route.snapshot.queryParams["no"]!,
     );
 
     let usageLocations = DetailViewComponent.buildUsageLocations(
@@ -177,7 +174,7 @@ export class DetailViewComponent {
     geo: GeoDataService,
     dataSignal: DetailViewComponent["data"],
   ): Signal<undefined | UsageLocations> {
-    let allUsageLocations = signals.fromPromise(
+    let allUsageLocations = signals.map(
       geo.fetchLayerContents(
         "water_right_usage_locations",
         undefined,

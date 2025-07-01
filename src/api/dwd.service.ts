@@ -1,11 +1,10 @@
-import {HttpClient, HttpContext, HttpParams} from "@angular/common/http";
-import {Injectable} from "@angular/core";
+import {HttpParams} from "@angular/common/http";
+import {computed, Injectable} from "@angular/core";
 import dayjs, {Dayjs} from "dayjs";
 import {FeatureCollection, Point} from "geojson";
-import {firstValueFrom} from "rxjs";
 import typia from "typia";
 
-import {httpContexts} from "../common/http-contexts";
+import {api} from "../common/api";
 
 const URL = "/api/dwd" as const;
 
@@ -15,76 +14,56 @@ const URL = "/api/dwd" as const;
 export class DwdService {
   private cacheTtl = dayjs.duration(12, "hours");
 
-  constructor(private http: HttpClient) {}
-
   readonly v2 = {
-    fetchStations: (): Promise<DwdService.V2.Stations> => {
-      let url = `${URL}/v2/stations`;
-      return firstValueFrom(
-        this.http.get<DwdService.V2.Stations>(url, {
-          context: new HttpContext()
-            .set(
-              httpContexts.validateType,
-              typia.createValidate<DwdService.V2.Stations>(),
-            )
-            .set(httpContexts.cache, [url, this.cacheTtl]),
-        }),
-      );
-    },
+    fetchStations: (): api.Signal<Self.V2.Stations> =>
+      api.resource({
+        url: `${URL}/v2/stations`,
+        validate: typia.createValidate<Self.V2.Stations>(),
+        cache: this.cacheTtl,
+      }),
   };
 
   readonly v1 = {
-    fetchStations: (): Promise<DwdService.V1.Stations> => {
-      let url = `${URL}/v1/`;
-      return firstValueFrom(
-        this.http.get<DwdService.V1.Stations>(url, {
-          context: new HttpContext()
-            .set(
-              httpContexts.validateType,
-              typia.createValidate<DwdService.V1.Stations>(),
-            )
-            .set(httpContexts.cache, [url, this.cacheTtl]),
-        }),
-      );
-    },
+    fetchStations: (): api.Signal<Self.V1.Stations> =>
+      api.resource({
+        url: `${URL}/v2/`,
+        validate: typia.createValidate<Self.V1.Stations>(),
+        cache: this.cacheTtl,
+      }),
 
-    fetchStation: (stationId: string): Promise<DwdService.V1.Station> => {
-      let url = `${URL}/v1/${stationId}`;
-      return firstValueFrom(
-        this.http.get<DwdService.V1.Station>(url, {
-          context: new HttpContext()
-            .set(
-              httpContexts.validateType,
-              typia.createValidate<DwdService.V1.Station>(),
-            )
-            .set(httpContexts.cache, [url, this.cacheTtl]),
-        }),
-      );
-    },
+    fetchStation: (
+      stationId: api.RequestSignal<string>,
+    ): api.Signal<Self.V1.Station> =>
+      api.resource({
+        url: api.url`${URL}/v1/${stationId}`,
+        validate: typia.createValidate<Self.V1.Station>(),
+        cache: this.cacheTtl,
+      }),
 
     fetchData: (parameters: {
-      stationId: string;
-      dataType: string;
-      granularity: string;
-      from?: Dayjs;
-      until?: Dayjs;
-    }): Promise<DwdService.V1.Data> => {
-      let {stationId, dataType, granularity, from, until} = parameters;
-      let url = `${URL}/v1/${stationId}/${dataType}/${granularity}`;
-      let params = new HttpParams();
-      if (from) params = params.set("from", from.unix());
-      if (until) params = params.set("until", until.unix());
-      return firstValueFrom(
-        this.http.get<DwdService.V1.Data>(url, {
-          params,
-          context: new HttpContext()
-            .set(
-              httpContexts.validateType,
-              typia.createValidate<DwdService.V1.Data>(),
-            )
-            .set(httpContexts.cache, [url + params.toString(), this.cacheTtl]),
-        }),
-      );
+      stationId: api.RequestSignal<string>;
+      dataType: api.RequestSignal<string>;
+      granularity: api.RequestSignal<string>;
+      from?: api.RequestSignal<Dayjs | undefined>;
+      until?: api.RequestSignal<Dayjs | undefined>;
+    }): api.Signal<Self.V1.Data> => {
+      let {stationId, dataType, granularity} = parameters;
+      let url = api.url`${URL}/v1/${stationId}/${dataType}/${granularity}`;
+      let params = computed(() => {
+        let params = new HttpParams();
+        let from = api.toSignal(parameters.from)();
+        if (from) params = params.set("from", from.unix());
+        let until = api.toSignal(parameters.until)();
+        if (until) params = params.set("until", until.unix());
+        return params;
+      });
+
+      return api.resource({
+        url,
+        body: params,
+        validate: typia.createValidate<Self.V1.Data>(),
+        cache: this.cacheTtl,
+      });
     },
   };
 }
@@ -158,3 +137,5 @@ export namespace DwdService {
     >;
   }
 }
+
+import Self = DwdService;

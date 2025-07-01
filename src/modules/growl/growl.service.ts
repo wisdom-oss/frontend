@@ -8,18 +8,13 @@ import {
 } from "@angular/core";
 import dayjs, {Dayjs} from "dayjs";
 import {Duration} from "dayjs/plugin/duration";
-import {
-  FeatureCollection,
-  Feature,
-  Geometry,
-  Point,
-  MultiPolygon,
-} from "geojson";
+import {FeatureCollection, Geometry, Point, MultiPolygon} from "geojson";
 
 import {GroundwaterLevelsService} from "../../api/groundwater-levels.service";
 import {GeoDataService} from "../../api/geo-data.service";
 import nlwknMeasurementClassificationColors from "../../assets/nlwkn-measurement-classification-colors.toml";
 import {range} from "../../common/utils/range";
+import {signals} from "../../common/signals";
 
 export namespace GrowlService {
   // geo data
@@ -83,13 +78,13 @@ export class GrowlService {
     measurementClassifications: WritableSignal<MeasurementClassifications>;
     lastWeek: {
       // today minus <index> days
-      0: [Dayjs, WritableSignal<MeasurementClassifications>];
-      1: [Dayjs, WritableSignal<MeasurementClassifications>];
-      2: [Dayjs, WritableSignal<MeasurementClassifications>];
-      3: [Dayjs, WritableSignal<MeasurementClassifications>];
-      4: [Dayjs, WritableSignal<MeasurementClassifications>];
-      5: [Dayjs, WritableSignal<MeasurementClassifications>];
-      6: [Dayjs, WritableSignal<MeasurementClassifications>];
+      0: [Dayjs, Signal<MeasurementClassifications>];
+      1: [Dayjs, Signal<MeasurementClassifications>];
+      2: [Dayjs, Signal<MeasurementClassifications>];
+      3: [Dayjs, Signal<MeasurementClassifications>];
+      4: [Dayjs, Signal<MeasurementClassifications>];
+      5: [Dayjs, Signal<MeasurementClassifications>];
+      6: [Dayjs, Signal<MeasurementClassifications>];
     };
   };
 
@@ -148,72 +143,51 @@ export class GrowlService {
     type: G["type"],
     cacheTtl: Duration,
   ): Signal<FeatureCollection<G, GeoProperties>> {
-    let geoSignal: WritableSignal<FeatureCollection<G, GeoProperties>> = signal(
-      {
+    return signals.map(
+      service.fetchLayerContents(layerName, undefined, cacheTtl),
+      contents => ({
         type: "FeatureCollection",
-        features: [],
-      },
+        features: (contents?.data ?? [])
+          .filter(({geometry, ...content}) => {
+            let isExpectedType = geometry.type === type;
+            let msg = `expected "${type}, got "${geometry.type}"`;
+            if (!isExpectedType) console.warn(msg, content);
+            return isExpectedType;
+          })
+          .map(({geometry, id, name, key, additionalProperties}) => ({
+            type: "Feature",
+            geometry: geometry as G,
+            id,
+            properties: {name, key, ...additionalProperties},
+          })),
+      }),
     );
-
-    (async () => {
-      let contents =
-        (await service.fetchLayerContents(layerName, undefined, cacheTtl))
-          ?.data ?? [];
-
-      let features: Feature<G, GeoProperties>[] = [];
-      for (let content of contents) {
-        if (content.geometry.type !== type) {
-          let msg = `expected "${type}", got "${content.geometry.type}"`;
-          console.warn(msg, content);
-          continue;
-        }
-
-        features.push({
-          type: "Feature",
-          geometry: content.geometry as G,
-          id: content.id,
-          properties: {
-            name: content.name,
-            key: content.key,
-            ...content.additionalProperties,
-          },
-        });
-
-        geoSignal.set({
-          type: "FeatureCollection",
-          features,
-        });
-      }
-    })();
-
-    return geoSignal;
   }
 
   private static constructGlDataSignals(
     service: GroundwaterLevelsService,
   ): GrowlService["gl"] {
-    function dateMeasurements(
-      day: Dayjs,
-    ): WritableSignal<Record<string, Measurement>> {
-      let measurementsSignal = signal({});
-      service
-        .fetchMeasurementClassifications(day)
-        .then(data => measurementsSignal.set(data));
-      return measurementsSignal;
-    }
-
     let today = dayjs();
     let week = range(7);
     let measurements = Object.fromEntries(
       week.map(i => {
         let day = today.subtract(dayjs.duration(i, "day"));
-        return [i, [day, dateMeasurements(day)]];
+        return [
+          i,
+          [
+            day,
+            signals.map(
+              service.fetchMeasurementClassifications(day),
+              data => data || {},
+            ),
+          ],
+        ];
       }),
     ) as GrowlService["gl"]["lastWeek"];
 
     return {
       service,
-      measurementClassifications: measurements[0][1],
+      measurementClassifications: signal(measurements[0][1]()),
       lastWeek: measurements,
     };
   }

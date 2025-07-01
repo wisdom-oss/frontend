@@ -2,6 +2,7 @@ import {NgIf, DatePipe, KeyValuePipe} from "@angular/common";
 import {
   computed,
   effect,
+  inject,
   resource,
   signal,
   viewChild,
@@ -56,6 +57,9 @@ import {signals} from "../../common/signals";
   templateUrl: "./growl.component.html",
 })
 export class GrowlComponent {
+  protected service = inject(GrowlService);
+  private waterRightsService = inject(WaterRightsService);
+
   protected style = colorful as any as StyleSpecification;
   protected measurementColors = nlwknMeasurementClassificationColors;
 
@@ -94,11 +98,41 @@ export class GrowlComponent {
   // additional delay to fix angular error for outputting event data of destroyed component
   protected hoverClusterPolygonDelay;
 
-  protected averageWithdrawals = signal<{
-    name: string;
-    key: string;
-    withdrawals: Signal<WaterRightsService.AverageWithdrawals | null>;
-  } | null>(null);
+  protected groundwaterBodyRequest = signal<GroundwaterBodyFeature | null>(
+    null,
+  );
+  protected averageWithdrawalsRequest = computed(() => {
+    let groundwaterBody = this.groundwaterBodyRequest();
+    if (this.hoverClusterPolygon.hasValue()) return;
+
+    for (let body of this.service.data.groundwaterBodies().features) {
+      if (groundwaterBody?.id == body.id) {
+        return body;
+      }
+    }
+
+    return null;
+  });
+  protected averageWithdrawalsResponse =
+    this.waterRightsService.fetchAverageWithdrawals(
+      computed(() => {
+        let geometry = this.averageWithdrawalsRequest()?.geometry;
+        return geometry ? [geometry] : undefined;
+      }),
+    );
+  protected averageWithdrawals = computed(() => {
+    let withdrawals = this.averageWithdrawalsResponse();
+    if (!withdrawals) return null;
+
+    let request = this.averageWithdrawalsRequest();
+    if (!request) return null;
+
+    return {
+      name: request.properties.name ?? request.properties.key,
+      key: request.properties.key,
+      withdrawals,
+    };
+  });
 
   protected lang = signals.lang();
   private initialLoad = computed(() => {
@@ -108,10 +142,7 @@ export class GrowlComponent {
     );
   });
 
-  constructor(
-    protected service: GrowlService,
-    private waterRightsService: WaterRightsService,
-  ) {
+  constructor() {
     effect(() => {
       // force layer order by redrawing them on every update
       this.initialLoad();
@@ -169,33 +200,6 @@ export class GrowlComponent {
 
   protected selectMeasurementDay(value: 0 | 1 | 2 | 3 | 4 | 5 | 6) {
     this.service.selectMeasurementsDay.set(value);
-  }
-
-  protected updateAverageWithdrawals(
-    groundwaterBody: GroundwaterBodyFeature | null,
-  ) {
-    if (this.hoverClusterPolygon.hasValue()) return;
-
-    for (let body of this.service.data.groundwaterBodies().features) {
-      if (groundwaterBody?.id == body.id) {
-        let withdrawalData = {
-          name: body.properties.name ?? body.properties.key,
-          key: body.properties.key,
-          withdrawals: signal<WaterRightsService.AverageWithdrawals | null>(
-            null,
-          ),
-        };
-
-        this.waterRightsService
-          .fetchAverageWithdrawals(body.geometry)
-          .then(data => withdrawalData.withdrawals.set(data));
-
-        this.averageWithdrawals.set(withdrawalData);
-        return;
-      }
-    }
-
-    return this.averageWithdrawals.set(null);
   }
 
   private hoverClusterPolygonResource() {
