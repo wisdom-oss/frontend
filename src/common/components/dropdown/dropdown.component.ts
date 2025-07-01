@@ -52,9 +52,6 @@ export class DropdownComponent {
   /** Define the kind of dropdown menu. */
   readonly kind = input.required<"hover" | "click">();
 
-  /** minimum allowed buttonsize in px, format: '200px' */
-  readonly buttonSize = input.required<string>();
-
   protected readonly isActive = signal(false);
 
   constructor(private translate: TranslateService) {
