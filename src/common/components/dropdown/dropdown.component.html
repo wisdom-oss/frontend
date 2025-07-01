@@ -7,6 +7,7 @@
 >
   <div class="dropdown-trigger">
     <button
+      [style.width]="buttonSize()"
       class="button is-rounded"
       (click)="kind() == 'click' && isActive.set(!isActive())"
     >
