@@ -523,7 +523,7 @@ export class WaterDemandPredictionComponent implements OnInit {
             this.currentPredictedSmartmeterData()!.resolution,
           );
 
-          this.showPredictedDatasats(
+          this.showPredictedDatasets(
             this.currentPredictedSmartmeterData()!.resolution,
           );
         },
@@ -627,7 +627,7 @@ export class WaterDemandPredictionComponent implements OnInit {
   }
 
   /** show predicted datasets based on the resolution chosen */
-  showPredictedDatasats(resolution: string): void {
+  showPredictedDatasets(resolution: string): void {
     // reset data to begin
     this.chartDataPredictedValues.datasets = [];
 

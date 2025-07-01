@@ -5,15 +5,16 @@
   <div class="columns">
     <!--Real Data Graph and Buttons-->
     <div class="column">
-      <div class="box">
+      <div class="box" style="height: 90vh">
         <div class="level">
           <div class="level-left">
             <div class="is-justify-content-start">
+              <!-- reset button -->
               <button
                 class="button is-primary is-rounded"
                 (click)="resetChart()"
               >
-                {{ "water-demand-prediction.delete" | translate }}
+                {{ "water-demand-prediction.delete.normal" | translate }}
               </button>
             </div>
           </div>
@@ -26,7 +27,7 @@
                 (click)="
                   setDisplayedResolution('hourly');
                   showDatasets('hourly');
-                  showPredictedDatasats('hourly')
+                  showPredictedDatasets('hourly')
                 "
               >
                 {{ optionsResolution["hourly"] | translate }}
@@ -37,7 +38,7 @@
                 (click)="
                   setDisplayedResolution('daily');
                   showDatasets('daily');
-                  showPredictedDatasats('daily')
+                  showPredictedDatasets('daily')
                 "
               >
                 {{ optionsResolution["daily"] | translate }}
@@ -48,7 +49,7 @@
                 (click)="
                   setDisplayedResolution('weekly');
                   showDatasets('weekly');
-                  showPredictedDatasats('weekly')
+                  showPredictedDatasets('weekly')
                 "
               >
                 {{ optionsResolution["weekly"] | translate }}
@@ -143,16 +144,16 @@
     </div>
     <!--Predicted Data Graph and Buttons-->
     <div class="column">
-      <div class="box">
+      <div class="box" style="height: 90vh">
         <div class="level">
           <div class="level-left">
-            <div class="buttons has-addons is-justify-content-start">
+            <div class="is-justify-content-start">
               <!-- reset button -->
               <button
                 class="button is-primary is-rounded"
                 (click)="resetPredictionChart()"
               >
-                {{ "water-demand-prediction.delete" | translate }}
+                {{ "water-demand-prediction.delete.predicted" | translate }}
               </button>
             </div>
           </div>
@@ -178,16 +179,34 @@
         <div>
           <table class="table is-fullwidth">
             <thead>
-              <th title="{{ explainMAE }}">
+              <th
+                title="{{
+                  'water-demand-prediction.explanation.MAE' | translate
+                }}"
+              >
                 {{ "water-demand-prediction.metrics.MAE" | translate }}
               </th>
-              <th title="{{ explainMSE }}">
+              <th
+                title="{{
+                  'water-demand-prediction.explanation.MSE' | translate
+                }}"
+              >
                 {{ "water-demand-prediction.metrics.MSE" | translate }}
               </th>
-              <th title="{{ explainRMSE }}">
+              <th
+                title="{{
+                  'water-demand-prediction.explanation.RMSE' | translate
+                }}"
+              >
                 {{ "water-demand-prediction.metrics.RMSE" | translate }}
               </th>
-              <th title="{{ explainR2 }}">R2</th>
+              <th
+                title="{{
+                  'water-demand-prediction.explanation.R2' | translate
+                }}"
+              >
+                {{ "water-demand-prediction.metrics.R2" | translate }}
+              </th>
             </thead>
             <tbody>
               <tr *ngIf="currentPredictedSmartmeterData()">
