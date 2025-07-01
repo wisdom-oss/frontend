@@ -2,7 +2,6 @@ import {
   httpResource,
   HttpStatusCode,
   HttpContext,
-  HttpResourceFn,
   HttpResourceOptions,
   HttpParams,
   HttpResourceRef,
