@@ -27,8 +27,8 @@ import {httpContexts} from "./http-contexts";
  * {@link api.RequestSignal}s more easily.
  *
  * New services should avoid calling Angular's {@link httpResource} directly.
- * Instead, use the functions provided here. 
- * They help enforce platform consistency in WISdoM and make things like auth, 
+ * Instead, use the functions provided here.
+ * They help enforce platform consistency in WISdoM and make things like auth,
  * validation and caching easier.
  */
 export namespace api {
@@ -57,18 +57,18 @@ export namespace api {
 
   /**
    * The signal type returned by API services.
-   * 
+   *
    * This should be the output of any API service method.
-   * It itself is a signal and can be called to the current value while it also 
-   * contains the original {@link HttpResourceRef} that is the underlying 
+   * It itself is a signal and can be called to the current value while it also
+   * contains the original {@link HttpResourceRef} that is the underlying
    * implementation.
-   * 
-   * Accessing the actual value should *only* be done via calling this signal 
+   *
+   * Accessing the actual value should *only* be done via calling this signal
    * directly and **not** via `.resource.value()`.
    */
   export type Signal<T, D = undefined> = CoreSignal<T | D> & {
-    // The `value` is not *really* omitted in the output but avoids accidentally 
-    // calling `.value()`. 
+    // The `value` is not *really* omitted in the output but avoids accidentally
+    // calling `.value()`.
     resource: Omit<HttpResourceRef<T | D>, "value">;
   };
 
@@ -108,7 +108,7 @@ export namespace api {
    * - {@link HttpResourceOptions} (for things like parsing and equality)
    * - and our own extra fields (like `validate`, `authenticate`, or `cache`)
    *
-   * Any option that uses a {@link RequestSignal} must return something 
+   * Any option that uses a {@link RequestSignal} must return something
    * other than `undefined` to trigger the request.
    * If you really need to pass an actual `undefined` through to the raw
    * {@link httpResource}, use {@link NONE} to do so explicitly.
@@ -138,8 +138,8 @@ export namespace api {
       /**
        * URL for the request.
        *
-       * This must be provided as a {@link RequestSignal}, meaning it can 
-       * either be a static string or a signal that dynamically updates over 
+       * This must be provided as a {@link RequestSignal}, meaning it can
+       * either be a static string or a signal that dynamically updates over
        * time.
        *
        * You can use {@link url} to construct URLs from tagged templates that
@@ -153,8 +153,8 @@ export namespace api {
        * This is created using {@link typia} and is used to make sure that the
        * parsed response actually matches what we expect as a final value.
        *
-       * If the requested service returns a structure that doesn't directly 
-       * match `TResult`, use the `parse` option to transform from `TRaw` to 
+       * If the requested service returns a structure that doesn't directly
+       * match `TResult`, use the `parse` option to transform from `TRaw` to
        * `TResult`.
        * This `validate` function will always run on the result of `parse`.
        */
@@ -162,16 +162,15 @@ export namespace api {
 
       /**
        * HTTP method to use.
-       * 
+       *
        * Defaults to "GET".
        */
       method?: "GET" | "POST";
 
-
       /**
        * Controls the raw response type returned by the server.
        *
-       * Angular provides different variants of {@link httpResource} based on 
+       * Angular provides different variants of {@link httpResource} based on
        * the expected response type:
        *
        * - {@link httpResource} for JSON responses (default)
@@ -182,7 +181,7 @@ export namespace api {
        * This field selects which one is used.
        * Useful if you're working with non-JSON formats like plain text files,
        * binary uploads, or multipart responses.
-       * 
+       *
        * By using `parse`, you can convert these raw values into a `TResult`.
        */
       responseType?: "arrayBuffer" | "blob" | "text";
@@ -201,8 +200,8 @@ export namespace api {
       /**
        * The default value returned before a response is available.
        *
-       * While a request is still in progress (or hasn't started yet), this 
-       * value is used instead of `undefined`. 
+       * While a request is still in progress (or hasn't started yet), this
+       * value is used instead of `undefined`.
        * If not set, `undefined` will be used.
        *
        * This is especially useful for UI code that expects an initial value.
@@ -212,7 +211,7 @@ export namespace api {
        *
        * @privateRemarks
        * `TDefault` must be assignable to `TResult | undefined`.
-       * So if you're passing in a value not assignable to `TResult`, you'll 
+       * So if you're passing in a value not assignable to `TResult`, you'll
        * need to adjust your `TResult` accordingly.
        */
       defaultValue?: TDefault;
@@ -240,11 +239,11 @@ export namespace api {
        * - the resolved `body`
        *
        * The duration must be a {@link Duration} from `dayjs/plugin/duration`.
-       * 
+       *
        * @privateRemarks
-       * The values for the key are serialized using {@link JSON.stringify()}. 
-       * If your request includes more complex values (e.g. {@link HttpParams} 
-       * or {@link FormData}), we need to apply custom serialization to make 
+       * The values for the key are serialized using {@link JSON.stringify()}.
+       * If your request includes more complex values (e.g. {@link HttpParams}
+       * or {@link FormData}), we need to apply custom serialization to make
        * sure the cache key stays stable.
        * Add another type to the replace function if necessary.
        */
@@ -253,13 +252,13 @@ export namespace api {
       /**
        * Custom error handler for specific HTTP status codes.
        *
-       * Normally, failed requests result in an error, but sometimes, you may 
+       * Normally, failed requests result in an error, but sometimes, you may
        * want to treat certain errors (like 404) as a valid fallback instead.
        *
-       * This field lets you do that. 
+       * This field lets you do that.
        * It's a partial record of handlers for specific {@link HttpStatusCode}s.
        *
-       * Each handler receives the full {@link HttpErrorResponse} and must 
+       * Each handler receives the full {@link HttpErrorResponse} and must
        * return a valid `TResult` to use instead of throwing.
        *
        * @example
@@ -285,10 +284,10 @@ export namespace api {
    * - Type-safe validation of responses
    * - Optional parsing, caching, and authentication
    *
-   * Unlike Angular's `httpResource`, which takes two arguments 
-   * (`request` and `options`), this function takes a single `options` object 
+   * Unlike Angular's `httpResource`, which takes two arguments
+   * (`request` and `options`), this function takes a single `options` object
    * that includes everything.
-   * This makes services easier to write and keeps all configuration in one 
+   * This makes services easier to write and keeps all configuration in one
    * place.
    *
    * Input values like `url`, `params`, or `body` can be plain values or signals.
@@ -298,63 +297,93 @@ export namespace api {
    * @see {@link ResourceOptions} for a full breakdown of the options format.
    *
    * @returns
-   * A {@link Signal} containing the result of the request, behaving like a 
-   * regular {@link CoreSignal}. 
+   * A {@link Signal} containing the result of the request, behaving like a
+   * regular {@link CoreSignal}.
    * You can access the actual value by calling it directly.
-   * If you need access to the underlying {@link HttpResourceRef}, it's 
+   * If you need access to the underlying {@link HttpResourceRef}, it's
    * available via `.resource`.
    */
   export function resource<
     TResult,
     TRaw = TResult,
     TDefault extends TResult | undefined = undefined,
-  >(
-    options: ResourceOptions<TResult, TRaw, TDefault>,
-  ): Signal<TResult, NoInfer<TDefault>> {
-    let {
-      responseType,
-      equal,
-      validate,
-      validateRaw,
+  >({
+    defaultValue,
+    equal,
+    ...options
+  }: ResourceOptions<TResult, TRaw, TDefault>): Signal<
+    TResult,
+    NoInfer<TDefault>
+  > {
+    let httpContext = buildResourceContext(options);
+    let resourceRequest = buildResourceRequest(options, httpContext);
+    let parse = buildResourceParser(options) as (raw: unknown) => TResult;
+    let httpResourceF = selectHttpResourceFunction(options);
+    let resourceRef = httpResourceF(resourceRequest, {
+      parse,
       defaultValue,
-      authenticate,
-      cache,
-      onError,
-    } = options;
+      equal,
+    }) as HttpResourceRef<TResult | TDefault>;
+    let value = buildResourceErrorHandler(options, resourceRef);
+    return Object.assign(value, {resource: resourceRef});
+  }
 
-    let httpContext = computed(() => {
+  function cacheJSONReplacer(_key: string, value: any): any {
+    if (value instanceof HttpParams) return value.toString();
+    if (value instanceof FormData) return Array.from(value.entries());
+    return value;
+  }
+
+  function buildResourceContext<
+    TResult,
+    TRaw = TResult,
+    TDefault extends TResult | undefined = undefined,
+  >({
+    authenticate,
+    cache,
+    url,
+    params,
+    body,
+  }: ResourceOptions<TResult, TRaw, TDefault>): CoreSignal<HttpContext> {
+    return computed(() => {
       let context = new HttpContext().set(
         httpContexts.authenticate,
         authenticate,
       );
+
       if (cache !== undefined) {
-        let {url, params, body} = options;
         let cacheKey = JSON.stringify(
           {
             url: isSignal(url) ? url() : url,
             params: isSignal(params) ? params() : params,
             body: isSignal(body) ? body() : body,
           },
-          (_, value) => {
-            if (value instanceof HttpParams) return value.toString();
-            if (value instanceof FormData) return Array.from(value.entries());
-            return value;
-          },
+          cacheJSONReplacer,
         );
+
         context = context.set(httpContexts.cache, [cacheKey, cache]);
       }
+
       return context;
     });
+  }
 
-    // Heads up: this signal is subtle and a bit delicate.
-    // The key idea is that the caller stays in control of the request.
-    // If a value is passed directly (even undefined), we use it as-is.
-    // But if a signal is passed and *its value* is undefined, we bail out early.
-    // That way, signals that aren't ready yet (like async data) delay the request,
-    // while static undefineds just fall through and let the resource use defaults.
-    // Once all signal values are ready, we build the request.
-    let resourceRequest = computed((): HttpResourceRequest | undefined => {
-      // TODO: explain that you can use api.NONE to send undefined
+  // Heads up: this signal is subtle and a bit delicate.
+  // The key idea is that the caller stays in control of the request.
+  // If a value is passed directly (even undefined), we use it as-is.
+  // But if a signal is passed and *its value* is undefined, we bail out early.
+  // That way, signals that aren't ready yet (like async data) delay the request,
+  // while static undefineds just fall through and let the resource use defaults.
+  // Once all signal values are ready, we build the request.
+  function buildResourceRequest<
+    TResult,
+    TRaw = TResult,
+    TDefault extends TResult | undefined = undefined,
+  >(
+    options: ResourceOptions<TResult, TRaw, TDefault>,
+    httpContext: CoreSignal<HttpContext>,
+  ): CoreSignal<HttpResourceRequest | undefined> {
+    return computed(() => {
       let url = isSignal(options.url) ? options.url() : options.url;
       if (url === undefined) return undefined;
       let context = httpContext();
@@ -381,18 +410,28 @@ export namespace api {
 
       return {context, ...request};
     });
+  }
 
-    // This is the parse function we throw on every http resource, for all
-    // request it will run the type validator to check if the response has the
-    // correct type.
-    // If the user provided its own parse function, we run that on the original
-    // result as it would be usually the case on http resources.
-    // When a validateRaw is provided we test the raw response type.
-    // This way we can ensure that the parse function acts correctly on its
-    // types.
-    let parse = (raw: TRaw): TResult => {
+  // This is the parse function we throw on every http resource, for all
+  // request it will run the type validator to check if the response has the
+  // correct type.
+  // If the user provided its own parse function, we run that on the original
+  // result as it would be usually the case on http resources.
+  // When a validateRaw is provided we test the raw response type.
+  // This way we can ensure that the parse function acts correctly on its
+  // types.
+  function buildResourceParser<
+    TResult,
+    TRaw = TResult,
+    TDefault extends TResult | undefined = undefined,
+  >({
+    validateRaw,
+    parse,
+    validate,
+  }: ResourceOptions<TResult, TRaw, TDefault>): (raw: TRaw) => TResult {
+    return raw => {
       let result = raw as unknown as TResult;
-      if (options.parse) {
+      if (parse) {
         if (validateRaw) {
           let validRaw = validateRaw(raw);
           if (!validRaw.success) {
@@ -401,7 +440,7 @@ export namespace api {
           }
         }
 
-        result = options.parse(raw);
+        result = parse(raw);
       }
 
       let validResult = validate(result);
@@ -412,28 +451,36 @@ export namespace api {
 
       return result;
     };
+  }
 
-    let resourceOptions: HttpResourceOptions<TResult, TRaw> = {
-      parse,
-      defaultValue,
-      equal,
-    };
+  function selectHttpResourceFunction<
+    TResult,
+    TRaw = TResult,
+    TDefault extends TResult | undefined = undefined,
+  >({
+    responseType,
+  }: ResourceOptions<TResult, TRaw, TDefault>): (
+    request: () => HttpResourceRequest | undefined,
+    options: HttpResourceOptions<TResult, unknown>,
+  ) => HttpResourceRef<TResult | undefined> {
+    // prettier-ignore
+    switch (responseType) {
+      case undefined: return httpResource<TResult>;
+      case "text": return httpResource.text;
+      case "arrayBuffer": return httpResource.arrayBuffer;
+      case "blob": return httpResource.blob;
+    }
+  }
 
-    let httpResourceF = (() => {
-      // prettier-ignore
-      switch (responseType) {
-        case undefined: return httpResource<TResult>;
-        case "text": return httpResource.text;
-        case "arrayBuffer": return httpResource.arrayBuffer;
-        case "blob": return httpResource.blob;
-      }
-    })() as HttpResourceFn;
-    let resourceRef = httpResourceF(
-      resourceRequest,
-      resourceOptions as HttpResourceOptions<TResult, unknown>,
-    ) as HttpResourceRef<TResult | TDefault>;
-
-    let value = computed(() => {
+  function buildResourceErrorHandler<
+    TResult,
+    TRaw = TResult,
+    TDefault extends TResult | undefined = undefined,
+  >(
+    {onError}: ResourceOptions<TResult, TRaw, TDefault>,
+    resourceRef: HttpResourceRef<TResult | TDefault>,
+  ): CoreSignal<TResult | TDefault> {
+    return computed(() => {
       let error = resourceRef.error();
       if (error && error instanceof HttpErrorResponse) {
         let handler = onError?.[error.status as HttpStatusCode];
@@ -442,8 +489,6 @@ export namespace api {
 
       return resourceRef.value();
     });
-
-    return Object.assign(value, {resource: resourceRef});
   }
 
   /**
@@ -456,11 +501,11 @@ export namespace api {
    * dynamic parts change and will return `undefined` until all values are ready.
    *
    * @param template
-   * The static parts of the template string. 
+   * The static parts of the template string.
    * These remain unchanged.
    *
    * @param args
-   * Dynamic values inserted into the template. 
+   * Dynamic values inserted into the template.
    * Each value may be:
    * - a static string, number, or boolean
    * - a {@link RequestSignal} of one of those types
@@ -469,7 +514,7 @@ export namespace api {
    * until all values are available.
    *
    * @returns
-   * A {@link CoreSignal} that gives the final string once all arguments are 
+   * A {@link CoreSignal} that gives the final string once all arguments are
    * defined.
    * Until then, it will return `undefined`.
    */
@@ -492,7 +537,7 @@ export namespace api {
    * Map a {@link RequestSignal} to a new value.
    *
    * This is a utility to work with {@link RequestSignal}s regardless of whether
-   * you're dealing with a raw value or a signal. 
+   * you're dealing with a raw value or a signal.
    * It lets you transform the inner value in a consistent way.
    *
    * If the input is a raw value, `f` is called directly with it.
