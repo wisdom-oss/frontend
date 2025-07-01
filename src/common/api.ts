@@ -16,40 +16,37 @@ import typia from "typia";
 import {httpContexts} from "./http-contexts";
 
 /**
- * Utilities to build API services.
- * 
- * All our services in `/src/api/` should make heavily use of this namespace to 
- * build methods that use {@link api.RequestSignal} as parameters and 
- * {@link api.Signal} as return values while internally using 
- * {@link api.resource}.
- * 
- * Things like {@link api.url} and {@link api.map} help with handling the 
- * {@link api.RequestSignal}s.
- * 
- * All future services should heavily set on the tools provided in this 
- * namespace rather than raw-dogging Angular's {@link httpResource} as our 
- * provided functions ensure consistency of the WISdoM platform and provide ease 
- * of use for things like authentication, type validation or caching.
+ * Toolkit to build API services.
+ *
+ * All services in `/src/api/` should make heavy use of this namespace to:
+ * - take {@link api.RequestSignal} as input parameters
+ * - return {@link api.Signal} values
+ * - and internally use {@link api.resource}
+ *
+ * Utilities like {@link api.url} and {@link api.map} help with handling
+ * {@link api.RequestSignal}s more easily.
+ *
+ * New services should avoid calling Angular's {@link httpResource} directly.
+ * Instead, use the functions provided here. 
+ * They help enforce platform consistency in WISdoM and make things like auth, 
+ * validation and caching easier.
  */
 export namespace api {
   /**
-   * A request signal, this may be any raw value or a signal that may produce 
-   * this value.
-   * 
-   * This should be used in API services for their parameters.
-   * Using them allows callers of API services to provide signal that are 
-   * reactions to user input or otherwise delayed data.
-   * Signals themselves could also be used to update the request without having 
-   * to call the api method again.
+   * A request signal can either be a raw value or a signal producing that value.
+   *
+   * API services should always take these as parameters.
+   * This lets consumers pass reactive values that change over time or get
+   * resolved later (e.g. user input).
+   * It also enables the request to auto-update when the signal changes.
    */
   export type RequestSignal<T> = T | CoreSignal<T | undefined>;
 
   /**
-   * Function to ensure that a {@link RequestSignal} is actually a signal.
-   * 
-   * It is easier to work with a request signal, if it known that we actually 
-   * have signals.
-   * To accommodate this, we just promote any raw value into a signal.
+   * Ensures a {@link RequestSignal} is a signal.
+   *
+   * If the input is already a signal, we return it.
+   * If not, we wrap it in a computed signal.
    */
   export function toSignal<T>(
     input: RequestSignal<T>,
@@ -59,7 +56,7 @@ export namespace api {
   }
 
   /**
-   * The namespaced signal type.
+   * The signal type returned by API services.
    * 
    * This should be the output of any API service method.
    * It itself is a signal and can be called to the current value while it also 
@@ -70,20 +67,22 @@ export namespace api {
    * directly and **not** via `.resource.value()`.
    */
   export type Signal<T, D = undefined> = CoreSignal<T | D> & {
-    resource: HttpResourceRef<T | D>;
+    // The `value` is not *really* omitted in the output but avoids accidentally 
+    // calling `.value()`. 
+    resource: Omit<HttpResourceRef<T | D>, "value">;
   };
 
   /**
-   * An explicit unset value.
-   * 
-   * The options of {@link resource} expect that each provided signal returns 
-   * anything other than `undefined` when it's ready.
-   * This will block the option to provide the `undefined` value as an output 
-   * for a signal.
-   * To alleviate that very specific and niche issue, this symbol should be used 
-   * instead.
-   * It will be converted to an `undefined` but after the initial check if the 
-   * signal provided a value.
+   * Special marker to explicitly pass `undefined` as a signal value.
+   *
+   * {@link resource} requires that all input signals return something other than
+   * `undefined` to be considered "ready".
+   * This makes it hard to send an actual `undefined` value, because `undefined`
+   * normally just delays the request.
+   *
+   * If you really want to send `undefined`, use this symbol instead.
+   * It'll pass the readiness check and get turned into `undefined` just before
+   * building the actual request.
    */
   export const NONE = Symbol("api.NONE");
   export type NONE = typeof NONE;
@@ -91,7 +90,7 @@ export namespace api {
   type Request = {
     [K in keyof Omit<
       HttpResourceRequest,
-      "method" | "context" | "withCredentials" | "transferCache"
+      "url" | "method" | "context" | "withCredentials" | "transferCache"
     >]: RequestSignal<HttpResourceRequest[K]>;
   };
 
@@ -101,32 +100,34 @@ export namespace api {
   >;
 
   /**
-   * The option for a {@link resource}.
-   * 
-   * These options will be extracted into {@link HttpResourceRequest}, 
-   * {@link HttpResourceOptions} and our own fields.
-   * 
-   * All options that allow passing in an {@link RequestSignal} are expected to 
-   * return anything other than `undefined` when they're ready.
-   * Passing a direct `undefined` or not passing that field into the `options`,
-   * will simply ignore that field.
-   * If you *need* to use an `undefined` in the underlying {@link httpResource}, 
-   * check out {@link NONE}.
-   * 
-   * @template TResult 
-   * The final output data type of this resource.
-   * This type can be inferred via `validate` and `parse.
-   * 
-   * @template TRaw 
-   * The raw response type that is passed to `parse`, may be the same as 
-   * `TResult`.
-   * This type can be inferred via `parse` and `validateRaw`.
-   * 
+   * Options for {@link resource}.
+   *
+   * These cover everything needed to configure a resource call.
+   * Internally, they're split across:
+   * - {@link HttpResourceRequest} (for the request setup)
+   * - {@link HttpResourceOptions} (for things like parsing and equality)
+   * - and our own extra fields (like `validate`, `authenticate`, or `cache`)
+   *
+   * Any option that uses a {@link RequestSignal} must return something 
+   * other than `undefined` to trigger the request.
+   * If you really need to pass an actual `undefined` through to the raw
+   * {@link httpResource}, use {@link NONE} to do so explicitly.
+   *
+   * @template TResult
+   * The final result type returned by the signal.
+   * This is the value you'll get when the request succeeds and passes validation.
+   * You can infer this type by setting `validate`, or optionally via `parse`.
+   *
+   * @template TRaw
+   * The unprocessed raw response type from the HTTP request.
+   * If you're not using `parse`, this is usually the same as `TResult`.
+   * You can infer this type by setting `parse`, or optionally via `validateRaw`.
+   *
    * @template TDefault
-   * The default type until a real value exists.
-   * This type can be inferred by setting `defaultValue`.
-   * 
-   * @see {@link resource}
+   * The type returned before the request completes.
+   * This is what the signal returns until real data is available.
+   * You can infer this type by setting `defaultValue`.
+   * If you don't set a value, this will default to `undefined`.
    */
   export type ResourceOptions<
     TResult,
@@ -134,100 +135,139 @@ export namespace api {
     TDefault extends TResult | undefined,
   > = Request &
     Options<TResult, TRaw> & {
-      /** 
-       * @see {@link url} to make building them easier.
+      /**
+       * URL for the request.
+       *
+       * This must be provided as a {@link RequestSignal}, meaning it can 
+       * either be a static string or a signal that dynamically updates over 
+       * time.
+       *
+       * You can use {@link url} to construct URLs from tagged templates that
+       * include other signals or dynamic parts.
        */
       url: RequestSignal<string>;
 
       /**
-       * A {@link typia}-created type validator that will be used to verify that the 
-       * output type is the expected type.
-       * If the `TResult` type is not what the service responds, use the `parse` 
-       * option to provide a parser from `TRaw` to `TResult`.
+       * Validator for the final result type (`TResult`).
+       *
+       * This is created using {@link typia} and is used to make sure that the
+       * parsed response actually matches what we expect as a final value.
+       *
+       * If the requested service returns a structure that doesn't directly 
+       * match `TResult`, use the `parse` option to transform from `TRaw` to 
+       * `TResult`.
+       * This `validate` function will always run on the result of `parse`.
        */
       validate: (input: unknown) => typia.IValidation<TResult>;
 
       /**
-       * The URL method. 
+       * HTTP method to use.
        * 
-       * By default is "GET" used.
+       * Defaults to "GET".
        */
       method?: "GET" | "POST";
 
 
       /**
-       * Define the raw response type of the underlying {@link httpResource}.
+       * Controls the raw response type returned by the server.
+       *
+       * Angular provides different variants of {@link httpResource} based on 
+       * the expected response type:
+       *
+       * - {@link httpResource} for JSON responses (default)
+       * - {@link httpResource.text} for plain text
+       * - {@link httpResource.blob} for binary blobs
+       * - {@link httpResource.arrayBuffer} for low-level binary buffers
+       *
+       * This field selects which one is used.
+       * Useful if you're working with non-JSON formats like plain text files,
+       * binary uploads, or multipart responses.
        * 
-       * {@link httpResource} provides 4 ways of calling it:
-       * - {@link httpResource} for JSON responses
-       * - {@link httpResource.arrayBuffer} for response with an {@link ArrayBuffer}
-       * - {@link httpResource.blob} for response with an {@link Blob}
-       * - {@link httpResource.text} for response with a string
-       * 
-       * By setting this option, you can use an alternative raw response type.
-       * This is especially useful for byte response or for text formats that 
-       * are not JSON. (e.g. a multipart form).
+       * By using `parse`, you can convert these raw values into a `TResult`.
        */
       responseType?: "arrayBuffer" | "blob" | "text";
 
       /**
-       * Validate the input type for `parse`.
-       * 
-       * Similar to `validate` is this a {@link typia}-created type validator.
-       * This together with `validate` ensures that working with `parse` doesn't 
-       * fail on weird type errors.
+       * Validator for the raw response type (`TRaw`), before parsing.
+       *
+       * Just like `validate`, this is also a {@link typia}-generated validator,
+       * but it runs on the raw response, before the `parse` function is applied.
+       *
+       * This is optional, but highly recommended when you're parsing structured
+       * data manually, to make sure your `parse` input is safe and expected.
        */
       validateRaw?: (input: unknown) => typia.IValidation<TRaw>;
 
       /**
-        * The default value of this resource.
-        * 
-        * While a request is inflight, we don't have a value, until then this 
-        * default value is used.
-        * Setting this value also automatically sets the `TDefault` type of this 
-        * resource.
-        * By default is `undefined` the default value used.
-        * 
-        * @privateRemarks
-        * The type bound of `TDefault` is `TResult | undefined`.
-        * So it has to be of this type.
-        * You may need to add your new default type to your `TResult` if it isn't 
-        * that already.
+       * The default value returned before a response is available.
+       *
+       * While a request is still in progress (or hasn't started yet), this 
+       * value is used instead of `undefined`. 
+       * If not set, `undefined` will be used.
+       *
+       * This is especially useful for UI code that expects an initial value.
+       * For example, returning an empty array while waiting for a list.
+       *
+       * Setting this also defines the `TDefault` template parameter.
+       *
+       * @privateRemarks
+       * `TDefault` must be assignable to `TResult | undefined`.
+       * So if you're passing in a value not assignable to `TResult`, you'll 
+       * need to adjust your `TResult` accordingly.
        */
       defaultValue?: TDefault;
 
       /**
-       * Define whether authentication should be used.
-       * 
-       * By default will all requests going to `/api/` be authenticated if the 
-       * user is logged in.
-       * To specifically authenticate or block doing that, this can be set.
+       * Whether to use authentication for this request.
+       *
+       * By default, any request going to `/api/` will automatically include
+       * authentication if the user is logged in.
+       *
+       * You can override this by explicitly setting this to:
+       * - `true` - force-authenticate, even if the URL doesn’t start with `/api/`
+       * - `false` - explicitly skip authentication
        */
       authenticate?: boolean;
 
       /**
-       * Define how long to cache OK values.
+       * Duration to cache successful (non-error) responses.
+       *
+       * Caching is only applied to OK results, errors are never cached.
+       *
+       * The key used for the cache includes:
+       * - the resolved URL
+       * - the resolved `params`
+       * - the resolved `body`
+       *
+       * The duration must be a {@link Duration} from `dayjs/plugin/duration`.
        * 
-       * This doesn't cache an error response.
-       * The duration is given by a dayjs {@link Duration}.
-       * The key for the cache entry will be generated from the URL, the params and 
-       * the body as a JSON-encoded string.
-       * If a more complex type is used for the params or body, you may need to add 
-       * it to the JSON replacer.
+       * @privateRemarks
+       * The values for the key are serialized using {@link JSON.stringify()}. 
+       * If your request includes more complex values (e.g. {@link HttpParams} 
+       * or {@link FormData}), we need to apply custom serialization to make 
+       * sure the cache key stays stable.
+       * Add another type to the replace function if necessary.
        */
       cache?: Duration;
 
       /**
-       * Error handler for specific error codes.
-       * 
-       * Some errors shouldn't be handled as error but rather as values.
-       * To accomplish this you can set a record using {@link HttpStatusCode} as 
-       * keys to define what should happen in that instance.
-       * 
+       * Custom error handler for specific HTTP status codes.
+       *
+       * Normally, failed requests result in an error, but sometimes, you may 
+       * want to treat certain errors (like 404) as a valid fallback instead.
+       *
+       * This field lets you do that. 
+       * It's a partial record of handlers for specific {@link HttpStatusCode}s.
+       *
+       * Each handler receives the full {@link HttpErrorResponse} and must 
+       * return a valid `TResult` to use instead of throwing.
+       *
        * @example
-       * A 404 should be handled as an empty array:
+       * Treat 404 Not Found as an empty list:
        * ```ts
-       * {[HttpStatusCode.NotFound]: () => []}
+       * {
+       *   [HttpStatusCode.NotFound]: (_err: HttpErrorResponse) => []
+       * }
        * ```
        */
       onError?: Partial<
@@ -236,19 +276,33 @@ export namespace api {
     };
 
   /**
-   * Our custom extension of the {@link httpResource}.
-   * 
-   * All API services should use this function if possible to define their 
-   * interaction with the http client.
-   * This function abstracts over the Angular provided {@link httpResource} 
-   * function to provide extra care for our typically used options.
-   * Instead of two parameters, we just use one parameter containing everything.
-   * 
-   * @see {@link ResourceOptions} for info about the options fields.
-   * 
-   * @returns 
-   * A request signal which acts like a regular {@link CoreSignal}.
-   * To access the underlying raw resource, use `.resource` on the signal.
+   * Our custom wrapper around Angular's {@link httpResource}.
+   *
+   * This is the main entry point for building API services in WISdoM.
+   * It replaces Angular's raw {@link httpResource} usage with a signal-based
+   * interface that handles all our typical needs:
+   * - Signals as inputs ({@link RequestSignal}s)
+   * - Type-safe validation of responses
+   * - Optional parsing, caching, and authentication
+   *
+   * Unlike Angular's `httpResource`, which takes two arguments 
+   * (`request` and `options`), this function takes a single `options` object 
+   * that includes everything.
+   * This makes services easier to write and keeps all configuration in one 
+   * place.
+   *
+   * Input values like `url`, `params`, or `body` can be plain values or signals.
+   * If any signal returns `undefined`, the request will be delayed until all
+   * values are ready.
+   *
+   * @see {@link ResourceOptions} for a full breakdown of the options format.
+   *
+   * @returns
+   * A {@link Signal} containing the result of the request, behaving like a 
+   * regular {@link CoreSignal}. 
+   * You can access the actual value by calling it directly.
+   * If you need access to the underlying {@link HttpResourceRef}, it's 
+   * available via `.resource`.
    */
   export function resource<
     TResult,
@@ -393,22 +447,31 @@ export namespace api {
   }
 
   /**
-   * A template literal tagging function for constructing URLs.
-   * 
-   * This function may be used to tag string literals to constructs URLs for 
-   * {@link resource}.
-   * The output of this is a {@link CoreSignal} that represents the formatted 
-   * string as long as every value is defined.
-   *  
+   * Template literal tagging function for building URLs.
+   *
+   * This is a helper for creating dynamic URLs to use with {@link resource}.
+   * It works like a regular tagged template string but supports signals.
+   *
+   * The returned {@link CoreSignal} updates automatically as soon as any of the
+   * dynamic parts change and will return `undefined` until all values are ready.
+   *
+   * @param template
+   * The static parts of the template string. 
+   * These remain unchanged.
+   *
    * @param args
-   * The arguments of this template may be raw values like `string`, `number` 
-   * or `boolean`.
-   * But it also accepts signals that may return any of these values or 
-   * `undefined` if they are not ready yet.
-   *  
-   * @returns 
-   * A {@link CoreSignal} with the formatted string or `undefined` if any 
-   * provided signal returns `undefined.
+   * Dynamic values inserted into the template. 
+   * Each value may be:
+   * - a static string, number, or boolean
+   * - a {@link RequestSignal} of one of those types
+   *
+   * If any signal returns `undefined`, the whole URL will return `undefined`
+   * until all values are available.
+   *
+   * @returns
+   * A {@link CoreSignal} that gives the final string once all arguments are 
+   * defined.
+   * Until then, it will return `undefined`.
    */
   export function url(
     template: TemplateStringsArray,
@@ -426,14 +489,27 @@ export namespace api {
   }
 
   /**
-   * Map a {@link RequestSignal} via a mapping function.
+   * Map a {@link RequestSignal} to a new value.
    *
-   * This makes it more simple to handle the type union that is a
-   * {@link RequestSignal}.
-   * If you have a value, it will be mapped, no matter if the input is a signal
-   * or not.
-   * The mapping function `f` will *only* not be called if the output of the
-   * signal variant is `undefined`.
+   * This is a utility to work with {@link RequestSignal}s regardless of whether
+   * you're dealing with a raw value or a signal. 
+   * It lets you transform the inner value in a consistent way.
+   *
+   * If the input is a raw value, `f` is called directly with it.
+   * If the input is a signal, the returned signal will call `f` whenever the
+   * inner value changes, unless that value is `undefined`, in which case the
+   * mapping is skipped and the output becomes `undefined`.
+   *
+   * @param request
+   * A {@link RequestSignal}, either a raw value or a signal producing `T`.
+   *
+   * @param f
+   * A mapping function that takes the raw `T` and returns a transformed `U`.
+   * Will never be called with `undefined`.
+   *
+   * @returns
+   * A new {@link RequestSignal} producing the mapped value.
+   * Will return `undefined` if the original signal is undefined.
    */
   export function map<T, U>(
     request: RequestSignal<T>,
