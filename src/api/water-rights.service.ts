@@ -1,4 +1,3 @@
-import {HttpClient} from "@angular/common/http";
 import {Injectable} from "@angular/core";
 import {parseMultipart} from "@mjackson/multipart-parser";
 import {GeoJsonObject, Point} from "geojson";
