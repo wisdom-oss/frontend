@@ -11,7 +11,7 @@ import {signals} from "../../../../common/signals";
   styles: ``,
 })
 export class WithdrawalInfoControlComponent {
-  readonly in = input.required<{
+  readonly data = input.required<{
     name: string;
     key: string;
     withdrawals: WaterRightsService.AverageWithdrawals | null;
@@ -20,7 +20,7 @@ export class WithdrawalInfoControlComponent {
   protected lang = signals.lang();
 
   protected value = computed(() => {
-    let input = this.in();
+    let input = this.data();
     if (!input) return null;
     let withdrawal = input.withdrawals;
     if (!withdrawal) return null;
