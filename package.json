@@ -39,7 +39,7 @@
     "@ng-icons/remixicon": "^32.0.0",
     "@ngx-translate/core": "^16.0.4",
     "@thatopen/components": "^2.4.5",
-    "@thatopen/components-front": "~2.4.5",
+    "@thatopen/components-front": "~2.4.6",
     "@thatopen/fragments": "~2.4.0",
     "@turf/turf": "^7.2.0",
     "@twemoji/svg": "^15.0.0",
