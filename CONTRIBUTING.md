@@ -130,53 +130,44 @@ Key directories:
 ## Building a New Module
 
 0. **Familiarize with Angular**:
-
    - Read some [Angular docs](https://angular.dev).
    - Consider completing the
      [Angular tutorial](https://angular.dev/tutorials/learn-angular).
    - Make sure you understand [Signals](https://angular.dev/guide/signals).
 
 1. **Workspace Setup**:
-
    - Create a new directory in `src/modules` for your feature.
    - Avoid generating unnecessary files.
 
 2. **API Integration**:
-
    - Add new services in `src/api`.
    - Use `src/common/api.ts` as your toolkit to build services.
 
 3. **Components**:
-
    - Build [standalone components](https://angular.dev/reference/migrations/standalone) (Angular standard).
    - Use [Bulma classes](https://bulma.io/documentation/) and directives from
      `src/common/directives`.
 
 4. **Translations**:
-
    - Add an `i18n.toml` file in your module directory.
    - Include it in `src/i18n.ts` and choose a clear namespace.
    - Use translations via [`TranslatePipe` or `TranslateDirective`](https://ngx-translate.org/getting-started/translating-your-components/).
 
 5. **Custom Signals**:
-
    - Check `src/common/signals.ts` for existing signals before creating new ones.
 
 6. **Dates**:
-
    - We use [Day.js](https://day.js.org) for dates on all public API.
      So use `dayjs()` and `dayjs.duration()` for dates and durations.
    - We also have some custom plugins, see [`src/core/dayjs`](./src/core/dayjs/).
 
 7. **Styling**:
-
    - Use Bulma for consistency.
    - Import `variables.scss` if you need
      [Bulma variables](https://bulma.io/documentation/customize/list-of-sass-variables/)
      or shared styles.
 
 8. **Exports**:
-
    - Each file should export a single symbol for better namespace management.
    - Use the [`namespace`](https://www.typescriptlang.org/docs/handbook/namespaces.html)
      keyword to group multiple symbols under one export.
