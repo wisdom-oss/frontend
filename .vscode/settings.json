@@ -21,5 +21,8 @@
     "greenable",
     "oowv",
     "typia"
-  ]
+  ],
+  "files.watcherExclude": {
+    "**/target": true
+  }
 }

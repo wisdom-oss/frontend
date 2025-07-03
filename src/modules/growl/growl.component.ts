@@ -204,7 +204,7 @@ export class GrowlComponent {
 
   private hoverClusterPolygonResource() {
     return resource({
-      request: () => {
+      params: () => {
         let cluster = this.hoveredFeatures.waterRightUsageLocationCluster();
         if (!cluster) return null;
 
@@ -225,8 +225,8 @@ export class GrowlComponent {
           | null
         >,
       ): Promise<Feature<Polygon> | undefined> => {
-        if (!param.request) return undefined;
-        let [[source, oldSource], cluster] = param.request;
+        if (!param.params) return undefined;
+        let [[source, oldSource], cluster] = param.params;
         let points;
         try {
           points = await this.getClusterChildrenRecursive(
