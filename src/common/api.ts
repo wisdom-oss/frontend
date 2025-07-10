@@ -89,7 +89,12 @@ export namespace api {
   type Request = {
     [K in keyof Omit<
       HttpResourceRequest,
-      "url" | "method" | "context" | "withCredentials" | "transferCache"
+      | "url"
+      | "method"
+      | "context"
+      | "withCredentials"
+      | "transferCache"
+      | "cache"
     >]: RequestSignal<HttpResourceRequest[K]>;
   };
 
