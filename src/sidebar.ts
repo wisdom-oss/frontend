@@ -1,4 +1,3 @@
-import {HttpClient} from "@angular/common/http";
 import {computed, inject, Component, Signal} from "@angular/core";
 import {
   remixBarChartFill,
@@ -12,7 +11,6 @@ import {
   remixSunCloudyFill,
   remixWaterPercentFill,
 } from "@ng-icons/remixicon";
-import {firstValueFrom} from "rxjs";
 import typia from "typia";
 
 import {extraTags} from "./common/utils/extra-tags";
