@@ -11,11 +11,17 @@
         @for (module of category.modules; track module) {
           @if (module.visible?.() ?? true) {
             <li [class.unauthorized]="(module.scopes | unauthorized)()">
-              <a class="icon-text" [routerLink]="module.link">
+              <a
+                class="icon-text is-flex is-gapless"
+                [routerLink]="module.link"
+              >
                 <span class="icon">
                   <sidebar-icon [icon]="module.icon"></sidebar-icon>
                 </span>
-                <span [translate]="module.module"></span>
+                <span class="is-flex-grow-1" [translate]="module.module"></span>
+                <span class="icon has-text-warning">
+                  <ng-icon name="remixErrorWarningFill"></ng-icon>
+                </span>
               </a>
             </li>
           }

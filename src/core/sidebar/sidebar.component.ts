@@ -13,7 +13,12 @@ import {
   PipeTransform,
 } from "@angular/core";
 import {NavigationEnd, RouterLink, Router} from "@angular/router";
-import {provideIcons, provideNgIconLoader} from "@ng-icons/core";
+import {
+  provideIcons,
+  provideNgIconLoader,
+  NgIconComponent,
+} from "@ng-icons/core";
+import {remixErrorWarningFill} from "@ng-icons/remixicon";
 import {TranslateDirective} from "@ngx-translate/core";
 import {filter} from "rxjs";
 
@@ -41,6 +46,7 @@ export class UnauthorizedPipe implements PipeTransform {
 @Component({
   selector: "sidebar",
   imports: [
+    NgIconComponent,
     RouterLink,
     SidebarIconComponent,
     SidebarLinkDirective,
@@ -51,7 +57,10 @@ export class UnauthorizedPipe implements PipeTransform {
   templateUrl: "./sidebar.component.html",
   styleUrl: "./sidebar.component.scss",
   providers: [
-    provideIcons(extractNgIcons(SIDEBAR_ENTRIES)),
+    provideIcons({
+      ...extractNgIcons(SIDEBAR_ENTRIES),
+      remixErrorWarningFill,
+    }),
     provideNgIconLoader(icon => {
       if (!icon.startsWith("http")) return "";
       const http = inject(HttpClient);
