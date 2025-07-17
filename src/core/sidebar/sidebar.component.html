@@ -9,9 +9,7 @@
       </p>
       <ul class="menu-list">
         @for (module of category.modules; track module) {
-          @let visible =
-            module.visible && runInInjectionContext(module.visible);
-          @if (visible?.() ?? true) {
+          @if (module.visible?.() ?? true) {
             <li [class.unauthorized]="(module.scopes | unauthorized)()">
               <a class="icon-text" [routerLink]="module.link">
                 <span class="icon">

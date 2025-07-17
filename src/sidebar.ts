@@ -26,7 +26,7 @@ type ComponentClass = new (...args: any[]) => Component;
 type Icon =
   | (Record<string, string> & extraTags.RecordEntries<1>)
   | ComponentClass
-  | (() => Promise<string>);
+  | URL;
 
 export interface SidebarEntry {
   category: string;
@@ -105,12 +105,7 @@ export function sidebar(): readonly SidebarEntry[] {
     },
     {
       category: "OOWV",
-      icon: () =>
-        firstValueFrom(
-          inject(HttpClient).get("https://www.oowv.de/favicons/favicon.svg", {
-            responseType: "text",
-          }),
-        ),
+      icon: new URL("https://www.oowv.de/favicons/favicon.svg"),
       modules: [
         {
           module: "oowv-action-map.display.module",

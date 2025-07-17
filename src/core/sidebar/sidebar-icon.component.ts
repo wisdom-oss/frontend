@@ -1,4 +1,4 @@
-import {NgComponentOutlet, AsyncPipe, KeyValuePipe} from "@angular/common";
+import {NgComponentOutlet, KeyValuePipe} from "@angular/common";
 import {
   inject,
   input,
@@ -12,15 +12,15 @@ import {SidebarEntry} from "../../sidebar";
 
 @Component({
   selector: "sidebar-icon",
-  imports: [NgIcon, KeyValuePipe, NgComponentOutlet, AsyncPipe],
+  imports: [NgIcon, KeyValuePipe, NgComponentOutlet],
   template: `
     @let iconVal = icon();
-    @if (isRecord(iconVal)) {
+    @if (isURL(iconVal)) {
+      <ng-icon [name]="iconVal.toString()"></ng-icon>
+    } @else if (isRecord(iconVal)) {
       <ng-icon [name]="(iconVal | keyvalue)[0].key"></ng-icon>
-    } @else if (isComponent(iconVal)) {
-      <ng-container *ngComponentOutlet="$any(iconVal)"></ng-container>
     } @else {
-      <ng-icon [svg]="(runInInjectionContext(iconVal) | async) ?? undefined"></ng-icon>
+      <ng-container *ngComponentOutlet="iconVal"></ng-container>
     }
   `,
 })
@@ -33,10 +33,8 @@ export class SidebarIconComponent {
     return typeof icon == "object";
   }
 
-  protected isComponent(
-    icon: SidebarEntry["icon"],
-  ): icon is new (...args: any[]) => Component {
-    return "ɵcmp" in icon;
+  protected isURL(icon: SidebarEntry["icon"]): icon is URL {
+    return icon instanceof URL;
   }
 
   private injector = inject(Injector);

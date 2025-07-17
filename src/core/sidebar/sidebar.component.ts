@@ -1,3 +1,4 @@
+import {HttpClient} from "@angular/common/http";
 import {
   computed,
   inject,
@@ -12,7 +13,7 @@ import {
   PipeTransform,
 } from "@angular/core";
 import {NavigationEnd, RouterLink, Router} from "@angular/router";
-import {provideIcons} from "@ng-icons/core";
+import {provideIcons, provideNgIconLoader} from "@ng-icons/core";
 import {TranslateDirective} from "@ngx-translate/core";
 import {filter} from "rxjs";
 
@@ -49,12 +50,31 @@ export class UnauthorizedPipe implements PipeTransform {
   ],
   templateUrl: "./sidebar.component.html",
   styleUrl: "./sidebar.component.scss",
-  providers: [provideIcons(extractNgIcons(SIDEBAR_ENTRIES))],
+  providers: [
+    provideIcons(extractNgIcons(SIDEBAR_ENTRIES)),
+    provideNgIconLoader(icon => {
+      if (!icon.startsWith("http")) return "";
+      const http = inject(HttpClient);
+      return http.get(icon, {
+        responseType: "text",
+      });
+    }),
+  ],
 })
 export class SidebarComponent implements AfterViewInit {
   private router = inject(Router);
 
-  protected entries = SIDEBAR_ENTRIES;
+  private injector = inject(Injector);
+  protected entries = runInInjectionContext(this.injector, () =>
+    SIDEBAR_ENTRIES.map(category => ({
+      ...category,
+      modules: category.modules.map(module => ({
+        ...module,
+        // this ensures that the visible signal is only constructed once
+        visible: module.visible?.(),
+      })),
+    })),
+  );
 
   @ViewChildren(SidebarLinkDirective)
   routerLinks?: QueryList<SidebarLinkDirective>;
@@ -64,11 +84,6 @@ export class SidebarComponent implements AfterViewInit {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => this.highlightCurrentRoute());
-  }
-
-  private injector = inject(Injector);
-  protected runInInjectionContext<T>(fn: () => T): T {
-    return runInInjectionContext(this.injector, fn);
   }
 
   private highlightCurrentRoute() {
@@ -91,11 +106,15 @@ function extractNgIcons(
 ): Record<string, string> {
   return Object.assign(
     {},
-    ...entries.map(entry => entry.icon).filter(icon => typeof icon == "object"),
+    ...entries
+      .map(entry => entry.icon)
+      .filter(icon => !(icon instanceof URL))
+      .filter(icon => typeof icon == "object"),
     ...entries
       .map(entry => entry.modules)
       .flat()
       .map(module => module.icon)
+      .filter(icon => !(icon instanceof URL))
       .filter(icon => typeof icon == "object"),
   );
 }
