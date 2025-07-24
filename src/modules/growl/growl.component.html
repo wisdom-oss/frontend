@@ -7,7 +7,7 @@
       [center]="{lat: 52.8, lon: 9.2}"
       [canvasContextAttributes]="{preserveDrawingBuffer: true}"
       [attributionControl]="false"
-      (click)="updateAverageWithdrawals(hoveredFeatures.groundwaterBody())"
+      (click)="groundwaterBodyRequest.set(hoveredFeatures.groundwaterBody())"
       (click)="fitBounds.set((hoverClusterPolygonDelay() ?? {}).bbox)"
       [fitBounds]="$any(fitBounds())"
       [fitBoundsOptions]="{
@@ -104,7 +104,7 @@
           @if (withdrawals) {
             <mgl-control position="bottom-right">
               <growl-withdrawal-info-control
-                [in]="withdrawals"
+                [data]="withdrawals"
               ></growl-withdrawal-info-control>
             </mgl-control>
           }

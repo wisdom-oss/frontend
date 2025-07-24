@@ -1,16 +1,10 @@
-import {
-  HttpClient,
-  HttpStatusCode,
-  HttpContext,
-  HttpErrorResponse,
-} from "@angular/common/http";
-import {Injectable} from "@angular/core";
+import {HttpStatusCode} from "@angular/common/http";
+import {computed, Injectable} from "@angular/core";
 import dayjs from "dayjs";
 import {Geometry} from "geojson";
-import {firstValueFrom} from "rxjs";
 import typia from "typia";
 
-import {httpContexts} from "../common/http-contexts";
+import {api} from "../common/api";
 
 const URL = "/api/geodata" as const;
 
@@ -18,92 +12,64 @@ const URL = "/api/geodata" as const;
   providedIn: "root",
 })
 export class GeoDataService {
-  constructor(private http: HttpClient) {}
-
-  fetchAvailableLayers(): Promise<GeoDataService.AvailableLayers> {
-    return firstValueFrom(
-      this.http.get<GeoDataService.AvailableLayers>(`${URL}/v2/`, {
-        context: new HttpContext().set(
-          httpContexts.validateType,
-          typia.createValidate<GeoDataService.AvailableLayers>(),
-        ),
-      }),
-    );
+  fetchAvailableLayers(): api.Signal<GeoDataService.AvailableLayers> {
+    return api.resource({
+      url: `${URL}/v2/`,
+      validate: typia.createValidate<GeoDataService.AvailableLayers>(),
+    });
   }
 
-  async fetchLayerInformation(
-    layerRef: string,
-  ): Promise<GeoDataService.LayerInformation | null> {
-    try {
-      return await firstValueFrom(
-        this.http.get<GeoDataService.LayerInformation>(
-          `${URL}/v1/${layerRef}`,
-          {
-            context: new HttpContext().set(
-              httpContexts.validateType,
-              typia.createValidate<GeoDataService.LayerInformation>(),
-            ),
-          },
-        ),
-      );
-    } catch (error) {
-      if (!(error instanceof HttpErrorResponse)) throw error;
-      if (error.status === HttpStatusCode.NotFound) return null;
-      throw error;
-    }
+  fetchLayerInformation(
+    layerRef: api.RequestSignal<string>,
+  ): api.Signal<GeoDataService.LayerInformation | null> {
+    return api.resource({
+      url: api.url`${URL}/v1/${layerRef}`,
+      validate: typia.createValidate<GeoDataService.LayerInformation>(),
+      onError: {[HttpStatusCode.NotFound]: () => null},
+    });
   }
 
-  async fetchLayerContents(
-    layerRef: string,
-    filter?: {
+  fetchLayerContents(
+    layerRef: api.RequestSignal<string>,
+    filter?: api.RequestSignal<{
       relation: "within" | "overlaps" | "contains";
       otherLayer: string;
       key: string[];
-    },
+    }>,
     cacheTtl = dayjs.duration(1, "week"),
-  ): Promise<GeoDataService.LayerContents | null> {
-    try {
-      let url = `${URL}/v2/content/${layerRef}`;
-      if (filter) {
-        let queryParams = [];
-        for (let [key, value] of Object.entries({
-          relation: filter.relation,
-          other_layer: filter.otherLayer,
-          key: filter.key,
-        }))
-          queryParams.push(`${key}=${value}`);
-        url += `/filtered?${queryParams.join("&")}`;
-      }
+  ): api.Signal<GeoDataService.LayerContents | null, null> {
+    let filterParam = computed(() => {
+      let filterOptions = api.toSignal(filter)();
+      if (!filterOptions) return "";
+      let {relation, otherLayer, key} = filterOptions;
+      return `/filtered?relation=${relation}&other_layer=${otherLayer}&key=${key}`;
+    });
 
-      let context = new HttpContext()
-        .set(
-          httpContexts.validateType,
-          typia.createValidate<GeoDataService.LayerContents>(),
-        )
-        .set(httpContexts.cache, [url, cacheTtl]);
-
-      return await firstValueFrom(
-        this.http.get<GeoDataService.LayerContents>(url, {context}),
-      );
-    } catch (error) {
-      if (!(error instanceof HttpErrorResponse)) throw error;
-      if (error.status === HttpStatusCode.NotFound) return null;
-      throw error;
-    }
+    return api.resource({
+      url: api.url`${URL}/v2/content/${layerRef}${filterParam}`,
+      validate: typia.createValidate<GeoDataService.LayerContents>(),
+      cache: cacheTtl,
+      defaultValue: null,
+      onError: {[HttpStatusCode.NotFound]: () => null},
+    });
   }
 
-  identify(keys: Iterable<string>): Promise<GeoDataService.IdentifiedObjects> {
-    let queryParams: string[] = [];
-    for (let key of keys) queryParams.push(`key=${key}`);
-    let url = `${URL}/v1/identify?${queryParams.join("&")}`;
-    return firstValueFrom(
-      this.http.get<GeoDataService.IdentifiedObjects>(url, {
-        context: new HttpContext().set(
-          httpContexts.validateType,
-          typia.createValidate<GeoDataService.IdentifiedObjects>(),
-        ),
-      }),
-    );
+  identify(
+    keys: api.RequestSignal<Iterable<string>>,
+  ): api.Signal<GeoDataService.IdentifiedObjects> {
+    let url = computed(() => {
+      let queryParams = [];
+      let iter = api.toSignal(keys)();
+      if (iter === undefined) return undefined;
+      for (let key of iter) queryParams.push(`key=${key}`);
+      return `${URL}/v1/identify?${queryParams.join("&")}`;
+    });
+
+    return api.resource({
+      url,
+      validate: typia.createValidate<GeoDataService.IdentifiedObjects>(),
+      cache: dayjs.duration(6, "months"),
+    });
   }
 }
 
@@ -114,7 +80,7 @@ export namespace GeoDataService {
     key: string;
     description?: string;
     attribution?: string;
-    attributionURL?: string;
+    attributionURL?: string | null;
     crs?: number & typia.tags.Type<"uint32">;
     private?: boolean;
   };

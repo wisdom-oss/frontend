@@ -63,8 +63,8 @@ export class ClusterPolygonSourceDirective {
 
   private polygonsCache = new Map<number, Feature<Polygon>>();
   private polygonsResource = resource({
-    request: () => this.clusterId(),
-    loader: async ({request: clusterId}) => {
+    params: () => this.clusterId(),
+    loader: async ({params: clusterId}) => {
       if (clusterId === null || clusterId === undefined) return;
 
       let cached = this.polygonsCache.get(clusterId);

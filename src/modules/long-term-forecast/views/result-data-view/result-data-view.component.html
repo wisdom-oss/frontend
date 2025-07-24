@@ -33,7 +33,7 @@
     <div class="column" style="min-width: 25em">
       <div class="card is-fullheight" style="position: relative">
         <div
-          *ngIf="datasets.value() | empty"
+          *ngIf="datasets() | empty"
           style="
             position: absolute;
             width: 100%;
@@ -51,14 +51,14 @@
         </div>
         <div
           class="card-content skeleton-block is-fullheight"
-          [class.skeleton-block]="datasets.value() | empty"
+          [class.skeleton-block]="datasets() | empty"
         >
           <canvas
             baseChart
             type="bar"
             class="is-fullheight is-fullwidth"
             [options]="options"
-            [datasets]="datasets.value()"
+            [datasets]="datasets()"
           ></canvas>
         </div>
       </div>

@@ -372,4 +372,11 @@ export namespace signals {
       return computed(() => makeDayjs(configSignal(), format));
     }
   }
+
+  export function map<T, U>(
+    input: Signal<T>,
+    transform: (value: T) => U,
+  ): Signal<U> {
+    return computed(() => transform(input()));
+  }
 }

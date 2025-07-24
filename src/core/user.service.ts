@@ -53,7 +53,7 @@ export namespace UserService {
     username: string;
     disabled: boolean;
     administrator: boolean;
-    /** @deprecated Use {@link AuthService.scopes()} instead. */
+    /** @deprecated Use {@link AuthService.prototype.scopes()} instead. */
     permissions: Record<string, string[]>;
   };
 }

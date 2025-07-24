@@ -1,5 +1,5 @@
 import {DecimalPipe} from "@angular/common";
-import {computed, input, Component, Signal} from "@angular/core";
+import {computed, input, Component} from "@angular/core";
 
 import {WaterRightsService} from "../../../../api/water-rights.service";
 import {signals} from "../../../../common/signals";
@@ -11,18 +11,18 @@ import {signals} from "../../../../common/signals";
   styles: ``,
 })
 export class WithdrawalInfoControlComponent {
-  readonly in = input.required<{
+  readonly data = input.required<{
     name: string;
     key: string;
-    withdrawals: Signal<WaterRightsService.AverageWithdrawals | null>;
+    withdrawals: WaterRightsService.AverageWithdrawals | null;
   }>();
 
   protected lang = signals.lang();
 
   protected value = computed(() => {
-    let input = this.in();
+    let input = this.data();
     if (!input) return null;
-    let withdrawal = input.withdrawals();
+    let withdrawal = input.withdrawals;
     if (!withdrawal) return null;
     return Math.floor(withdrawal.minimalWithdrawal);
   });
