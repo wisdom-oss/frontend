@@ -44,9 +44,17 @@ nav {
 }
 
 .service-warning {
-  $text-color: hsl(var(--bulma-black-h), var(--bulma-black-s), var(--bulma-black-l));
-  $background-color: hsl(var(--bulma-warning-h), var(--bulma-warning-s), var(--bulma-warning-l));
-  
+  $text-color: hsl(
+    var(--bulma-black-h),
+    var(--bulma-black-s),
+    var(--bulma-black-l)
+  );
+  $background-color: hsl(
+    var(--bulma-warning-h),
+    var(--bulma-warning-s),
+    var(--bulma-warning-l)
+  );
+
   border-radius: var(--bulma-menu-item-radius);
   padding: var(--bulma-menu-list-link-padding);
   background-color: $background-color;
