@@ -1,6 +1,7 @@
 import {HttpClient} from "@angular/common/http";
 import {
   computed,
+  effect,
   inject,
   runInInjectionContext,
   ViewChildren,
@@ -26,6 +27,7 @@ import {SidebarLinkDirective} from "./sidebar-link.directive";
 import {SidebarMenuLabelDirective} from "./sidebar-menu-label.directive";
 import {SidebarIconComponent} from "./sidebar-icon.component";
 import {sidebar, SidebarEntry} from "../../sidebar";
+import {StatusService} from "../../api/status.service";
 import {AuthService} from "../auth/auth.service";
 import {Scopes} from "../auth/scopes";
 
@@ -72,6 +74,7 @@ export class UnauthorizedPipe implements PipeTransform {
 })
 export class SidebarComponent implements AfterViewInit {
   private router = inject(Router);
+  private status = inject(StatusService);
 
   private injector = inject(Injector);
   protected entries = runInInjectionContext(this.injector, () =>
@@ -84,6 +87,8 @@ export class SidebarComponent implements AfterViewInit {
       })),
     })),
   );
+
+  private onMessage = effect(() => console.log(this.status.socket()));
 
   @ViewChildren(SidebarLinkDirective)
   routerLinks?: QueryList<SidebarLinkDirective>;
