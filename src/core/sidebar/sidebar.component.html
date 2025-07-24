@@ -19,8 +19,10 @@
                   <sidebar-icon [icon]="module.icon"></sidebar-icon>
                 </span>
                 <span class="is-flex-grow-1" [translate]="module.module"></span>
-                <span class="icon has-text-warning">
-                  <ng-icon name="remixErrorWarningFill"></ng-icon>
+                <span [style.cursor]="'help'">
+                  <span data-tooltip="lol" class="icon has-text-warning has-tooltip-warning has-tooltip-right has-tooltip-arrow has-tooltip-active">
+                    <ng-icon name="remixErrorWarningFill"></ng-icon>
+                  </span>
                 </span>
               </a>
             </li>
