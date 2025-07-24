@@ -10,21 +10,31 @@
       <ul class="menu-list">
         @for (module of category.modules; track module) {
           @if (module.visible?.() ?? true) {
-            <li [class.unauthorized]="(module.scopes | unauthorized)()">
+            <li
+              class="is-flex is-flex-direction-column"
+              [class.unauthorized]="(module.scopes | unauthorized)()"
+            >
               <a
                 class="icon-text is-flex is-gapless"
                 [routerLink]="module.link"
               >
-                <span class="icon">
-                  <sidebar-icon [icon]="module.icon"></sidebar-icon>
-                </span>
+                <sidebar-icon [icon]="module.icon"></sidebar-icon>
                 <span class="is-flex-grow-1" [translate]="module.module"></span>
-                <span [style.cursor]="'help'">
-                  <span data-tooltip="lol" class="icon has-text-warning has-tooltip-warning has-tooltip-right has-tooltip-arrow has-tooltip-active">
-                    <ng-icon name="remixErrorWarningFill"></ng-icon>
-                  </span>
+                <span class="icon has-text-warning" [style.cursor]="'help'">
+                  <ng-icon name="remixErrorWarningFill"></ng-icon>
                 </span>
               </a>
+              <div
+                style="
+                  position: absolute;
+                  align-self: flex-end;
+                  transform: translateX(calc(100% - 0.3em));
+                "
+              >
+                <div class="service-warning">
+                  <p>Some text here</p>
+                </div>
+              </div>
             </li>
           }
         }
