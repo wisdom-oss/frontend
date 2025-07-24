@@ -8,8 +8,15 @@ import {
   HttpResourceRequest,
   HttpErrorResponse,
 } from "@angular/common/http";
-import {computed, isSignal, Signal as CoreSignal} from "@angular/core";
+import {
+  computed,
+  isSignal,
+  signal,
+  Signal as CoreSignal,
+  WritableSignal,
+} from "@angular/core";
 import {Duration} from "dayjs/plugin/duration";
+import {isTypedArray} from "three/src/animation/AnimationUtils.js";
 import typia from "typia";
 
 import {httpContexts} from "./http-contexts";
@@ -544,6 +551,90 @@ export namespace api {
 
       return resourceRef.value();
     });
+  }
+
+  export type Socket<TMessage, TDefault, TSend> = CoreSignal<
+    TMessage | TDefault
+  > & {
+    close(): void;
+    send(message: TSend): void;
+  };
+
+  export type SocketOptions<TMessage, TDefault, TSend> = {
+    url: ConstructorParameters<typeof WebSocket>[0];
+    validate: (input: unknown) => typia.IValidation<TMessage>;
+    protocols?: ConstructorParameters<typeof WebSocket>[1];
+    binaryType?: WebSocket["binaryType"];
+    onClose?: (
+      socket: Socket<TMessage, TDefault, TSend>,
+      event: CloseEvent,
+    ) => void;
+    onError?: (socket: Socket<TMessage, TDefault, TSend>, event: Event) => void;
+    onOpen?: (socket: Socket<TMessage, TDefault, TSend>, event: Event) => void;
+    onMessage?: (
+      socket: Socket<TMessage, TDefault, TSend>,
+      event: MessageEvent,
+    ) => void;
+    defaultValue?: TDefault;
+  };
+
+  export function socket<TMessage, TDefault, TSend>({
+    url,
+    validate,
+    protocols,
+    binaryType,
+    onClose,
+    onError,
+    onOpen,
+    onMessage,
+    defaultValue,
+  }: SocketOptions<TMessage, TDefault, TSend>): Socket<
+    TMessage,
+    TDefault,
+    TSend
+  > {
+    let webSocket = new WebSocket(url, protocols);
+    if (binaryType) webSocket.binaryType = binaryType;
+
+    let send = (message: TSend) => {
+      if (
+        message instanceof ArrayBuffer ||
+        message instanceof Blob ||
+        isTypedArray(message) ||
+        message instanceof DataView
+      )
+        webSocket.send(message as ArrayBuffer | Blob | ArrayBufferLike);
+      else webSocket.send(JSON.stringify(message));
+    };
+
+    let writeSignal = signal<TMessage | TDefault>(defaultValue as TDefault);
+    let socket = Object.assign(writeSignal, {
+      close: webSocket.close,
+      send,
+    });
+
+    let addEventListener = webSocket.addEventListener;
+    if (onClose) addEventListener("close", ev => onClose(socket, ev));
+    if (onError) addEventListener("error", ev => onError(socket, ev));
+    if (onOpen) addEventListener("open", ev => onOpen(socket, ev));
+    if (onMessage) addEventListener("message", ev => onMessage(socket, ev));
+
+    webSocket.addEventListener("message", ev => {
+      let message;
+      if (ev.type == "text") message = JSON.parse(ev.data);
+      else if (ev.type == "binary") message = ev.data;
+      else throw new Error("Unexpected websocket message type");
+
+      let checked = validate(message);
+      if (!checked.success) {
+        console.error(checked.errors);
+        throw new Error("Invalid type on message");
+      }
+
+      writeSignal.set(checked.data);
+    });
+
+    return socket;
   }
 
   /**
