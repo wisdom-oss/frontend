@@ -604,6 +604,7 @@ export namespace api {
         message instanceof DataView
       )
         webSocket.send(message as ArrayBuffer | Blob | ArrayBufferLike);
+      else if (typeof message === "string") webSocket.send(message);
       else webSocket.send(JSON.stringify(message));
     };
 
@@ -621,9 +622,10 @@ export namespace api {
 
     webSocket.addEventListener("message", ev => {
       let message;
-      if (ev.type == "text") message = JSON.parse(ev.data);
-      else if (ev.type == "binary") message = ev.data;
-      else throw new Error("Unexpected websocket message type");
+      if (typeof ev.data === "string") message = JSON.parse(ev.data);
+      else if (webSocket.binaryType === "blob") message = new Blob(ev.data);
+      else if (webSocket.binaryType === "arraybuffer")
+        message = new ArrayBuffer(ev.data);
 
       let checked = validate(message);
       if (!checked.success) {
