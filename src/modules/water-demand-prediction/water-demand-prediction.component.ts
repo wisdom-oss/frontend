@@ -1,6 +1,5 @@
 import {CommonModule} from "@angular/common";
 import {
-  computed,
   effect,
   signal,
   ViewChildren,
@@ -294,7 +293,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     resolution: string,
     timeframe: string,
     fillOption: any,
-    type: string,
+    type: ChartType,
   ): ChartDataset {
     let color = "#D3D3D3"; // light grey
 
@@ -303,12 +302,13 @@ export class WaterDemandPredictionComponent implements OnInit {
       color = this.createColorFromParameter(label, resolution, timeframe);
     }
 
-    const newDataset: ChartDataset<"line"> = {
+    const newDataset: ChartDataset = {
       label: label,
       data: data,
       borderColor: color,
       backgroundColor: color,
       fill: fillOption,
+      type: type as ChartType,
     };
 
     return newDataset;
@@ -400,11 +400,15 @@ export class WaterDemandPredictionComponent implements OnInit {
           console.log(error);
         },
         complete: () => {
+          if (!this.currentSmartmeterData) {
+            return;
+          }
+
           let newDataset = this.createNewDataset(
-            this.currentSmartmeterData?.value!,
-            this.currentSmartmeterData?.name!,
-            this.currentSmartmeterData?.resolution!,
-            this.currentSmartmeterData?.timeframe!,
+            this.currentSmartmeterData.value!,
+            this.currentSmartmeterData.name!,
+            this.currentSmartmeterData.resolution!,
+            this.currentSmartmeterData.timeframe!,
             false,
             this.chartType(),
           );

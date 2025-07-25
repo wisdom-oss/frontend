@@ -38,8 +38,8 @@ export class WaterDemandPredictionService {
     };
 
     const LOCAL = "/local"; /** local development */
-    const LOCAL_DOCKER = "/local_docker"; /** local docker development */
-    const DEV_SERVER = "/dev/training"; /** training container on wisdom.dev */
+    const _LOCAL_DOCKER = "/local_docker"; /** local docker development */
+    const _DEV_SERVER = "/dev/training"; /** training container on wisdom.dev */
 
     let final_url = this.router.parseUrl(LOCAL + API_PREFIX + url).toString();
 
