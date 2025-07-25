@@ -415,14 +415,14 @@ export class WaterDemandPredictionComponent implements OnInit {
 
           let smartmeterdata: SmartmeterDataset = {
             dataset: newDataset,
-            labels: this.currentSmartmeterData?.date!,
+            labels: this.currentSmartmeterData.date!,
           };
 
-          if (!this.savedDatasets[this.currentSmartmeterData?.resolution!]) {
-            this.savedDatasets[this.currentSmartmeterData?.resolution!] = [];
+          if (!this.savedDatasets[this.currentSmartmeterData.resolution!]) {
+            this.savedDatasets[this.currentSmartmeterData.resolution!] = [];
           }
 
-          this.savedDatasets[this.currentSmartmeterData?.resolution!].push(
+          this.savedDatasets[this.currentSmartmeterData.resolution!].push(
             smartmeterdata,
           );
 
@@ -431,8 +431,8 @@ export class WaterDemandPredictionComponent implements OnInit {
             this.chartDataPredictedValues.labels = smartmeterdata.labels;
           }
 
-          this.setDisplayedResolution(this.currentSmartmeterData?.resolution!);
-          this.showDatasets(this.currentSmartmeterData?.resolution!);
+          this.setDisplayedResolution(this.currentSmartmeterData.resolution!);
+          this.showDatasets(this.currentSmartmeterData.resolution!);
           this.currentSmartmeterData = undefined;
         },
       });
