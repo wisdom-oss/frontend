@@ -553,31 +553,109 @@ export namespace api {
     });
   }
 
+  /**
+   * A signal-based WebSocket connection.
+   *
+   * Returned by {@link socket}, this type allows reactive handling of WebSocket
+   * messages.
+   *
+   * It extends Angular's {@link CoreSignal}, letting you directly get the current
+   * message value by calling the signal.
+   *
+   * The additional methods `.send()` and `.close()` control the WebSocket
+   * connection directly.
+   *
+   * @template TMessage
+   * Type of messages received from the server.
+   *
+   * @template TDefault
+   * Default value initially returned before any message is received.
+   *
+   * @template TSend
+   * Type of messages that can be sent to the server via `.send()`.
+   */
   export type Socket<TMessage, TDefault, TSend> = CoreSignal<
     TMessage | TDefault
   > & {
+    /** Close the WebSocket connection. */
     close(): void;
+    /** Send a message through the WebSocket. */
     send(message: TSend): void;
   };
 
+  /**
+   * Configuration options for creating a WebSocket connection using {@link socket}.
+   *
+   * Includes settings like URL, protocols, validation, event handlers,
+   * and a default message value.
+   *
+   * @template TMessage
+   * Type of messages received from the server, validated via `validate`.
+   *
+   * @template TDefault
+   * Default value initially returned before any message is received.
+   *
+   * @template TSend
+   * Type of messages that can be sent to the server.
+   */
   export type SocketOptions<TMessage, TDefault, TSend> = {
+    /** URL of the WebSocket server. */
     url: ConstructorParameters<typeof WebSocket>[0];
+
+    /** Typia validator to ensure incoming messages match the expected type. */
     validate: (input: unknown) => typia.IValidation<TMessage>;
+
+    /** Protocols to use when connecting to the WebSocket server. */
     protocols?: ConstructorParameters<typeof WebSocket>[1];
+
+    /** 
+     * Binary data type expected from the WebSocket server 
+     * (e.g., "blob", "arraybuffer"). 
+     */
     binaryType?: WebSocket["binaryType"];
+
+    /** Called when the WebSocket connection closes. */
     onClose?: (
       socket: Socket<TMessage, TDefault, TSend>,
       event: CloseEvent,
     ) => void;
+
+    /** Called when the WebSocket connection encounters an error. */
     onError?: (socket: Socket<TMessage, TDefault, TSend>, event: Event) => void;
+
+    /** Called when the WebSocket connection successfully opens. */
     onOpen?: (socket: Socket<TMessage, TDefault, TSend>, event: Event) => void;
+    
+    /** 
+     * Called when a message is received from the WebSocket server.
+     * 
+     * This is the raw received message without any validation.
+     * Also the main purpose to use the {@link socket} function is to access 
+     * messages via the signal interface.
+     */
     onMessage?: (
       socket: Socket<TMessage, TDefault, TSend>,
       event: MessageEvent,
     ) => void;
+
+    /** Default message value initially returned by the socket signal. */
     defaultValue?: TDefault;
   };
 
+  /**
+   * Opens a WebSocket connection and returns a reactive {@link Socket}.
+   *
+   * The socket reacts to incoming messages by validating and updating the signal.
+   * It also provides methods for sending messages and closing the connection.
+   *
+   * @returns
+   * A {@link Socket} object that lets you:
+   * - Reactively read incoming messages by calling the signal.
+   * - Send messages with `.send()`.
+   * - Close the connection with `.close()`.
+   *
+   * @see {@link SocketOptions} for configuration details.
+   */
   export function socket<TMessage, TDefault, TSend>({
     url,
     validate,
