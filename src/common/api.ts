@@ -584,7 +584,8 @@ export namespace api {
   };
 
   /**
-   * Configuration options for creating a WebSocket connection using {@link socket}.
+   * Configuration options for creating a WebSocket connection using 
+   * {@link socket}.
    *
    * Includes settings like URL, protocols, validation, event handlers,
    * and a default message value.
@@ -608,9 +609,9 @@ export namespace api {
     /** Protocols to use when connecting to the WebSocket server. */
     protocols?: ConstructorParameters<typeof WebSocket>[1];
 
-    /** 
-     * Binary data type expected from the WebSocket server 
-     * (e.g., "blob", "arraybuffer"). 
+    /**
+     * Binary data type expected from the WebSocket server
+     * (e.g., "blob", "arraybuffer").
      */
     binaryType?: WebSocket["binaryType"];
 
@@ -625,12 +626,12 @@ export namespace api {
 
     /** Called when the WebSocket connection successfully opens. */
     onOpen?: (socket: Socket<TMessage, TDefault, TSend>, event: Event) => void;
-    
-    /** 
+
+    /**
      * Called when a message is received from the WebSocket server.
-     * 
+     *
      * This is the raw received message without any validation.
-     * Also the main purpose to use the {@link socket} function is to access 
+     * Also the main purpose to use the {@link socket} function is to access
      * messages via the signal interface.
      */
     onMessage?: (
