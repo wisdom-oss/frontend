@@ -8,13 +8,7 @@ import {
   HttpResourceRequest,
   HttpErrorResponse,
 } from "@angular/common/http";
-import {
-  computed,
-  isSignal,
-  signal,
-  Signal as CoreSignal,
-  WritableSignal,
-} from "@angular/core";
+import {computed, isSignal, signal, Signal as CoreSignal} from "@angular/core";
 import {Duration} from "dayjs/plugin/duration";
 import {isTypedArray} from "three/src/animation/AnimationUtils.js";
 import typia from "typia";
@@ -584,7 +578,7 @@ export namespace api {
   };
 
   /**
-   * Configuration options for creating a WebSocket connection using 
+   * Configuration options for creating a WebSocket connection using
    * {@link socket}.
    *
    * Includes settings like URL, protocols, validation, event handlers,
