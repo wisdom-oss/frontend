@@ -63,6 +63,24 @@ const PROXY_CONFIG = {
     changeOrigin: true,
     rewrite: path => path.replace(/^\/api/, ""),
   },
+  "/local/**": {
+    target: "http://localhost:8090",
+    secure: false,
+    changeOrigin: true,
+    rewrite: path => path.replace(/^\/local/, ""),
+  },
+  "/local_docker/**": {
+    target: "http://localhost:9120",
+    secure: false,
+    changeOrigin: true,
+    rewrite: path => path.replace(/^\/local_docker/, ""),
+  },
+  "/dev/training/**": {
+    target: "http://wisdom-dev.vlba.uni-oldenburg.de:9120",
+    secure: false,
+    changeOrigin: true,
+    rewrite: path => path.replace(/^\/dev\/training/, ""),
+  },
 };
 
 /**
