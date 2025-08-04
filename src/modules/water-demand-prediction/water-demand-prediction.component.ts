@@ -1,4 +1,4 @@
-import {CommonModule} from "@angular/common";
+import { CommonModule } from "@angular/common";
 import {
   effect,
   signal,
@@ -7,18 +7,18 @@ import {
   OnInit,
   QueryList,
 } from "@angular/core";
-import {TranslatePipe} from "@ngx-translate/core";
-import {ChartConfiguration, ChartData, ChartDataset, ChartType} from "chart.js";
-import {BaseChartDirective} from "ng2-charts";
-
+import { TranslatePipe } from "@ngx-translate/core";
+import { ChartConfiguration, ChartData, ChartDataset, ChartType } from "chart.js";
+import { BaseChartDirective } from "ng2-charts";
 import {
   PredictedSmartmeterDataset,
   SmartmeterDataset,
   PredictionSingleSmartmeter,
   SingleSmartmeter,
 } from "./water-demand-prediction.interface";
-import {WaterDemandPredictionService} from "../../api/water-demand-prediction.service";
-import {DropdownComponent} from "../../common/components/dropdown/dropdown.component";
+import { WaterDemandPredictionService, WeatherColumns } from "../../api/water-demand-prediction.service";
+import { DropdownComponent } from "../../common/components/dropdown/dropdown.component";
+import { Signal } from "@angular/core";
 
 @Component({
   selector: "water-demand-prediction",
@@ -79,7 +79,8 @@ export class WaterDemandPredictionComponent implements OnInit {
   /** effect to fetch the weather columns based on the selected weather */
   weatherEffect = effect(() => {
     const weather = this.choiceWeather();
-    this.fetchWeatherColumns(weather);
+    //this.fetchWeatherColumns(weather);
+    //this.fetchSignalWeatherColumns(weather);
   });
 
   menuWeatherColumn = "water-demand-prediction.choice.weatherColumn";
@@ -181,7 +182,23 @@ export class WaterDemandPredictionComponent implements OnInit {
   explainR2: string =
     "The R-squared metric — R², or the coefficient of determination – is used to measure how well a model fits data, and how well it can predict future outcomes. Simply put, it tells you how much of the variation in your data can be explained by your model. The closer the R-squared value is to one, the better your model fits the data.";
 
-  constructor(public waterDemandService: WaterDemandPredictionService) {}
+
+  weatherColumnsSignal!: Signal<WeatherColumns | undefined>;
+
+  constructor(public waterDemandService: WaterDemandPredictionService) {
+    // Call here (in injection context)
+    this.weatherColumnsSignal = this.waterDemandService.fetchSignalWeatherColumns('air_temperature');
+
+    effect(() => {
+      const val = this.weatherColumnsSignal();
+      console.log('Weather columns:', val);
+    });
+
+
+
+
+
+  }
 
   ngOnInit() {
     this.fetchMeterInformation();
@@ -325,7 +342,7 @@ export class WaterDemandPredictionComponent implements OnInit {
       error: error => {
         console.error(error);
       },
-      complete: () => {},
+      complete: () => { },
     });
   }
 
@@ -337,7 +354,7 @@ export class WaterDemandPredictionComponent implements OnInit {
       error: error => {
         console.error(error);
       },
-      complete: () => {},
+      complete: () => { },
     });
   }
 
@@ -369,7 +386,7 @@ export class WaterDemandPredictionComponent implements OnInit {
         error: error => {
           console.log(error);
         },
-        complete: () => {},
+        complete: () => { },
       });
   }
 
@@ -511,7 +528,7 @@ export class WaterDemandPredictionComponent implements OnInit {
 
           if (
             !this.predictedDatasets[
-              this.currentPredictedSmartmeterData()!.resolution
+            this.currentPredictedSmartmeterData()!.resolution
             ]
           ) {
             this.predictedDatasets[

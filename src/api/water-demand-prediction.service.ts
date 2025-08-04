@@ -3,6 +3,9 @@ import { Injectable } from "@angular/core";
 import { Router } from "@angular/router";
 import { Observable } from "rxjs";
 
+import { api } from "../common/api";
+import typia from "typia";
+
 const API_PREFIX = "/api/waterdemand";
 
 /**
@@ -55,6 +58,17 @@ export class WaterDemandPredictionService {
     return this.sendRequest("post", "/weatherColumns", {
       capability: capability,
     });
+  }
+
+  fetchSignalWeatherColumns(capability: string): api.Signal<WeatherColumns> {
+    return api.resource(
+      {
+        url: api.url`${API_PREFIX}/weatherColumns`,
+        validate: typia.createValidate<WeatherColumns>(),
+        method: `POST`,
+        body: { capability }
+      }
+    );
   }
 
   fetchSingleSmartmeter(
@@ -118,3 +132,5 @@ export class WaterDemandPredictionService {
     });
   }
 }
+
+export type WeatherColumns = Record<string, string>
