@@ -47,30 +47,30 @@ const OPTIONAL_PROXY_CONFIGS = {
     },
   ],
   wdp_local: [
-    "/local/**",
+    "/api/waterdemand/**",
     {
       target: "http://localhost:8090",
       secure: false,
       changeOrigin: true,
-      rewrite: path => path.replace(/^\/local/, ""),
+      rewrite: path => path.replace(/^\/api/, ""),
     },
   ],
   wdp_local_docker: [
-    "/local_docker/**",
+    "/api/waterdemand/**",
     {
       target: "http://localhost:9120",
       secure: false,
       changeOrigin: true,
-      rewrite: path => path.replace(/^\/local_docker/, ""),
+      rewrite: path => path.replace(/^\/api/, ""),
     },
   ],
   wdp_dev_training: [
-    "/dev/training/**",
+    "/api/waterdemand/**",
     {
       target: "http://wisdom-dev.vlba.uni-oldenburg.de:9120",
       secure: false,
       changeOrigin: true,
-      rewrite: path => path.replace(/^\/dev\/training/, ""),
+      rewrite: path => path.replace(/^\/api/, ""),
     },
   ],
 };
