@@ -6,6 +6,7 @@ import {
   Component,
   OnInit,
   QueryList,
+  inject
 } from "@angular/core";
 import { TranslatePipe } from "@ngx-translate/core";
 import { ChartConfiguration, ChartData, ChartDataset, ChartType } from "chart.js";
@@ -27,6 +28,8 @@ import { Signal } from "@angular/core";
   styles: ``,
 })
 export class WaterDemandPredictionComponent implements OnInit {
+  private waterDemandService = inject(WaterDemandPredictionService);
+
   /** the displayed resolution in the charts of real data */
   displayedResolution = signal<string>("hourly");
 
@@ -74,14 +77,6 @@ export class WaterDemandPredictionComponent implements OnInit {
     moisture: "water-demand-prediction.weather.moisture",
   };
   choiceWeather = signal<string>("plain");
-
-  /** variables weather column dropdown */
-  /** effect to fetch the weather columns based on the selected weather */
-  weatherEffect = effect(() => {
-    const weather = this.choiceWeather();
-    //this.fetchWeatherColumns(weather);
-    //this.fetchSignalWeatherColumns(weather);
-  });
 
   menuWeatherColumn = "water-demand-prediction.choice.weatherColumn";
   optionsWeatherColumn: Record<string, string> = {};
@@ -182,23 +177,30 @@ export class WaterDemandPredictionComponent implements OnInit {
   explainR2: string =
     "The R-squared metric — R², or the coefficient of determination – is used to measure how well a model fits data, and how well it can predict future outcomes. Simply put, it tells you how much of the variation in your data can be explained by your model. The closer the R-squared value is to one, the better your model fits the data.";
 
+  /** create a record of all columns based on choiceWeather requested to DWD */
+  weatherColumnsSignal: Signal<WeatherColumns | undefined> = this.waterDemandService.fetchSignalWeatherColumns(this.choiceWeather);
 
-  weatherColumnsSignal!: Signal<WeatherColumns | undefined>;
+  constructor() {
 
-  constructor(public waterDemandService: WaterDemandPredictionService) {
-    // Call here (in injection context)
-    this.weatherColumnsSignal = this.waterDemandService.fetchSignalWeatherColumns('air_temperature');
-
+    /**
+     * exchanges current options for weather columns with
+     * new requested values based on choiceWeather();
+     */
     effect(() => {
-      const val = this.weatherColumnsSignal();
-      console.log('Weather columns:', val);
-    });
-
-
-
-
+      let a = this.weatherColumnsSignal();
+      console.log(this.weatherColumnsSignal());
+      if (!a) {
+        return;
+      }
+      this.optionsWeatherColumn = a;
+    })
 
   }
+
+
+
+
+
 
   ngOnInit() {
     this.fetchMeterInformation();

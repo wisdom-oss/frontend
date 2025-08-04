@@ -60,13 +60,14 @@ export class WaterDemandPredictionService {
     });
   }
 
-  fetchSignalWeatherColumns(capability: string): api.Signal<WeatherColumns> {
+  fetchSignalWeatherColumns(capability: api.RequestSignal<string>): api.Signal<WeatherColumns> {
+    let body = api.map(capability, capability => ({ capability }))
     return api.resource(
       {
         url: api.url`${API_PREFIX}/weatherColumns`,
         validate: typia.createValidate<WeatherColumns>(),
         method: `POST`,
-        body: { capability }
+        body
       }
     );
   }
