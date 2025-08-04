@@ -1,9 +1,9 @@
-import {HttpClient} from "@angular/common/http";
-import {Injectable} from "@angular/core";
-import {Router} from "@angular/router";
-import {Observable} from "rxjs";
+import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { Router } from "@angular/router";
+import { Observable } from "rxjs";
 
-const API_PREFIX = "/waterdemand";
+const API_PREFIX = "/api/waterdemand";
 
 /**
  * injects the service to be singleton throughout project.
@@ -16,7 +16,7 @@ export class WaterDemandPredictionService {
   constructor(
     private http: HttpClient,
     private router: Router,
-  ) {}
+  ) { }
 
   /**
    * generalized request method for bws api
@@ -37,11 +37,8 @@ export class WaterDemandPredictionService {
       body: requestBody,
     };
 
-    const LOCAL = "/local"; /** local development */
-    const _LOCAL_DOCKER = "/local_docker"; /** local docker development */
-    const _DEV_SERVER = "/dev/training"; /** training container on wisdom.dev */
-
-    let final_url = this.router.parseUrl(LOCAL + API_PREFIX + url).toString();
+    let final_url = this.router.parseUrl(API_PREFIX + url).toString();
+    console.log(final_url)
 
     return this.http.request<T>(
       method,
