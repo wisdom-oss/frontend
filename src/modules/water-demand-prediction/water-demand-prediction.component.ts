@@ -187,12 +187,10 @@ export class WaterDemandPredictionComponent implements OnInit {
      * new requested values based on choiceWeather();
      */
     effect(() => {
-      let a = this.weatherColumnsSignal();
-      console.log(this.weatherColumnsSignal());
-      if (!a) {
-        return;
+      let weatherCols = this.weatherColumnsSignal();
+      if (weatherCols) {
+        this.optionsWeatherColumn = weatherCols;
       }
-      this.optionsWeatherColumn = a;
     })
 
   }
