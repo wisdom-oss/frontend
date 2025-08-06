@@ -5,6 +5,7 @@ import { Observable } from "rxjs";
 
 import { api } from "../common/api";
 import typia from "typia";
+import { time } from "three/src/nodes/TSL.js";
 
 const API_PREFIX = "/api/waterdemand";
 
@@ -19,7 +20,9 @@ export class WaterDemandPredictionService {
   constructor(
     private http: HttpClient,
     private router: Router,
-  ) { }
+  ) {
+
+  }
 
   /**
    * generalized request method for bws api
@@ -94,16 +97,23 @@ export class WaterDemandPredictionService {
     });
   }
 
-  /** fetch a single smartmeter data based on requested parameters */
+  /** fetch a single smartmeter data based on requested parameters, only when every parameter is defined */
   fetchSignalSingleSmartmeter(startpoint: api.RequestSignal<string>, name: api.RequestSignal<string>,
     timeframe: api.RequestSignal<string>, resolution: api.RequestSignal<string>): api.Signal<SingleSmartmeter> {
 
-    let body = computed(() => ({
-      startpoint: api.toSignal(startpoint)(),
-      name: api.toSignal(name)(),
-      timeframe: api.toSignal(timeframe)(),
-      resolution: api.toSignal(resolution)(),
-    }));
+    const body = api.map(
+      computed(() => [
+        api.toSignal(startpoint)(),
+        api.toSignal(name)(),
+        api.toSignal(timeframe)(),
+        api.toSignal(resolution)(),
+      ]),
+
+      ([startpoint, name, timeframe, resolution]) => {
+        if (!startpoint || !name || !timeframe || !resolution) return undefined;
+        return { startpoint, name, timeframe, resolution };
+      }
+    );
 
     return api.resource(
       {
@@ -113,6 +123,8 @@ export class WaterDemandPredictionService {
         body
       }
     );
+
+
   }
 
   fetchSinglePredictionSmartmeter(

@@ -31,7 +31,7 @@ export class WaterDemandPredictionComponent implements OnInit {
   private waterDemandService = inject(WaterDemandPredictionService);
 
   /** the displayed resolution in the charts of real data */
-  displayedResolution = signal<string>("hourly");
+  displayedResolution = signal<string | undefined>(undefined);
 
   /** variables startpoint dropdown */
   menuStartPoint = "water-demand-prediction.startpoint.menu";
@@ -40,7 +40,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     "2021-06-01 00:00:00": "water-demand-prediction.startpoint.options.b",
     "2022-01-01 00:00:00": "water-demand-prediction.startpoint.options.c",
   };
-  choiceStartPoint = signal<string>("");
+  choiceStartPoint = signal<string | undefined>(undefined);
 
   /** variables resolution dropdown */
   menuResolution = "water-demand-prediction.choice.resolution";
@@ -49,7 +49,7 @@ export class WaterDemandPredictionComponent implements OnInit {
     daily: "water-demand-prediction.resolution.daily",
     weekly: "water-demand-prediction.resolution.weekly",
   };
-  choiceResolution = signal<string>("");
+  choiceResolution = signal<string | undefined>(undefined);
 
   /** variables timeframe dropdown */
   menuTime = "water-demand-prediction.choice.timeframe";
@@ -62,12 +62,12 @@ export class WaterDemandPredictionComponent implements OnInit {
     "one year": "water-demand-prediction.timeframe.one-year",
     all: "water-demand-prediction.timeframe.all",
   };
-  choiceTime = signal<string>("");
+  choiceTime = signal<string | undefined>(undefined);
 
   /** variables name dropdown */
   menuSmartmeter = "water-demand-prediction.choice.smartmeter";
   optionsSmartmeter: Record<string, string> = {};
-  choiceSmartmeter = signal<string>("");
+  choiceSmartmeter = signal<string | undefined>(undefined);
 
   menuWeather = "water-demand-prediction.choice.weather";
   optionsWeather: Record<string, string> = {
@@ -81,7 +81,7 @@ export class WaterDemandPredictionComponent implements OnInit {
   menuWeatherColumn = "water-demand-prediction.choice.weatherColumn";
   weatherColumnsSignal: Signal<WeatherColumns | undefined> = this.waterDemandService.fetchSignalWeatherColumns(this.choiceWeather);
   optionsWeatherColumn: Record<string, string> = {};
-  choiceWeatherColumn = signal<string>("");
+  choiceWeatherColumn = signal<string | undefined>(undefined);
 
   /** data object of current requested Smartmeterdata */
   currentPredictedSmartmeterData = signal<PredictionSingleSmartmeter | null>(
@@ -189,7 +189,9 @@ export class WaterDemandPredictionComponent implements OnInit {
       }
     })
 
-    /** extract data for predicted smartmeter */
+
+
+    /** extract data to show single smart meter data */
     effect(() => {
       let curData = this.currentSingleSmartmeterDataSignal();
       if (curData) {
@@ -198,10 +200,6 @@ export class WaterDemandPredictionComponent implements OnInit {
     })
 
   }
-
-
-
-
 
 
   ngOnInit() {
@@ -376,10 +374,10 @@ export class WaterDemandPredictionComponent implements OnInit {
 
     this.waterDemandService
       .trainModelOnSingleSmartmeter(
-        this.choiceStartPoint(),
-        this.choiceSmartmeter(),
-        this.choiceTime(),
-        this.choiceResolution(),
+        this.choiceStartPoint()!,
+        this.choiceSmartmeter()!,
+        this.choiceTime()!,
+        this.choiceResolution()!,
         this.choiceWeather()!,
         this.choiceWeatherColumn(),
       )
@@ -406,57 +404,40 @@ export class WaterDemandPredictionComponent implements OnInit {
       return;
     }
 
-    this.waterDemandService
-      .fetchSingleSmartmeter(
-        this.choiceStartPoint(),
-        this.choiceSmartmeter(),
-        this.choiceTime(),
-        this.choiceResolution(),
-      )
-      .subscribe({
-        next: (response: SingleSmartmeter) => {
-          this.currentSmartmeterData = response;
-        },
-        error: error => {
-          console.log(error);
-        },
-        complete: () => {
-          if (!this.currentSmartmeterData) {
-            return;
-          }
+    if (!this.currentSmartmeterData) {
+      return;
+    }
 
-          let newDataset = this.createNewDataset(
-            this.currentSmartmeterData.value!,
-            this.currentSmartmeterData.name!,
-            this.currentSmartmeterData.resolution!,
-            this.currentSmartmeterData.timeframe!,
-            false,
-            this.chartType(),
-          );
+    let newDataset = this.createNewDataset(
+      this.currentSmartmeterData.value!,
+      this.currentSmartmeterData.name!,
+      this.currentSmartmeterData.resolution!,
+      this.currentSmartmeterData.timeframe!,
+      false,
+      this.chartType(),
+    );
 
-          let smartmeterdata: SmartmeterDataset = {
-            dataset: newDataset,
-            labels: this.currentSmartmeterData.date!,
-          };
+    let smartmeterdata: SmartmeterDataset = {
+      dataset: newDataset,
+      labels: this.currentSmartmeterData.date!,
+    };
 
-          if (!this.savedDatasets[this.currentSmartmeterData.resolution!]) {
-            this.savedDatasets[this.currentSmartmeterData.resolution!] = [];
-          }
+    if (!this.savedDatasets[this.currentSmartmeterData.resolution!]) {
+      this.savedDatasets[this.currentSmartmeterData.resolution!] = [];
+    }
 
-          this.savedDatasets[this.currentSmartmeterData.resolution!].push(
-            smartmeterdata,
-          );
+    this.savedDatasets[this.currentSmartmeterData.resolution!].push(
+      smartmeterdata,
+    );
 
-          // hacky way to initiate the labels of the predicted chart as well
-          if (this.chartDataPredictedValues.labels?.length === 0) {
-            this.chartDataPredictedValues.labels = smartmeterdata.labels;
-          }
+    // hacky way to initiate the labels of the predicted chart as well
+    if (this.chartDataPredictedValues.labels?.length === 0) {
+      this.chartDataPredictedValues.labels = smartmeterdata.labels;
+    }
 
-          this.setDisplayedResolution(this.currentSmartmeterData.resolution!);
-          this.showDatasets(this.currentSmartmeterData.resolution!);
-          this.currentSmartmeterData = undefined;
-        },
-      });
+    this.setDisplayedResolution(this.currentSmartmeterData.resolution!);
+    this.showDatasets(this.currentSmartmeterData.resolution!);
+    this.currentSmartmeterData = undefined;
   }
 
   /**
@@ -470,10 +451,10 @@ export class WaterDemandPredictionComponent implements OnInit {
 
     this.waterDemandService
       .fetchSinglePredictionSmartmeter(
-        this.choiceStartPoint(),
-        this.choiceSmartmeter(),
-        this.choiceTime(),
-        this.choiceResolution(),
+        this.choiceStartPoint()!,
+        this.choiceSmartmeter()!,
+        this.choiceTime()!,
+        this.choiceResolution()!,
         this.choiceWeather()!,
         this.choiceWeatherColumn(),
       )
@@ -581,11 +562,11 @@ export class WaterDemandPredictionComponent implements OnInit {
     /** checks if resolution as key is already present in datasetsrecord.
      * If not, request must be true and thus unique */
     if (!pred) {
-      if (!this.savedDatasets[this.choiceResolution()]) {
+      if (!this.savedDatasets[this.choiceResolution()!]) {
         return true;
       }
     } else {
-      if (!this.predictedDatasets[this.choiceResolution()]) {
+      if (!this.predictedDatasets[this.choiceResolution()!]) {
         return true;
       }
     }
@@ -593,9 +574,9 @@ export class WaterDemandPredictionComponent implements OnInit {
     /** the color is based on 3 unique parameters,
      *  thus, when color is equal, the set is already present */
     let colorToCheck = this.createColorFromParameter(
-      this.choiceSmartmeter(),
-      this.choiceResolution(),
-      this.choiceTime(),
+      this.choiceSmartmeter()!,
+      this.choiceResolution()!,
+      this.choiceTime()!,
     );
 
     let errormsg: string =
@@ -608,7 +589,7 @@ export class WaterDemandPredictionComponent implements OnInit {
 
     /** check if given dataset is already containing the colorcode to request */
     if (!pred) {
-      for (let entry of this.savedDatasets[this.choiceResolution()]) {
+      for (let entry of this.savedDatasets[this.choiceResolution()!]) {
         if (
           entry.dataset.borderColor === colorToCheck ||
           entry.dataset.backgroundColor === colorToCheck
@@ -618,7 +599,7 @@ export class WaterDemandPredictionComponent implements OnInit {
         }
       }
     } else {
-      for (let entry of this.predictedDatasets[this.choiceResolution()]) {
+      for (let entry of this.predictedDatasets[this.choiceResolution()!]) {
         if (
           entry.dataset.borderColor === colorToCheck ||
           entry.dataset.backgroundColor === colorToCheck
