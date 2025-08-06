@@ -1,5 +1,5 @@
 import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
+import { computed, Injectable } from "@angular/core";
 import { Router } from "@angular/router";
 import { Observable } from "rxjs";
 
@@ -54,6 +54,14 @@ export class WaterDemandPredictionService {
     return this.sendRequest("get", "/meterNames");
   }
 
+  fetchSignalMeterInformation(): api.Signal<MeterNames> {
+    return api.resource({
+      url: api.url`${API_PREFIX}/meterNames`,
+      method: `GET`,
+      validate: typia.createValidate<MeterNames>(),
+    })
+  }
+
   fetchWeatherColumns(capability: string): Observable<any> {
     return this.sendRequest("post", "/weatherColumns", {
       capability: capability,
@@ -65,8 +73,8 @@ export class WaterDemandPredictionService {
     return api.resource(
       {
         url: api.url`${API_PREFIX}/weatherColumns`,
-        validate: typia.createValidate<WeatherColumns>(),
         method: `POST`,
+        validate: typia.createValidate<WeatherColumns>(),
         body
       }
     );
@@ -84,6 +92,27 @@ export class WaterDemandPredictionService {
       timeframe: timeframe,
       resolution: resolution,
     });
+  }
+
+  /** fetch a single smartmeter data based on requested parameters */
+  fetchSignalSingleSmartmeter(startpoint: api.RequestSignal<string>, name: api.RequestSignal<string>,
+    timeframe: api.RequestSignal<string>, resolution: api.RequestSignal<string>): api.Signal<SingleSmartmeter> {
+
+    let body = computed(() => ({
+      startpoint: api.toSignal(startpoint)(),
+      name: api.toSignal(name)(),
+      timeframe: api.toSignal(timeframe)(),
+      resolution: api.toSignal(resolution)(),
+    }));
+
+    return api.resource(
+      {
+        url: api.url`${API_PREFIX}/singleSmartmeter`,
+        method: `POST`,
+        validate: typia.createValidate<SingleSmartmeter>(),
+        body
+      }
+    );
   }
 
   fetchSinglePredictionSmartmeter(
@@ -104,6 +133,32 @@ export class WaterDemandPredictionService {
     });
   }
 
+  /** fetch a single smartmeter data based on requested parameters */
+  fetchSignalSinglePredictionSmartmeter(startpoint: api.RequestSignal<string>, name: api.RequestSignal<string>,
+    timeframe: api.RequestSignal<string>, resolution: api.RequestSignal<string>, weatherCapability: api.RequestSignal<string>,
+    weatherColumn: api.RequestSignal<string>): api.Signal<PredictedSmartmeter> {
+
+    let body = computed(() => ({
+      startpoint: api.toSignal(startpoint)(),
+      name: api.toSignal(name)(),
+      timeframe: api.toSignal(timeframe)(),
+      resolution: api.toSignal(resolution)(),
+      weatherCapability: api.toSignal(weatherCapability)(),
+      weatherColumn: api.toSignal(weatherColumn)()
+    }));
+
+    console.log(body());
+
+    return api.resource(
+      {
+        url: api.url`${API_PREFIX}/singleSmartmeter`,
+        method: `POST`,
+        validate: typia.createValidate<PredictedSmartmeter>(),
+        body
+      }
+    );
+  }
+
   trainModelOnSingleSmartmeter(
     startpoint: string,
     nameOfSmartmeter: string,
@@ -121,17 +176,30 @@ export class WaterDemandPredictionService {
       weatherColumn: weatherColumn,
     });
   }
-
-  /**
-   * creates an Observable with an error to subscribe to it and logs the information in the console.
-   * @param msg error meesage
-   * @returns observable with contained error.
-   */
-  handleError(msg: string): Observable<any> {
-    return new Observable(observer => {
-      observer.error(new Error(msg));
-    });
-  }
 }
 
 export type WeatherColumns = Record<string, string>
+export type MeterNames = Record<string, string>
+export type SingleSmartmeter = {
+  name: string;
+  resolution: string;
+  timeframe: string;
+  value: number[];
+  date: string[];
+}
+export type PredictedSmartmeter = {
+  name: string;
+  resolution: string;
+  timeframe: string;
+  value: number[];
+  date: string[];
+  lowerConfValues: [];
+  upperConfValues: [];
+  realValue: [];
+  meanAbsoluteError: number;
+  meanSquaredError: number;
+  rootOfmeanSquaredError: number;
+  r2: number;
+  aic: number;
+  fitTime: string;
+}

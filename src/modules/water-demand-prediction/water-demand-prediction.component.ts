@@ -83,9 +83,6 @@ export class WaterDemandPredictionComponent implements OnInit {
   choiceWeatherColumn = signal<string>("");
 
   /** data object of current requested Smartmeterdata */
-  currentSmartmeterData?: SingleSmartmeter;
-
-  /** data object of current requested Smartmeterdata */
   currentPredictedSmartmeterData = signal<PredictionSingleSmartmeter | null>(
     null,
   );
@@ -180,6 +177,10 @@ export class WaterDemandPredictionComponent implements OnInit {
   /** create a record of all columns based on choiceWeather requested to DWD */
   weatherColumnsSignal: Signal<WeatherColumns | undefined> = this.waterDemandService.fetchSignalWeatherColumns(this.choiceWeather);
 
+  /** data object of current requested Smartmeterdata */
+  currentSingleSmartmeterDataSignal: Signal<SingleSmartmeter | undefined> = this.waterDemandService.fetchSignalSingleSmartmeter(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution)
+  currentSmartmeterData?: SingleSmartmeter;
+
   constructor() {
 
     /**
@@ -190,6 +191,14 @@ export class WaterDemandPredictionComponent implements OnInit {
       let weatherCols = this.weatherColumnsSignal();
       if (weatherCols) {
         this.optionsWeatherColumn = weatherCols;
+      }
+    })
+
+    /** extract data for predicted smartmeter */
+    effect(() => {
+      let curData = this.currentSingleSmartmeterDataSignal();
+      if (curData) {
+        this.currentSmartmeterData = curData;
       }
     })
 
