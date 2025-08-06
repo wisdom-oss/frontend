@@ -101,7 +101,7 @@ export class WaterDemandPredictionService {
   fetchSignalSingleSmartmeter(startpoint: api.RequestSignal<string>, name: api.RequestSignal<string>,
     timeframe: api.RequestSignal<string>, resolution: api.RequestSignal<string>): api.Signal<SingleSmartmeter> {
 
-    const body = api.map(
+    let body = api.map(
       computed(() => [
         api.toSignal(startpoint)(),
         api.toSignal(name)(),
