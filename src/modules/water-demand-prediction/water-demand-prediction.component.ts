@@ -76,9 +76,10 @@ export class WaterDemandPredictionComponent implements OnInit {
     precipitation: "water-demand-prediction.weather.precipitation",
     moisture: "water-demand-prediction.weather.moisture",
   };
-  choiceWeather = signal<string>("plain");
+  choiceWeather = signal<string | undefined>(undefined);
 
   menuWeatherColumn = "water-demand-prediction.choice.weatherColumn";
+  weatherColumnsSignal: Signal<WeatherColumns | undefined> = this.waterDemandService.fetchSignalWeatherColumns(this.choiceWeather);
   optionsWeatherColumn: Record<string, string> = {};
   choiceWeatherColumn = signal<string>("");
 
@@ -174,19 +175,13 @@ export class WaterDemandPredictionComponent implements OnInit {
   explainR2: string =
     "The R-squared metric — R², or the coefficient of determination – is used to measure how well a model fits data, and how well it can predict future outcomes. Simply put, it tells you how much of the variation in your data can be explained by your model. The closer the R-squared value is to one, the better your model fits the data.";
 
-  /** create a record of all columns based on choiceWeather requested to DWD */
-  weatherColumnsSignal: Signal<WeatherColumns | undefined> = this.waterDemandService.fetchSignalWeatherColumns(this.choiceWeather);
-
   /** data object of current requested Smartmeterdata */
   currentSingleSmartmeterDataSignal: Signal<SingleSmartmeter | undefined> = this.waterDemandService.fetchSignalSingleSmartmeter(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution)
   currentSmartmeterData?: SingleSmartmeter;
 
   constructor() {
 
-    /**
-     * exchanges current options for weather columns with
-     * new requested values based on choiceWeather();
-     */
+    /** updates optionsWeatherColumn when selected weather attribute changes */
     effect(() => {
       let weatherCols = this.weatherColumnsSignal();
       if (weatherCols) {
@@ -385,7 +380,7 @@ export class WaterDemandPredictionComponent implements OnInit {
         this.choiceSmartmeter(),
         this.choiceTime(),
         this.choiceResolution(),
-        this.choiceWeather(),
+        this.choiceWeather()!,
         this.choiceWeatherColumn(),
       )
       .subscribe({
@@ -479,7 +474,7 @@ export class WaterDemandPredictionComponent implements OnInit {
         this.choiceSmartmeter(),
         this.choiceTime(),
         this.choiceResolution(),
-        this.choiceWeather(),
+        this.choiceWeather()!,
         this.choiceWeatherColumn(),
       )
       .subscribe({
