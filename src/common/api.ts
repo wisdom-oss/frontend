@@ -562,13 +562,13 @@ export namespace api {
    * @template TMessage
    * Type of messages received from the server.
    *
-   * @template TDefault
-   * Default value initially returned before any message is received.
-   *
    * @template TSend
    * Type of messages that can be sent to the server via `.send()`.
+   * 
+   * @template TDefault
+   * Default value initially returned before any message is received.
    */
-  export type Socket<TMessage, TDefault, TSend> = CoreSignal<
+  export type Socket<TMessage, TSend, TDefault = undefined> = CoreSignal<
     TMessage | TDefault
   > & {
     /** Close the WebSocket connection. */
@@ -593,12 +593,24 @@ export namespace api {
    * @template TSend
    * Type of messages that can be sent to the server.
    */
-  export type SocketOptions<TMessage, TDefault, TSend> = {
+  export type SocketOptions<
+    TMessage, 
+    TSend,
+    TDefault = undefined,
+    TRaw = TMessage,
+    TSerialized = TSend,
+  > = {
     /** URL of the WebSocket server. */
     url: ConstructorParameters<typeof WebSocket>[0];
 
     /** Typia validator to ensure incoming messages match the expected type. */
     validate: (input: unknown) => typia.IValidation<TMessage>;
+
+    validateRaw?: (input: unknown) => typia.IValidation<TRaw>;
+
+    parse?: (input: TRaw) => TMessage;
+
+    serialize?: (input: TSend) => TSerialized;
 
     /** Protocols to use when connecting to the WebSocket server. */
     protocols?: ConstructorParameters<typeof WebSocket>[1];
@@ -651,9 +663,12 @@ export namespace api {
    *
    * @see {@link SocketOptions} for configuration details.
    */
-  export function socket<TMessage, TDefault, TSend>({
+  export function socket<TMessage, TSend, TDefault = undefined, TRaw = TMessage, TSerialized = TSend>({
     url,
     validate,
+    validateRaw,
+    parse,
+    serialize,
     protocols,
     binaryType,
     onClose,
@@ -661,24 +676,26 @@ export namespace api {
     onOpen,
     onMessage,
     defaultValue,
-  }: SocketOptions<TMessage, TDefault, TSend>): Socket<
+  }: SocketOptions<TMessage, TSend, TDefault, TRaw, TSerialized>): Socket<
     TMessage,
-    TDefault,
-    TSend
+    TSend,
+    TDefault
   > {
     let webSocket = new WebSocket(url, protocols);
     if (binaryType) webSocket.binaryType = binaryType;
 
     let send = (message: TSend) => {
+      let payload = serialize ? serialize(message) : message;
+
       if (
-        message instanceof ArrayBuffer ||
-        message instanceof Blob ||
-        isTypedArray(message) ||
-        message instanceof DataView
+        payload instanceof ArrayBuffer ||
+        payload instanceof Blob ||
+        isTypedArray(payload) ||
+        payload instanceof DataView
       )
-        webSocket.send(message as ArrayBuffer | Blob | ArrayBufferLike);
-      else if (typeof message === "string") webSocket.send(message);
-      else webSocket.send(JSON.stringify(message));
+        webSocket.send(payload as ArrayBuffer | Blob | ArrayBufferLike);
+      else if (typeof payload === "string") webSocket.send(payload);
+      else webSocket.send(JSON.stringify(payload));
     };
 
     let writeSignal = signal<TMessage | TDefault>(defaultValue as TDefault);
@@ -699,6 +716,16 @@ export namespace api {
       else if (webSocket.binaryType === "blob") message = new Blob(ev.data);
       else if (webSocket.binaryType === "arraybuffer")
         message = new ArrayBuffer(ev.data);
+
+      if (validateRaw) {
+        let checked = validateRaw(message);
+        if (!checked.success) {
+        console.error(checked.errors);
+        throw new Error("Invalid type on raw message");
+      }
+      }
+
+      if (parse) message = parse(message);
 
       let checked = validate(message);
       if (!checked.success) {
