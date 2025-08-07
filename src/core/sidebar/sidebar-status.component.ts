@@ -1,16 +1,8 @@
 import {KeyValuePipe} from "@angular/common";
-import {
-  computed,
-  effect,
-  input,
-  output,
-  Component,
-  InputSignal,
-} from "@angular/core";
+import {computed, input, Component, InputSignal} from "@angular/core";
 import {provideIcons, NgIcon} from "@ng-icons/core";
 import {remixErrorWarningFill, remixQuestionFill} from "@ng-icons/remixicon";
 
-import {SidebarEntry} from "../../sidebar";
 import {StatusService} from "../../api/status.service";
 import {api} from "../../common/api";
 import {keys} from "../../common/utils/keys";

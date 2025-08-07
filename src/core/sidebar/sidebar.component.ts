@@ -5,16 +5,12 @@ import {
   inject,
   runInInjectionContext,
   signal,
-  untracked,
   ViewChildren,
   Component,
   AfterViewInit,
   Injector,
   QueryList,
-  Pipe,
-  Signal,
   WritableSignal,
-  PipeTransform,
 } from "@angular/core";
 import {NavigationEnd, RouterLink, Router} from "@angular/router";
 import {provideIcons, provideNgIconLoader} from "@ng-icons/core";
@@ -31,10 +27,6 @@ import {
 } from "./sidebar-status.component";
 import {sidebar, SidebarEntry} from "../../sidebar";
 import {StatusService} from "../../api/status.service";
-import {DwdService} from "../../api/dwd.service";
-import {GroundwaterLevelsService} from "../../api/groundwater-levels.service";
-import {GeoDataService} from "../../api/geo-data.service";
-import {BeWaterSmartService} from "../../api/be-water-smart.service";
 import {api} from "../../common/api";
 import {defaults} from "../../common/utils/defaults";
 import {AuthService} from "../auth/auth.service";
