@@ -106,13 +106,11 @@ export class SidebarStatusIconComponent extends SidebarStatusBaseComponent {
     `,
   },
   template: `
-    @if (thisStatus().value !== "ok") {
-      <div class="service-status-info {{ thisStatus().value }}">
-        @for (service of relevantServices() | keyvalue; track service.key) {
-          <p>{{ service.key }} is {{ service.value?.status ?? "unknown" }}</p>
-        }
-      </div>
-    }
+    <div class="service-status-info {{ thisStatus().value }}">
+      @for (service of relevantServices() | keyvalue; track service.key) {
+        <p>{{ service.key }} is {{ service.value?.status ?? "unknown" }}</p>
+      }
+    </div>
   `,
 })
 export class SidebarStatusInfoComponent extends SidebarStatusBaseComponent {
