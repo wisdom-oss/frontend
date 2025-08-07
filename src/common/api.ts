@@ -14,6 +14,7 @@ import {isTypedArray} from "three/src/animation/AnimationUtils.js";
 import typia from "typia";
 
 import {httpContexts} from "./http-contexts";
+import {Once} from "./utils/once";
 
 /**
  * Toolkit to build API services.
@@ -589,7 +590,11 @@ export namespace api {
   > & {
     /** Close the WebSocket connection. */
     close(): void;
-    /** Send a message through the WebSocket. */
+    /**
+     * Send a message through the WebSocket.
+     *
+     * This automatically waits until the socket is open.
+     */
     send(message: TSend): void;
   };
 
@@ -706,18 +711,21 @@ export namespace api {
     let webSocket = new WebSocket(url, protocols);
     if (binaryType) webSocket.binaryType = binaryType;
 
+    let waitUntilOpen = new Once();
     let send = (message: TSend) => {
       let payload = serialize ? serialize(message) : message;
 
-      if (
-        payload instanceof ArrayBuffer ||
-        payload instanceof Blob ||
-        isTypedArray(payload) ||
-        payload instanceof DataView
-      )
-        webSocket.send(payload as ArrayBuffer | Blob | ArrayBufferLike);
-      else if (typeof payload === "string") webSocket.send(payload);
-      else webSocket.send(JSON.stringify(payload));
+      waitUntilOpen.then(() => {
+        if (
+          payload instanceof ArrayBuffer ||
+          payload instanceof Blob ||
+          isTypedArray(payload) ||
+          payload instanceof DataView
+        )
+          webSocket.send(payload as ArrayBuffer | Blob | ArrayBufferLike);
+        else if (typeof payload === "string") webSocket.send(payload);
+        else webSocket.send(JSON.stringify(payload));
+      });
     };
 
     let writeSignal = signal<TMessage | TDefault>(defaultValue as TDefault);
@@ -732,6 +740,7 @@ export namespace api {
     if (onOpen) addEventListener("open", ev => onOpen(socket, ev));
     if (onMessage) addEventListener("message", ev => onMessage(socket, ev));
 
+    webSocket.addEventListener("open", () => waitUntilOpen.set());
     webSocket.addEventListener("message", ev => {
       let message;
       if (typeof ev.data === "string") message = JSON.parse(ev.data);

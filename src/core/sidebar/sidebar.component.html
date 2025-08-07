@@ -9,10 +9,10 @@
       </p>
       <ul class="menu-list">
         @for (module of category.modules; track module) {
-          @if (module.visible?.() ?? true) {
+          @if (module.visible()) {
             <li
               class="is-flex is-flex-direction-column"
-              [class.unauthorized]="(module.scopes | unauthorized)()"
+              [class.unauthorized]="!module.authorized()"
             >
               <a
                 class="icon-text is-flex is-gapless"

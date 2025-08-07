@@ -11,9 +11,15 @@ import {
   remixSunCloudyFill,
   remixWaterPercentFill,
 } from "@ng-icons/remixicon";
-import typia from "typia";
 
+import {DwdService} from "./api/dwd.service";
+import {GroundwaterLevelsService} from "./api/groundwater-levels.service";
+import {GeoDataService} from "./api/geo-data.service";
+import {WaterRightsService} from "./api/water-rights.service";
+import {UsageForecastsService} from "./api/usage-forecasts.service";
+import {BeWaterSmartService} from "./api/be-water-smart.service";
 import {extraTags} from "./common/utils/extra-tags";
+import {api} from "./common/api";
 import {AuthService} from "./core/auth/auth.service";
 import {Scopes} from "./core/auth/scopes";
 import {OowvActionMapIconComponent} from "./core/sidebar/icons/oowv-action-map-icon/oowv-action-map-icon.component";
@@ -33,13 +39,14 @@ export interface SidebarEntry {
     module: string;
     icon: Icon;
     link: string;
+    services: Record<string, api.Service>;
     scopes?: Scopes.Scope[];
     visible?: () => Signal<boolean>;
   }>;
 }
 
 export function sidebar(): readonly SidebarEntry[] {
-  return typia.assert<SidebarEntry[]>([
+  return [
     {
       category: "core.sidebar.category.precipitation",
       icon: {remixDrizzleFill},
@@ -48,6 +55,7 @@ export function sidebar(): readonly SidebarEntry[] {
           module: "weather-data.display.module",
           icon: {remixSunCloudyFill},
           link: "/weather-data",
+          services: {DwdService},
         },
       ],
     },
@@ -59,11 +67,13 @@ export function sidebar(): readonly SidebarEntry[] {
           module: "GroWL",
           icon: {remixDatabase2Fill},
           link: "/growl",
+          services: {GroundwaterLevelsService, GeoDataService},
         },
         {
           module: "water-rights.display.module",
           icon: {remixFilePaper2Fill},
           link: "/water-rights",
+          services: {WaterRightsService, GeoDataService},
         },
       ],
     },
@@ -75,11 +85,13 @@ export function sidebar(): readonly SidebarEntry[] {
           module: "long-term-forecast.display.module",
           icon: {remixBarChartFill},
           link: "/long-term-forecast",
+          services: {UsageForecastsService},
         },
         {
           module: "Be-Water-Smart",
           icon: {remixRfidLine},
           link: "/be-water-smart",
+          services: {BeWaterSmartService},
         },
       ],
     },
@@ -91,6 +103,7 @@ export function sidebar(): readonly SidebarEntry[] {
           module: "pump-models.display.module",
           icon: {remixInstanceLine},
           link: "/pump-models",
+          services: {},
           scopes: PumpModelsComponent.SCOPES,
           visible: () => {
             const auth = inject(AuthService);
@@ -109,9 +122,10 @@ export function sidebar(): readonly SidebarEntry[] {
           module: "oowv-action-map.display.module",
           icon: OowvActionMapIconComponent,
           link: "/oowv/action-map",
+          services: {GeoDataService},
           scopes: OowvActionMapComponent.SCOPES,
         },
       ],
     },
-  ] satisfies SidebarEntry[]);
+  ];
 }
