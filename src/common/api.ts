@@ -623,15 +623,15 @@ export namespace api {
 
     /** Called when the WebSocket connection closes. */
     onClose?: (
-      socket: Socket<TMessage, TDefault, TSend>,
+      socket: Socket<TMessage, TSend, TDefault>,
       event: CloseEvent,
     ) => void;
 
     /** Called when the WebSocket connection encounters an error. */
-    onError?: (socket: Socket<TMessage, TDefault, TSend>, event: Event) => void;
+    onError?: (socket: Socket<TMessage, TSend, TDefault>, event: Event) => void;
 
     /** Called when the WebSocket connection successfully opens. */
-    onOpen?: (socket: Socket<TMessage, TDefault, TSend>, event: Event) => void;
+    onOpen?: (socket: Socket<TMessage, TSend, TDefault>, event: Event) => void;
 
     /**
      * Called when a message is received from the WebSocket server.
@@ -641,7 +641,7 @@ export namespace api {
      * messages via the signal interface.
      */
     onMessage?: (
-      socket: Socket<TMessage, TDefault, TSend>,
+      socket: Socket<TMessage, TSend, TDefault>,
       event: MessageEvent,
     ) => void;
 
