@@ -11,7 +11,7 @@ const URL = "/api/status" as const;
 @Injectable({
   providedIn: "root",
 })
-export class StatusService {
+export class StatusService extends api.service(URL) {
   private statusSocket?: api.Socket<Self.Status, Self.Subscribe>;
 
   get socket() {

@@ -32,6 +32,22 @@ import {httpContexts} from "./http-contexts";
  * validation and caching easier.
  */
 export namespace api {
+  export type Service = typeof ApiService;
+
+  abstract class ApiService {
+    get URL(): string {
+      return undefined!;
+    }
+  }
+
+  export function service<URL extends `/api/${string}`>(url: URL): Service {
+    return class extends ApiService {
+      override get URL(): string {
+        return url;
+      }
+    };
+  }
+
   /**
    * A request signal can either be a raw value or a signal producing that value.
    *
