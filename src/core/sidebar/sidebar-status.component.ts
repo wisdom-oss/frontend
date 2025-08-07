@@ -1,3 +1,4 @@
+import {KeyValuePipe} from "@angular/common";
 import {
   computed,
   effect,
@@ -97,7 +98,7 @@ export class SidebarStatusIconComponent extends SidebarStatusBaseComponent {
 
 @Component({
   selector: "sidebar-status-info",
-  imports: [NgIcon],
+  imports: [KeyValuePipe],
   providers: [
     provideIcons({
       remixErrorWarningFill,
@@ -115,7 +116,9 @@ export class SidebarStatusIconComponent extends SidebarStatusBaseComponent {
   template: `
     @if (thisStatus().value !== "ok") {
       <div class="service-status-info {{ thisStatus().value }}">
-        <p>Some text here</p>
+        @for (service of relevantServices() | keyvalue; track service.key) {
+          <p>{{ service.key }} is {{ service.value?.status ?? "unknown" }}</p>
+        }
       </div>
     }
   `,
@@ -123,4 +126,8 @@ export class SidebarStatusIconComponent extends SidebarStatusBaseComponent {
 export class SidebarStatusInfoComponent extends SidebarStatusBaseComponent {
   readonly services = input.required<ServiceRecord>();
   readonly status = input<StatusRecord>();
+
+  protected relevantServices = computed(() =>
+    Object.map(this.services(), (_, name) => this.status()?.[name]),
+  );
 }
