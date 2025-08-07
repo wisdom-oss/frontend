@@ -43,21 +43,15 @@ nav {
   padding-bottom: calc(var(--bulma-box-padding) / 2);
 }
 
-.service-warning {
+.service-status-info {
   $text-color: hsl(
     var(--bulma-black-h),
     var(--bulma-black-s),
     var(--bulma-black-l)
   );
-  $background-color: hsl(
-    var(--bulma-warning-h),
-    var(--bulma-warning-s),
-    var(--bulma-warning-l)
-  );
 
   border-radius: var(--bulma-menu-item-radius);
   padding: var(--bulma-menu-list-link-padding);
-  background-color: $background-color;
   color: $text-color;
 
   &::before {
@@ -67,7 +61,44 @@ nav {
     top: 0.85em;
     left: -0.75em;
     border-style: solid;
-    border-color: $background-color transparent transparent transparent;
     transform: rotate(90deg);
+  }
+
+  &.warning {
+    $background-color: hsl(
+      var(--bulma-warning-h),
+      var(--bulma-warning-s),
+      var(--bulma-warning-l)
+    );
+
+    background-color: $background-color;
+
+    &::before {
+      border-color: $background-color transparent transparent transparent;
+    }
+  }
+
+  &.error {
+    $background-color: hsl(
+      var(--bulma-danger-h),
+      var(--bulma-danger-s),
+      var(--bulma-danger-l)
+    );
+
+    background-color: $background-color;
+
+    &::before {
+      border-color: $background-color transparent transparent transparent;
+    }
+  }
+
+  &.unknown {
+    $background-color: gray;
+
+    background-color: $background-color;
+
+    &::before {
+      border-color: $background-color transparent transparent transparent;
+    }
   }
 }

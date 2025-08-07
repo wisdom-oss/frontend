@@ -13,7 +13,6 @@ import {SidebarEntry} from "../../sidebar";
 @Component({
   selector: "sidebar-icon",
   imports: [NgIcon, KeyValuePipe, NgComponentOutlet],
-  host: {"[class.icon]": "true"},
   template: `
     @let iconVal = icon();
     @if (isURL(iconVal)) {

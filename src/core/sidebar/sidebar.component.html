@@ -10,6 +10,8 @@
       <ul class="menu-list">
         @for (module of category.modules; track module) {
           @if (module.visible()) {
+            @let showInfo =
+              showStatusInfo[`${category.category}:${module.module}`];
             <li
               class="is-flex is-flex-direction-column"
               [class.unauthorized]="!module.authorized()"
@@ -18,23 +20,23 @@
                 class="icon-text is-flex is-gapless"
                 [routerLink]="module.link"
               >
-                <sidebar-icon [icon]="module.icon"></sidebar-icon>
+                <sidebar-icon [icon]="module.icon" class="mr-1"></sidebar-icon>
                 <span class="is-flex-grow-1" [translate]="module.module"></span>
-                <span class="icon has-text-warning" [style.cursor]="'help'">
-                  <ng-icon name="remixErrorWarningFill"></ng-icon>
-                </span>
+                @if (module.authorized()) {
+                  <sidebar-status-icon
+                    [services]="module.services"
+                    [status]="serviceStatus()"
+                    (mouseenter)="showInfo.set(true)"
+                    (mouseleave)="showInfo.set(false)"
+                  ></sidebar-status-icon>
+                }
               </a>
-              <div
-                style="
-                  position: absolute;
-                  align-self: flex-end;
-                  transform: translateX(calc(100% - 0.3em));
-                "
-              >
-                <div class="service-warning">
-                  <p>Some text here</p>
-                </div>
-              </div>
+              @if (showInfo()) {
+                <sidebar-status-info
+                  [services]="module.services"
+                  [status]="serviceStatus()"
+                ></sidebar-status-info>
+              }
             </li>
           }
         }

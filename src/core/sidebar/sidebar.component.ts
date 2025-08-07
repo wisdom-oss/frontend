@@ -13,15 +13,11 @@ import {
   QueryList,
   Pipe,
   Signal,
+  WritableSignal,
   PipeTransform,
 } from "@angular/core";
 import {NavigationEnd, RouterLink, Router} from "@angular/router";
-import {
-  provideIcons,
-  provideNgIconLoader,
-  NgIconComponent,
-} from "@ng-icons/core";
-import {remixErrorWarningFill} from "@ng-icons/remixicon";
+import {provideIcons, provideNgIconLoader} from "@ng-icons/core";
 import {TranslateDirective} from "@ngx-translate/core";
 import dayjs from "dayjs";
 import {filter} from "rxjs";
@@ -29,31 +25,37 @@ import {filter} from "rxjs";
 import {SidebarLinkDirective} from "./sidebar-link.directive";
 import {SidebarMenuLabelDirective} from "./sidebar-menu-label.directive";
 import {SidebarIconComponent} from "./sidebar-icon.component";
+import {
+  SidebarStatusIconComponent,
+  SidebarStatusInfoComponent,
+} from "./sidebar-status.component";
 import {sidebar, SidebarEntry} from "../../sidebar";
 import {StatusService} from "../../api/status.service";
+import {DwdService} from "../../api/dwd.service";
+import {GroundwaterLevelsService} from "../../api/groundwater-levels.service";
+import {GeoDataService} from "../../api/geo-data.service";
+import {BeWaterSmartService} from "../../api/be-water-smart.service";
 import {api} from "../../common/api";
+import {defaults} from "../../common/utils/defaults";
 import {AuthService} from "../auth/auth.service";
-import {Scopes} from "../auth/scopes";
 
 const SIDEBAR_ENTRIES = sidebar();
 
 @Component({
   selector: "sidebar",
   imports: [
-    NgIconComponent,
     RouterLink,
     SidebarIconComponent,
     SidebarLinkDirective,
     SidebarMenuLabelDirective,
     TranslateDirective,
+    SidebarStatusIconComponent,
+    SidebarStatusInfoComponent,
   ],
   templateUrl: "./sidebar.component.html",
   styleUrl: "./sidebar.component.scss",
   providers: [
-    provideIcons({
-      ...extractNgIcons(SIDEBAR_ENTRIES),
-      remixErrorWarningFill,
-    }),
+    provideIcons(extractNgIcons(SIDEBAR_ENTRIES)),
     provideNgIconLoader(icon => {
       if (!icon.startsWith("http")) return "";
       const http = inject(HttpClient);
@@ -107,13 +109,38 @@ export class SidebarComponent implements AfterViewInit {
     });
   });
 
-  private serviceStatus = computed(() => {
+  protected serviceStatus = computed(() => {
     let status = this.status.socket();
     if (!status) return undefined;
-    return Object.map(untracked(this.services), service =>
-      status.find(status => status.path == service.URL),
-    );
+
+    return {
+      GroundwaterLevelsService: {
+        path: "",
+        lastUpdate: dayjs(),
+        status: "down" as const,
+      },
+      GeoDataService: {
+        path: "",
+        lastUpdate: dayjs(),
+        status: "limited" as const,
+      },
+      BeWaterSmartService: {
+        path: "",
+        lastUpdate: dayjs(),
+        status: "ok" as const,
+      },
+    };
+
+    // FIXME: after testing enable this again
+    // return Object.map(untracked(this.services), service =>
+    //   status.find(status => status.path == service.URL),
+    // );
   });
+
+  protected showStatusInfo = defaults(
+    {} as Record<string, WritableSignal<boolean>>,
+    () => signal(false),
+  );
 
   private onMessage = effect(() => console.log(this.serviceStatus()));
 
@@ -140,6 +167,9 @@ export class SidebarComponent implements AfterViewInit {
       );
     });
   }
+
+  protected signal = signal;
+  protected log = console.log;
 }
 
 function extractNgIcons(
