@@ -26,39 +26,39 @@ export namespace typeUtils {
     U,
   > = (Omit<A[0], O> & U)[];
 
-/**
- * Overwrite fields of record from another record.
- *
- * @template T The base type whose fields may be updated.
- * @template U A subset of T’s keys with new types for those keys.
- *
- * This removes each key in U from T, then re-adds it with U’s definition.
- *
- * @example
- * ```ts
- * type Base = {
- *   id: number
- *   name: string
- *   active: boolean
- * }
- *
- * // only 'active' can be overwritten, 'lastLogin' would error
- * type Updates = {
- *   active: string
- * }
- *
- * type Combined = Overwrite<Base, Updates>
- * // {
- * //   id: number
- * //   name: string
- * //   active: string
- * // }
- * ```
- */
-export type Overwrite<
-  T extends Record<string, any>,
-  U extends Partial<Record<keyof T, any>>,
-> = Omit<T, keyof U> & U;
+  /**
+   * Overwrite fields of record from another record.
+   *
+   * @template T The base type whose fields may be updated.
+   * @template U A subset of T’s keys with new types for those keys.
+   *
+   * This removes each key in U from T, then re-adds it with U’s definition.
+   *
+   * @example
+   * ```ts
+   * type Base = {
+   *   id: number
+   *   name: string
+   *   active: boolean
+   * }
+   *
+   * // only 'active' can be overwritten, 'lastLogin' would error
+   * type Updates = {
+   *   active: string
+   * }
+   *
+   * type Combined = Overwrite<Base, Updates>
+   * // {
+   * //   id: number
+   * //   name: string
+   * //   active: string
+   * // }
+   * ```
+   */
+  export type Overwrite<
+    T extends Record<string, any>,
+    U extends Partial<Record<keyof T, any>>,
+  > = Omit<T, keyof U> & U;
 
   /**
    * Extracts the inner type from a `Signal<T>` or any extension of it like `WritableSignal<T>`.

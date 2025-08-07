@@ -564,7 +564,7 @@ export namespace api {
    *
    * @template TSend
    * Type of messages that can be sent to the server via `.send()`.
-   * 
+   *
    * @template TDefault
    * Default value initially returned before any message is received.
    */
@@ -594,7 +594,7 @@ export namespace api {
    * Type of messages that can be sent to the server.
    */
   export type SocketOptions<
-    TMessage, 
+    TMessage,
     TSend,
     TDefault = undefined,
     TRaw = TMessage,
@@ -663,7 +663,13 @@ export namespace api {
    *
    * @see {@link SocketOptions} for configuration details.
    */
-  export function socket<TMessage, TSend, TDefault = undefined, TRaw = TMessage, TSerialized = TSend>({
+  export function socket<
+    TMessage,
+    TSend,
+    TDefault = undefined,
+    TRaw = TMessage,
+    TSerialized = TSend,
+  >({
     url,
     validate,
     validateRaw,
@@ -720,9 +726,9 @@ export namespace api {
       if (validateRaw) {
         let checked = validateRaw(message);
         if (!checked.success) {
-        console.error(checked.errors);
-        throw new Error("Invalid type on raw message");
-      }
+          console.error(checked.errors);
+          throw new Error("Invalid type on raw message");
+        }
       }
 
       if (parse) message = parse(message);
