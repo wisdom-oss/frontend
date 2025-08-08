@@ -6,11 +6,11 @@ import {
   remixErrorWarningFill,
   remixQuestionFill,
 } from "@ng-icons/remixicon";
+import {TranslateDirective} from "@ngx-translate/core";
 
 import {StatusService} from "../../api/status.service";
 import {api} from "../../common/api";
 import {keys} from "../../common/utils/keys";
-import { TranslateDirective } from "@ngx-translate/core";
 
 type ServiceRecord = Record<string, InstanceType<api.Service>>;
 type StatusRecord = Record<string, StatusService.Status[0] | undefined>;
@@ -151,7 +151,11 @@ export class SidebarStatusIconComponent extends SidebarStatusBaseComponent {
               <span class="icon" [class]="service.value.status.hasText">
                 <ng-icon [name]="service.value.status.icon"></ng-icon>
               </span>
-              <span translate>core.sidebar.status.{{service.value.status.description}}</span>
+              <span translate
+                >core.sidebar.status.{{
+                  service.value.status.description
+                }}</span
+              >
             </td>
           </tr>
         }
