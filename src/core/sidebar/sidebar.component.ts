@@ -121,6 +121,11 @@ export class SidebarComponent implements AfterViewInit {
         lastUpdate: dayjs(),
         status: "ok" as const,
       },
+      WaterRightsService: {
+        path: "",
+        lastUpdate: dayjs(),
+        status: "ok" as const,
+      },
     };
 
     // FIXME: after testing enable this again

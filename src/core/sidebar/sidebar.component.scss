@@ -44,12 +44,14 @@ nav {
 }
 
 .service-status-info {
+  $background-color: light-dark(rgb(238, 238, 238), rgb(9, 10, 12));
   $text-color: hsl(
     var(--bulma-black-h),
     var(--bulma-black-s),
     var(--bulma-black-l)
   );
 
+  background-color: $background-color;
   border-radius: var(--bulma-menu-item-radius);
   padding: var(--bulma-menu-list-link-padding);
   color: $text-color;
@@ -58,47 +60,10 @@ nav {
     content: "";
     position: absolute;
     border-width: 0.75em 0.75em 0 0.75em;
+    border-color: $background-color transparent transparent transparent;
     top: 0.85em;
     left: -0.75em;
     border-style: solid;
     transform: rotate(90deg);
-  }
-
-  &.warning {
-    $background-color: hsl(
-      var(--bulma-warning-h),
-      var(--bulma-warning-s),
-      var(--bulma-warning-l)
-    );
-
-    background-color: $background-color;
-
-    &::before {
-      border-color: $background-color transparent transparent transparent;
-    }
-  }
-
-  &.error {
-    $background-color: hsl(
-      var(--bulma-danger-h),
-      var(--bulma-danger-s),
-      var(--bulma-danger-l)
-    );
-
-    background-color: $background-color;
-
-    &::before {
-      border-color: $background-color transparent transparent transparent;
-    }
-  }
-
-  &.unknown {
-    $background-color: gray;
-
-    background-color: $background-color;
-
-    &::before {
-      border-color: $background-color transparent transparent transparent;
-    }
   }
 }

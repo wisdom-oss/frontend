@@ -31,7 +31,10 @@
                   ></sidebar-status-icon>
                 }
               </a>
-              @if (showInfo()) {
+              @if (
+                showInfo() ||
+                module.module == "water-rights.display.module" + "k"
+              ) {
                 <sidebar-status-info
                   [services]="module.services"
                   [status]="serviceStatus()"
