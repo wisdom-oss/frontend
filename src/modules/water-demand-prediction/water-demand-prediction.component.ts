@@ -6,8 +6,7 @@ import {
   Component,
   OnInit,
   QueryList,
-  inject,
-  WritableSignal
+  inject
 } from "@angular/core";
 import { TranslatePipe } from "@ngx-translate/core";
 import { ChartConfiguration, ChartData, ChartDataset, ChartType } from "chart.js";
@@ -16,7 +15,7 @@ import {
   PredictedSmartmeterDataset,
   SmartmeterDataset
 } from "./water-demand-prediction.interface";
-import { WaterDemandPredictionService, WeatherColumns } from "../../api/water-demand-prediction.service";
+import { MeterNames, WaterDemandPredictionService, WeatherColumns } from "../../api/water-demand-prediction.service";
 import { DropdownComponent } from "../../common/components/dropdown/dropdown.component";
 import { Signal } from "@angular/core";
 import { SingleSmartmeter, PredictedSmartmeter } from "../../api/water-demand-prediction.service";
@@ -27,11 +26,17 @@ import { SingleSmartmeter, PredictedSmartmeter } from "../../api/water-demand-pr
   templateUrl: "./water-demand-prediction.component.html",
   styles: ``,
 })
-export class WaterDemandPredictionComponent implements OnInit {
+export class WaterDemandPredictionComponent {
   private waterDemandService = inject(WaterDemandPredictionService);
 
   /** the displayed resolution in the charts of real data */
   displayedResolution = signal<string | undefined>(undefined);
+
+  /** variables name dropdown */
+  menuSmartmeter = "water-demand-prediction.choice.smartmeter";
+  smartmeterSignal: Signal<MeterNames | undefined> = this.waterDemandService.fetchSignalMeterInformation();
+  optionsSmartmeter: Record<string, string> = {};
+  choiceSmartmeter = signal<string | undefined>(undefined);
 
   /** variables startpoint dropdown */
   menuStartPoint = "water-demand-prediction.startpoint.menu";
@@ -63,11 +68,6 @@ export class WaterDemandPredictionComponent implements OnInit {
     all: "water-demand-prediction.timeframe.all",
   };
   choiceTime = signal<string | undefined>(undefined);
-
-  /** variables name dropdown */
-  menuSmartmeter = "water-demand-prediction.choice.smartmeter";
-  optionsSmartmeter: Record<string, string> = {};
-  choiceSmartmeter = signal<string | undefined>(undefined);
 
   menuWeather = "water-demand-prediction.choice.weather";
   optionsWeather: Record<string, string> = {
@@ -178,9 +178,14 @@ export class WaterDemandPredictionComponent implements OnInit {
   currentPredictedSmartmeterDataSignal: Signal<PredictedSmartmeter | undefined> = this.waterDemandService.fetchSignalSinglePredictionSmartmeter(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution, this.choiceWeather, this.choiceWeatherColumn)
   currentPredictedSmartmeterData?: PredictedSmartmeter;
 
-  trainModelSignal: WritableSignal<boolean> = signal(false);
-
   constructor() {
+
+    effect(() => {
+      let smartmeters = this.smartmeterSignal();
+      if (smartmeters) {
+        this.optionsSmartmeter = smartmeters;
+      }
+    })
 
     /** updates optionsWeatherColumn when selected weather attribute changes */
     effect(() => {
@@ -198,7 +203,7 @@ export class WaterDemandPredictionComponent implements OnInit {
       }
     })
 
-    /** extract data to show single smart meter data */
+    /** extract data to show predicted smart meter data */
     effect(() => {
       let curData = this.currentPredictedSmartmeterDataSignal();
       if (curData) {
@@ -206,26 +211,6 @@ export class WaterDemandPredictionComponent implements OnInit {
       }
     })
 
-    /** extract data to show single smart meter data */
-    effect(() => {
-      if (this.trainModelSignal()) {
-        // ✅ now it's safe
-        this.waterDemandService.trainModelOnSingleSmartmeter(
-          this.choiceStartPoint,
-          this.choiceSmartmeter,
-          this.choiceTime,
-          this.choiceResolution,
-          this.choiceWeather,
-          this.choiceWeatherColumn
-        );
-      }
-    });
-
-  }
-
-
-  ngOnInit() {
-    this.fetchMeterInformation();
   }
 
   /** set the displayed resolution and update the chart to mirror that
@@ -383,17 +368,6 @@ export class WaterDemandPredictionComponent implements OnInit {
   }
 
   /**
-   * train a model for prediction, as long as all parameters are unique
-   * @returns nothing, prints answer
-   */
-  trainModel(): void {
-
-    /** set the trainModelSignal to true*/
-    this.trainModelSignal.set(true);
-    // Add Mode to turn back to default
-  }
-
-  /**
    * function to fetch data by parameters provided
    * doesnt request data when data is already requested before
    * creates new ChartDatasets and activates the display function
@@ -519,6 +493,10 @@ export class WaterDemandPredictionComponent implements OnInit {
     this.showPredictedDatasets(
       this.currentPredictedSmartmeterData!.resolution,
     );
+  }
+
+  trainModel(): void {
+    return;
   }
 
   /**
