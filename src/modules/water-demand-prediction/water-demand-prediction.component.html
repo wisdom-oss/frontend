@@ -176,9 +176,12 @@
           <!-- buttons for prediction values -->
           <button
             class="button is-primary is-rounded"
-            (click)="fetchPredDataSmartmeter()"
+            (click)="fetchPredData()"
           >
             {{ "water-demand-prediction.request.preddata" | translate }}
+          </button>
+          <button class="button is-primary is-rounded" (click)="showPredData()">
+            show pred data
           </button>
         </div>
         <!-- Analysis metrics -->

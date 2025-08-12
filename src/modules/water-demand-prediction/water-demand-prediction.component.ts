@@ -1,13 +1,6 @@
+import { ViewChildren, Component, QueryList, inject } from "@angular/core";
+import { signals } from "../../common/signals";
 import { CommonModule } from "@angular/common";
-import {
-  effect,
-  signal,
-  ViewChildren,
-  Component,
-  OnInit,
-  QueryList,
-  inject
-} from "@angular/core";
 import { TranslatePipe } from "@ngx-translate/core";
 import { ChartConfiguration, ChartData, ChartDataset, ChartType } from "chart.js";
 import { BaseChartDirective } from "ng2-charts";
@@ -17,8 +10,9 @@ import {
 } from "./water-demand-prediction.interface";
 import { MeterNames, WaterDemandPredictionService, WeatherColumns } from "../../api/water-demand-prediction.service";
 import { DropdownComponent } from "../../common/components/dropdown/dropdown.component";
-import { Signal } from "@angular/core";
 import { SingleSmartmeter, PredictedSmartmeter } from "../../api/water-demand-prediction.service";
+import { signal, Signal, effect, computed } from "@angular/core";
+
 
 @Component({
   selector: "water-demand-prediction",
@@ -28,6 +22,16 @@ import { SingleSmartmeter, PredictedSmartmeter } from "../../api/water-demand-pr
 })
 export class WaterDemandPredictionComponent {
   private waterDemandService = inject(WaterDemandPredictionService);
+
+  explainMAE: string =
+    "In the context of machine learning, absolute error refers to the magnitude of difference between the prediction of an observation and the true value of that observation. MAE takes the average of absolute errors for a group of predictions and observations as a measurement of the magnitude of errors for the entire group. MAE can also be referred as L1 loss function.";
+  explainRMSE: string =
+    "Root mean square error or root mean square deviation is one of the most commonly used measures for evaluating the quality of predictions. It shows how far predictions fall from measured true values using Euclidean distance.";
+  explainMSE: string =
+    "In the fields of regression analysis and machine learning, the Mean Square Error (MSE) is a crucial metric for evaluating the performance of predictive models. It measures the average squared difference between the predicted and the actual target values within a dataset. The primary objective of the MSE is to assess the quality of a model's predictions by measuring how closely they align with the ground truth.";
+  explainR2: string =
+    "The R-squared metric — R², or the coefficient of determination – is used to measure how well a model fits data, and how well it can predict future outcomes. Simply put, it tells you how much of the variation in your data can be explained by your model. The closer the R-squared value is to one, the better your model fits the data.";
+
 
   /** the displayed resolution in the charts of real data */
   displayedResolution = signal<string | undefined>(undefined);
@@ -161,22 +165,19 @@ export class WaterDemandPredictionComponent {
     | QueryList<BaseChartDirective>
     | undefined;
 
-  explainMAE: string =
-    "In the context of machine learning, absolute error refers to the magnitude of difference between the prediction of an observation and the true value of that observation. MAE takes the average of absolute errors for a group of predictions and observations as a measurement of the magnitude of errors for the entire group. MAE can also be referred as L1 loss function.";
-  explainRMSE: string =
-    "Root mean square error or root mean square deviation is one of the most commonly used measures for evaluating the quality of predictions. It shows how far predictions fall from measured true values using Euclidean distance.";
-  explainMSE: string =
-    "In the fields of regression analysis and machine learning, the Mean Square Error (MSE) is a crucial metric for evaluating the performance of predictive models. It measures the average squared difference between the predicted and the actual target values within a dataset. The primary objective of the MSE is to assess the quality of a model's predictions by measuring how closely they align with the ground truth.";
-  explainR2: string =
-    "The R-squared metric — R², or the coefficient of determination – is used to measure how well a model fits data, and how well it can predict future outcomes. Simply put, it tells you how much of the variation in your data can be explained by your model. The closer the R-squared value is to one, the better your model fits the data.";
-
   /** data object of current requested Smartmeterdata */
   currentSingleSmartmeterDataSignal: Signal<SingleSmartmeter | undefined> = this.waterDemandService.fetchSignalSingleSmartmeter(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution)
   currentSmartmeterData?: SingleSmartmeter;
 
+  triggerTrain = signal<boolean>(false);
+  training = this.waterDemandService.trainModelOnSingleSmartmeter(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution, this.choiceWeather, this.choiceWeatherColumn, this.triggerTrain);
+
   /** data object of current requested Smartmeterdata */
-  currentPredictedSmartmeterDataSignal: Signal<PredictedSmartmeter | undefined> = this.waterDemandService.fetchSignalSinglePredictionSmartmeter(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution, this.choiceWeather, this.choiceWeatherColumn)
+  triggerFetchPredictedSmartmeterData = signal<boolean>(false);
+  currentPredictedSmartmeterDataSignal: Signal<PredictedSmartmeter | undefined> = this.waterDemandService.fetchSignalSinglePredictionSmartmeter(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution, this.choiceWeather, this.choiceWeatherColumn, this.triggerFetchPredictedSmartmeterData)
   currentPredictedSmartmeterData?: PredictedSmartmeter;
+
+
 
   constructor() {
 
@@ -203,11 +204,12 @@ export class WaterDemandPredictionComponent {
       }
     })
 
-    /** extract data to show predicted smart meter data */
+    /** extract data to show single smart meter data */
     effect(() => {
-      let curData = this.currentPredictedSmartmeterDataSignal();
-      if (curData) {
+      if (this.triggerFetchPredictedSmartmeterData()) {
+        let curData = this.currentPredictedSmartmeterDataSignal();
         this.currentPredictedSmartmeterData = curData;
+        console.log(this.currentPredictedSmartmeterData);
       }
     })
 
@@ -341,43 +343,12 @@ export class WaterDemandPredictionComponent {
   }
 
   /**
-   * fetches all smartmeter names
-   */
-  fetchMeterInformation(): void {
-    this.waterDemandService.fetchMeterInformation().subscribe({
-      next: response => {
-        this.optionsSmartmeter = response;
-      },
-      error: error => {
-        console.error(error);
-      },
-      complete: () => { },
-    });
-  }
-
-  fetchWeatherColumns(param: any): void {
-    this.waterDemandService.fetchWeatherColumns(param).subscribe({
-      next: response => {
-        this.optionsWeatherColumn = response;
-      },
-      error: error => {
-        console.error(error);
-      },
-      complete: () => { },
-    });
-  }
-
-  /**
    * function to fetch data by parameters provided
    * doesnt request data when data is already requested before
    * creates new ChartDatasets and activates the display function
    * @returns nothing
    */
   fetchDataSmartmeter(): void {
-    /** if request parameters are not unique, abandon request */
-    if (!this.checkParameters(false)) {
-      return;
-    }
 
     if (!this.currentSmartmeterData) {
       return;
@@ -415,15 +386,15 @@ export class WaterDemandPredictionComponent {
     this.currentSmartmeterData = undefined;
   }
 
-  /**
-   * fetches the prediction data of a given set of choices.
-   */
-  fetchPredDataSmartmeter(): void {
-    /** if request parameters are not unique, abandon request */
-    if (!this.checkParameters(false)) {
-      return;
-    }
+  fetchPredData(): void {
+    this.triggerFetchPredictedSmartmeterData.set(true);
+  }
 
+  showPredData(): void {
+
+    console.log(this.currentPredictedSmartmeterData);
+
+    /** set trigger to true */
     if (!this.currentPredictedSmartmeterData) {
       return;
     }
@@ -493,86 +464,13 @@ export class WaterDemandPredictionComponent {
     this.showPredictedDatasets(
       this.currentPredictedSmartmeterData!.resolution,
     );
+
+    /** set trigger back to false */
+    this.triggerFetchPredictedSmartmeterData.set(false);
   }
 
   trainModel(): void {
-    return;
-  }
-
-  /**
-   * checks first if all 3 choices are set and returns false when not.
-   * afterwards check if resolution key is already in datasets, true when not.
-   * last create colorcode from parameters and check if colorcode already present.
-   * when colorcode not present, request is unique and thus true.
-   * @param pred flag im request is for real or predicted data
-   * @returns true if request unique, false else
-   */
-  /* deprecated */
-  checkParameters(pred: boolean): boolean {
-    if (this.allowCheckMultiple()) {
-      return true;
-    }
-
-    if (
-      !this.choiceSmartmeter() ||
-      !this.choiceResolution() ||
-      !this.choiceTime() ||
-      !this.choiceStartPoint()
-    ) {
-      alert("Not every parameter for request is set.");
-    }
-
-    /** checks if resolution as key is already present in datasetsrecord.
-     * If not, request must be true and thus unique */
-    if (!pred) {
-      if (!this.savedDatasets[this.choiceResolution()!]) {
-        return true;
-      }
-    } else {
-      if (!this.predictedDatasets[this.choiceResolution()!]) {
-        return true;
-      }
-    }
-
-    /** the color is based on 3 unique parameters,
-     *  thus, when color is equal, the set is already present */
-    let colorToCheck = this.createColorFromParameter(
-      this.choiceSmartmeter()!,
-      this.choiceResolution()!,
-      this.choiceTime()!,
-    );
-
-    let errormsg: string =
-      "combination already requested \n" +
-      this.choiceResolution() +
-      "\n" +
-      this.choiceSmartmeter() +
-      "\n" +
-      this.choiceTime();
-
-    /** check if given dataset is already containing the colorcode to request */
-    if (!pred) {
-      for (let entry of this.savedDatasets[this.choiceResolution()!]) {
-        if (
-          entry.dataset.borderColor === colorToCheck ||
-          entry.dataset.backgroundColor === colorToCheck
-        ) {
-          alert(errormsg);
-          return false;
-        }
-      }
-    } else {
-      for (let entry of this.predictedDatasets[this.choiceResolution()!]) {
-        if (
-          entry.dataset.borderColor === colorToCheck ||
-          entry.dataset.backgroundColor === colorToCheck
-        ) {
-          alert(errormsg);
-          return false;
-        }
-      }
-    }
-    return true;
+    this.triggerTrain.set(true);
   }
 
   /** show datasets based on the resolution chosen */
