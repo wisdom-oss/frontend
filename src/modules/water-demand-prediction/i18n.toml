@@ -91,6 +91,10 @@ en = "Train Model"
 de = "Modell trainieren"
 
 [request.preddata]
+en = "Request predicted Data"
+de = "Frage vorhergesagte Daten an"
+
+[request.showdata]
 en = "Display predicted data"
 de = "Zeige vorhergesagte Daten an"
 

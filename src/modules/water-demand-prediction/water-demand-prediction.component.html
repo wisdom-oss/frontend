@@ -176,9 +176,12 @@
           <!-- buttons for prediction values -->
           <button
             class="button is-primary is-rounded"
-            (click)="fetchPredDataSmartmeter()"
+            (click)="fetchPredData()"
           >
             {{ "water-demand-prediction.request.preddata" | translate }}
+          </button>
+          <button class="button is-primary is-rounded" (click)="showPredData()">
+            {{ "water-demand-prediction.request.showdata" | translate }}
           </button>
         </div>
         <!-- Analysis metrics -->
@@ -215,41 +218,36 @@
               </th>
             </thead>
             <tbody>
-              <tr *ngIf="currentPredictedSmartmeterData()">
+              <tr *ngIf="currentPredictedSmartmeterData">
                 <td
-                  title="{{
-                    currentPredictedSmartmeterData()?.meanAbsoluteError
-                  }}"
+                  title="{{ currentPredictedSmartmeterData.meanAbsoluteError }}"
                 >
                   {{
-                    currentPredictedSmartmeterData()!.meanAbsoluteError * 100
+                    currentPredictedSmartmeterData!.meanAbsoluteError * 100
+                      | number: "1.2-2"
+                  }}%
+                </td>
+                <td
+                  title="{{ currentPredictedSmartmeterData.meanSquaredError }}"
+                >
+                  {{
+                    currentPredictedSmartmeterData!.meanSquaredError * 100
                       | number: "1.2-2"
                   }}%
                 </td>
                 <td
                   title="{{
-                    currentPredictedSmartmeterData()?.meanSquaredError
+                    currentPredictedSmartmeterData.rootOfmeanSquaredError
                   }}"
                 >
                   {{
-                    currentPredictedSmartmeterData()!.meanSquaredError * 100
+                    currentPredictedSmartmeterData!.rootOfmeanSquaredError * 100
                       | number: "1.2-2"
                   }}%
                 </td>
-                <td
-                  title="{{
-                    currentPredictedSmartmeterData()?.rootOfmeanSquaredError
-                  }}"
-                >
+                <td title="{{ currentPredictedSmartmeterData.r2 }}">
                   {{
-                    currentPredictedSmartmeterData()!.rootOfmeanSquaredError *
-                      100 | number: "1.2-2"
-                  }}%
-                </td>
-                <td title="{{ currentPredictedSmartmeterData()?.r2 }}">
-                  {{
-                    currentPredictedSmartmeterData()!.r2 * 100
-                      | number: "1.2-2"
+                    currentPredictedSmartmeterData.r2 * 100 | number: "1.2-2"
                   }}%
                 </td>
               </tr>

@@ -1,7 +1,6 @@
-import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
-import { Router } from "@angular/router";
-import { Observable } from "rxjs";
+import { computed, Injectable } from "@angular/core";
+import { api } from "../common/api";
+import typia from "typia";
 
 const API_PREFIX = "/api/waterdemand";
 
@@ -13,108 +12,150 @@ const API_PREFIX = "/api/waterdemand";
   providedIn: "root",
 })
 export class WaterDemandPredictionService {
-  constructor(
-    private http: HttpClient,
-    private router: Router,
-  ) { }
+  constructor() { }
 
-  /**
-   * generalized request method for bws api
-   * @param method to use for request
-   * @param url string as api endpoint
-   * @param prod true if for production, false else
-   * @param requestBody bonus information in post and put requests
-   * @returns an Observable with the set interface
-   */
-  sendRequest<T>(
-    method: "get" | "post" | "put" | "delete",
-    url: string,
-    requestBody?: any,
-  ) {
-    let requestOptions: any = {
-      //context: ctx,
-      responseType: "json",
-      body: requestBody,
-    };
-
-    let final_url = this.router.parseUrl(API_PREFIX + url).toString();
-    console.log(final_url)
-
-    return this.http.request<T>(
-      method,
-      final_url!,
-      requestOptions,
-    ) as Observable<T>;
+  fetchMeterInformation(): api.Signal<MeterNames> {
+    return api.resource({
+      url: api.url`${API_PREFIX}/meterNames`,
+      method: `GET`,
+      validate: typia.createValidate<MeterNames>(),
+      defaultValue: {}
+    })
   }
 
-  fetchMeterInformation(): Observable<any> {
-    return this.sendRequest("get", "/meterNames");
+  fetchWeatherCols(capability: api.RequestSignal<string>): api.Signal<WeatherColumns> {
+    let body = api.map(capability, capability => ({ capability }))
+    return api.resource(
+      {
+        url: api.url`${API_PREFIX}/weatherColumns`,
+        method: `POST`,
+        validate: typia.createValidate<WeatherColumns>(),
+        body
+      }
+    );
   }
 
-  fetchWeatherColumns(capability: string): Observable<any> {
-    return this.sendRequest("post", "/weatherColumns", {
-      capability: capability,
-    });
+  /** fetch a single smartmeter data based on requested parameters, only when every parameter is defined */
+  fetchSmartmeter(startpoint: api.RequestSignal<string>, name: api.RequestSignal<string>,
+    timeframe: api.RequestSignal<string>, resolution: api.RequestSignal<string>): api.Signal<SingleSmartmeter> {
+
+    let body = api.map(
+      computed(() => [
+        api.toSignal(startpoint)(),
+        api.toSignal(name)(),
+        api.toSignal(timeframe)(),
+        api.toSignal(resolution)(),
+      ]),
+
+      ([startpoint, name, timeframe, resolution]) => {
+        if (!startpoint || !name || !timeframe || !resolution) return undefined;
+        return { startpoint, name, timeframe, resolution };
+      }
+    );
+
+    return api.resource(
+      {
+        url: api.url`${API_PREFIX}/singleSmartmeter`,
+        method: `POST`,
+        validate: typia.createValidate<SingleSmartmeter>(),
+        body
+      }
+    );
+
+
   }
 
-  fetchSingleSmartmeter(
-    startpoint: string,
-    nameOfSmartmeter: string,
-    timeframe: string,
-    resolution: string,
-  ): Observable<any> {
-    return this.sendRequest("post", "/singleSmartmeter", {
-      startpoint: startpoint,
-      name: nameOfSmartmeter,
-      timeframe: timeframe,
-      resolution: resolution,
-    });
+  trainModel(startpoint: api.RequestSignal<string>, name: api.RequestSignal<string>,
+    timeframe: api.RequestSignal<string>, resolution: api.RequestSignal<string>, weatherCapability: api.RequestSignal<string>,
+    weatherColumn: api.RequestSignal<string>, trigger: api.RequestSignal<boolean>): api.Signal<string> {
+
+
+    let body = api.map(
+      computed(() => [
+        api.toSignal(startpoint)(),
+        api.toSignal(name)(),
+        api.toSignal(timeframe)(),
+        api.toSignal(resolution)(),
+        api.toSignal(weatherCapability)(),
+        api.toSignal(weatherColumn)(),
+        api.toSignal(trigger)(),
+      ]),
+
+      ([startpoint, name, timeframe, resolution, weatherCapability, weatherColumn, trigger]) => {
+        if (!startpoint || !name || !timeframe || !resolution || !weatherCapability || !weatherColumn || !trigger) return undefined;
+        return { startpoint, name, timeframe, resolution, weatherCapability, weatherColumn };
+      }
+    );
+
+    return api.resource(
+      {
+        url: api.url`${API_PREFIX}/trainModel`,
+        method: `POST`,
+        validate: typia.createValidate<string>(),
+        body
+      }
+    );
   }
 
-  fetchSinglePredictionSmartmeter(
-    startpoint: string,
-    nameOfSmartmeter: string,
-    timeframe: string,
-    resolution: string,
-    weatherCapability: string,
-    weatherColumn?: string,
-  ): Observable<any> {
-    return this.sendRequest("post", "/loadModelAndPredict", {
-      startpoint: startpoint,
-      name: nameOfSmartmeter,
-      timeframe: timeframe,
-      resolution: resolution,
-      weatherCapability: weatherCapability,
-      weatherColumn: weatherColumn,
-    });
+  /** fetch predicted smartmeter data based on requested parameters */
+  fetchPrediction(startpoint: api.RequestSignal<string>, name: api.RequestSignal<string>,
+    timeframe: api.RequestSignal<string>, resolution: api.RequestSignal<string>, weatherCapability: api.RequestSignal<string>,
+    weatherColumn: api.RequestSignal<string>, trigger: api.RequestSignal<boolean>): api.Signal<PredictedSmartmeter> {
+
+    //NOTE: Maybe add an extra identifier if model requested is trained
+
+    let body = api.map(
+      computed(() => [
+        api.toSignal(startpoint)(),
+        api.toSignal(name)(),
+        api.toSignal(timeframe)(),
+        api.toSignal(resolution)(),
+        api.toSignal(weatherCapability)(),
+        api.toSignal(weatherColumn)(),
+        api.toSignal(trigger)()
+      ]),
+
+      ([startpoint, name, timeframe, resolution, weatherCapability, weatherColumn, trigger]) => {
+        if (!startpoint || !name || !timeframe || !resolution || !weatherCapability || !weatherColumn || !trigger) return undefined;
+        return { startpoint, name, timeframe, resolution, weatherCapability, weatherColumn };
+      }
+    );
+
+    return api.resource(
+      {
+        url: api.url`${API_PREFIX}/loadModelAndPredict`,
+        method: `POST`,
+        validate: typia.createValidate<PredictedSmartmeter>(),
+        body
+      }
+    );
   }
 
-  trainModelOnSingleSmartmeter(
-    startpoint: string,
-    nameOfSmartmeter: string,
-    timeframe: string,
-    resolution: string,
-    weatherCapability: string,
-    weatherColumn?: string,
-  ): Observable<any> {
-    return this.sendRequest("post", "/trainModel", {
-      startpoint: startpoint,
-      name: nameOfSmartmeter,
-      timeframe: timeframe,
-      resolution: resolution,
-      weatherCapability: weatherCapability,
-      weatherColumn: weatherColumn,
-    });
-  }
 
-  /**
-   * creates an Observable with an error to subscribe to it and logs the information in the console.
-   * @param msg error meesage
-   * @returns observable with contained error.
-   */
-  handleError(msg: string): Observable<any> {
-    return new Observable(observer => {
-      observer.error(new Error(msg));
-    });
-  }
+}
+
+export type WeatherColumns = Record<string, string>
+export type MeterNames = Record<string, string>
+export type SingleSmartmeter = {
+  name: string;
+  resolution: string;
+  timeframe: string;
+  value: number[];
+  date: string[];
+}
+export type PredictedSmartmeter = {
+  aic: number;
+  date: string[];
+  fitTime: number;
+  lowerConfValues: number[];
+  meanAbsoluteError: number;
+  meanSquaredError: number;
+  name: string;
+  r2: number;
+  realValue: number[];
+  resolution: string;
+  rootOfmeanSquaredError: number;
+  timeframe: string;
+  upperConfValues: number[];
+  value: number[];
 }
