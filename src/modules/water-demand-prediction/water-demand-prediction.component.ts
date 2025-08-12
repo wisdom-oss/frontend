@@ -10,7 +10,7 @@ import {
 import { MeterNames, WaterDemandPredictionService, WeatherColumns } from "../../api/water-demand-prediction.service";
 import { DropdownComponent } from "../../common/components/dropdown/dropdown.component";
 import { SingleSmartmeter, PredictedSmartmeter } from "../../api/water-demand-prediction.service";
-import { signal, Signal, effect, computed } from "@angular/core";
+import { signal, Signal, effect } from "@angular/core";
 
 
 @Component({
