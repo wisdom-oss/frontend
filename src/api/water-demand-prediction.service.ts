@@ -1,8 +1,4 @@
-import { HttpClient } from "@angular/common/http";
 import { computed, Injectable } from "@angular/core";
-import { Router } from "@angular/router";
-import { Observable } from "rxjs";
-
 import { api } from "../common/api";
 import typia from "typia";
 
@@ -16,14 +12,9 @@ const API_PREFIX = "/api/waterdemand";
   providedIn: "root",
 })
 export class WaterDemandPredictionService {
-  constructor(
-    private http: HttpClient,
-    private router: Router,
-  ) {
+  constructor() { }
 
-  }
-
-  fetchSignalMeterInformation(): api.Signal<MeterNames> {
+  fetchMeterInformation(): api.Signal<MeterNames> {
     return api.resource({
       url: api.url`${API_PREFIX}/meterNames`,
       method: `GET`,
@@ -32,7 +23,7 @@ export class WaterDemandPredictionService {
     })
   }
 
-  fetchSignalWeatherColumns(capability: api.RequestSignal<string>): api.Signal<WeatherColumns> {
+  fetchWeatherCols(capability: api.RequestSignal<string>): api.Signal<WeatherColumns> {
     let body = api.map(capability, capability => ({ capability }))
     return api.resource(
       {
@@ -45,7 +36,7 @@ export class WaterDemandPredictionService {
   }
 
   /** fetch a single smartmeter data based on requested parameters, only when every parameter is defined */
-  fetchSignalSingleSmartmeter(startpoint: api.RequestSignal<string>, name: api.RequestSignal<string>,
+  fetchSmartmeter(startpoint: api.RequestSignal<string>, name: api.RequestSignal<string>,
     timeframe: api.RequestSignal<string>, resolution: api.RequestSignal<string>): api.Signal<SingleSmartmeter> {
 
     let body = api.map(
@@ -74,7 +65,7 @@ export class WaterDemandPredictionService {
 
   }
 
-  trainModelOnSingleSmartmeter(startpoint: api.RequestSignal<string>, name: api.RequestSignal<string>,
+  trainModel(startpoint: api.RequestSignal<string>, name: api.RequestSignal<string>,
     timeframe: api.RequestSignal<string>, resolution: api.RequestSignal<string>, weatherCapability: api.RequestSignal<string>,
     weatherColumn: api.RequestSignal<string>, trigger: api.RequestSignal<boolean>): api.Signal<string> {
 
@@ -107,7 +98,7 @@ export class WaterDemandPredictionService {
   }
 
   /** fetch predicted smartmeter data based on requested parameters */
-  fetchSignalSinglePredictionSmartmeter(startpoint: api.RequestSignal<string>, name: api.RequestSignal<string>,
+  fetchPrediction(startpoint: api.RequestSignal<string>, name: api.RequestSignal<string>,
     timeframe: api.RequestSignal<string>, resolution: api.RequestSignal<string>, weatherCapability: api.RequestSignal<string>,
     weatherColumn: api.RequestSignal<string>, trigger: api.RequestSignal<boolean>): api.Signal<PredictedSmartmeter> {
 

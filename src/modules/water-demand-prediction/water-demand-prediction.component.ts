@@ -1,5 +1,4 @@
 import { ViewChildren, Component, QueryList, inject } from "@angular/core";
-import { signals } from "../../common/signals";
 import { CommonModule } from "@angular/common";
 import { TranslatePipe } from "@ngx-translate/core";
 import { ChartConfiguration, ChartData, ChartDataset, ChartType } from "chart.js";
@@ -36,21 +35,6 @@ export class WaterDemandPredictionComponent {
   /** the displayed resolution in the charts of real data */
   displayedResolution = signal<string | undefined>(undefined);
 
-  /** variables name dropdown */
-  menuSmartmeter = "water-demand-prediction.choice.smartmeter";
-  smartmeterSignal: Signal<MeterNames | undefined> = this.waterDemandService.fetchSignalMeterInformation();
-  optionsSmartmeter: Record<string, string> = {};
-  choiceSmartmeter = signal<string | undefined>(undefined);
-
-  /** variables startpoint dropdown */
-  menuStartPoint = "water-demand-prediction.startpoint.menu";
-  optionsStartPoint: Record<string, string> = {
-    "2021-05-26 00:00:00": "water-demand-prediction.startpoint.options.a",
-    "2021-06-01 00:00:00": "water-demand-prediction.startpoint.options.b",
-    "2022-01-01 00:00:00": "water-demand-prediction.startpoint.options.c",
-  };
-  choiceStartPoint = signal<string | undefined>(undefined);
-
   /** variables resolution dropdown */
   menuResolution = "water-demand-prediction.choice.resolution";
   optionsResolution: Record<string, string> = {
@@ -73,6 +57,21 @@ export class WaterDemandPredictionComponent {
   };
   choiceTime = signal<string | undefined>(undefined);
 
+  /** variables name dropdown */
+  menuSmartmeter = "water-demand-prediction.choice.smartmeter";
+  smartmeterSignal: Signal<MeterNames | undefined> = this.waterDemandService.fetchMeterInformation();
+  optionsSmartmeter: Record<string, string> = {};
+  choiceSmartmeter = signal<string | undefined>(undefined);
+
+  /** variables startpoint dropdown */
+  menuStartPoint = "water-demand-prediction.startpoint.menu";
+  optionsStartPoint: Record<string, string> = {
+    "2021-05-26 00:00:00": "water-demand-prediction.startpoint.options.a",
+    "2021-06-01 00:00:00": "water-demand-prediction.startpoint.options.b",
+    "2022-01-01 00:00:00": "water-demand-prediction.startpoint.options.c",
+  };
+  choiceStartPoint = signal<string | undefined>(undefined);
+
   menuWeather = "water-demand-prediction.choice.weather";
   optionsWeather: Record<string, string> = {
     plain: "water-demand-prediction.weather.plain",
@@ -83,18 +82,28 @@ export class WaterDemandPredictionComponent {
   choiceWeather = signal<string | undefined>(undefined);
 
   menuWeatherColumn = "water-demand-prediction.choice.weatherColumn";
-  weatherColumnsSignal: Signal<WeatherColumns | undefined> = this.waterDemandService.fetchSignalWeatherColumns(this.choiceWeather);
+  weatherColumnsSignal: Signal<WeatherColumns | undefined> = this.waterDemandService.fetchWeatherCols(this.choiceWeather);
   optionsWeatherColumn: Record<string, string> = {};
   choiceWeatherColumn = signal<string | undefined>(undefined);
+
+  /** data object of current requested Smartmeterdata */
+  currentSingleSmartmeterDataSignal: Signal<SingleSmartmeter | undefined> = this.waterDemandService.fetchSmartmeter(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution)
+  currentSmartmeterData: SingleSmartmeter | undefined;
+
+  /** signal to trigger training on button click and store the answer */
+  triggerTraining = signal<boolean>(false);
+  trainingResp = this.waterDemandService.trainModel(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution, this.choiceWeather, this.choiceWeatherColumn, this.triggerTraining);
+
+  /** data object of current requested Smartmeterdata */
+  triggerFetchPredictedSmartmeterData = signal<boolean>(false);
+  currentPredictedSmartmeterDataSignal: Signal<PredictedSmartmeter | undefined> = this.waterDemandService.fetchPrediction(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution, this.choiceWeather, this.choiceWeatherColumn, this.triggerFetchPredictedSmartmeterData)
+  currentPredictedSmartmeterData: PredictedSmartmeter | undefined;
 
   /** Record to hold all saved ChartDatasets */
   savedDatasets: Record<string, SmartmeterDataset[]> = {};
 
   /** Record to hold all saved predicted ChartDatasets */
   predictedDatasets: Record<string, PredictedSmartmeterDataset[]> = {};
-
-  /**allows multiple records over all charts if true */
-  allowCheckMultiple = signal<boolean>(false);
 
   /**
    * data skeleton for the line graph
@@ -165,22 +174,9 @@ export class WaterDemandPredictionComponent {
     | QueryList<BaseChartDirective>
     | undefined;
 
-  /** data object of current requested Smartmeterdata */
-  currentSingleSmartmeterDataSignal: Signal<SingleSmartmeter | undefined> = this.waterDemandService.fetchSignalSingleSmartmeter(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution)
-  currentSmartmeterData?: SingleSmartmeter;
-
-  triggerTrain = signal<boolean>(false);
-  training = this.waterDemandService.trainModelOnSingleSmartmeter(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution, this.choiceWeather, this.choiceWeatherColumn, this.triggerTrain);
-
-  /** data object of current requested Smartmeterdata */
-  triggerFetchPredictedSmartmeterData = signal<boolean>(false);
-  currentPredictedSmartmeterDataSignal: Signal<PredictedSmartmeter | undefined> = this.waterDemandService.fetchSignalSinglePredictionSmartmeter(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution, this.choiceWeather, this.choiceWeatherColumn, this.triggerFetchPredictedSmartmeterData)
-  currentPredictedSmartmeterData?: PredictedSmartmeter;
-
-
-
   constructor() {
 
+    /** define smartmeter options */
     effect(() => {
       let smartmeters = this.smartmeterSignal();
       if (smartmeters) {
@@ -196,7 +192,7 @@ export class WaterDemandPredictionComponent {
       }
     })
 
-    /** extract data to show single smart meter data */
+    /** request current smartmeter data */
     effect(() => {
       let curData = this.currentSingleSmartmeterDataSignal();
       if (curData) {
@@ -204,12 +200,11 @@ export class WaterDemandPredictionComponent {
       }
     })
 
-    /** extract data to show single smart meter data */
+    /** request predicted smartmeter data */
     effect(() => {
       if (this.triggerFetchPredictedSmartmeterData()) {
         let curData = this.currentPredictedSmartmeterDataSignal();
         this.currentPredictedSmartmeterData = curData;
-        console.log(this.currentPredictedSmartmeterData);
       }
     })
 
@@ -387,12 +382,18 @@ export class WaterDemandPredictionComponent {
   }
 
   fetchPredData(): void {
+    //BUG: REDESIGN
     this.triggerFetchPredictedSmartmeterData.set(true);
+    this.triggerTraining.set(false);
+  }
+
+  trainModel(): void {
+    //BUG: REDESIGN
+    this.triggerTraining.set(true);
+    this.triggerFetchPredictedSmartmeterData.set(false);
   }
 
   showPredData(): void {
-
-    console.log(this.currentPredictedSmartmeterData);
 
     /** set trigger to true */
     if (!this.currentPredictedSmartmeterData) {
@@ -410,7 +411,7 @@ export class WaterDemandPredictionComponent {
 
     let realDataset = this.createNewDataset(
       this.currentPredictedSmartmeterData!.realValue,
-      "real values" + this.currentPredictedSmartmeterData!.name,
+      "actualValues" + this.currentPredictedSmartmeterData!.name,
       this.currentPredictedSmartmeterData!.resolution,
       this.currentPredictedSmartmeterData!.timeframe,
       false,
@@ -419,7 +420,7 @@ export class WaterDemandPredictionComponent {
 
     let lower_conf_int = this.createNewDataset(
       this.currentPredictedSmartmeterData!.lowerConfValues,
-      "lower_confidence_interval",
+      "lowerConfidenceInterval",
       this.currentPredictedSmartmeterData!.resolution,
       this.currentPredictedSmartmeterData!.timeframe,
       0,
@@ -428,7 +429,7 @@ export class WaterDemandPredictionComponent {
 
     let upper_conf_int = this.createNewDataset(
       this.currentPredictedSmartmeterData!.upperConfValues,
-      "upper_confidence_interval",
+      "upperConfidenceInterval",
       this.currentPredictedSmartmeterData!.resolution,
       this.currentPredictedSmartmeterData!.timeframe,
       0,
@@ -467,10 +468,6 @@ export class WaterDemandPredictionComponent {
 
     /** set trigger back to false */
     this.triggerFetchPredictedSmartmeterData.set(false);
-  }
-
-  trainModel(): void {
-    this.triggerTrain.set(true);
   }
 
   /** show datasets based on the resolution chosen */
