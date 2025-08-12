@@ -3,10 +3,6 @@ import { CommonModule } from "@angular/common";
 import { TranslatePipe } from "@ngx-translate/core";
 import { ChartConfiguration, ChartData, ChartDataset, ChartType } from "chart.js";
 import { BaseChartDirective } from "ng2-charts";
-import {
-  PredictedSmartmeterDataset,
-  SmartmeterDataset
-} from "./water-demand-prediction.interface";
 import { MeterNames, WaterDemandPredictionService, WeatherColumns } from "../../api/water-demand-prediction.service";
 import { DropdownComponent } from "../../common/components/dropdown/dropdown.component";
 import { SingleSmartmeter, PredictedSmartmeter } from "../../api/water-demand-prediction.service";
@@ -437,10 +433,10 @@ export class WaterDemandPredictionComponent {
     );
 
     let smartmeterdata: PredictedSmartmeterDataset = {
-      upper_conf_interval_dataset: upper_conf_int,
+      upperConfIntervalDataset: upper_conf_int,
       dataset: newDataset,
-      realValue_dataset: realDataset,
-      lower_conf_interval_dataset: lower_conf_int,
+      realValueDataset: realDataset,
+      lowerConfIntervalDataset: lower_conf_int,
       labels: this.currentPredictedSmartmeterData!.date,
     };
 
@@ -502,12 +498,12 @@ export class WaterDemandPredictionComponent {
     /** add relevant datasets based on resolution to chartData */
     this.predictedDatasets[resolution].forEach(entry => {
       this.chartDataPredictedValues.datasets.push(entry.dataset);
-      this.chartDataPredictedValues.datasets.push(entry.realValue_dataset);
+      this.chartDataPredictedValues.datasets.push(entry.realValueDataset);
       this.chartDataPredictedValues.datasets.push(
-        entry.lower_conf_interval_dataset,
+        entry.lowerConfIntervalDataset,
       );
       this.chartDataPredictedValues.datasets.push(
-        entry.upper_conf_interval_dataset,
+        entry.upperConfIntervalDataset,
       );
       this.chartDataPredictedValues.labels = entry.labels;
     });
@@ -515,4 +511,17 @@ export class WaterDemandPredictionComponent {
     /** update charts to display information */
     this.updateCharts(0);
   }
+}
+
+export type SmartmeterDataset = {
+  dataset: ChartDataset;
+  labels: string[];
+}
+
+export type PredictedSmartmeterDataset = {
+  dataset: ChartDataset;
+  labels: string[];
+  lowerConfIntervalDataset: ChartDataset;
+  upperConfIntervalDataset: ChartDataset;
+  realValueDataset: ChartDataset;
 }
