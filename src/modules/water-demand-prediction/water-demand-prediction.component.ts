@@ -21,29 +21,28 @@ dayjs.extend(relativeTime);
   selector: "water-demand-prediction",
   imports: [BaseChartDirective, DropdownComponent, TranslatePipe, CommonModule],
   templateUrl: "./water-demand-prediction.component.html",
-  styles: ``,
 })
 export class WaterDemandPredictionComponent {
   private waterDemandService = inject(WaterDemandPredictionService);
 
   /** the displayed resolution in the charts of real data */
-  displayedResolution = signal<string | undefined>(undefined);
+  protected displayedResolution = signal<string | undefined>(undefined);
 
   /** variables resolution dropdown */
-  menuResolution = "water-demand-prediction.choice.resolution";
-  optionsResolution: Record<string, string> = {
+  protected menuResolution = "water-demand-prediction.choice.resolution";
+  protected optionsResolution: Record<string, string> = {
     hourly: "water-demand-prediction.resolution.hourly",
     daily: "water-demand-prediction.resolution.daily",
     weekly: "water-demand-prediction.resolution.weekly",
   };
-  choiceResolution = signal<string | undefined>(undefined);
+  readonly choiceResolution = signal<string | undefined>(undefined);
 
-  translateString = "de"
-  currentLang = dayjs.locale(this.translateString)
+  private translateString = "de"
+  private currentLang = dayjs.locale(this.translateString)
 
   /** variables timeframe dropdown */
-  menuTime = "water-demand-prediction.choice.timeframe";
-  optionsTime: Record<string, string> = {
+  protected menuTime = "water-demand-prediction.choice.timeframe";
+  protected optionsTime: Record<string, string> = {
     "one day": dayjs.duration(1, "days").humanize(),
     "one week": dayjs.duration(1, "week").humanize(),
     "one month": dayjs.duration(1, "month").humanize(),
@@ -52,7 +51,7 @@ export class WaterDemandPredictionComponent {
     "one year": dayjs.duration(1, "year").humanize(),
     all: dayjs.duration(3, "year").humanize(),
   };
-  choiceTime = signal<string | undefined>(undefined);
+  readonly choiceTime = signal<string | undefined>(undefined);
 
   //BUG Continue here, to fix translation
 
@@ -63,51 +62,62 @@ export class WaterDemandPredictionComponent {
   choiceSmartmeter = signal<string | undefined>(undefined);
 
   /** variables startpoint dropdown */
-  menuStartPoint = "water-demand-prediction.startpoint.menu";
-  optionsStartPoint: Record<string, string> = {
+  protected menuStartPoint = "water-demand-prediction.startpoint.menu";
+  protected optionsStartPoint: Record<string, string> = {
     "2021-05-26 00:00:00": "water-demand-prediction.startpoint.options.a",
     "2021-06-01 00:00:00": "water-demand-prediction.startpoint.options.b",
     "2022-01-01 00:00:00": "water-demand-prediction.startpoint.options.c",
   };
-  choiceStartPoint = signal<string | undefined>(undefined);
 
-  menuWeather = "water-demand-prediction.choice.weather";
-  optionsWeather: Record<string, string> = {
+  private startOfData = dayjs(new Date(2021, 4, 26, 0, 0, 0)).format('YYYY-MM-DD HH:mm:ss');
+  private startofJune = dayjs(new Date(2021, 5, 1, 0, 0, 0)).format('YYYY-MM-DD HH:mm:ss');
+  private startOfYear22 = dayjs(new Date(2022, 0, 1, 0, 0, 0)).format('YYYY-MM-DD HH:mm:ss');
+
+
+  protected optionsStartPointNew: Record<string, string> = {
+    [this.startOfData]: "water-demand-prediction.startpoint.options.a",
+    [this.startofJune]: "water-demand-prediction.startpoint.options.b",
+    [this.startOfYear22]: "water-demand-prediction.startpoint.options.c",
+  };
+  readonly choiceStartPoint = signal<string | undefined>(undefined);
+
+  protected menuWeather = "water-demand-prediction.choice.weather";
+  protected optionsWeather: Record<string, string> = {
     plain: "water-demand-prediction.weather.plain",
     air_temperature: "water-demand-prediction.weather.air_temperature",
     precipitation: "water-demand-prediction.weather.precipitation",
     moisture: "water-demand-prediction.weather.moisture",
   };
-  choiceWeather = signal<string | undefined>(undefined);
+  readonly choiceWeather = signal<string | undefined>(undefined);
 
-  menuWeatherColumn = "water-demand-prediction.choice.weatherColumn";
-  weatherColumnsSignal: Signal<WeatherColumns | undefined> = this.waterDemandService.fetchWeatherCols(this.choiceWeather);
-  optionsWeatherColumn: Record<string, string> = {};
-  choiceWeatherColumn = signal<string | undefined>(undefined);
+  protected menuWeatherColumn = "water-demand-prediction.choice.weatherColumn";
+  readonly weatherColumnsSignal: Signal<WeatherColumns | undefined> = this.waterDemandService.fetchWeatherCols(this.choiceWeather);
+  protected optionsWeatherColumn: Record<string, string> = {};
+  readonly choiceWeatherColumn = signal<string | undefined>(undefined);
 
   /** data object of current requested Smartmeterdata */
-  currentSingleSmartmeterDataSignal: Signal<SingleSmartmeter | undefined> = this.waterDemandService.fetchSmartmeter(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution)
-  currentSmartmeterData: SingleSmartmeter | undefined;
+  readonly currentSingleSmartmeterDataSignal: Signal<SingleSmartmeter | undefined> = this.waterDemandService.fetchSmartmeter(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution)
+  private currentSmartmeterData: SingleSmartmeter | undefined;
 
   /** signal to trigger training on button click and store the answer */
-  triggerTraining = signal<boolean>(false);
-  trainingResp = this.waterDemandService.trainModel(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution, this.choiceWeather, this.choiceWeatherColumn, this.triggerTraining);
+  readonly triggerTraining = signal<boolean>(false);
+  readonly trainingResp = this.waterDemandService.trainModel(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution, this.choiceWeather, this.choiceWeatherColumn, this.triggerTraining);
 
   /** data object of current requested Smartmeterdata */
-  triggerFetchPredictedSmartmeterData = signal<boolean>(false);
-  currentPredictedSmartmeterDataSignal: Signal<PredictedSmartmeter | undefined> = this.waterDemandService.fetchPrediction(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution, this.choiceWeather, this.choiceWeatherColumn, this.triggerFetchPredictedSmartmeterData)
-  currentPredictedSmartmeterData: PredictedSmartmeter | undefined;
+  readonly triggerFetchPredictedSmartmeterData = signal<boolean>(false);
+  readonly currentPredictedSmartmeterDataSignal: Signal<PredictedSmartmeter | undefined> = this.waterDemandService.fetchPrediction(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution, this.choiceWeather, this.choiceWeatherColumn, this.triggerFetchPredictedSmartmeterData)
+  protected currentPredictedSmartmeterData: PredictedSmartmeter | undefined;
 
   /** Record to hold all saved ChartDatasets */
-  savedDatasets: Record<string, SmartmeterDataset[]> = {};
+  private savedDatasets: Record<string, SmartmeterDataset[]> = {};
 
   /** Record to hold all saved predicted ChartDatasets */
-  predictedDatasets: Record<string, PredictedSmartmeterDataset[]> = {};
+  private predictedDatasets: Record<string, PredictedSmartmeterDataset[]> = {};
 
   /**
    * data skeleton for the line graph
    */
-  chartDataCurrentValues: ChartData = {
+  protected chartDataCurrentValues: ChartData = {
     labels: [], // X-axis labels
     datasets: [], // data points
   };
@@ -115,7 +125,7 @@ export class WaterDemandPredictionComponent {
   /**
    * data skeleton for the line graph
    */
-  chartDataPredictedValues: ChartData = {
+  protected chartDataPredictedValues: ChartData = {
     labels: [], // X-axis labels
     datasets: [], // data points
   };
@@ -124,12 +134,12 @@ export class WaterDemandPredictionComponent {
    * type of graph to use in chart
    * as a signal to change it via template
    */
-  chartType = signal<ChartType>("line");
+  protected chartType = signal<ChartType>("line");
 
   /**
    * options used for the line chart to visualize prediction values
    */
-  chartOptions: ChartConfiguration["options"] = {
+  protected chartOptions: ChartConfiguration["options"] = {
     responsive: true,
     maintainAspectRatio: false,
     elements: {
