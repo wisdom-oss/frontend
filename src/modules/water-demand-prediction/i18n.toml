@@ -163,17 +163,41 @@ en = "R2"
 de = "R2"
 
 [explanation.MAE]
-en = "In the context of machine learning, absolute error refers to the magnitude of difference between the prediction of an observation and the true value of that observation. MAE takes the average of absolute errors for a group of predictions and observations as a measurement of the magnitude of errors for the entire group. MAE can also be referred as L1 loss function."
-de = "Im Kontext des maschinellen Lernens bezieht sich der absolute Fehler auf die Größe der Differenz zwischen der Vorhersage einer Beobachtung und dem wahren Wert dieser Beobachtung. MAE nimmt den Durchschnitt der absoluten Fehler für eine Gruppe von Vorhersagen und Beobachtungen als Maß für das Ausmaß der Fehler für die gesamte Gruppe. MAE kann auch als L1-Verlustfunktion bezeichnet werden."
+en = """In the context of machine learning, absolute error refers to the magnitude of difference
+between the prediction of an observation and the true value of that observation. MAE takes the average
+of absolute errors for a group of predictions and observations as a measurement of the magnitude of errors
+for the entire group. MAE can also be referred as L1 loss function."""
+de = """Im Kontext des maschinellen Lernens bezieht sich der absolute Fehler auf die Größe der Differenz
+zwischen der Vorhersage einer Beobachtung und dem wahren Wert dieser Beobachtung. MAE nimmt den Durchschnitt
+der absoluten Fehler für eine Gruppe von Vorhersagen und Beobachtungen als Maß für das Ausmaß der Fehler für
+die gesamte Gruppe. MAE kann auch als L1-Verlustfunktion bezeichnet werden."""
 
 [explanation.MSE]
-en = "In the fields of regression analysis and machine learning, the Mean Square Error (MSE) is a crucial metric for evaluating the performance of predictive models. It measures the average squared difference between the predicted and the actual target values within a dataset. The primary objective of the MSE is to assess the quality of a model's predictions by measuring how closely they align with the ground truth."
-de = "In den Bereichen Regressionsanalyse und maschinelles Lernen ist der mittlere quadratische Fehler (Mean Square Error, MSE) eine wichtige Kennzahl für die Bewertung der Leistung von Vorhersagemodellen. Er misst die durchschnittliche quadratische Differenz zwischen den vorhergesagten und den tatsächlichen Zielwerten innerhalb eines Datensatzes. Das Hauptziel des MSE besteht darin, die Qualität der Vorhersagen eines Modells zu bewerten, indem man misst, wie gut sie mit der Grundwahrheit übereinstimmen."
+en = """In the fields of regression analysis and machine learning, the Mean Square Error (MSE) is a crucial metric
+for evaluating the performance of predictive models. It measures the average squared difference between the predicted
+and the actual target values within a dataset. The primary objective of the MSE is to assess the quality of a model's
+predictions by measuring how closely they align with the ground truth."""
+de = """In den Bereichen Regressionsanalyse und maschinelles Lernen ist der mittlere quadratische Fehler (Mean Square Error, MSE)
+eine wichtige Kennzahl für die Bewertung der Leistung von Vorhersagemodellen. Er misst die durchschnittliche quadratische Differenz
+zwischen den vorhergesagten und den tatsächlichen Zielwerten innerhalb eines Datensatzes. Das Hauptziel des MSE besteht darin,
+die Qualität der Vorhersagen eines Modells zu bewerten, indem man misst, wie gut sie mit der Grundwahrheit übereinstimmen."""
 
 [explanation.RMSE]
-en = "Root mean square error or root mean square deviation is one of the most commonly used measures for evaluating the quality of predictions. It shows how far predictions fall from measured true values using Euclidean distance."
-de = "Der mittlere quadratische Fehler (Root Mean Square Error) oder die mittlere quadratische Abweichung (Root Mean Square Deviation) ist eines der am häufigsten verwendeten Maße zur Bewertung der Qualität von Vorhersagen. Es zeigt, wie weit die Vorhersagen von den gemessenen wahren Werten abweichen, wobei der euklidische Abstand verwendet wird"
+en = """Root mean square error or root mean square deviation is one of the most commonly used measures for evaluating
+the quality of predictions. It shows how far predictions fall from measured true values using Euclidean distance."""
+de = """Der mittlere quadratische Fehler (Root Mean Square Error) oder die mittlere quadratische Abweichung
+(Root Mean Square Deviation) ist eines der am häufigsten verwendeten Maße zur Bewertung der Qualität von Vorhersagen.
+Es zeigt, wie weit die Vorhersagen von den gemessenen wahren Werten abweichen, wobei der euklidische Abstand verwendet wird"""
 
 [explanation.R2]
-en = "The R-squared metric — R², or the coefficient of determination – is used to measure how well a model fits data, and how well it can predict future outcomes. Simply put, it tells you how much of the variation in your data can be explained by your model. The closer the R-squared value is to one, the better your model fits the data."
-de = "Die Metrik R-Quadrat - R² oder das Bestimmtheitsmaß - wird verwendet, um zu messen, wie gut ein Modell zu den Daten passt und wie gut es zukünftige Ergebnisse vorhersagen kann. Einfach ausgedrückt, sagt es aus, wie viel der Variation in Ihren Daten durch Ihr Modell erklärt werden kann. Je näher der R-Quadrat-Wert bei eins liegt, desto besser passt Ihr Modell zu den Daten."
+en = """The R-squared metric — R², or the coefficient of determination – is used to measure how well a model fits data,
+and how well it can predict future outcomes. Simply put, it tells you how much of the variation in your data can be
+explained by your model. The closer the R-squared value is to one, the better your model fits the data."""
+de = """Die Metrik R-Quadrat - R² oder das Bestimmtheitsmaß - wird verwendet, um zu messen, wie gut ein Modell
+zu den Daten passt und wie gut es zukünftige Ergebnisse vorhersagen kann. Einfach ausgedrückt, sagt es aus,
+wie viel der Variation in Ihren Daten durch Ihr Modell erklärt werden kann. Je näher der R-Quadrat-Wert bei eins
+liegt, desto besser passt Ihr Modell zu den Daten."""
+
+[dayjs.locale]
+en = "en"
+de = "de"

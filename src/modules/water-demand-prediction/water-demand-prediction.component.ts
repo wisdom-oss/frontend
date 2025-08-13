@@ -7,6 +7,14 @@ import { MeterNames, WaterDemandPredictionService, WeatherColumns } from "../../
 import { DropdownComponent } from "../../common/components/dropdown/dropdown.component";
 import { SingleSmartmeter, PredictedSmartmeter } from "../../api/water-demand-prediction.service";
 import { signal, Signal, effect } from "@angular/core";
+import dayjs from "dayjs";
+import "dayjs/locale/de";
+import "dayjs/locale/en";
+import duration from "dayjs/plugin/duration";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+dayjs.extend(duration);
+dayjs.extend(relativeTime);
 
 
 @Component({
@@ -17,16 +25,6 @@ import { signal, Signal, effect } from "@angular/core";
 })
 export class WaterDemandPredictionComponent {
   private waterDemandService = inject(WaterDemandPredictionService);
-
-  explainMAE: string =
-    "In the context of machine learning, absolute error refers to the magnitude of difference between the prediction of an observation and the true value of that observation. MAE takes the average of absolute errors for a group of predictions and observations as a measurement of the magnitude of errors for the entire group. MAE can also be referred as L1 loss function.";
-  explainRMSE: string =
-    "Root mean square error or root mean square deviation is one of the most commonly used measures for evaluating the quality of predictions. It shows how far predictions fall from measured true values using Euclidean distance.";
-  explainMSE: string =
-    "In the fields of regression analysis and machine learning, the Mean Square Error (MSE) is a crucial metric for evaluating the performance of predictive models. It measures the average squared difference between the predicted and the actual target values within a dataset. The primary objective of the MSE is to assess the quality of a model's predictions by measuring how closely they align with the ground truth.";
-  explainR2: string =
-    "The R-squared metric — R², or the coefficient of determination – is used to measure how well a model fits data, and how well it can predict future outcomes. Simply put, it tells you how much of the variation in your data can be explained by your model. The closer the R-squared value is to one, the better your model fits the data.";
-
 
   /** the displayed resolution in the charts of real data */
   displayedResolution = signal<string | undefined>(undefined);
@@ -51,7 +49,22 @@ export class WaterDemandPredictionComponent {
     "one year": "water-demand-prediction.timeframe.one-year",
     all: "water-demand-prediction.timeframe.all",
   };
+
+  translateString = "de"
+  currentLang = dayjs.locale(this.translateString)
+
+  optionsTimeNew: Record<string, string> = {
+    "one day": dayjs.duration(1, "days").humanize(),
+    "one week": dayjs.duration(1, "week").humanize(),
+    "one month": dayjs.duration(1, "month").humanize(),
+    "three months": dayjs.duration(3, "month").humanize(),
+    "six months": dayjs.duration(6, "month").humanize(),
+    "one year": dayjs.duration(1, "year").humanize(),
+    all: dayjs.duration(3, "year").humanize(),
+  };
   choiceTime = signal<string | undefined>(undefined);
+
+  //BUG Continue here, to fix translation
 
   /** variables name dropdown */
   menuSmartmeter = "water-demand-prediction.choice.smartmeter";
