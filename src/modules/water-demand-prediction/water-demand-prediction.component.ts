@@ -38,22 +38,12 @@ export class WaterDemandPredictionComponent {
   };
   choiceResolution = signal<string | undefined>(undefined);
 
-  /** variables timeframe dropdown */
-  menuTime = "water-demand-prediction.choice.timeframe";
-  optionsTime: Record<string, string> = {
-    "one day": "water-demand-prediction.timeframe.one-day",
-    "one week": "water-demand-prediction.timeframe.one-week",
-    "one month": "water-demand-prediction.timeframe.one-month",
-    "three months": "water-demand-prediction.timeframe.three-months",
-    "six months": "water-demand-prediction.timeframe.six-months",
-    "one year": "water-demand-prediction.timeframe.one-year",
-    all: "water-demand-prediction.timeframe.all",
-  };
-
   translateString = "de"
   currentLang = dayjs.locale(this.translateString)
 
-  optionsTimeNew: Record<string, string> = {
+  /** variables timeframe dropdown */
+  menuTime = "water-demand-prediction.choice.timeframe";
+  optionsTime: Record<string, string> = {
     "one day": dayjs.duration(1, "days").humanize(),
     "one week": dayjs.duration(1, "week").humanize(),
     "one month": dayjs.duration(1, "month").humanize(),
