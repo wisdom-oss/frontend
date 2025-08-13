@@ -17,16 +17,20 @@ import {
 } from "@ng-icons/core";
 import {
   remixBarChartFill,
+  remixBnbLine,
   remixBookLine,
   remixBookShelfLine,
   remixBuilding3Fill,
+  remixDrizzleFill,
   remixDatabase2Fill,
   remixFilePaper2Fill,
   remixInstanceLine,
   remixLineChartLine,
   remixMapLine,
+  remixMap2Fill,
   remixRfidLine,
   remixSunCloudyFill,
+  remixSwap2Line,
   remixWaterPercentFill,
 } from "@ng-icons/remixicon";
 import {TranslateDirective} from "@ngx-translate/core";
@@ -54,16 +58,20 @@ import {AuthService} from "../auth/auth.service";
   providers: [
     provideIcons({
       remixBarChartFill,
+      remixBnbLine,
       remixBookLine,
       remixBookShelfLine,
       remixBuilding3Fill,
       remixDatabase2Fill,
+      remixDrizzleFill,
       remixFilePaper2Fill,
       remixInstanceLine,
       remixLineChartLine,
       remixMapLine,
+      remixMap2Fill,
       remixRfidLine,
       remixSunCloudyFill,
+      remixSwap2Line,
       remixWaterPercentFill,
     }),
     provideNgIconLoader(name => {

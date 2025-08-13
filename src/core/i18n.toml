@@ -49,3 +49,7 @@ de = "Wasserverbrauch"
 [sidebar.category.waterworks]
 en = "Waterworks"
 de = "Wasserwerke"
+
+[sidebar.category.digital-twin]
+en = "Digital Twin"
+de = "Digitaler Zwilling"

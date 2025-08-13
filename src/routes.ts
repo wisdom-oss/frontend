@@ -12,6 +12,8 @@ import {PumpModelsComponent} from "./modules/pump-models/pump-models.component";
 import {WaterRightsComponent} from "./modules/water-rights/water-rights.component";
 import {waterRightsRoutes} from "./modules/water-rights/routes";
 import {WeatherDataComponent} from "./modules/weather-data/weather-data.component";
+import {BraintankComponent} from "./modules/braintank/braintank.component";
+
 
 export const routes: Routes = [
   {path: "callback", component: CallbackComponent},
@@ -41,6 +43,10 @@ export const routes: Routes = [
         path: "oowv/action-map",
         component: OowvActionMapComponent,
         canActivate: [permissionsGuard(...OowvActionMapComponent.SCOPES)],
+      },
+      {
+        path: "braintank",
+        component: BraintankComponent,
       },
     ],
   },
