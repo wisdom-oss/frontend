@@ -71,7 +71,7 @@ export namespace api {
    *
    * @example
    * const URL = "/api/status" as const;
-   * 
+   *
    * @Injectable({ providedIn: "root" })
    * export class StatusService extends api.service(URL) {
    *   // fields via inject(...) here, no constructor
@@ -646,13 +646,13 @@ export namespace api {
    *
    * @template TSend
    * Type of messages that can be sent to the server.
-   * 
+   *
    * @template TDefault
    * Default value initially returned before any message is received.
-   * 
+   *
    * @template TRaw
    * Raw message format from the WebSocket.
-   * 
+   *
    * @template TSerialized
    * JSON-able format to send to the WebSocket.
    */
@@ -666,26 +666,26 @@ export namespace api {
     /** URL of the WebSocket server. */
     url: ConstructorParameters<typeof WebSocket>[0];
 
-    /** 
-     * Typia validator to ensure incoming (parsed) messages match the expected 
-     * type. 
+    /**
+     * Typia validator to ensure incoming (parsed) messages match the expected
+     * type.
      */
     validate: (input: unknown) => typia.IValidation<TMessage>;
 
-    /** 
-     * Typia validator to ensure incoming raw messages match the expected type. 
+    /**
+     * Typia validator to ensure incoming raw messages match the expected type.
      */
     validateRaw?: (input: unknown) => typia.IValidation<TRaw>;
 
     /**
-     * Parse the raw messages into a message format to be used in the public API. 
+     * Parse the raw messages into a message format to be used in the public API.
      * @param input Raw incoming message, validated via {@link validateRaw}.
      */
     parse?: (input: TRaw) => TMessage;
 
     /**
      * Serialize the message to send it to the socket.
-     * 
+     *
      * This should take care of mapping complex types into easily JSON-able types.
      */
     serialize?: (input: TSend) => TSerialized;
