@@ -11,6 +11,7 @@ import {TranslateDirective} from "@ngx-translate/core";
 import {StatusService} from "../../api/status.service";
 import {api} from "../../common/api";
 import {keys} from "../../common/utils/keys";
+import {signals} from "../../common/signals";
 
 type ServiceRecord = Record<string, InstanceType<api.Service>>;
 type StatusRecord = Record<string, StatusService.Status[0] | undefined>;
@@ -148,14 +149,29 @@ export class SidebarStatusIconComponent extends SidebarStatusBaseComponent {
             <td
               style="white-space: nowrap; vertical-align: middle; font-size: 1.1em;"
             >
-              <span class="icon" [class]="service.value.status.hasText">
-                <ng-icon [name]="service.value.status.icon"></ng-icon>
-              </span>
-              <span translate
-                >core.sidebar.status.{{
-                  service.value.status.description
-                }}</span
-              >
+              <div class="level is-gapless">
+                <div class="level-item is-flex-grow-0">
+                  <p
+                    class="icon is-medium"
+                    [class]="service.value.status.hasText"
+                  >
+                    <ng-icon
+                      size="1.2em"
+                      [name]="service.value.status.icon"
+                    ></ng-icon>
+                  </p>
+                </div>
+                <div
+                  class="level-item is-flex-direction-column is-align-items-stretch"
+                >
+                  <p class="title is-6" translate>
+                    core.sidebar.status.{{ service.value.status.description }}
+                  </p>
+                  <p class="subtitle is-7">
+                    {{ service.value.lastUpdate?.locale(lang())?.fromNow() }}
+                  </p>
+                </div>
+              </div>
             </td>
           </tr>
         }
@@ -166,6 +182,7 @@ export class SidebarStatusIconComponent extends SidebarStatusBaseComponent {
 export class SidebarStatusInfoComponent extends SidebarStatusBaseComponent {
   readonly services = input.required<ServiceRecord>();
   readonly status = input<StatusRecord>();
+  protected lang = signals.lang();
 
   protected relevantServices = computed(() =>
     Object.map(this.services(), (service, name) => {
@@ -178,7 +195,7 @@ export class SidebarStatusInfoComponent extends SidebarStatusBaseComponent {
         case "down": return new SidebarStatus("error");
         case "limited": return new SidebarStatus("warning");
       }};
-      return {path, status: sidebarStatus()};
+      return {path, status: sidebarStatus(), lastUpdate: status?.lastUpdate};
     }),
   );
 }

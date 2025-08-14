@@ -123,7 +123,7 @@ export class SidebarComponent implements AfterViewInit {
       },
       WaterRightsService: {
         path: "",
-        lastUpdate: dayjs(),
+        lastUpdate: dayjs("2025-08-14T07:52"),
         status: "ok" as const,
       },
     };
