@@ -6,7 +6,7 @@
  * `Once` can be set exactly once.
  * Consumers can `await` or `.then` it.
  */
-export class Once<T> implements PromiseLike<T> {
+export class Once<T = void> implements PromiseLike<T> {
   private promise: Promise<T>;
   private resolve!: (value: T) => void;
   private isSet = false;

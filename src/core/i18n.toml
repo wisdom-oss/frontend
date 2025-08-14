@@ -34,6 +34,22 @@ de = "Wenn das nicht funktioniert:"
 en = "Back to Home"
 de = "Zurück zur Startseite"
 
+[sidebar.status.operational]
+en = "operational"
+de = "betriebsbereit"
+
+[sidebar.status.unknown]
+en = "unknown"
+de = "unbekannt"
+
+[sidebar.status.limited]
+en = "limited"
+de = "eingeschränkt"
+
+[sidebar.status.down]
+en = "down"
+de = "außer Betrieb"
+
 [sidebar.category.groundwater]
 en = "Groundwater"
 de = "Grundwasser"

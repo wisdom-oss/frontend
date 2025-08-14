@@ -11,7 +11,7 @@ const URL = "/api/groundwater-levels" as const;
 @Injectable({
   providedIn: "root",
 })
-export class GroundwaterLevelsService {
+export class GroundwaterLevelsService extends api.service(URL) {
   fetchRecorderLocation(
     stationId: api.RequestSignal<string>,
   ): api.Signal<Self.RecorderLocation> {

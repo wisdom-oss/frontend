@@ -1,0 +1,20 @@
+{
+  sortImports: [
+    "globalFirst",
+    "!sideEffect",
+    "sourceType",
+    "!namespacePresence",
+    "pathName",
+    "sourceName",
+  ],
+  separateBy: [
+    "separateGlobal",
+    "unequalSideEffectUse",
+    "unequalPackageState",
+    "unequalNamespaceUse",
+  ],
+  require: {
+    globalFirst: "./scripts/primp/globalFirst.ts",
+    separateGlobal: "./scripts/primp/separateGlobal.ts",
+  },
+}

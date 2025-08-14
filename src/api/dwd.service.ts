@@ -11,7 +11,7 @@ const URL = "/api/dwd" as const;
 @Injectable({
   providedIn: "root",
 })
-export class DwdService {
+export class DwdService extends api.service(URL) {
   private cacheTtl = dayjs.duration(12, "hours");
 
   readonly v2 = {

@@ -8,11 +8,13 @@ import {
   HttpResourceRequest,
   HttpErrorResponse,
 } from "@angular/common/http";
-import {computed, isSignal, Signal as CoreSignal} from "@angular/core";
+import {computed, isSignal, signal, Signal as CoreSignal} from "@angular/core";
 import {Duration} from "dayjs/plugin/duration";
+import {isTypedArray} from "three/src/animation/AnimationUtils.js";
 import typia from "typia";
 
 import {httpContexts} from "./http-contexts";
+import {Once} from "./utils/once";
 
 /**
  * Toolkit to build API services.
@@ -31,6 +33,58 @@ import {httpContexts} from "./http-contexts";
  * validation and caching easier.
  */
 export namespace api {
+  /**
+   * Class type of an API service.
+   *
+   * This is the constructor type of classes that extend {@link ApiService}.
+   * We export the type, not the base class, so users cannot subclass it directly.
+   *
+   * @example
+   * export class SomeService extends api.service("/api/something") {}
+   */
+  export type Service = typeof ApiService;
+
+  /**
+   * Base class for all API services.
+   *
+   * Services must provide a `URL` that points to an `/api/...` endpoint.
+   * We keep shared expectations here so all services behave the same.
+   *
+   * Prefer {@link service} to create your own base to extend from,
+   * instead of extending this class directly.
+   */
+  abstract class ApiService {
+    get URL(): string {
+      return undefined!;
+    }
+  }
+
+  /**
+   * Create an extendable API service class without a constructor.
+   *
+   * Returns a class that extends {@link ApiService} and fixes its `URL`.
+   * Downstream services can `extends` that class and use field injection,
+   * so no need to write a constructor or call `super`.
+   *
+   * @param url An `/api/...` URL literal used as the service root.
+   * @returns A {@link Service} class you can extend.
+   *
+   * @example
+   * const URL = "/api/status" as const;
+   *
+   * @Injectable({ providedIn: "root" })
+   * export class StatusService extends api.service(URL) {
+   *   // fields via inject(...) here, no constructor
+   * }
+   */
+  export function service<URL extends `/api/${string}`>(url: URL): Service {
+    return class extends ApiService {
+      override get URL(): string {
+        return url;
+      }
+    };
+  }
+
   /**
    * A request signal can either be a raw value or a signal producing that value.
    *
@@ -544,6 +598,233 @@ export namespace api {
 
       return resourceRef.value();
     });
+  }
+
+  /**
+   * A signal-based WebSocket connection.
+   *
+   * Returned by {@link socket}, this type allows reactive handling of WebSocket
+   * messages.
+   *
+   * It extends Angular's {@link CoreSignal}, letting you directly get the current
+   * message value by calling the signal.
+   *
+   * The additional methods `.send()` and `.close()` control the WebSocket
+   * connection directly.
+   *
+   * @template TMessage
+   * Type of messages received from the server.
+   *
+   * @template TSend
+   * Type of messages that can be sent to the server via `.send()`.
+   *
+   * @template TDefault
+   * Default value initially returned before any message is received.
+   */
+  export type Socket<TMessage, TSend, TDefault = undefined> = CoreSignal<
+    TMessage | TDefault
+  > & {
+    /** Close the WebSocket connection. */
+    close(): void;
+    /**
+     * Send a message through the WebSocket.
+     *
+     * This automatically waits until the socket is open.
+     */
+    send(message: TSend): void;
+  };
+
+  /**
+   * Configuration options for creating a WebSocket connection using
+   * {@link socket}.
+   *
+   * Includes settings like URL, protocols, validation, event handlers,
+   * and a default message value.
+   *
+   * @template TMessage
+   * Type of messages received from the server, validated via `validate`.
+   *
+   * @template TSend
+   * Type of messages that can be sent to the server.
+   *
+   * @template TDefault
+   * Default value initially returned before any message is received.
+   *
+   * @template TRaw
+   * Raw message format from the WebSocket.
+   *
+   * @template TSerialized
+   * JSON-able format to send to the WebSocket.
+   */
+  export type SocketOptions<
+    TMessage,
+    TSend,
+    TDefault = undefined,
+    TRaw = TMessage,
+    TSerialized = TSend,
+  > = {
+    /** URL of the WebSocket server. */
+    url: ConstructorParameters<typeof WebSocket>[0];
+
+    /**
+     * Typia validator to ensure incoming (parsed) messages match the expected
+     * type.
+     */
+    validate: (input: unknown) => typia.IValidation<TMessage>;
+
+    /**
+     * Typia validator to ensure incoming raw messages match the expected type.
+     */
+    validateRaw?: (input: unknown) => typia.IValidation<TRaw>;
+
+    /**
+     * Parse the raw messages into a message format to be used in the public API.
+     * @param input Raw incoming message, validated via {@link validateRaw}.
+     */
+    parse?: (input: TRaw) => TMessage;
+
+    /**
+     * Serialize the message to send it to the socket.
+     *
+     * This should take care of mapping complex types into easily JSON-able types.
+     */
+    serialize?: (input: TSend) => TSerialized;
+
+    /** Protocols to use when connecting to the WebSocket server. */
+    protocols?: ConstructorParameters<typeof WebSocket>[1];
+
+    /**
+     * Binary data type expected from the WebSocket server
+     * (e.g., "blob", "arraybuffer").
+     */
+    binaryType?: WebSocket["binaryType"];
+
+    /** Called when the WebSocket connection closes. */
+    onClose?: (
+      socket: Socket<TMessage, TSend, TDefault>,
+      event: CloseEvent,
+    ) => void;
+
+    /** Called when the WebSocket connection encounters an error. */
+    onError?: (socket: Socket<TMessage, TSend, TDefault>, event: Event) => void;
+
+    /** Called when the WebSocket connection successfully opens. */
+    onOpen?: (socket: Socket<TMessage, TSend, TDefault>, event: Event) => void;
+
+    /**
+     * Called when a message is received from the WebSocket server.
+     *
+     * This is the raw received message without any validation.
+     * Also the main purpose to use the {@link socket} function is to access
+     * messages via the signal interface.
+     */
+    onMessage?: (
+      socket: Socket<TMessage, TSend, TDefault>,
+      event: MessageEvent,
+    ) => void;
+
+    /** Default message value initially returned by the socket signal. */
+    defaultValue?: TDefault;
+  };
+
+  /**
+   * Opens a WebSocket connection and returns a reactive {@link Socket}.
+   *
+   * The socket reacts to incoming messages by validating and updating the signal.
+   * It also provides methods for sending messages and closing the connection.
+   *
+   * @returns
+   * A {@link Socket} object that lets you:
+   * - Reactively read incoming messages by calling the signal.
+   * - Send messages with `.send()`.
+   * - Close the connection with `.close()`.
+   *
+   * @see {@link SocketOptions} for configuration details.
+   */
+  export function socket<
+    TMessage,
+    TSend,
+    TDefault = undefined,
+    TRaw = TMessage,
+    TSerialized = TSend,
+  >({
+    url,
+    validate,
+    validateRaw,
+    parse,
+    serialize,
+    protocols,
+    binaryType,
+    onClose,
+    onError,
+    onOpen,
+    onMessage,
+    defaultValue,
+  }: SocketOptions<TMessage, TSend, TDefault, TRaw, TSerialized>): Socket<
+    TMessage,
+    TSend,
+    TDefault
+  > {
+    let webSocket = new WebSocket(url, protocols);
+    if (binaryType) webSocket.binaryType = binaryType;
+
+    let waitUntilOpen = new Once();
+    let send = (message: TSend) => {
+      let payload = serialize ? serialize(message) : message;
+
+      waitUntilOpen.then(() => {
+        if (
+          payload instanceof ArrayBuffer ||
+          payload instanceof Blob ||
+          isTypedArray(payload) ||
+          payload instanceof DataView
+        )
+          webSocket.send(payload as ArrayBuffer | Blob | ArrayBufferLike);
+        else if (typeof payload === "string") webSocket.send(payload);
+        else webSocket.send(JSON.stringify(payload));
+      });
+    };
+
+    let writeSignal = signal<TMessage | TDefault>(defaultValue as TDefault);
+    let socket = Object.assign(writeSignal, {
+      close: webSocket.close,
+      send,
+    });
+
+    let addEventListener = webSocket.addEventListener;
+    if (onClose) addEventListener("close", ev => onClose(socket, ev));
+    if (onError) addEventListener("error", ev => onError(socket, ev));
+    if (onOpen) addEventListener("open", ev => onOpen(socket, ev));
+    if (onMessage) addEventListener("message", ev => onMessage(socket, ev));
+
+    webSocket.addEventListener("open", () => waitUntilOpen.set());
+    webSocket.addEventListener("message", ev => {
+      let message;
+      if (typeof ev.data === "string") message = JSON.parse(ev.data);
+      else if (webSocket.binaryType === "blob") message = new Blob(ev.data);
+      else if (webSocket.binaryType === "arraybuffer")
+        message = new ArrayBuffer(ev.data);
+
+      if (validateRaw) {
+        let checked = validateRaw(message);
+        if (!checked.success) {
+          console.error(checked.errors);
+          throw new Error("Invalid type on raw message");
+        }
+      }
+
+      if (parse) message = parse(message);
+
+      let checked = validate(message);
+      if (!checked.success) {
+        console.error(checked.errors);
+        throw new Error("Invalid type on message");
+      }
+
+      writeSignal.set(checked.data);
+    });
+
+    return socket;
   }
 
   /**
