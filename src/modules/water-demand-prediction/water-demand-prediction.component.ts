@@ -17,7 +17,6 @@ import { stringToColor } from "../../common/stringToColor";
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
 
-
 @Component({
   selector: "water-demand-prediction",
   imports: [BaseChartDirective, DropdownComponent, TranslatePipe, CommonModule],
@@ -455,7 +454,6 @@ export class WaterDemandPredictionComponent {
     this.chartDataCurrentValues.datasets = [];
 
     if (!this.savedDatasets[resolution]) {
-      alert("No suitable chart to show!");
       return;
     }
 
