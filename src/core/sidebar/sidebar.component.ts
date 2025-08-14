@@ -93,7 +93,7 @@ export class SidebarComponent implements AfterViewInit {
   private statusSubscribe = effect(() => {
     this.status.socket.send({
       command: "subscribe",
-      id: "",
+      id: `subscribe@${dayjs().toISOString()}`,
       data: {
         paths: Object.values(this.services()).map(service => service.URL),
         updateInterval: dayjs.duration(15, "seconds"),
