@@ -13,6 +13,8 @@ import {wisdomAppConfig} from "./config";
 import {configureTranslations} from "./i18n";
 import durationExt from "./core/dayjs/duration-ext.plugin";
 
+import "dayjs/locale/de";
+
 import "./global";
 
 @Component({
