@@ -143,7 +143,7 @@ export function sidebar(): readonly SidebarEntry[] {
           module: "long-term-forecast.display.module",
           icon: {remixBarChartFill},
           link: "/long-term-forecast",
-          services: {UsageForecastsService},
+          services: {UsageForecastsService, GeoDataService},
         },
         {
           module: "Be-Water-Smart",
