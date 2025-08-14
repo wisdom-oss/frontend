@@ -12,6 +12,7 @@ import "dayjs/locale/de";
 import "dayjs/locale/en";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { stringToColor } from "../../common/stringToColor";
 
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
@@ -37,8 +38,8 @@ export class WaterDemandPredictionComponent {
   };
   readonly choiceResolution = signal<string | undefined>(undefined);
 
-  private translateString = "de"
-  private currentLang = dayjs.locale(this.translateString)
+  private translateString = signal<string>("water-demand-prediction.dayjs.locale")
+  private currentLang = dayjs.locale(this.translateString())
 
   /** variables timeframe dropdown */
   protected menuTime = "water-demand-prediction.choice.timeframe";
@@ -178,6 +179,10 @@ export class WaterDemandPredictionComponent {
 
   constructor() {
 
+    effect(() => {
+      console.log(this.translateString());
+    })
+
     /** define smartmeter options */
     effect(() => {
       let smartmeters = this.smartmeterSignal();
@@ -274,33 +279,7 @@ export class WaterDemandPredictionComponent {
     resolution: string,
     timeframe: string,
   ): string {
-    return this.stringToColor(label + resolution + timeframe);
-  }
-
-  /**
-   * Generates deterministically a hex color code from any string.
-   *
-   * This is a modernized version of this
-   * [StackOverflow reply](https://stackoverflow.com/a/16348977/15800714).
-   * @param str A string to generate a hex color for
-   * @param map A color map for predefined strings
-   *
-   * @returns A hex color code in the style of '#abc123'
-   */
-  stringToColor(str: string, map?: Record<string, string>): string {
-    if (map && map[str]) {
-      return map[str];
-    }
-    let hash = 0;
-    for (let s of str) {
-      hash = s.charCodeAt(0) + ((hash << 5) - hash);
-    }
-    let color = "#";
-    for (let i = 0; i < 3; i++) {
-      let value = (hash >> (i * 8)) & 0xff;
-      color += ("00" + value.toString(16)).slice(-2);
-    }
-    return color;
+    return stringToColor(label + resolution + timeframe);
   }
 
   /**
