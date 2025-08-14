@@ -96,7 +96,7 @@ export interface SidebarEntry {
 /**
  * Declare which sidebar entries exist in the app.
  *
- * Must run in a static context outside an injection context, do not call 
+ * Must run in a static context outside an injection context, do not call
  * `inject` here.
  *
  * The `SidebarComponent` uses this list to build the sidebar.

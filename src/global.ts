@@ -3,8 +3,8 @@
  * Runs before anything else in the app to define project-wide changes.
  *
  * This file is meant for global patches, polyfills, and other modifications
- * that need to be available from the very start of execution. 
- * It ensures that these changes are applied consistently across the entire app 
+ * that need to be available from the very start of execution.
+ * It ensures that these changes are applied consistently across the entire app
  * without having to import them in multiple places.
  */
 
