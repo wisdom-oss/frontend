@@ -5,6 +5,7 @@ import {
   inject,
   runInInjectionContext,
   signal,
+  untracked,
   ViewChildren,
   Component,
   AfterViewInit,
@@ -105,41 +106,15 @@ export class SidebarComponent implements AfterViewInit {
     let status = this.status.socket();
     if (!status) return undefined;
 
-    return {
-      GroundwaterLevelsService: {
-        path: "",
-        lastUpdate: dayjs(),
-        status: "down" as const,
-      },
-      GeoDataService: {
-        path: "",
-        lastUpdate: dayjs(),
-        status: "limited" as const,
-      },
-      BeWaterSmartService: {
-        path: "",
-        lastUpdate: dayjs(),
-        status: "ok" as const,
-      },
-      WaterRightsService: {
-        path: "",
-        lastUpdate: dayjs("2025-08-14T07:52"),
-        status: "ok" as const,
-      },
-    };
-
-    // FIXME: after testing enable this again
-    // return Object.map(untracked(this.services), service =>
-    //   status.find(status => status.path == service.URL),
-    // );
+    return Object.map(untracked(this.services), service =>
+      status.find(status => status.path == service.URL),
+    );
   });
 
   protected showStatusInfo = defaults(
     {} as Record<string, WritableSignal<boolean>>,
     () => signal(false),
   );
-
-  private onMessage = effect(() => console.log(this.serviceStatus()));
 
   @ViewChildren(SidebarLinkDirective)
   routerLinks?: QueryList<SidebarLinkDirective>;
