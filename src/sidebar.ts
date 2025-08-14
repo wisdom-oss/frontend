@@ -26,25 +26,83 @@ import {OowvActionMapIconComponent} from "./core/sidebar/icons/oowv-action-map-i
 import {OowvActionMapComponent} from "./modules/oowv/action-map/action-map.component";
 import {PumpModelsComponent} from "./modules/pump-models/pump-models.component";
 
+/** Any class that is a {@link Component}. */
 type ComponentClass = new (...args: any[]) => Component;
+
+/**
+ * An icon for either a category or a module in the sidebar.
+ *
+ * Can be one of:
+ * - A record with exactly one entry pointing to an icon from `@ng-icons`.
+ * - A {@link Component} used as a custom icon (for compound or dynamic icons).
+ * - A `URL` to an image (ensure CORS allows fetching if not same-origin).
+ */
 type Icon =
   | (Record<string, string> & extraTags.RecordEntries<1>)
   | ComponentClass
   | URL;
 
+/**
+ * A category entry for the sidebar.
+ *
+ * Defines a category and the modules it contains.
+ */
 export interface SidebarEntry {
+  /**
+   * The category name.
+   *
+   * May be a translation key.
+   */
   category: string;
+
+  /** Icon shown next to the category name. */
   icon: Icon;
+
   modules: Array<{
+    /**
+     * Module name.
+     *
+     * May be a translation key.
+     */
     module: string;
+
+    /** Icon shown next to the module name. */
     icon: Icon;
+
+    /** Router link to the component. */
     link: string;
+
+    /**
+     * Services used by this module.
+     *
+     * Used to show warnings if any have availability issues.
+     */
     services: Record<string, api.Service>;
+
+    /** Required {@link Scopes.Scope scopes} to see this module. */
     scopes?: Scopes.Scope[];
+
+    /**
+     * Optional factory returning a {@link Signal} controlling visibility.
+     *
+     * Runs inside an injection context, so `inject` can be used here.
+     * Call `inject` before creating the signal, the signal itself may run
+     * outside of an injection context.
+     */
     visible?: () => Signal<boolean>;
   }>;
 }
 
+/**
+ * Declare which sidebar entries exist in the app.
+ *
+ * Must run in a static context outside an injection context, do not call 
+ * `inject` here.
+ *
+ * The `SidebarComponent` uses this list to build the sidebar.
+ *
+ * @see SidebarEntry
+ */
 export function sidebar(): readonly SidebarEntry[] {
   return [
     {
