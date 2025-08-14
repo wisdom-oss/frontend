@@ -30,6 +30,7 @@ export class AppComponent {
     dayjs.extend(relativeTime);
     dayjs.extend(durationExt);
     configureTranslations(translate);
+    translate.onLangChange.subscribe(({lang}) => dayjs.locale(lang));
     registerLocaleData(localeDe, "de", localeDeExtra);
   }
 }
