@@ -63,22 +63,15 @@ export class WaterDemandPredictionComponent {
 
   /** variables startpoint dropdown */
   protected menuStartPoint = "water-demand-prediction.startpoint.menu";
-  protected optionsStartPoint: Record<string, string> = {
-    "2021-05-26 00:00:00": "water-demand-prediction.startpoint.options.a",
-    "2021-06-01 00:00:00": "water-demand-prediction.startpoint.options.b",
-    "2022-01-01 00:00:00": "water-demand-prediction.startpoint.options.c",
-  };
-
   private startOfData = dayjs(new Date(2021, 4, 26, 0, 0, 0)).format('YYYY-MM-DD HH:mm:ss');
   private startofJune = dayjs(new Date(2021, 5, 1, 0, 0, 0)).format('YYYY-MM-DD HH:mm:ss');
   private startOfYear22 = dayjs(new Date(2022, 0, 1, 0, 0, 0)).format('YYYY-MM-DD HH:mm:ss');
-
-
-  protected optionsStartPointNew: Record<string, string> = {
+  protected optionsStartPoint: Record<string, string> = {
     [this.startOfData]: "water-demand-prediction.startpoint.options.a",
     [this.startofJune]: "water-demand-prediction.startpoint.options.b",
     [this.startOfYear22]: "water-demand-prediction.startpoint.options.c",
   };
+
   readonly choiceStartPoint = signal<string | undefined>(undefined);
 
   protected menuWeather = "water-demand-prediction.choice.weather";
@@ -219,9 +212,7 @@ export class WaterDemandPredictionComponent {
 
   }
 
-  /** set the displayed resolution and update the chart to mirror that
-   * CONTINUE WITH DECIDING IF GRAPHS ARE INDEPENDEND with buttons or not!
-   */
+  /** set displayed resolution and update chart to mirror that */
   setDisplayedResolution(resolution: string): void {
     this.displayedResolution.set(resolution);
   }
@@ -522,7 +513,7 @@ export class WaterDemandPredictionComponent {
     });
 
     /** update charts to display information */
-    this.updateCharts(0);
+    this.updateCharts(1);
   }
 }
 
