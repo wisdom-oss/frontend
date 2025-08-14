@@ -87,7 +87,7 @@
     "prettier-plugin-toml": "2.0.6",
     "pretty-ts-imports": "^1.1.0",
     "sharp": "^0.34.2",
-    "smol-toml": "^1.4.1",
+    "smol-toml": "^1.4.2",
     "ts-patch": "^3.3.0",
     "typescript": "~5.8.3",
     "typescript-plugin-toml": "^0.5.0"
