@@ -3,59 +3,57 @@ import { CommonModule } from "@angular/common";
 import { TranslatePipe } from "@ngx-translate/core";
 import { ChartConfiguration, ChartData, ChartDataset, ChartType } from "chart.js";
 import { BaseChartDirective } from "ng2-charts";
-import {
-  PredictedSmartmeterDataset,
-  SmartmeterDataset
-} from "./water-demand-prediction.interface";
 import { MeterNames, WaterDemandPredictionService, WeatherColumns } from "../../api/water-demand-prediction.service";
 import { DropdownComponent } from "../../common/components/dropdown/dropdown.component";
 import { SingleSmartmeter, PredictedSmartmeter } from "../../api/water-demand-prediction.service";
 import { signal, Signal, effect } from "@angular/core";
+import dayjs from "dayjs";
+import "dayjs/locale/de";
+import "dayjs/locale/en";
+import duration from "dayjs/plugin/duration";
+import relativeTime from "dayjs/plugin/relativeTime";
+import { stringToColor } from "../../common/stringToColor";
 
+dayjs.extend(duration);
+dayjs.extend(relativeTime);
 
 @Component({
   selector: "water-demand-prediction",
   imports: [BaseChartDirective, DropdownComponent, TranslatePipe, CommonModule],
   templateUrl: "./water-demand-prediction.component.html",
-  styles: ``,
 })
 export class WaterDemandPredictionComponent {
   private waterDemandService = inject(WaterDemandPredictionService);
 
-  explainMAE: string =
-    "In the context of machine learning, absolute error refers to the magnitude of difference between the prediction of an observation and the true value of that observation. MAE takes the average of absolute errors for a group of predictions and observations as a measurement of the magnitude of errors for the entire group. MAE can also be referred as L1 loss function.";
-  explainRMSE: string =
-    "Root mean square error or root mean square deviation is one of the most commonly used measures for evaluating the quality of predictions. It shows how far predictions fall from measured true values using Euclidean distance.";
-  explainMSE: string =
-    "In the fields of regression analysis and machine learning, the Mean Square Error (MSE) is a crucial metric for evaluating the performance of predictive models. It measures the average squared difference between the predicted and the actual target values within a dataset. The primary objective of the MSE is to assess the quality of a model's predictions by measuring how closely they align with the ground truth.";
-  explainR2: string =
-    "The R-squared metric — R², or the coefficient of determination – is used to measure how well a model fits data, and how well it can predict future outcomes. Simply put, it tells you how much of the variation in your data can be explained by your model. The closer the R-squared value is to one, the better your model fits the data.";
-
-
   /** the displayed resolution in the charts of real data */
-  displayedResolution = signal<string | undefined>(undefined);
+  protected displayedResolution = signal<string | undefined>(undefined);
 
   /** variables resolution dropdown */
-  menuResolution = "water-demand-prediction.choice.resolution";
-  optionsResolution: Record<string, string> = {
+  protected menuResolution = "water-demand-prediction.choice.resolution";
+  protected optionsResolution: Record<string, string> = {
     hourly: "water-demand-prediction.resolution.hourly",
     daily: "water-demand-prediction.resolution.daily",
     weekly: "water-demand-prediction.resolution.weekly",
   };
-  choiceResolution = signal<string | undefined>(undefined);
+  readonly choiceResolution = signal<string | undefined>(undefined);
+
+  private translateString = signal<string>("water-demand-prediction.dayjs.locale")
+  private currentLang = dayjs.locale(this.translateString())
 
   /** variables timeframe dropdown */
-  menuTime = "water-demand-prediction.choice.timeframe";
-  optionsTime: Record<string, string> = {
-    "one day": "water-demand-prediction.timeframe.one-day",
-    "one week": "water-demand-prediction.timeframe.one-week",
-    "one month": "water-demand-prediction.timeframe.one-month",
-    "three months": "water-demand-prediction.timeframe.three-months",
-    "six months": "water-demand-prediction.timeframe.six-months",
-    "one year": "water-demand-prediction.timeframe.one-year",
-    all: "water-demand-prediction.timeframe.all",
+  protected menuTime = "water-demand-prediction.choice.timeframe";
+  protected optionsTime: Record<string, string> = {
+    "one day": dayjs.duration(1, "days").humanize(),
+    "one week": dayjs.duration(1, "week").humanize(),
+    "one month": dayjs.duration(1, "month").humanize(),
+    "three months": dayjs.duration(3, "month").humanize(),
+    "six months": dayjs.duration(6, "month").humanize(),
+    "one year": dayjs.duration(1, "year").humanize(),
+    all: dayjs.duration(3, "year").humanize(),
   };
-  choiceTime = signal<string | undefined>(undefined);
+  readonly choiceTime = signal<string | undefined>(undefined);
+
+  //BUG Continue here, to fix translation
 
   /** variables name dropdown */
   menuSmartmeter = "water-demand-prediction.choice.smartmeter";
@@ -64,51 +62,55 @@ export class WaterDemandPredictionComponent {
   choiceSmartmeter = signal<string | undefined>(undefined);
 
   /** variables startpoint dropdown */
-  menuStartPoint = "water-demand-prediction.startpoint.menu";
-  optionsStartPoint: Record<string, string> = {
-    "2021-05-26 00:00:00": "water-demand-prediction.startpoint.options.a",
-    "2021-06-01 00:00:00": "water-demand-prediction.startpoint.options.b",
-    "2022-01-01 00:00:00": "water-demand-prediction.startpoint.options.c",
+  protected menuStartPoint = "water-demand-prediction.startpoint.menu";
+  private startOfData = dayjs(new Date(2021, 4, 26, 0, 0, 0)).format('YYYY-MM-DD HH:mm:ss');
+  private startofJune = dayjs(new Date(2021, 5, 1, 0, 0, 0)).format('YYYY-MM-DD HH:mm:ss');
+  private startOfYear22 = dayjs(new Date(2022, 0, 1, 0, 0, 0)).format('YYYY-MM-DD HH:mm:ss');
+  protected optionsStartPoint: Record<string, string> = {
+    [this.startOfData]: "water-demand-prediction.startpoint.options.a",
+    [this.startofJune]: "water-demand-prediction.startpoint.options.b",
+    [this.startOfYear22]: "water-demand-prediction.startpoint.options.c",
   };
-  choiceStartPoint = signal<string | undefined>(undefined);
 
-  menuWeather = "water-demand-prediction.choice.weather";
-  optionsWeather: Record<string, string> = {
+  readonly choiceStartPoint = signal<string | undefined>(undefined);
+
+  protected menuWeather = "water-demand-prediction.choice.weather";
+  protected optionsWeather: Record<string, string> = {
     plain: "water-demand-prediction.weather.plain",
     air_temperature: "water-demand-prediction.weather.air_temperature",
     precipitation: "water-demand-prediction.weather.precipitation",
     moisture: "water-demand-prediction.weather.moisture",
   };
-  choiceWeather = signal<string | undefined>(undefined);
+  readonly choiceWeather = signal<string | undefined>(undefined);
 
-  menuWeatherColumn = "water-demand-prediction.choice.weatherColumn";
-  weatherColumnsSignal: Signal<WeatherColumns | undefined> = this.waterDemandService.fetchWeatherCols(this.choiceWeather);
-  optionsWeatherColumn: Record<string, string> = {};
-  choiceWeatherColumn = signal<string | undefined>(undefined);
+  protected menuWeatherColumn = "water-demand-prediction.choice.weatherColumn";
+  readonly weatherColumnsSignal: Signal<WeatherColumns | undefined> = this.waterDemandService.fetchWeatherCols(this.choiceWeather);
+  protected optionsWeatherColumn: Record<string, string> = {};
+  readonly choiceWeatherColumn = signal<string | undefined>(undefined);
 
   /** data object of current requested Smartmeterdata */
-  currentSingleSmartmeterDataSignal: Signal<SingleSmartmeter | undefined> = this.waterDemandService.fetchSmartmeter(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution)
-  currentSmartmeterData: SingleSmartmeter | undefined;
+  readonly currentSingleSmartmeterDataSignal: Signal<SingleSmartmeter | undefined> = this.waterDemandService.fetchSmartmeter(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution)
+  private currentSmartmeterData: SingleSmartmeter | undefined;
 
   /** signal to trigger training on button click and store the answer */
-  triggerTraining = signal<boolean>(false);
-  trainingResp = this.waterDemandService.trainModel(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution, this.choiceWeather, this.choiceWeatherColumn, this.triggerTraining);
+  readonly triggerTraining = signal<boolean>(false);
+  readonly trainingResp = this.waterDemandService.trainModel(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution, this.choiceWeather, this.choiceWeatherColumn, this.triggerTraining);
 
   /** data object of current requested Smartmeterdata */
-  triggerFetchPredictedSmartmeterData = signal<boolean>(false);
-  currentPredictedSmartmeterDataSignal: Signal<PredictedSmartmeter | undefined> = this.waterDemandService.fetchPrediction(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution, this.choiceWeather, this.choiceWeatherColumn, this.triggerFetchPredictedSmartmeterData)
-  currentPredictedSmartmeterData: PredictedSmartmeter | undefined;
+  readonly triggerFetchPredictedSmartmeterData = signal<boolean>(false);
+  readonly currentPredictedSmartmeterDataSignal: Signal<PredictedSmartmeter | undefined> = this.waterDemandService.fetchPrediction(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution, this.choiceWeather, this.choiceWeatherColumn, this.triggerFetchPredictedSmartmeterData)
+  protected currentPredictedSmartmeterData: PredictedSmartmeter | undefined;
 
   /** Record to hold all saved ChartDatasets */
-  savedDatasets: Record<string, SmartmeterDataset[]> = {};
+  private savedDatasets: Record<string, SmartmeterDataset[]> = {};
 
   /** Record to hold all saved predicted ChartDatasets */
-  predictedDatasets: Record<string, PredictedSmartmeterDataset[]> = {};
+  private predictedDatasets: Record<string, PredictedSmartmeterDataset[]> = {};
 
   /**
    * data skeleton for the line graph
    */
-  chartDataCurrentValues: ChartData = {
+  protected chartDataCurrentValues: ChartData = {
     labels: [], // X-axis labels
     datasets: [], // data points
   };
@@ -116,7 +118,7 @@ export class WaterDemandPredictionComponent {
   /**
    * data skeleton for the line graph
    */
-  chartDataPredictedValues: ChartData = {
+  protected chartDataPredictedValues: ChartData = {
     labels: [], // X-axis labels
     datasets: [], // data points
   };
@@ -125,12 +127,12 @@ export class WaterDemandPredictionComponent {
    * type of graph to use in chart
    * as a signal to change it via template
    */
-  chartType = signal<ChartType>("line");
+  protected chartType = signal<ChartType>("line");
 
   /**
    * options used for the line chart to visualize prediction values
    */
-  chartOptions: ChartConfiguration["options"] = {
+  protected chartOptions: ChartConfiguration["options"] = {
     responsive: true,
     maintainAspectRatio: false,
     elements: {
@@ -176,6 +178,10 @@ export class WaterDemandPredictionComponent {
 
   constructor() {
 
+    effect(() => {
+      console.log(this.translateString());
+    })
+
     /** define smartmeter options */
     effect(() => {
       let smartmeters = this.smartmeterSignal();
@@ -210,9 +216,7 @@ export class WaterDemandPredictionComponent {
 
   }
 
-  /** set the displayed resolution and update the chart to mirror that
-   * CONTINUE WITH DECIDING IF GRAPHS ARE INDEPENDEND with buttons or not!
-   */
+  /** set displayed resolution and update chart to mirror that */
   setDisplayedResolution(resolution: string): void {
     this.displayedResolution.set(resolution);
   }
@@ -274,33 +278,7 @@ export class WaterDemandPredictionComponent {
     resolution: string,
     timeframe: string,
   ): string {
-    return this.stringToColor(label + resolution + timeframe);
-  }
-
-  /**
-   * Generates deterministically a hex color code from any string.
-   *
-   * This is a modernized version of this
-   * [StackOverflow reply](https://stackoverflow.com/a/16348977/15800714).
-   * @param str A string to generate a hex color for
-   * @param map A color map for predefined strings
-   *
-   * @returns A hex color code in the style of '#abc123'
-   */
-  stringToColor(str: string, map?: Record<string, string>): string {
-    if (map && map[str]) {
-      return map[str];
-    }
-    let hash = 0;
-    for (let s of str) {
-      hash = s.charCodeAt(0) + ((hash << 5) - hash);
-    }
-    let color = "#";
-    for (let i = 0; i < 3; i++) {
-      let value = (hash >> (i * 8)) & 0xff;
-      color += ("00" + value.toString(16)).slice(-2);
-    }
-    return color;
+    return stringToColor(label + resolution + timeframe);
   }
 
   /**
@@ -437,10 +415,10 @@ export class WaterDemandPredictionComponent {
     );
 
     let smartmeterdata: PredictedSmartmeterDataset = {
-      upper_conf_interval_dataset: upper_conf_int,
+      upperConfIntervalDataset: upper_conf_int,
       dataset: newDataset,
-      realValue_dataset: realDataset,
-      lower_conf_interval_dataset: lower_conf_int,
+      realValueDataset: realDataset,
+      lowerConfIntervalDataset: lower_conf_int,
       labels: this.currentPredictedSmartmeterData!.date,
     };
 
@@ -476,7 +454,6 @@ export class WaterDemandPredictionComponent {
     this.chartDataCurrentValues.datasets = [];
 
     if (!this.savedDatasets[resolution]) {
-      alert("No suitable chart to show!");
       return;
     }
 
@@ -502,17 +479,30 @@ export class WaterDemandPredictionComponent {
     /** add relevant datasets based on resolution to chartData */
     this.predictedDatasets[resolution].forEach(entry => {
       this.chartDataPredictedValues.datasets.push(entry.dataset);
-      this.chartDataPredictedValues.datasets.push(entry.realValue_dataset);
+      this.chartDataPredictedValues.datasets.push(entry.realValueDataset);
       this.chartDataPredictedValues.datasets.push(
-        entry.lower_conf_interval_dataset,
+        entry.lowerConfIntervalDataset,
       );
       this.chartDataPredictedValues.datasets.push(
-        entry.upper_conf_interval_dataset,
+        entry.upperConfIntervalDataset,
       );
       this.chartDataPredictedValues.labels = entry.labels;
     });
 
     /** update charts to display information */
-    this.updateCharts(0);
+    this.updateCharts(1);
   }
+}
+
+export type SmartmeterDataset = {
+  dataset: ChartDataset;
+  labels: string[];
+}
+
+export type PredictedSmartmeterDataset = {
+  dataset: ChartDataset;
+  labels: string[];
+  lowerConfIntervalDataset: ChartDataset;
+  upperConfIntervalDataset: ChartDataset;
+  realValueDataset: ChartDataset;
 }

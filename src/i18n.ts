@@ -3,7 +3,7 @@ import {
   TranslateService,
 } from "@ngx-translate/core";
 
-import {asserts} from "./common/asserts";
+import { asserts } from "./common/asserts";
 import core from "./core/i18n.toml";
 import beWaterSmart from "./modules/be-water-smart/i18n.toml";
 import growl from "./modules/growl/i18n.toml";
@@ -17,12 +17,12 @@ import weatherData from "./modules/weather-data/i18n.toml";
 // add translations to this record
 const modules: NestedStringRecord = {
   core,
-  "water-demand-prediction": waterDemandPrediction,
   growl,
   "be-water-smart": beWaterSmart,
   "long-term-forecast": longTermForecast,
   "oowv-action-map": oowvActionMap,
   "pump-models": pumpModels,
+  "water-demand-prediction": waterDemandPrediction,
   "water-rights": waterRights,
   "weather-data": weatherData,
 };
@@ -67,19 +67,19 @@ type NestedStringRecord = Record<
   string,
   | string
   | Record<
+    string,
+    | string
+    | Record<
       string,
       | string
       | Record<
+        string,
+        | string
+        | Record<
           string,
-          | string
-          | Record<
-              string,
-              | string
-              | Record<
-                  string,
-                  string | Record<string, string | Record<string, string>>
-                >
-            >
+          string | Record<string, string | Record<string, string>>
         >
+      >
     >
+  >
 >;
