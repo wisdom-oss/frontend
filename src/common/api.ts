@@ -33,14 +33,50 @@ import {Once} from "./utils/once";
  * validation and caching easier.
  */
 export namespace api {
+  /**
+   * Class type of an API service.
+   *
+   * This is the constructor type of classes that extend {@link ApiService}.
+   * We export the type, not the base class, so users cannot subclass it directly.
+   *
+   * @example
+   * export class SomeService extends api.service("/api/something") {}
+   */
   export type Service = typeof ApiService;
 
+  /**
+   * Base class for all API services.
+   *
+   * Services must provide a `URL` that points to an `/api/...` endpoint.
+   * We keep shared expectations here so all services behave the same.
+   *
+   * Prefer {@link service} to create your own base to extend from,
+   * instead of extending this class directly.
+   */
   abstract class ApiService {
     get URL(): string {
       return undefined!;
     }
   }
 
+  /**
+   * Create an extendable API service class without a constructor.
+   *
+   * Returns a class that extends {@link ApiService} and fixes its `URL`.
+   * Downstream services can `extends` that class and use field injection,
+   * so no need to write a constructor or call `super`.
+   *
+   * @param url An `/api/...` URL literal used as the service root.
+   * @returns A {@link Service} class you can extend.
+   *
+   * @example
+   * const URL = "/api/status" as const;
+   * 
+   * @Injectable({ providedIn: "root" })
+   * export class StatusService extends api.service(URL) {
+   *   // fields via inject(...) here, no constructor
+   * }
+   */
   export function service<URL extends `/api/${string}`>(url: URL): Service {
     return class extends ApiService {
       override get URL(): string {
@@ -608,11 +644,17 @@ export namespace api {
    * @template TMessage
    * Type of messages received from the server, validated via `validate`.
    *
-   * @template TDefault
-   * Default value initially returned before any message is received.
-   *
    * @template TSend
    * Type of messages that can be sent to the server.
+   * 
+   * @template TDefault
+   * Default value initially returned before any message is received.
+   * 
+   * @template TRaw
+   * Raw message format from the WebSocket.
+   * 
+   * @template TSerialized
+   * JSON-able format to send to the WebSocket.
    */
   export type SocketOptions<
     TMessage,
@@ -624,13 +666,28 @@ export namespace api {
     /** URL of the WebSocket server. */
     url: ConstructorParameters<typeof WebSocket>[0];
 
-    /** Typia validator to ensure incoming messages match the expected type. */
+    /** 
+     * Typia validator to ensure incoming (parsed) messages match the expected 
+     * type. 
+     */
     validate: (input: unknown) => typia.IValidation<TMessage>;
 
+    /** 
+     * Typia validator to ensure incoming raw messages match the expected type. 
+     */
     validateRaw?: (input: unknown) => typia.IValidation<TRaw>;
 
+    /**
+     * Parse the raw messages into a message format to be used in the public API. 
+     * @param input Raw incoming message, validated via {@link validateRaw}.
+     */
     parse?: (input: TRaw) => TMessage;
 
+    /**
+     * Serialize the message to send it to the socket.
+     * 
+     * This should take care of mapping complex types into easily JSON-able types.
+     */
     serialize?: (input: TSend) => TSerialized;
 
     /** Protocols to use when connecting to the WebSocket server. */
