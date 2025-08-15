@@ -28,6 +28,10 @@ export class WaterDemandPredictionComponent {
   protected minHeightCharts: string = "15em";
   protected standardHeightCharts: string = "50%"
 
+  private translateString = signal<string>("water-demand-prediction.dayjs.locale")
+  private currentLang = dayjs.locale(this.translateString())
+  //BUG Continue here, to fix translation
+
   /** the displayed resolution in the charts of real data */
   protected displayedResolution = signal<string | undefined>("hourly");
 
@@ -39,9 +43,6 @@ export class WaterDemandPredictionComponent {
     weekly: "water-demand-prediction.resolution.weekly",
   };
   readonly choiceResolution = signal<string | undefined>(undefined);
-
-  private translateString = signal<string>("water-demand-prediction.dayjs.locale")
-  private currentLang = dayjs.locale(this.translateString())
 
   /** variables timeframe dropdown */
   protected menuTime = "water-demand-prediction.choice.timeframe";
@@ -55,8 +56,6 @@ export class WaterDemandPredictionComponent {
     all: dayjs.duration(3, "year").humanize(),
   };
   readonly choiceTime = signal<string | undefined>(undefined);
-
-  //BUG Continue here, to fix translation
 
   /** variables name dropdown */
   menuSmartmeter = "water-demand-prediction.choice.smartmeter";
@@ -218,19 +217,6 @@ export class WaterDemandPredictionComponent {
   /** set displayed resolution and update chart to mirror that */
   setDisplayedResolution(resolution: string): void {
     this.displayedResolution.set(resolution);
-  }
-
-  /** set the displayed chartType to change from line to bar and back */
-  switchDisplayedChartType(): void {
-    if (this.chartType() === "line") {
-      this.chartType.set("bar");
-      console.log(this.chartType())
-    } else if (this.chartType() === "bar") {
-      this.chartType.set("line");
-      console.log(this.chartType())
-    } else {
-      console.log("No correct mode selected!")
-    }
   }
 
   /**

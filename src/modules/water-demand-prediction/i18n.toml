@@ -59,8 +59,8 @@ en = "Delete Charts"
 de = "Lösche Graphen"
 
 [delete.predicted]
-en = "Delete Prediction Charts"
-de = "Lösche Vorhersagegraphen"
+en = "Delete Predictions"
+de = "Lösche Vorhersagen"
 
 [choice.smartmeter]
 en = "Select Smartmeter"
@@ -92,11 +92,11 @@ de = "Modell trainieren"
 
 [request.preddata]
 en = "Request predicted Data"
-de = "Frage vorhergesagte Daten an"
+de = "Frage Vorhersage an"
 
 [request.showdata]
 en = "Display predicted data"
-de = "Zeige vorhergesagte Daten an"
+de = "Zeige Vorhersage an"
 
 [graph.mode.line]
 en = "Line Chart"
@@ -156,7 +156,7 @@ de = "Mittlere quadratische Abweichung"
 
 [metrics.RMSE]
 en = "Root Mean Squared Error"
-de = "Wurzel des mittleren quadratischen Fehlers"
+de = "Wurzel des mittl. quadr. Fehlers"
 
 [metrics.R2]
 en = "R2"

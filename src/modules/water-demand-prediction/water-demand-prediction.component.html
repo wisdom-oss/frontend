@@ -72,19 +72,6 @@
       <!-- Delete, ChartType, Show Smartmeter, Train Model Buttons -->
       <div class="buttons is-centered responsive-buttons">
         <button
-          class="button is-danger is-rounded is-responsive"
-          (click)="resetChart()"
-        >
-          {{ "water-demand-prediction.delete.normal" | translate }}
-        </button>
-        <button
-          class="button is-rounded"
-          [class.is-active]="chartType() === 'line'"
-          (click)="switchDisplayedChartType()"
-        >
-          {{ "water-demand-prediction.graph.mode." + chartType() | translate }}
-        </button>
-        <button
           class="button is-primary is-rounded is-responsive"
           (click)="fetchDataSmartmeter()"
         >
@@ -95,6 +82,12 @@
           (click)="trainModel()"
         >
           {{ "water-demand-prediction.request.trainModel" | translate }}
+        </button>
+        <button
+          class="button is-danger is-rounded is-responsive"
+          (click)="resetChart()"
+        >
+          {{ "water-demand-prediction.delete.normal" | translate }}
         </button>
       </div>
       <!-- Dropdown Menus for Control-->
@@ -167,17 +160,17 @@
       </div>
       <!-- Delete, Request Prediction, Show Prediction -->
       <div class="buttons is-centered responsive-buttons">
-        <button
-          class="button is-danger is-rounded"
-          (click)="resetPredictionChart()"
-        >
-          {{ "water-demand-prediction.delete.predicted" | translate }}
-        </button>
         <button class="button is-primary is-rounded" (click)="fetchPredData()">
           {{ "water-demand-prediction.request.preddata" | translate }}
         </button>
         <button class="button is-primary is-rounded" (click)="showPredData()">
           {{ "water-demand-prediction.request.showdata" | translate }}
+        </button>
+        <button
+          class="button is-danger is-rounded"
+          (click)="resetPredictionChart()"
+        >
+          {{ "water-demand-prediction.delete.predicted" | translate }}
         </button>
       </div>
       <!-- KPI Metrics -->
