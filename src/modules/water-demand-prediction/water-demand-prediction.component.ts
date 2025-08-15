@@ -1,6 +1,6 @@
 import { ViewChildren, Component, QueryList, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { TranslatePipe } from "@ngx-translate/core";
+import { TranslatePipe, TranslateService } from "@ngx-translate/core";
 import { ChartConfiguration, ChartData, ChartDataset, ChartType } from "chart.js";
 import { BaseChartDirective } from "ng2-charts";
 import { MeterNames, WaterDemandPredictionService, WeatherColumns } from "../../api/water-demand-prediction.service";
@@ -14,8 +14,7 @@ import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { stringToColor } from "../../common/stringToColor";
 
-dayjs.extend(duration);
-dayjs.extend(relativeTime);
+dayjs.extend(duration, relativeTime);
 
 @Component({
   selector: "water-demand-prediction",
@@ -28,21 +27,11 @@ export class WaterDemandPredictionComponent {
   protected minHeightCharts: string = "15em";
   protected standardHeightCharts: string = "50%"
 
-  private translateString = signal<string>("water-demand-prediction.dayjs.locale")
-  private currentLang = dayjs.locale(this.translateString())
-  //BUG Continue here, to fix translation
-
   /** the displayed resolution in the charts of real data */
   protected displayedResolution = signal<string | undefined>("hourly");
 
-  /** variables resolution dropdown */
-  protected menuResolution = "water-demand-prediction.choice.resolution";
-  protected optionsResolution: Record<string, string> = {
-    hourly: "water-demand-prediction.resolution.hourly",
-    daily: "water-demand-prediction.resolution.daily",
-    weekly: "water-demand-prediction.resolution.weekly",
-  };
-  readonly choiceResolution = signal<string | undefined>(undefined);
+  private currentLang = "water-demand-prediction.dayjs.locale"
+  //BUG: dayjs sets locale when initializing variables, cant dynamically chagne them
 
   /** variables timeframe dropdown */
   protected menuTime = "water-demand-prediction.choice.timeframe";
@@ -57,12 +46,6 @@ export class WaterDemandPredictionComponent {
   };
   readonly choiceTime = signal<string | undefined>(undefined);
 
-  /** variables name dropdown */
-  menuSmartmeter = "water-demand-prediction.choice.smartmeter";
-  smartmeterSignal: Signal<MeterNames | undefined> = this.waterDemandService.fetchMeterInformation();
-  optionsSmartmeter: Record<string, string> = {};
-  choiceSmartmeter = signal<string | undefined>(undefined);
-
   /** variables startpoint dropdown */
   protected menuStartPoint = "water-demand-prediction.startpoint.menu";
   private startOfData = dayjs(new Date(2021, 4, 26, 0, 0, 0)).format('YYYY-MM-DD HH:mm:ss');
@@ -73,8 +56,22 @@ export class WaterDemandPredictionComponent {
     [this.startofJune]: "water-demand-prediction.startpoint.options.b",
     [this.startOfYear22]: "water-demand-prediction.startpoint.options.c",
   };
-
   readonly choiceStartPoint = signal<string | undefined>(undefined);
+
+  /** variables resolution dropdown */
+  protected menuResolution = "water-demand-prediction.choice.resolution";
+  protected optionsResolution: Record<string, string> = {
+    hourly: "water-demand-prediction.resolution.hourly",
+    daily: "water-demand-prediction.resolution.daily",
+    weekly: "water-demand-prediction.resolution.weekly",
+  };
+  readonly choiceResolution = signal<string | undefined>(undefined);
+
+  /** variables name dropdown */
+  menuSmartmeter = "water-demand-prediction.choice.smartmeter";
+  smartmeterSignal: Signal<MeterNames | undefined> = this.waterDemandService.fetchMeterInformation();
+  optionsSmartmeter: Record<string, string> = {};
+  choiceSmartmeter = signal<string | undefined>(undefined);
 
   protected menuWeather = "water-demand-prediction.choice.weather";
   protected optionsWeather: Record<string, string> = {
@@ -178,7 +175,15 @@ export class WaterDemandPredictionComponent {
     | QueryList<BaseChartDirective>
     | undefined;
 
-  constructor() {
+  constructor(private translateService: TranslateService) {
+
+    console.log(this.currentLang)
+    dayjs.locale(this.translateService.currentLang || 'en');
+
+    // update dayjs whenever language changes
+    this.translateService.onLangChange.subscribe((event) => {
+      dayjs.locale(event.lang);
+    });
 
     /** define smartmeter options */
     effect(() => {
