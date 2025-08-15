@@ -19,14 +19,17 @@ dayjs.extend(relativeTime);
 
 @Component({
   selector: "water-demand-prediction",
-  imports: [BaseChartDirective, DropdownComponent, TranslatePipe, CommonModule],
+  imports: [BaseChartDirective, CommonModule, DropdownComponent, TranslatePipe],
   templateUrl: "./water-demand-prediction.component.html",
 })
 export class WaterDemandPredictionComponent {
   private waterDemandService = inject(WaterDemandPredictionService);
 
+  protected minHeightCharts: string = "15em";
+  protected standardHeightCharts: string = "50%"
+
   /** the displayed resolution in the charts of real data */
-  protected displayedResolution = signal<string | undefined>(undefined);
+  protected displayedResolution = signal<string | undefined>("hourly");
 
   /** variables resolution dropdown */
   protected menuResolution = "water-demand-prediction.choice.resolution";
@@ -178,10 +181,6 @@ export class WaterDemandPredictionComponent {
 
   constructor() {
 
-    effect(() => {
-      console.log(this.translateString());
-    })
-
     /** define smartmeter options */
     effect(() => {
       let smartmeters = this.smartmeterSignal();
@@ -225,8 +224,12 @@ export class WaterDemandPredictionComponent {
   switchDisplayedChartType(): void {
     if (this.chartType() === "line") {
       this.chartType.set("bar");
-    } else {
+      console.log(this.chartType())
+    } else if (this.chartType() === "bar") {
       this.chartType.set("line");
+      console.log(this.chartType())
+    } else {
+      console.log("No correct mode selected!")
     }
   }
 
