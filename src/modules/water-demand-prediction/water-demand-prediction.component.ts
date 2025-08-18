@@ -220,7 +220,7 @@ export class WaterDemandPredictionComponent {
   }
 
   /** set displayed resolution and update chart to mirror that */
-  setDisplayedResolution(resolution: string): void {
+  protected setDisplayedResolution(resolution: string): void {
     this.displayedResolution.set(resolution);
   }
 
@@ -229,7 +229,7 @@ export class WaterDemandPredictionComponent {
    * update only one chart based on index given, when given one.
    * @returns if there is no chart
    */
-  updateCharts(indexOfChart?: number): void {
+  protected updateCharts(indexOfChart?: number): void {
     if (!this.charts) {
       console.log("No chart initialized!");
       return;
@@ -251,7 +251,7 @@ export class WaterDemandPredictionComponent {
   }
 
   /** Completely erases data from the real data graph element */
-  resetChart(): void {
+  protected resetChart(): void {
     this.chartDataCurrentValues.datasets = [];
 
     this.savedDatasets = {};
@@ -259,7 +259,7 @@ export class WaterDemandPredictionComponent {
   }
 
   /** Completely erases data from predicted graph element */
-  resetPredictionChart(): void {
+  protected resetPredictionChart(): void {
     this.chartDataPredictedValues.datasets = [];
 
     this.predictedDatasets = {};
@@ -267,7 +267,7 @@ export class WaterDemandPredictionComponent {
   }
 
   /** helper function to create a color from values */
-  createColorFromParameter(
+  protected createColorFromParameter(
     label: string,
     resolution: string,
     timeframe: string,
@@ -282,7 +282,7 @@ export class WaterDemandPredictionComponent {
    * @param fillOption: false, 0 for confidence interval
    * @returns new dataset
    */
-  createNewDataset(
+  protected createNewDataset(
     data: number[],
     label: string,
     resolution: string,
@@ -315,7 +315,7 @@ export class WaterDemandPredictionComponent {
    * creates new ChartDatasets and activates the display function
    * @returns nothing
    */
-  fetchDataSmartmeter(): void {
+  protected fetchDataSmartmeter(): void {
 
     if (!this.currentSmartmeterData) {
       return;
@@ -353,19 +353,19 @@ export class WaterDemandPredictionComponent {
     this.currentSmartmeterData = undefined;
   }
 
-  fetchPredData(): void {
+  protected fetchPredData(): void {
     //BUG: REDESIGN
     this.triggerFetchPredictedSmartmeterData.set(true);
     this.triggerTraining.set(false);
   }
 
-  trainModel(): void {
+  protected trainModel(): void {
     //BUG: REDESIGN
     this.triggerTraining.set(true);
     this.triggerFetchPredictedSmartmeterData.set(false);
   }
 
-  showPredData(): void {
+  protected showPredData(): void {
 
     /** set trigger to true */
     if (!this.currentPredictedSmartmeterData) {
@@ -443,7 +443,7 @@ export class WaterDemandPredictionComponent {
   }
 
   /** show datasets based on the resolution chosen */
-  showDatasets(resolution: string): void {
+  protected showDatasets(resolution: string): void {
     // reset data to begin
     this.chartDataCurrentValues.datasets = [];
 
@@ -462,7 +462,7 @@ export class WaterDemandPredictionComponent {
   }
 
   /** show predicted datasets based on the resolution chosen */
-  showPredictedDatasets(resolution: string): void {
+  protected showPredictedDatasets(resolution: string): void {
     // reset data to begin
     this.chartDataPredictedValues.datasets = [];
 
