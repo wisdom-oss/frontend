@@ -1,20 +1,28 @@
-<div class="columns is-multiline">
-  <!--Real Data Graph and Buttons-->
-  <div class="column is-full-tablet is-half-desktop">
-    <div class="box is-fullheight">
-      <!-- reset button -->
-      <button
-        class="button is-primary is-rounded is-responsive"
-        (click)="resetChart()"
-      >
-        {{ "water-demand-prediction.delete.normal" | translate }}
-      </button>
-      <!-- Resolution Switches -->
+<div class="card is-fullheight is-fullwidth">
+  <style>
+    /* Make all buttons inside this container small below Full HD */
+    @media (max-width: 1919px) {
+      .responsive-buttons .button {
+        font-size: 0.75rem; /* Bulma is-small */
+        padding: 0.25rem 0.5rem; /* Bulma is-small */
+      }
+    }
+    @media (max-width: 1919px) {
+      .responsive-dropdown {
+        transform: scale(0.7); /* shrink to 80% */
+        transform-origin: center; /* keep dropdowns aligned */
+      }
+    }
+  </style>
+  <div class="columns is-fullheight is-fullwidth">
+    <!-- Normal Smartmeter -->
+    <div class="column is-half">
+      <!-- Resolution Buttons -->
       <div
-        class="buttons has-addons are-small is-flex is-justify-content-flex-end"
+        class="buttons has-addons is-justify-content-flex-end responsive-buttons"
       >
         <button
-          class="button is-responsive"
+          class="button is-rounded"
           [class.is-active]="displayedResolution() === 'hourly'"
           (click)="
             setDisplayedResolution('hourly');
@@ -25,7 +33,7 @@
           {{ optionsResolution["hourly"] | translate }}
         </button>
         <button
-          class="button is-responsive"
+          class="button"
           [class.is-active]="displayedResolution() === 'daily'"
           (click)="
             setDisplayedResolution('daily');
@@ -36,7 +44,7 @@
           {{ optionsResolution["daily"] | translate }}
         </button>
         <button
-          class="button is-responsive"
+          class="button is-rounded"
           [class.is-active]="displayedResolution() === 'weekly'"
           (click)="
             setDisplayedResolution('weekly');
@@ -46,86 +54,188 @@
         >
           {{ optionsResolution["weekly"] | translate }}
         </button>
+      </div>
+      <!-- Smartmeter Data Chart-->
+      <div
+        class=""
+        [style.min-height]="minHeightCharts"
+        [style.height]="standardHeightCharts"
+        style="min-width: 100%"
+      >
+        <canvas
+          baseChart
+          [data]="chartDataCurrentValues"
+          [options]="chartOptions"
+          [type]="chartType()"
+        ></canvas>
+      </div>
+      <!-- Delete, ChartType, Show Smartmeter, Train Model Buttons -->
+      <div class="buttons is-centered responsive-buttons">
         <button
-          class="button is-rounded is-responsive"
-          [class.is-active]="chartType() === 'line'"
-          (click)="switchDisplayedChartType()"
+          class="button is-primary is-rounded is-responsive"
+          (click)="fetchDataSmartmeter()"
         >
-          {{ "water-demand-prediction.graph.mode." + chartType() | translate }}
+          {{ "water-demand-prediction.request.realdata" | translate }}
+        </button>
+        <button
+          class="button is-primary is-rounded is-responsive"
+          (click)="trainModel()"
+        >
+          {{ "water-demand-prediction.request.trainModel" | translate }}
+        </button>
+        <button
+          class="button is-danger is-rounded is-responsive"
+          (click)="resetChart()"
+        >
+          {{ "water-demand-prediction.delete.normal" | translate }}
         </button>
       </div>
-      <div class="">
-        <!-- graph real data container box -->
-        <div class="" style="height: 40vh">
-          <canvas
-            baseChart
-            [data]="chartDataCurrentValues"
-            [options]="chartOptions"
-            [type]="chartType()"
-          ></canvas>
-        </div>
-        <!--buttons for showing and training -->
-        <div class="">
-          <div class="buttons">
-            <button
-              class="button is-primary is-rounded is-responsive"
-              (click)="fetchDataSmartmeter()"
+      <!-- Dropdown Menus for Control-->
+      <div class="buttons responsive-dropdown is-centered">
+        <dropdown
+          [menuName]="menuResolution"
+          [options]="optionsResolution"
+          [changeMenuName]="true"
+          kind="hover"
+          [(choice)]="choiceResolution"
+        ></dropdown>
+        <dropdown
+          [menuName]="menuTime"
+          [options]="optionsTime"
+          [changeMenuName]="true"
+          kind="hover"
+          [(choice)]="choiceTime"
+        ></dropdown>
+        <dropdown
+          [menuName]="menuSmartmeter"
+          [options]="optionsSmartmeter"
+          [changeMenuName]="true"
+          kind="hover"
+          [(choice)]="choiceSmartmeter"
+        ></dropdown>
+        <dropdown
+          [menuName]="menuStartPoint"
+          [options]="optionsStartPoint"
+          [changeMenuName]="true"
+          kind="hover"
+          [(choice)]="choiceStartPoint"
+        ></dropdown>
+        <dropdown
+          [menuName]="menuWeather"
+          [options]="optionsWeather"
+          [changeMenuName]="true"
+          kind="hover"
+          [(choice)]="choiceWeather"
+        ></dropdown>
+        <dropdown
+          [menuName]="menuWeatherColumn"
+          [options]="optionsWeatherColumn"
+          [changeMenuName]="true"
+          kind="hover"
+          [(choice)]="choiceWeatherColumn"
+        ></dropdown>
+      </div>
+    </div>
+    <!-- Predicted Smartmeter -->
+    <div class="column is-half">
+      <!-- Spacer Button-->
+      <div class="buttons has-addons responsive-buttons">
+        <button class="button" style="visibility: hidden">
+          Spacer Button for easier alignment
+        </button>
+      </div>
+      <!-- Predicted Smartmeter Data-->
+      <div
+        class=""
+        [style.min-height]="minHeightCharts"
+        [style.height]="standardHeightCharts"
+        style="min-width: 100%"
+      >
+        <canvas
+          baseChart
+          [data]="chartDataPredictedValues"
+          [options]="chartOptions"
+          [type]="chartType()"
+        ></canvas>
+      </div>
+      <!-- Delete, Request Prediction, Show Prediction -->
+      <div class="buttons is-centered responsive-buttons">
+        <button class="button is-primary is-rounded" (click)="fetchPredData()">
+          {{ "water-demand-prediction.request.preddata" | translate }}
+        </button>
+        <button class="button is-primary is-rounded" (click)="showPredData()">
+          {{ "water-demand-prediction.request.showdata" | translate }}
+        </button>
+        <button
+          class="button is-danger is-rounded"
+          (click)="resetPredictionChart()"
+        >
+          {{ "water-demand-prediction.delete.predicted" | translate }}
+        </button>
+      </div>
+      <!-- KPI Metrics -->
+      <div class="table-container">
+        <table class="table is-centered is-fullwidth">
+          <thead>
+            <th
+              title="{{
+                'water-demand-prediction.explanation.MAE' | translate
+              }}"
             >
-              {{ "water-demand-prediction.request.realdata" | translate }}
-            </button>
-            <button
-              class="button is-primary is-rounded is-responsive"
-              (click)="trainModel()"
+              {{ "water-demand-prediction.metrics.MAE" | translate }}
+            </th>
+            <th
+              title="{{
+                'water-demand-prediction.explanation.MSE' | translate
+              }}"
             >
-              {{ "water-demand-prediction.request.trainModel" | translate }}
-            </button>
-          </div>
-          <!-- drop down menus-->
-          <div class="buttons">
-            <dropdown
-              [menuName]="menuResolution"
-              [options]="optionsResolution"
-              [changeMenuName]="true"
-              kind="hover"
-              [(choice)]="choiceResolution"
-            ></dropdown>
-            <dropdown
-              [menuName]="menuTime"
-              [options]="optionsTime"
-              [changeMenuName]="true"
-              kind="hover"
-              [(choice)]="choiceTime"
-            ></dropdown>
-            <dropdown
-              [menuName]="menuSmartmeter"
-              [options]="optionsSmartmeter"
-              [changeMenuName]="true"
-              kind="hover"
-              [(choice)]="choiceSmartmeter"
-            ></dropdown>
-            <dropdown
-              [menuName]="menuStartPoint"
-              [options]="optionsStartPoint"
-              [changeMenuName]="true"
-              kind="hover"
-              [(choice)]="choiceStartPoint"
-            ></dropdown>
-            <dropdown
-              [menuName]="menuWeather"
-              [options]="optionsWeather"
-              [changeMenuName]="true"
-              kind="hover"
-              [(choice)]="choiceWeather"
-            ></dropdown>
-            <dropdown
-              [menuName]="menuWeatherColumn"
-              [options]="optionsWeatherColumn"
-              [changeMenuName]="true"
-              kind="hover"
-              [(choice)]="choiceWeatherColumn"
-            ></dropdown>
-          </div>
-        </div>
+              {{ "water-demand-prediction.metrics.MSE" | translate }}
+            </th>
+            <th
+              title="{{
+                'water-demand-prediction.explanation.RMSE' | translate
+              }}"
+            >
+              {{ "water-demand-prediction.metrics.RMSE" | translate }}
+            </th>
+            <th
+              title="{{ 'water-demand-prediction.explanation.R2' | translate }}"
+            >
+              {{ "water-demand-prediction.metrics.R2" | translate }}
+            </th>
+          </thead>
+          <tbody>
+            <tr *ngIf="currentPredictedSmartmeterData">
+              <td
+                title="{{ currentPredictedSmartmeterData.meanAbsoluteError }}"
+              >
+                {{
+                  currentPredictedSmartmeterData!.meanAbsoluteError * 100
+                    | number: "1.2-2"
+                }}%
+              </td>
+              <td title="{{ currentPredictedSmartmeterData.meanSquaredError }}">
+                {{
+                  currentPredictedSmartmeterData!.meanSquaredError * 100
+                    | number: "1.2-2"
+                }}%
+              </td>
+              <td
+                title="{{
+                  currentPredictedSmartmeterData.rootOfmeanSquaredError
+                }}"
+              >
+                {{
+                  currentPredictedSmartmeterData!.rootOfmeanSquaredError * 100
+                    | number: "1.2-2"
+                }}%
+              </td>
+              <td title="{{ currentPredictedSmartmeterData.r2 }}">
+                {{ currentPredictedSmartmeterData.r2 * 100 | number: "1.2-2" }}%
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>

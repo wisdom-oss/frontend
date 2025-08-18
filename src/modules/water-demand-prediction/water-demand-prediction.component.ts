@@ -1,6 +1,6 @@
 import { ViewChildren, Component, QueryList, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { TranslatePipe } from "@ngx-translate/core";
+import { TranslatePipe, TranslateService } from "@ngx-translate/core";
 import { ChartConfiguration, ChartData, ChartDataset, ChartType } from "chart.js";
 import { BaseChartDirective } from "ng2-charts";
 import { MeterNames, WaterDemandPredictionService, WeatherColumns } from "../../api/water-demand-prediction.service";
@@ -14,31 +14,24 @@ import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { stringToColor } from "../../common/stringToColor";
 
-dayjs.extend(duration);
-dayjs.extend(relativeTime);
+dayjs.extend(duration, relativeTime);
 
 @Component({
   selector: "water-demand-prediction",
-  imports: [BaseChartDirective, DropdownComponent, TranslatePipe, CommonModule],
+  imports: [BaseChartDirective, CommonModule, DropdownComponent, TranslatePipe],
   templateUrl: "./water-demand-prediction.component.html",
 })
 export class WaterDemandPredictionComponent {
   private waterDemandService = inject(WaterDemandPredictionService);
 
+  protected minHeightCharts: string = "15em";
+  protected standardHeightCharts: string = "50%"
+
   /** the displayed resolution in the charts of real data */
-  protected displayedResolution = signal<string | undefined>(undefined);
+  protected displayedResolution = signal<string | undefined>("hourly");
 
-  /** variables resolution dropdown */
-  protected menuResolution = "water-demand-prediction.choice.resolution";
-  protected optionsResolution: Record<string, string> = {
-    hourly: "water-demand-prediction.resolution.hourly",
-    daily: "water-demand-prediction.resolution.daily",
-    weekly: "water-demand-prediction.resolution.weekly",
-  };
-  readonly choiceResolution = signal<string | undefined>(undefined);
-
-  private translateString = signal<string>("water-demand-prediction.dayjs.locale")
-  private currentLang = dayjs.locale(this.translateString())
+  private currentLang = "water-demand-prediction.dayjs.locale"
+  //BUG: dayjs sets locale when initializing variables, cant dynamically chagne them
 
   /** variables timeframe dropdown */
   protected menuTime = "water-demand-prediction.choice.timeframe";
@@ -53,14 +46,6 @@ export class WaterDemandPredictionComponent {
   };
   readonly choiceTime = signal<string | undefined>(undefined);
 
-  //BUG Continue here, to fix translation
-
-  /** variables name dropdown */
-  menuSmartmeter = "water-demand-prediction.choice.smartmeter";
-  smartmeterSignal: Signal<MeterNames | undefined> = this.waterDemandService.fetchMeterInformation();
-  optionsSmartmeter: Record<string, string> = {};
-  choiceSmartmeter = signal<string | undefined>(undefined);
-
   /** variables startpoint dropdown */
   protected menuStartPoint = "water-demand-prediction.startpoint.menu";
   private startOfData = dayjs(new Date(2021, 4, 26, 0, 0, 0)).format('YYYY-MM-DD HH:mm:ss');
@@ -71,8 +56,22 @@ export class WaterDemandPredictionComponent {
     [this.startofJune]: "water-demand-prediction.startpoint.options.b",
     [this.startOfYear22]: "water-demand-prediction.startpoint.options.c",
   };
-
   readonly choiceStartPoint = signal<string | undefined>(undefined);
+
+  /** variables resolution dropdown */
+  protected menuResolution = "water-demand-prediction.choice.resolution";
+  protected optionsResolution: Record<string, string> = {
+    hourly: "water-demand-prediction.resolution.hourly",
+    daily: "water-demand-prediction.resolution.daily",
+    weekly: "water-demand-prediction.resolution.weekly",
+  };
+  readonly choiceResolution = signal<string | undefined>(undefined);
+
+  /** variables name dropdown */
+  menuSmartmeter = "water-demand-prediction.choice.smartmeter";
+  smartmeterSignal: Signal<MeterNames | undefined> = this.waterDemandService.fetchMeterInformation();
+  optionsSmartmeter: Record<string, string> = {};
+  choiceSmartmeter = signal<string | undefined>(undefined);
 
   protected menuWeather = "water-demand-prediction.choice.weather";
   protected optionsWeather: Record<string, string> = {
@@ -176,11 +175,15 @@ export class WaterDemandPredictionComponent {
     | QueryList<BaseChartDirective>
     | undefined;
 
-  constructor() {
+  constructor(private translateService: TranslateService) {
 
-    effect(() => {
-      console.log(this.translateString());
-    })
+    console.log(this.currentLang)
+    dayjs.locale(this.translateService.currentLang || 'en');
+
+    // update dayjs whenever language changes
+    this.translateService.onLangChange.subscribe((event) => {
+      dayjs.locale(event.lang);
+    });
 
     /** define smartmeter options */
     effect(() => {
@@ -217,17 +220,8 @@ export class WaterDemandPredictionComponent {
   }
 
   /** set displayed resolution and update chart to mirror that */
-  setDisplayedResolution(resolution: string): void {
+  protected setDisplayedResolution(resolution: string): void {
     this.displayedResolution.set(resolution);
-  }
-
-  /** set the displayed chartType to change from line to bar and back */
-  switchDisplayedChartType(): void {
-    if (this.chartType() === "line") {
-      this.chartType.set("bar");
-    } else {
-      this.chartType.set("line");
-    }
   }
 
   /**
@@ -235,7 +229,7 @@ export class WaterDemandPredictionComponent {
    * update only one chart based on index given, when given one.
    * @returns if there is no chart
    */
-  updateCharts(indexOfChart?: number): void {
+  protected updateCharts(indexOfChart?: number): void {
     if (!this.charts) {
       console.log("No chart initialized!");
       return;
@@ -257,7 +251,7 @@ export class WaterDemandPredictionComponent {
   }
 
   /** Completely erases data from the real data graph element */
-  resetChart(): void {
+  protected resetChart(): void {
     this.chartDataCurrentValues.datasets = [];
 
     this.savedDatasets = {};
@@ -265,7 +259,7 @@ export class WaterDemandPredictionComponent {
   }
 
   /** Completely erases data from predicted graph element */
-  resetPredictionChart(): void {
+  protected resetPredictionChart(): void {
     this.chartDataPredictedValues.datasets = [];
 
     this.predictedDatasets = {};
@@ -273,7 +267,7 @@ export class WaterDemandPredictionComponent {
   }
 
   /** helper function to create a color from values */
-  createColorFromParameter(
+  protected createColorFromParameter(
     label: string,
     resolution: string,
     timeframe: string,
@@ -288,7 +282,7 @@ export class WaterDemandPredictionComponent {
    * @param fillOption: false, 0 for confidence interval
    * @returns new dataset
    */
-  createNewDataset(
+  protected createNewDataset(
     data: number[],
     label: string,
     resolution: string,
@@ -321,7 +315,7 @@ export class WaterDemandPredictionComponent {
    * creates new ChartDatasets and activates the display function
    * @returns nothing
    */
-  fetchDataSmartmeter(): void {
+  protected fetchDataSmartmeter(): void {
 
     if (!this.currentSmartmeterData) {
       return;
@@ -359,19 +353,19 @@ export class WaterDemandPredictionComponent {
     this.currentSmartmeterData = undefined;
   }
 
-  fetchPredData(): void {
+  protected fetchPredData(): void {
     //BUG: REDESIGN
     this.triggerFetchPredictedSmartmeterData.set(true);
     this.triggerTraining.set(false);
   }
 
-  trainModel(): void {
+  protected trainModel(): void {
     //BUG: REDESIGN
     this.triggerTraining.set(true);
     this.triggerFetchPredictedSmartmeterData.set(false);
   }
 
-  showPredData(): void {
+  protected showPredData(): void {
 
     /** set trigger to true */
     if (!this.currentPredictedSmartmeterData) {
@@ -449,7 +443,7 @@ export class WaterDemandPredictionComponent {
   }
 
   /** show datasets based on the resolution chosen */
-  showDatasets(resolution: string): void {
+  protected showDatasets(resolution: string): void {
     // reset data to begin
     this.chartDataCurrentValues.datasets = [];
 
@@ -468,7 +462,7 @@ export class WaterDemandPredictionComponent {
   }
 
   /** show predicted datasets based on the resolution chosen */
-  showPredictedDatasets(resolution: string): void {
+  protected showPredictedDatasets(resolution: string): void {
     // reset data to begin
     this.chartDataPredictedValues.datasets = [];
 
