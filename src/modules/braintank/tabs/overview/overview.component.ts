@@ -48,8 +48,10 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
       const model = gltf.scene;
       this.scene.add(model);
 
-      this.colorMesh(model, 'Water', 0x0000ff);
-      this.colorMesh(model, 'Cube', 0xffffff);
+      this.setColorMesh(model, 'Water', 0x0000ff);
+      this.setColorMesh(model, 'Cube', 0xffffff);
+
+      this.setScaleYWater(model, 0.66);
 
       model.rotation.y = - Math.PI / 4;
     });
@@ -84,11 +86,28 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
     this.renderer.setSize(width, height);
   };
 
-  private colorMesh = (model: THREE.Group<THREE.Object3DEventMap>, objectName: string, color: string|number) => {
+  private setColorMesh = (model: THREE.Group<THREE.Object3DEventMap>, objectName: string, color: string|number) => {
     const mesh = model.getObjectByName(objectName) as THREE.Mesh;
 
     if (mesh && mesh.material instanceof THREE.MeshStandardMaterial) {
       mesh.material.color.set(color);
     }
+  };
+
+  private setScaleYWater = (model: THREE.Group<THREE.Object3DEventMap>, scaleY: number) => {
+    const water = model.getObjectByName('Water') as THREE.Mesh;
+    const originalHeight = 0.8;
+    let scaleToHeight = scaleY * originalHeight;
+
+    if (scaleToHeight < 0 || scaleToHeight > originalHeight) {
+      scaleToHeight = 0;
+    }
+
+    if (water) {
+      water.scale.set(1, scaleToHeight, 1);
+      water.position.y = (originalHeight * (scaleToHeight - originalHeight)) / 2;
+    } 
+
+    water.renderOrder = 1;
   };
 }
