@@ -1,28 +1,30 @@
-<div class="tabs is-toggle is-medium is-fullwidth">
-  <ul>
-    <li [class.is-active]="activeTab() === 'overview'" (click)="setActiveTab('overview')">
-      <a>
-        <span class="icon">
+<div class="is-fullwidth is is-fullheight" style="overflow: auto">
+  <div class="tabs is-toggle is-medium is-fullwidth">
+    <ul>
+      <li [class.is-active]="activeTab() === 'overview'" (click)="setActiveTab('overview')">
+        <a>
+          <span class="icon">
             <ng-icon name="remixLineChartLine"></ng-icon>
-        </span>
-        <span translate>braintank.tab.overview</span>
-      </a>
-    </li>
-    <li [class.is-active]="activeTab() === 'simulation'" (click)="setActiveTab('simulation')">
-      <a>
-        <span class="icon">
+          </span>
+          <span translate>braintank.tab.overview</span>
+        </a>
+      </li>
+      <li [class.is-active]="activeTab() === 'simulation'" (click)="setActiveTab('simulation')">
+        <a>
+          <span class="icon">
             <ng-icon name="remixMovieLine"></ng-icon>
-        </span>
-        <span translate>braintank.tab.simulation</span>
-      </a>
-    </li>
-  </ul>
-</div>
+          </span>
+          <span translate>braintank.tab.simulation</span>
+        </a>
+      </li>
+    </ul>
+  </div>
 
-@if(activeTab() === 'overview') {
+  @if(activeTab() === 'overview') {
     <braintank-overview/>
-}
+  }
 
-@if(activeTab() === 'simulation') {
+  @if(activeTab() === 'simulation') {
     <braintank-simulation/>
-}
+  }
+</div>
