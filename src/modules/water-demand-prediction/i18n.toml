@@ -86,13 +86,21 @@ de = "Wähle Spalte"
 en = "Display Data"
 de = "Zeige Daten an"
 
-[request.trainModel]
-en = "Train Model"
-de = "Modell trainieren"
+[request.trainModelfalse]
+en = "Training denied"
+de = "Training ausgesetzt"
 
-[request.preddata]
-en = "Request predicted Data"
-de = "Frage Vorhersage an"
+[request.trainModeltrue]
+en = "Training allowed"
+de = "Training erlaubt"
+
+[request.preddatafalse]
+en = "Requesting Data denied"
+de = "Daten anfragen ausgesetzt"
+
+[request.preddatatrue]
+en = "Requesting Data allowed"
+de = "Daten anfragen erlaubt"
 
 [request.showdata]
 en = "Display predicted data"

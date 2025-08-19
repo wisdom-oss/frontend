@@ -92,7 +92,7 @@ export class WaterDemandPredictionComponent {
   private currentSmartmeterData: SingleSmartmeter | undefined;
 
   /** signal to trigger training on button click and store the answer */
-  readonly triggerTraining = signal<boolean>(false);
+  protected triggerTraining = signal<boolean>(false);
   readonly trainingResp = this.waterDemandService.trainModel(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution, this.choiceWeather, this.choiceWeatherColumn, this.triggerTraining);
 
   /** data object of current requested Smartmeterdata */
@@ -176,8 +176,6 @@ export class WaterDemandPredictionComponent {
     | undefined;
 
   constructor(private translateService: TranslateService) {
-
-    console.log(this.currentLang)
     dayjs.locale(this.translateService.currentLang || 'en');
 
     // update dayjs whenever language changes
@@ -353,17 +351,16 @@ export class WaterDemandPredictionComponent {
     this.currentSmartmeterData = undefined;
   }
 
-  protected fetchPredData(): void {
-    //BUG: REDESIGN
-    this.triggerFetchPredictedSmartmeterData.set(true);
-    this.triggerTraining.set(false);
+  /** inverts the training signal */
+  protected trainModel(): void {
+    this.triggerTraining.set(!this.triggerTraining());
   }
 
-  protected trainModel(): void {
-    //BUG: REDESIGN
-    this.triggerTraining.set(true);
-    this.triggerFetchPredictedSmartmeterData.set(false);
+  protected fetchPredData(): void {
+    this.triggerFetchPredictedSmartmeterData.set(!this.triggerFetchPredictedSmartmeterData());
   }
+
+
 
   protected showPredData(): void {
 
@@ -437,9 +434,6 @@ export class WaterDemandPredictionComponent {
     this.showPredictedDatasets(
       this.currentPredictedSmartmeterData!.resolution,
     );
-
-    /** set trigger back to false */
-    this.triggerFetchPredictedSmartmeterData.set(false);
   }
 
   /** show datasets based on the resolution chosen */

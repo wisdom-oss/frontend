@@ -78,10 +78,16 @@
           {{ "water-demand-prediction.request.realdata" | translate }}
         </button>
         <button
-          class="button is-primary is-rounded is-responsive"
+          class="button is-rounded"
+          [ngClass]="triggerTraining() ? 'is-primary' : 'is-danger'"
           (click)="trainModel()"
         >
-          {{ "water-demand-prediction.request.trainModel" | translate }}
+          {{
+            (triggerTraining()
+              ? "water-demand-prediction.request.trainModeltrue"
+              : "water-demand-prediction.request.trainModelfalse"
+            ) | translate
+          }}
         </button>
         <button
           class="button is-danger is-rounded is-responsive"
@@ -160,11 +166,22 @@
       </div>
       <!-- Delete, Request Prediction, Show Prediction -->
       <div class="buttons is-centered responsive-buttons">
-        <button class="button is-primary is-rounded" (click)="fetchPredData()">
-          {{ "water-demand-prediction.request.preddata" | translate }}
-        </button>
         <button class="button is-primary is-rounded" (click)="showPredData()">
           {{ "water-demand-prediction.request.showdata" | translate }}
+        </button>
+        <button
+          class="button is-rounded"
+          [ngClass]="
+            triggerFetchPredictedSmartmeterData() ? 'is-primary' : 'is-danger'
+          "
+          (click)="fetchPredData()"
+        >
+          {{
+            (triggerFetchPredictedSmartmeterData()
+              ? "water-demand-prediction.request.preddatatrue"
+              : "water-demand-prediction.request.preddatafalse"
+            ) | translate
+          }}
         </button>
         <button
           class="button is-danger is-rounded"
@@ -176,105 +193,6 @@
       <!-- KPI Metrics -->
       <div class="table-container">
         <table class="table is-centered is-fullwidth">
-          <thead>
-            <th
-              title="{{
-                'water-demand-prediction.explanation.MAE' | translate
-              }}"
-            >
-              {{ "water-demand-prediction.metrics.MAE" | translate }}
-            </th>
-            <th
-              title="{{
-                'water-demand-prediction.explanation.MSE' | translate
-              }}"
-            >
-              {{ "water-demand-prediction.metrics.MSE" | translate }}
-            </th>
-            <th
-              title="{{
-                'water-demand-prediction.explanation.RMSE' | translate
-              }}"
-            >
-              {{ "water-demand-prediction.metrics.RMSE" | translate }}
-            </th>
-            <th
-              title="{{ 'water-demand-prediction.explanation.R2' | translate }}"
-            >
-              {{ "water-demand-prediction.metrics.R2" | translate }}
-            </th>
-          </thead>
-          <tbody>
-            <tr *ngIf="currentPredictedSmartmeterData">
-              <td
-                title="{{ currentPredictedSmartmeterData.meanAbsoluteError }}"
-              >
-                {{
-                  currentPredictedSmartmeterData!.meanAbsoluteError * 100
-                    | number: "1.2-2"
-                }}%
-              </td>
-              <td title="{{ currentPredictedSmartmeterData.meanSquaredError }}">
-                {{
-                  currentPredictedSmartmeterData!.meanSquaredError * 100
-                    | number: "1.2-2"
-                }}%
-              </td>
-              <td
-                title="{{
-                  currentPredictedSmartmeterData.rootOfmeanSquaredError
-                }}"
-              >
-                {{
-                  currentPredictedSmartmeterData!.rootOfmeanSquaredError * 100
-                    | number: "1.2-2"
-                }}%
-              </td>
-              <td title="{{ currentPredictedSmartmeterData.r2 }}">
-                {{ currentPredictedSmartmeterData.r2 * 100 | number: "1.2-2" }}%
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-  <!--Predicted Data Graph and Buttons-->
-  <div class="column is-full-tablet is-half-desktop">
-    <div class="box is-fullheight">
-      <!-- reset button -->
-      <button
-        class="button is-primary is-rounded is-responsive mb-6"
-        (click)="resetPredictionChart()"
-      >
-        {{ "water-demand-prediction.delete.predicted" | translate }}
-      </button>
-      <div class="" style="height: 40vh">
-        <canvas
-          baseChart
-          [data]="chartDataPredictedValues"
-          [options]="chartOptions"
-          [type]="chartType()"
-        ></canvas>
-      </div>
-      <div class="buttons">
-        <!-- buttons for prediction values -->
-        <button
-          class="button is-primary is-rounded is-responsive"
-          (click)="fetchPredData()"
-        >
-          {{ "water-demand-prediction.request.preddata" | translate }}
-        </button>
-        <button
-          class="button is-primary is-rounded is-responsive"
-          (click)="showPredData()"
-        >
-          {{ "water-demand-prediction.request.showdata" | translate }}
-        </button>
-      </div>
-      <!-- Analysis metrics -->
-      <div>
-        <table class="table">
           <thead>
             <th
               title="{{
