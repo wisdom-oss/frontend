@@ -1,3 +1,7 @@
+[overview.header.features]
+en = "Current Values & Properties"
+de = "Aktuelle Messwerte & Eigenschaften"
+
 [tab.overview]
 en = "Overview"
 de = "Übersicht"
