@@ -260,10 +260,10 @@ export class WaterDemandPredictionComponent {
 
     effect(() => {
       let info = this.trainingResp();
-      if(info) {
-      this.modalOpen.set(true);
+      if (info) {
+        this.modalOpen.set(true);
       }
-    })
+    });
   }
 
   /** set displayed resolution and update chart to mirror that */
