@@ -3,7 +3,7 @@ import {
   TranslateService,
 } from "@ngx-translate/core";
 
-import { asserts } from "./common/asserts";
+import {asserts} from "./common/asserts";
 import core from "./core/i18n.toml";
 import beWaterSmart from "./modules/be-water-smart/i18n.toml";
 import growl from "./modules/growl/i18n.toml";
@@ -67,19 +67,19 @@ type NestedStringRecord = Record<
   string,
   | string
   | Record<
-    string,
-    | string
-    | Record<
       string,
       | string
       | Record<
-        string,
-        | string
-        | Record<
           string,
-          string | Record<string, string | Record<string, string>>
+          | string
+          | Record<
+              string,
+              | string
+              | Record<
+                  string,
+                  string | Record<string, string | Record<string, string>>
+                >
+            >
         >
-      >
     >
-  >
 >;

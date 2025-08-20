@@ -1,4 +1,4 @@
-import { CommonModule } from "@angular/common";
+import {CommonModule} from "@angular/common";
 import {
   computed,
   effect,
@@ -8,9 +8,9 @@ import {
   signal,
   Component,
 } from "@angular/core";
-import { provideIcons, NgIconComponent } from "@ng-icons/core";
-import { remixArrowDownSLine, remixArrowUpSLine } from "@ng-icons/remixicon";
-import { TranslatePipe, TranslateService } from "@ngx-translate/core";
+import {provideIcons, NgIconComponent} from "@ng-icons/core";
+import {remixArrowDownSLine, remixArrowUpSLine} from "@ng-icons/remixicon";
+import {TranslatePipe, TranslateService} from "@ngx-translate/core";
 
 @Component({
   selector: "dropdown",
@@ -43,7 +43,7 @@ export class DropdownComponent {
 
   /** Selected choice. */
   readonly choice = model<string | undefined>(undefined);
-  protected choiceOutput = output<string>({ alias: "choice" });
+  protected choiceOutput = output<string>({alias: "choice"});
   protected choiceName = computed(() => {
     let choice = this.choice();
     if (choice) return this.options()[choice];

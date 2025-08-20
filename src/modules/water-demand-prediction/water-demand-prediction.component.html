@@ -72,10 +72,10 @@
       <!-- Delete, ChartType, Show Smartmeter, Train Model Buttons -->
       <div class="buttons is-centered responsive-buttons">
         <button
-          class="button is-primary is-rounded is-responsive"
-          (click)="fetchDataSmartmeter()"
+          class="button is-danger is-rounded is-responsive"
+          (click)="resetChart()"
         >
-          {{ "water-demand-prediction.request.realdata" | translate }}
+          {{ "water-demand-prediction.delete.normal" | translate }}
         </button>
         <button
           class="button is-rounded"
@@ -89,13 +89,35 @@
             ) | translate
           }}
         </button>
+        
         <button
-          class="button is-danger is-rounded is-responsive"
-          (click)="resetChart()"
+          class="button is-primary is-rounded is-responsive"
+          (click)="fetchDataSmartmeter()"
         >
-          {{ "water-demand-prediction.delete.normal" | translate }}
+          {{ "water-demand-prediction.request.realdata" | translate }}
         </button>
       </div>
+      <!-- Modal -->
+<div class="modal" [class.is-active]="modalOpen()">
+  <div class="modal-background" (click)="closeModal()"></div>
+
+  <!-- smaller modal using modal-content -->
+  <div class="modal-content has-text-centered">
+    <div class="box">
+      <p class="title is-5 has-text-primary">Training Status</p>
+      <p class="mb-4">{{ trainingResp() }}</p>
+      <button class="button is-primary is-centered" (click)="closeModal()">
+        Close
+      </button>
+    </div>
+  </div>
+
+  <button
+    class="modal-close is-large"
+    aria-label="close"
+    (click)="closeModal()"
+  ></button>
+</div>
       <!-- Dropdown Menus for Control-->
       <div class="buttons responsive-dropdown is-centered">
         <dropdown
@@ -166,8 +188,11 @@
       </div>
       <!-- Delete, Request Prediction, Show Prediction -->
       <div class="buttons is-centered responsive-buttons">
-        <button class="button is-primary is-rounded" (click)="showPredData()">
-          {{ "water-demand-prediction.request.showdata" | translate }}
+        <button
+          class="button is-danger is-rounded"
+          (click)="resetPredictionChart()"
+        >
+          {{ "water-demand-prediction.delete.predicted" | translate }}
         </button>
         <button
           class="button is-rounded"
@@ -183,11 +208,8 @@
             ) | translate
           }}
         </button>
-        <button
-          class="button is-danger is-rounded"
-          (click)="resetPredictionChart()"
-        >
-          {{ "water-demand-prediction.delete.predicted" | translate }}
+        <button class="button is-primary is-rounded" (click)="showPredData()">
+          {{ "water-demand-prediction.request.showdata" | translate }}
         </button>
       </div>
       <!-- KPI Metrics -->

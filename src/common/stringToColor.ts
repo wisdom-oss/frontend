@@ -1,4 +1,3 @@
-
 /**
  * Generates deterministically a hex color code from any string.
  *
@@ -9,7 +8,10 @@
  *
  * @returns A hex color code in the style of '#abc123'
  */
-export function stringToColor(str: string, map?: Record<string, string>): string {
+export function stringToColor(
+  str: string,
+  map?: Record<string, string>,
+): string {
   if (map && map[str]) {
     return map[str];
   }
@@ -24,4 +26,3 @@ export function stringToColor(str: string, map?: Record<string, string>): string
   }
   return color;
 }
-

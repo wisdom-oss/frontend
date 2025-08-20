@@ -1,18 +1,27 @@
-import { ViewChildren, Component, QueryList, inject } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { TranslatePipe, TranslateService } from "@ngx-translate/core";
-import { ChartConfiguration, ChartData, ChartDataset, ChartType } from "chart.js";
-import { BaseChartDirective } from "ng2-charts";
-import { MeterNames, WaterDemandPredictionService, WeatherColumns } from "../../api/water-demand-prediction.service";
-import { DropdownComponent } from "../../common/components/dropdown/dropdown.component";
-import { SingleSmartmeter, PredictedSmartmeter } from "../../api/water-demand-prediction.service";
-import { signal, Signal, effect } from "@angular/core";
+import {CommonModule} from "@angular/common";
+import {inject, ViewChildren, Component, QueryList} from "@angular/core";
+import {effect, signal, Signal} from "@angular/core";
+import {TranslatePipe, TranslateService} from "@ngx-translate/core";
+import {ChartConfiguration, ChartData, ChartDataset, ChartType} from "chart.js";
 import dayjs from "dayjs";
-import "dayjs/locale/de";
-import "dayjs/locale/en";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { stringToColor } from "../../common/stringToColor";
+import {BaseChartDirective} from "ng2-charts";
+
+import {
+  WeatherColumns,
+  MeterNames,
+  WaterDemandPredictionService,
+} from "../../api/water-demand-prediction.service";
+import {
+  PredictedSmartmeter,
+  SingleSmartmeter,
+} from "../../api/water-demand-prediction.service";
+import {DropdownComponent} from "../../common/components/dropdown/dropdown.component";
+import {stringToColor} from "../../common/stringToColor";
+
+import "dayjs/locale/de";
+import "dayjs/locale/en";
 
 dayjs.extend(duration, relativeTime);
 
@@ -25,12 +34,12 @@ export class WaterDemandPredictionComponent {
   private waterDemandService = inject(WaterDemandPredictionService);
 
   protected minHeightCharts: string = "15em";
-  protected standardHeightCharts: string = "50%"
+  protected standardHeightCharts: string = "50%";
 
   /** the displayed resolution in the charts of real data */
   protected displayedResolution = signal<string | undefined>("hourly");
 
-  private currentLang = "water-demand-prediction.dayjs.locale"
+  private currentLang = "water-demand-prediction.dayjs.locale";
   //BUG: dayjs sets locale when initializing variables, cant dynamically chagne them
 
   /** variables timeframe dropdown */
@@ -48,9 +57,15 @@ export class WaterDemandPredictionComponent {
 
   /** variables startpoint dropdown */
   protected menuStartPoint = "water-demand-prediction.startpoint.menu";
-  private startOfData = dayjs(new Date(2021, 4, 26, 0, 0, 0)).format('YYYY-MM-DD HH:mm:ss');
-  private startofJune = dayjs(new Date(2021, 5, 1, 0, 0, 0)).format('YYYY-MM-DD HH:mm:ss');
-  private startOfYear22 = dayjs(new Date(2022, 0, 1, 0, 0, 0)).format('YYYY-MM-DD HH:mm:ss');
+  private startOfData = dayjs(new Date(2021, 4, 26, 0, 0, 0)).format(
+    "YYYY-MM-DD HH:mm:ss",
+  );
+  private startofJune = dayjs(new Date(2021, 5, 1, 0, 0, 0)).format(
+    "YYYY-MM-DD HH:mm:ss",
+  );
+  private startOfYear22 = dayjs(new Date(2022, 0, 1, 0, 0, 0)).format(
+    "YYYY-MM-DD HH:mm:ss",
+  );
   protected optionsStartPoint: Record<string, string> = {
     [this.startOfData]: "water-demand-prediction.startpoint.options.a",
     [this.startofJune]: "water-demand-prediction.startpoint.options.b",
@@ -69,7 +84,8 @@ export class WaterDemandPredictionComponent {
 
   /** variables name dropdown */
   menuSmartmeter = "water-demand-prediction.choice.smartmeter";
-  smartmeterSignal: Signal<MeterNames | undefined> = this.waterDemandService.fetchMeterInformation();
+  smartmeterSignal: Signal<MeterNames | undefined> =
+    this.waterDemandService.fetchMeterInformation();
   optionsSmartmeter: Record<string, string> = {};
   choiceSmartmeter = signal<string | undefined>(undefined);
 
@@ -83,21 +99,48 @@ export class WaterDemandPredictionComponent {
   readonly choiceWeather = signal<string | undefined>(undefined);
 
   protected menuWeatherColumn = "water-demand-prediction.choice.weatherColumn";
-  readonly weatherColumnsSignal: Signal<WeatherColumns | undefined> = this.waterDemandService.fetchWeatherCols(this.choiceWeather);
+  readonly weatherColumnsSignal: Signal<WeatherColumns | undefined> =
+    this.waterDemandService.fetchWeatherCols(this.choiceWeather);
   protected optionsWeatherColumn: Record<string, string> = {};
   readonly choiceWeatherColumn = signal<string | undefined>(undefined);
 
   /** data object of current requested Smartmeterdata */
-  readonly currentSingleSmartmeterDataSignal: Signal<SingleSmartmeter | undefined> = this.waterDemandService.fetchSmartmeter(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution)
+  readonly currentSingleSmartmeterDataSignal: Signal<
+    SingleSmartmeter | undefined
+  > = this.waterDemandService.fetchSmartmeter(
+    this.choiceStartPoint,
+    this.choiceSmartmeter,
+    this.choiceTime,
+    this.choiceResolution,
+  );
   private currentSmartmeterData: SingleSmartmeter | undefined;
 
   /** signal to trigger training on button click and store the answer */
   protected triggerTraining = signal<boolean>(false);
-  readonly trainingResp = this.waterDemandService.trainModel(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution, this.choiceWeather, this.choiceWeatherColumn, this.triggerTraining);
+  protected modalOpen = signal(false);
+  readonly trainingResp = this.waterDemandService.trainModel(
+    this.choiceStartPoint,
+    this.choiceSmartmeter,
+    this.choiceTime,
+    this.choiceResolution,
+    this.choiceWeather,
+    this.choiceWeatherColumn,
+    this.triggerTraining,
+  );
 
   /** data object of current requested Smartmeterdata */
   readonly triggerFetchPredictedSmartmeterData = signal<boolean>(false);
-  readonly currentPredictedSmartmeterDataSignal: Signal<PredictedSmartmeter | undefined> = this.waterDemandService.fetchPrediction(this.choiceStartPoint, this.choiceSmartmeter, this.choiceTime, this.choiceResolution, this.choiceWeather, this.choiceWeatherColumn, this.triggerFetchPredictedSmartmeterData)
+  readonly currentPredictedSmartmeterDataSignal: Signal<
+    PredictedSmartmeter | undefined
+  > = this.waterDemandService.fetchPrediction(
+    this.choiceStartPoint,
+    this.choiceSmartmeter,
+    this.choiceTime,
+    this.choiceResolution,
+    this.choiceWeather,
+    this.choiceWeatherColumn,
+    this.triggerFetchPredictedSmartmeterData,
+  );
   protected currentPredictedSmartmeterData: PredictedSmartmeter | undefined;
 
   /** Record to hold all saved ChartDatasets */
@@ -176,10 +219,10 @@ export class WaterDemandPredictionComponent {
     | undefined;
 
   constructor(private translateService: TranslateService) {
-    dayjs.locale(this.translateService.currentLang || 'en');
+    dayjs.locale(this.translateService.currentLang || "en");
 
     // update dayjs whenever language changes
-    this.translateService.onLangChange.subscribe((event) => {
+    this.translateService.onLangChange.subscribe(event => {
       dayjs.locale(event.lang);
     });
 
@@ -189,7 +232,7 @@ export class WaterDemandPredictionComponent {
       if (smartmeters) {
         this.optionsSmartmeter = smartmeters;
       }
-    })
+    });
 
     /** updates optionsWeatherColumn when selected weather attribute changes */
     effect(() => {
@@ -197,7 +240,7 @@ export class WaterDemandPredictionComponent {
       if (weatherCols) {
         this.optionsWeatherColumn = weatherCols;
       }
-    })
+    });
 
     /** request current smartmeter data */
     effect(() => {
@@ -205,7 +248,7 @@ export class WaterDemandPredictionComponent {
       if (curData) {
         this.currentSmartmeterData = curData;
       }
-    })
+    });
 
     /** request predicted smartmeter data */
     effect(() => {
@@ -213,8 +256,14 @@ export class WaterDemandPredictionComponent {
         let curData = this.currentPredictedSmartmeterDataSignal();
         this.currentPredictedSmartmeterData = curData;
       }
-    })
+    });
 
+    effect(() => {
+      let info = this.trainingResp();
+      if(info) {
+      this.modalOpen.set(true);
+      }
+    })
   }
 
   /** set displayed resolution and update chart to mirror that */
@@ -314,7 +363,6 @@ export class WaterDemandPredictionComponent {
    * @returns nothing
    */
   protected fetchDataSmartmeter(): void {
-
     if (!this.currentSmartmeterData) {
       return;
     }
@@ -353,17 +401,22 @@ export class WaterDemandPredictionComponent {
 
   /** inverts the training signal */
   protected trainModel(): void {
+    this.triggerFetchPredictedSmartmeterData.set(
+      false,
+    ); /** set up false to make sure training and prediction doesnt happen at the same time */
     this.triggerTraining.set(!this.triggerTraining());
   }
 
   protected fetchPredData(): void {
-    this.triggerFetchPredictedSmartmeterData.set(!this.triggerFetchPredictedSmartmeterData());
+    this.triggerTraining.set(
+      false,
+    ); /** set up false to make sure training and prediction doesnt happen at the same time */
+    this.triggerFetchPredictedSmartmeterData.set(
+      !this.triggerFetchPredictedSmartmeterData(),
+    );
   }
 
-
-
   protected showPredData(): void {
-
     /** set trigger to true */
     if (!this.currentPredictedSmartmeterData) {
       return;
@@ -414,13 +467,10 @@ export class WaterDemandPredictionComponent {
     };
 
     if (
-      !this.predictedDatasets[
-      this.currentPredictedSmartmeterData!.resolution
-      ]
+      !this.predictedDatasets[this.currentPredictedSmartmeterData!.resolution]
     ) {
-      this.predictedDatasets[
-        this.currentPredictedSmartmeterData!.resolution
-      ] = [];
+      this.predictedDatasets[this.currentPredictedSmartmeterData!.resolution] =
+        [];
     }
 
     this.predictedDatasets[
@@ -431,9 +481,7 @@ export class WaterDemandPredictionComponent {
       this.currentPredictedSmartmeterData!.resolution,
     );
 
-    this.showPredictedDatasets(
-      this.currentPredictedSmartmeterData!.resolution,
-    );
+    this.showPredictedDatasets(this.currentPredictedSmartmeterData!.resolution);
   }
 
   /** show datasets based on the resolution chosen */
@@ -480,12 +528,16 @@ export class WaterDemandPredictionComponent {
     /** update charts to display information */
     this.updateCharts(1);
   }
+
+  protected closeModal() {
+    this.modalOpen.set(false);
+  }
 }
 
 export type SmartmeterDataset = {
   dataset: ChartDataset;
   labels: string[];
-}
+};
 
 export type PredictedSmartmeterDataset = {
   dataset: ChartDataset;
@@ -493,4 +545,4 @@ export type PredictedSmartmeterDataset = {
   lowerConfIntervalDataset: ChartDataset;
   upperConfIntervalDataset: ChartDataset;
   realValueDataset: ChartDataset;
-}
+};
