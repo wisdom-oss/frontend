@@ -44,7 +44,7 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
       this.controls = new OrbitControls(this.camera, this.renderer.domElement);
       
       const loader = new GLTFLoader();
-      loader.load('/assets/uploads_files_5179123_IBC.glb', (gltf) => {
+      loader.load('/public/model/uploads_files_5179123_IBC.glb', (gltf) => {
         const model = gltf.scene;
         this.scene.add(model);
   
