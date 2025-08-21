@@ -1,7 +1,4 @@
-import {
-  TranslateService,
-  TranslationObject,
-} from "@ngx-translate/core";
+import {TranslationObject, TranslateService} from "@ngx-translate/core";
 
 import {asserts} from "./common/asserts";
 import core from "./core/i18n.toml";
@@ -51,10 +48,7 @@ export function configureTranslations(service: TranslateService) {
 
   service.addLangs(Object.keys(transformed));
   for (let [key, translations] of Object.entries(transformed)) {
-    service.setTranslation(
-      key,
-      translations as TranslationObject,
-    );
+    service.setTranslation(key, translations as TranslationObject);
   }
 
   service.setFallbackLang(fallbackLanguage);
