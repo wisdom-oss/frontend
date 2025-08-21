@@ -1,4 +1,4 @@
-import {computed, signal, Signal as CoreSignal} from "@angular/core";
+import {computed, signal} from "@angular/core";
 
 import {api} from "./api";
 
