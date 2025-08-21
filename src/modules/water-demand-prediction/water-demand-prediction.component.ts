@@ -107,40 +107,40 @@ export class WaterDemandPredictionComponent {
   /** data object of current requested Smartmeterdata */
   readonly currentSingleSmartmeterDataSignal: Signal<
     SingleSmartmeter | undefined
-  > = this.waterDemandService.fetchSmartmeter(
-    this.choiceStartPoint,
-    this.choiceSmartmeter,
-    this.choiceTime,
-    this.choiceResolution,
-  );
+  > = this.waterDemandService.fetchSmartmeter({
+    startpoint: this.choiceStartPoint,
+    name: this.choiceSmartmeter,
+    timeframe: this.choiceTime,
+    resolution: this.choiceResolution,
+  });
   private currentSmartmeterData: SingleSmartmeter | undefined;
 
   /** signal to trigger training on button click and store the answer */
   protected triggerTraining = signal<boolean>(false);
   protected modalOpen = signal(false);
-  readonly trainingResp = this.waterDemandService.trainModel(
-    this.choiceStartPoint,
-    this.choiceSmartmeter,
-    this.choiceTime,
-    this.choiceResolution,
-    this.choiceWeather,
-    this.choiceWeatherColumn,
-    this.triggerTraining,
-  );
+  readonly trainingResp = this.waterDemandService.trainModel({
+    startpoint: this.choiceStartPoint,
+    name: this.choiceSmartmeter,
+    timeframe: this.choiceTime,
+    resolution: this.choiceResolution,
+    weatherCapability: this.choiceWeather,
+    weatherColumn: this.choiceWeatherColumn,
+    trigger: this.triggerTraining,
+  });
 
   /** data object of current requested Smartmeterdata */
   readonly triggerFetchPredictedSmartmeterData = signal<boolean>(false);
   readonly currentPredictedSmartmeterDataSignal: Signal<
     PredictedSmartmeter | undefined
-  > = this.waterDemandService.fetchPrediction(
-    this.choiceStartPoint,
-    this.choiceSmartmeter,
-    this.choiceTime,
-    this.choiceResolution,
-    this.choiceWeather,
-    this.choiceWeatherColumn,
-    this.triggerFetchPredictedSmartmeterData,
-  );
+  > = this.waterDemandService.fetchPrediction({
+    startpoint: this.choiceStartPoint,
+    name: this.choiceSmartmeter,
+    timeframe: this.choiceTime,
+    resolution: this.choiceResolution,
+    weatherCapability: this.choiceWeather,
+    weatherColumn: this.choiceWeatherColumn,
+    trigger: this.triggerFetchPredictedSmartmeterData,
+  });
   protected currentPredictedSmartmeterData: PredictedSmartmeter | undefined;
 
   /** Record to hold all saved ChartDatasets */
