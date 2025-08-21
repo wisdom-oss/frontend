@@ -50,6 +50,10 @@ de = "eingeschränkt"
 en = "down"
 de = "außer Betrieb"
 
+[sidebar.last-update]
+en = "last update"
+de = "zuletzt aktualisiert"
+
 [sidebar.category.groundwater]
 en = "Groundwater"
 de = "Grundwasser"

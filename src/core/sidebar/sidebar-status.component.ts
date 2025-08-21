@@ -167,9 +167,15 @@ export class SidebarStatusIconComponent extends SidebarStatusBaseComponent {
                   <p class="title is-6" translate>
                     core.sidebar.status.{{ service.value.status.description }}
                   </p>
-                  <p class="subtitle is-7">
-                    {{ service.value.lastUpdate?.locale(lang())?.fromNow() }}
-                  </p>
+                  @if (service.value.lastUpdate) {
+                    <p
+                      class="subtitle is-7"
+                      translate="core.sidebar.last-update"
+                    ></p>
+                    <p class="subtitle is-7">
+                      {{ service.value.lastUpdate.locale(lang()).fromNow() }}
+                    </p>
+                  }
                 </div>
               </div>
             </td>
