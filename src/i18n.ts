@@ -1,6 +1,6 @@
 import {
-  InterpolatableTranslationObject,
   TranslateService,
+  TranslationObject,
 } from "@ngx-translate/core";
 
 import {asserts} from "./common/asserts";
@@ -26,7 +26,7 @@ const modules: NestedStringRecord = {
 };
 
 export function configureTranslations(service: TranslateService) {
-  let defaultLanguage = service.getBrowserLang() ?? "en";
+  let fallbackLanguage = service.getBrowserLang() ?? "en";
   const transformed: NestedStringRecord = {};
 
   function traverse(record: object, path: string[] = []) {
@@ -53,12 +53,12 @@ export function configureTranslations(service: TranslateService) {
   for (let [key, translations] of Object.entries(transformed)) {
     service.setTranslation(
       key,
-      translations as InterpolatableTranslationObject,
+      translations as TranslationObject,
     );
   }
 
-  service.setDefaultLang(defaultLanguage);
-  service.use(defaultLanguage);
+  service.setFallbackLang(fallbackLanguage);
+  service.use(fallbackLanguage);
 }
 
 type NestedStringRecord = Record<
