@@ -19,7 +19,7 @@ export const provideLangSignal = () =>
       useFactory: () => {
         let translate = inject(TranslateService);
         return toSignal(translate.onLangChange.pipe(map(event => event.lang)), {
-          initialValue: translate.currentLang,
+          initialValue: translate.getCurrentLang(),
         });
       },
     },
