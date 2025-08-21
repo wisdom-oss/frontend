@@ -38,9 +38,9 @@
     "@ng-icons/core": "^32.1.0",
     "@ng-icons/remixicon": "^32.1.0",
     "@ngx-translate/core": "^17.0.0",
-    "@thatopen/components": "^2.4.11",
-    "@thatopen/components-front": "~2.4.12",
-    "@thatopen/fragments": "~3.0.11",
+    "@thatopen/components": "^3.1.2",
+    "@thatopen/components-front": "^3.1.6",
+    "@thatopen/fragments": "^3.1.6",
     "@turf/turf": "^7.2.0",
     "@twemoji/svg": "^15.0.0",
     "@wisdom-oss/brand": "github:wisdom-oss/brand",
@@ -91,6 +91,11 @@
     "ts-patch": "^3.3.0",
     "typescript": "~5.8.3",
     "typescript-plugin-toml": "^0.5.0"
+  },
+  "overrides": {
+    "@compodoc/compodoc": {
+      "chokidar": "3.6.0"
+    }
   },
   "volta": {
     "node": "22.18.0",
