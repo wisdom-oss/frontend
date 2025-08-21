@@ -3,6 +3,7 @@ import {
   computed,
   effect,
   input,
+  model,
   output,
   signal,
   Component,
@@ -41,7 +42,7 @@ export class DropdownComponent {
   readonly changeMenuName = input(true);
 
   /** Selected choice. */
-  readonly choice = signal<string | undefined>(undefined);
+  readonly choice = model<string | undefined>(undefined);
   protected choiceOutput = output<string>({alias: "choice"});
   protected choiceName = computed(() => {
     let choice = this.choice();

@@ -622,4 +622,37 @@ export namespace api {
       return f(value);
     });
   }
+
+  /**
+   * Build a signal that yields the full record only when every field is defined.
+   *
+   * Use this when several params must be sent together as JSON.
+   * The result stays `undefined` while any input field is `undefined`, then
+   * emits the record with the defined values.
+   * Handy as the `body` of an {@link api.resource} so a request is sent only
+   * once everything is ready.
+   *
+   * Only `undefined` is treated as missing.
+   * `null`, `false`, `0`, and '' pass through.
+   *
+   * @param input Record whose values are signals or plain values.
+   * @returns A signal that is `undefined` until all fields are defined, then
+   *          the record with `undefined` removed from each property's type.
+   */
+  export function require<T extends Record<string, any>>(input: {
+    [K in keyof T]: RequestSignal<T[K]>;
+  }): CoreSignal<{[K in keyof T]-?: Exclude<T[K], undefined>} | undefined> {
+    return computed(() => {
+      let pairs = Object.entries(input).map(([key, value]) => [
+        key,
+        isSignal(value) ? value() : value,
+      ]);
+
+      for (let [_, value] of pairs) {
+        if (value === undefined) return undefined;
+      }
+
+      return Object.fromEntries(pairs);
+    });
+  }
 }
