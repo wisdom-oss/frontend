@@ -9,22 +9,22 @@ const URL = "/api/waterdemand" as const;
   providedIn: "root",
 })
 export class WaterDemandPredictionService {
-  fetchMeterInformation(): api.Signal<Self.MeterNames> {
+  fetchMeterInformation(): api.Signal<MeterNames> {
     return api.resource({
       url: `${URL}/meterNames`,
-      validate: typia.createValidate<Self.MeterNames>(),
+      validate: typia.createValidate<MeterNames>(),
       defaultValue: {},
     });
   }
 
   fetchWeatherCols(
     capability: api.RequestSignal<string>,
-  ): api.Signal<Self.WeatherColumns> {
+  ): api.Signal<WeatherColumns> {
     let body = api.map(capability, capability => ({capability}));
     return api.resource({
       url: `${URL}/weatherColumns`,
       method: `POST`,
-      validate: typia.createValidate<Self.WeatherColumns>(),
+      validate: typia.createValidate<WeatherColumns>(),
       body,
     });
   }
@@ -39,11 +39,11 @@ export class WaterDemandPredictionService {
     name: api.RequestSignal<string>;
     timeframe: api.RequestSignal<string>;
     resolution: api.RequestSignal<string>;
-  }): api.Signal<Self.SingleSmartmeter> {
+  }): api.Signal<SingleSmartmeter> {
     return api.resource({
       url: `${URL}/singleSmartmeter`,
       method: `POST`,
-      validate: typia.createValidate<Self.SingleSmartmeter>(),
+      validate: typia.createValidate<SingleSmartmeter>(),
       body: api.require(params),
     });
   }
@@ -74,44 +74,40 @@ export class WaterDemandPredictionService {
     weatherCapability: api.RequestSignal<string>;
     weatherColumn: api.RequestSignal<string>;
     trigger: api.RequestSignal<boolean>;
-  }): api.Signal<Self.PredictedSmartmeter> {
+  }): api.Signal<PredictedSmartmeter> {
     // NOTE: Maybe add an extra identifier if model requested is trained
 
     return api.resource({
       url: `${URL}/loadModelAndPredict`,
       method: `POST`,
-      validate: typia.createValidate<Self.PredictedSmartmeter>(),
+      validate: typia.createValidate<PredictedSmartmeter>(),
       body: api.require(params),
     });
   }
 }
 
-export namespace WaterDemandPredictionService {
-  export type WeatherColumns = Record<string, string>;
-  export type MeterNames = Record<string, string>;
-  export type SingleSmartmeter = {
-    name: string;
-    resolution: string;
-    timeframe: string;
-    value: number[];
-    date: string[];
-  };
-  export type PredictedSmartmeter = {
-    aic: number;
-    date: string[];
-    fitTime: number;
-    lowerConfValues: number[];
-    meanAbsoluteError: number;
-    meanSquaredError: number;
-    name: string;
-    r2: number;
-    realValue: number[];
-    resolution: string;
-    rootOfmeanSquaredError: number;
-    timeframe: string;
-    upperConfValues: number[];
-    value: number[];
-  };
-}
-
-import Self = WaterDemandPredictionService;
+export type WeatherColumns = Record<string, string>;
+export type MeterNames = Record<string, string>;
+export type SingleSmartmeter = {
+  name: string;
+  resolution: string;
+  timeframe: string;
+  value: number[];
+  date: string[];
+};
+export type PredictedSmartmeter = {
+  aic: number;
+  date: string[];
+  fitTime: number;
+  lowerConfValues: number[];
+  meanAbsoluteError: number;
+  meanSquaredError: number;
+  name: string;
+  r2: number;
+  realValue: number[];
+  resolution: string;
+  rootOfmeanSquaredError: number;
+  timeframe: string;
+  upperConfValues: number[];
+  value: number[];
+};

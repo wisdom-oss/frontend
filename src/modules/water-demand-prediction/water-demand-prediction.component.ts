@@ -8,7 +8,15 @@ import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
 import {BaseChartDirective} from "ng2-charts";
 
-import {WaterDemandPredictionService} from "../../api/water-demand-prediction.service";
+import {
+  WeatherColumns,
+  MeterNames,
+  WaterDemandPredictionService,
+} from "../../api/water-demand-prediction.service";
+import {
+  PredictedSmartmeter,
+  SingleSmartmeter,
+} from "../../api/water-demand-prediction.service";
 import {DropdownComponent} from "../../common/components/dropdown/dropdown.component";
 import {stringToColor} from "../../common/stringToColor";
 
@@ -16,11 +24,6 @@ import "dayjs/locale/de";
 import "dayjs/locale/en";
 
 dayjs.extend(duration, relativeTime);
-
-type MeterNames = WaterDemandPredictionService.MeterNames;
-type WeatherColumns = WaterDemandPredictionService.WeatherColumns;
-type SingleSmartmeter = WaterDemandPredictionService.SingleSmartmeter;
-type PredictedSmartmeter = WaterDemandPredictionService.PredictedSmartmeter;
 
 @Component({
   selector: "water-demand-prediction",
