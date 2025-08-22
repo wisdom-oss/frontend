@@ -20,7 +20,6 @@
     "bbox",
     "greenable",
     "oowv",
-    "smartmeter",
     "typia"
   ],
   "files.watcherExclude": {
