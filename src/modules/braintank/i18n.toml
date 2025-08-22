@@ -2,6 +2,14 @@
 en = "Current Values & Properties"
 de = "Aktuelle Messwerte & Eigenschaften"
 
+[overview.draining.yes]
+en = "Draining since"
+de = "Entwässern seit"
+
+[overview.draining.no]
+en = "No draining"
+de = "Keine Entwässerung"
+
 [tab.overview]
 en = "Overview"
 de = "Übersicht"
