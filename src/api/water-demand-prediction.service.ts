@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import typia, {tags} from "typia";
+import typia from "typia";
 
 import {api} from "../common/api";
 
@@ -87,32 +87,30 @@ export class WaterDemandPredictionService {
 }
 
 export namespace WaterDemandPredictionService {
-  export type Resolution = "hourly" | "daily" | "weekly";
-  export type Timeframe = "one day" | "one week" | "one month" | "three months" | "six months" | "one year" | "all";
   export type WeatherColumns = Record<string, string>;
   export type MeterNames = Record<string, string>;
   export type SingleSmartmeter = {
     name: string;
-    resolution: Resolution;
-    timeframe: Timeframe;
-    value: (number & tags.Type<"double">)[];
-    date: (string & tags.Format<"date-time">)[];
+    resolution: string;
+    timeframe: string;
+    value: number[];
+    date: string[];
   };
   export type PredictedSmartmeter = {
-    aic: number & tags.Type<"double">;
-    date: (string & tags.Format<"date-time">)[];
-    fitTime: number & tags.Type<"double">;
-    lowerConfValues: (number & tags.Type<"double">)[];
-    meanAbsoluteError: number & tags.Type<"double">;
-    meanSquaredError: number & tags.Type<"double">;
+    aic: number;
+    date: string[];
+    fitTime: number;
+    lowerConfValues: number[];
+    meanAbsoluteError: number;
+    meanSquaredError: number;
     name: string;
-    r2: number & tags.Type<"double">;
-    realValue: (number & tags.Type<"double">)[];
-    resolution: Resolution;
-    rootOfmeanSquaredError: number & tags.Type<"double">;
-    timeframe: Timeframe;
-    upperConfValues: (number & tags.Type<"double">)[];
-    value: (number & tags.Type<"double">)[];
+    r2: number;
+    realValue: number[];
+    resolution: string;
+    rootOfmeanSquaredError: number;
+    timeframe: string;
+    upperConfValues: number[];
+    value: number[];
   };
 }
 
