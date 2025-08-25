@@ -1,3 +1,5 @@
+import "./global";
+
 import {registerLocaleData} from "@angular/common";
 import localeDe from "@angular/common/locales/de";
 import localeDeExtra from "@angular/common/locales/extra/de";
@@ -9,9 +11,9 @@ import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
 
+import durationExt from "./core/dayjs/duration-ext.plugin";
 import {wisdomAppConfig} from "./config";
 import {configureTranslations} from "./i18n";
-import durationExt from "./core/dayjs/duration-ext.plugin";
 
 import "dayjs/locale/de";
 

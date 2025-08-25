@@ -42,3 +42,28 @@ nav {
 .menu-list li:not(:last-child) {
   padding-bottom: calc(var(--bulma-box-padding) / 2);
 }
+
+.service-status-info {
+  $background-color: light-dark(rgb(238, 238, 238), rgb(9, 10, 12));
+  $text-color: hsl(
+    var(--bulma-black-h),
+    var(--bulma-black-s),
+    var(--bulma-black-l)
+  );
+
+  background-color: $background-color;
+  border-radius: var(--bulma-menu-item-radius);
+  padding: var(--bulma-menu-list-link-padding);
+  color: $text-color;
+
+  &::before {
+    content: "";
+    position: absolute;
+    border-width: 0.75em 0.75em 0 0.75em;
+    border-color: $background-color transparent transparent transparent;
+    top: 0.85em;
+    left: -0.75em;
+    border-style: solid;
+    transform: rotate(90deg);
+  }
+}

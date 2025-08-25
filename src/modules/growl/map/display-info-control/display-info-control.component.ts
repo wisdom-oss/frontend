@@ -31,12 +31,7 @@ export class DisplayInfoControlComponent {
     return {
       title: data.title,
       subtitle: data.subtitle,
-      table: Object.fromEntries(
-        Object.entries(data.table ?? {}).map(([key, value]) => [
-          key,
-          this.toDisplay(value, lang),
-        ]),
-      ),
+      table: Object.map(data.table ?? {}, value => this.toDisplay(value, lang)),
     };
   });
 

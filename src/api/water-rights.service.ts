@@ -6,15 +6,15 @@ import typia from "typia";
 import {typeUtils} from "../common/utils/type-utils";
 import {api} from "../common/api";
 
-const URL = "/api/water-rights/v1" as const;
+const URL = "/api/water-rights" as const;
 
 @Injectable({
   providedIn: "root",
 })
-export class WaterRightsService {
+export class WaterRightsService extends api.service(URL) {
   fetchUsageLocations(): api.Signal<Self.UsageLocation[]> {
     return api.resource({
-      url: `${URL}/`,
+      url: `${URL}/v1/`,
       validate: typia.createValidate<Self.UsageLocation[]>(),
     });
   }
@@ -49,7 +49,7 @@ export class WaterRightsService {
     };
 
     return api.resource({
-      url: api.url`${URL}/details/${no}`,
+      url: api.url`${URL}/v1/details/${no}`,
       responseType: "text",
       validateRaw: typia.createValidate<string>(),
       validate: typia.createValidate<Self.WaterRightDetails>(),
@@ -61,7 +61,7 @@ export class WaterRightsService {
     geometries: api.RequestSignal<GeoJsonObject[]>,
   ): api.Signal<Self.AverageWithdrawals> {
     return api.resource({
-      url: `${URL}/average-withdrawals`,
+      url: `${URL}/v1/average-withdrawals`,
       validate: typia.createValidate<WaterRightsService.AverageWithdrawals>(),
       body: geometries,
       method: "POST",
