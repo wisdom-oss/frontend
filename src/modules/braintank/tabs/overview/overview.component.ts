@@ -1,9 +1,11 @@
 import { Component, signal, WritableSignal } from '@angular/core';
 import { NgIconComponent, provideIcons } from "@ng-icons/core";
-import { remixContrastDrop2Line, remixTimeLine, remixHome8Line, remixMapPin2Line, remixWaterPercentLine } from '@ng-icons/remixicon';
+import { remixContrastDrop2Line, remixTimeLine, remixHome8Line, remixMapPin2Line, remixWaterPercentLine, remixRainyLine } from '@ng-icons/remixicon';
 import { TranslateDirective } from '@ngx-translate/core';
 import { ModelViewComponent } from "../../model-view/model-view.component";
 import dayjs, { Dayjs } from 'dayjs';
+import { BaseChartDirective } from 'ng2-charts';
+import { ChartData } from 'chart.js';
 
 
 @Component({
@@ -12,6 +14,7 @@ import dayjs, { Dayjs } from 'dayjs';
     ModelViewComponent,
     TranslateDirective,
     NgIconComponent,
+    BaseChartDirective,
 ],
   templateUrl: './overview.component.html',
   providers: [
@@ -21,6 +24,7 @@ import dayjs, { Dayjs } from 'dayjs';
       remixTimeLine,
       remixHome8Line,
       remixMapPin2Line,
+      remixRainyLine,
     }),
   ],
 })
@@ -32,4 +36,14 @@ export class OverviewComponent {
   long : WritableSignal<number> = signal(8.185);
   draining : WritableSignal<boolean> = signal(true);
   drainingTime: WritableSignal<Dayjs> = signal(dayjs().subtract(30, 'minutes'));
+
+  dataTest: ChartData<'line', {x: string, y: number}[]> = {
+    datasets: [{
+      data: [{x: '6:00', y: 20}, {x: '8:00', y: 12}, {x: '10:00', y: 7}, {x: '12:00', y: 0}, {x: '14:00', y: 10}, {x: '16:00', y: 7}],
+      parsing: {
+        xAxisKey: 'x',
+        yAxisKey: 'y'
+      }
+    }],
+  };
 }

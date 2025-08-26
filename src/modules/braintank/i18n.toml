@@ -1,6 +1,22 @@
+[overview.header.daySelection]
+en = "Daily Course from:"
+de = "Tagesverlauf vom:"
+
+[overview.header.drainage]
+en = "Drainage"
+de = "Entwässerung"
+
 [overview.header.features]
 en = "Current Values & Properties"
 de = "Aktuelle Messwerte & Eigenschaften"
+
+[overview.header.rainForecast]
+en = "Rain Forecast"
+de = "Regenvorhersage"
+
+[overview.header.waterLevel]
+en = "Water Level"
+de = "Wasserspiegel"
 
 [overview.draining.yes]
 en = "Draining since"
