@@ -1,6 +1,7 @@
 import {computed, inject, Component, Signal} from "@angular/core";
 import {
   remixBarChartFill,
+  remixBookLine,
   remixBuilding3Fill,
   remixDatabase2Fill,
   remixDrizzleFill,
@@ -25,6 +26,7 @@ import {Scopes} from "./core/auth/scopes";
 import {OowvActionMapIconComponent} from "./core/sidebar/icons/oowv-action-map-icon/oowv-action-map-icon.component";
 import {OowvActionMapComponent} from "./modules/oowv/action-map/action-map.component";
 import {PumpModelsComponent} from "./modules/pump-models/pump-models.component";
+import { WaterDemandPredictionService } from "./api/water-demand-prediction.service";
 
 /** Any class that is a {@link Component}. */
 type ComponentClass = new (...args: any[]) => Component;
@@ -183,6 +185,12 @@ export function sidebar(): readonly SidebarEntry[] {
           services: {GeoDataService},
           scopes: OowvActionMapComponent.SCOPES,
         },
+        {
+          module: "core.sidebar.category.waterprediction",
+          icon: {remixBookLine},
+          link: "/oowv/water-demand-prediction",
+          services: {WaterDemandPredictionService}
+        }
       ],
     },
   ];

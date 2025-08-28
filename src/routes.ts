@@ -21,10 +21,6 @@ export const routes: Routes = [
     component: CoreComponent,
     children: [
       {path: "", component: GreeterComponent}, // Default child route
-      {
-        path: "water-demand-prediction",
-        component: WaterDemandPredictionComponent,
-      },
       {path: "weather-data", component: WeatherDataComponent},
       {path: "be-water-smart", component: BeWaterSmartComponent},
       {path: "growl", component: GrowlComponent},
@@ -46,6 +42,10 @@ export const routes: Routes = [
         path: "oowv/action-map",
         component: OowvActionMapComponent,
         canActivate: [permissionsGuard(...OowvActionMapComponent.SCOPES)],
+      },
+      {
+        path: "oowv/water-demand-prediction",
+        component: WaterDemandPredictionComponent,
       },
     ],
   },

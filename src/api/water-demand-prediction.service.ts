@@ -8,7 +8,7 @@ const URL = "/api/waterdemand" as const;
 @Injectable({
   providedIn: "root",
 })
-export class WaterDemandPredictionService {
+export class WaterDemandPredictionService extends api.service(URL) {
   fetchMeterInformation(): api.Signal<Self.MeterNames> {
     return api.resource({
       url: `${URL}/meterNames`,
