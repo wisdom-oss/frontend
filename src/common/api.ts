@@ -915,6 +915,8 @@ export namespace api {
    *
    * Only `undefined` is treated as missing.
    * `null`, `false`, `0`, and '' pass through.
+   * 
+   * @deprecated we don't really need that
    *
    * @param input Record whose values are signals or plain values.
    * @returns A signal that is `undefined` until all fields are defined, then
