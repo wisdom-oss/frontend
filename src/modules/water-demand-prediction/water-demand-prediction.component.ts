@@ -1,5 +1,12 @@
 import {CommonModule} from "@angular/common";
-import {inject, ViewChildren, Component, QueryList} from "@angular/core";
+import {
+  computed,
+  inject,
+  ViewChildren,
+  Component,
+  QueryList,
+  WritableSignal,
+} from "@angular/core";
 import {effect, signal, Signal} from "@angular/core";
 import {TranslatePipe, TranslateService} from "@ngx-translate/core";
 import {ChartConfiguration, ChartData, ChartDataset, ChartType} from "chart.js";
@@ -11,6 +18,7 @@ import {BaseChartDirective} from "ng2-charts";
 import {WaterDemandPredictionService} from "../../api/water-demand-prediction.service";
 import {DropdownComponent} from "../../common/components/dropdown/dropdown.component";
 import {stringToColor} from "../../common/stringToColor";
+import {api} from "../../common/api";
 
 import "dayjs/locale/de";
 import "dayjs/locale/en";

@@ -1,3 +1,4 @@
+# TODO: remove timeframes handled by dayjs
 [timeframe.one-day]
 en = "one day"
 de = "ein Tag"
@@ -38,6 +39,7 @@ de = "täglich"
 en = "weekly"
 de = "wöchentlich"
 
+# TODO: remove these short ones
 [smartmeter.atypical]
 en = "atypical household"
 de = "atypischer Haushalt"
@@ -51,6 +53,22 @@ en = "retired household"
 de = "Ruhestandshaushalt"
 
 [smartmeter.single]
+en = "single household"
+de = "Single Haushalt"
+
+[smartmeter.atypical-household]
+en = "atypical household"
+de = "atypischer Haushalt"
+
+[smartmeter.family-household]
+en = "family household"
+de = "Familienhaushalt"
+
+[smartmeter.retired-household]
+en = "retired household"
+de = "Ruhestandshaushalt"
+
+[smartmeter.single-household]
 en = "single household"
 de = "Single Haushalt"
 
@@ -81,6 +99,10 @@ de = "Wähle Wetter"
 [choice.weatherColumn]
 en = "Select Column"
 de = "Wähle Spalte"
+
+[choice.start-point]
+en = "Start Point"
+de = "Startpunkt"
 
 [request.realdata]
 en = "Display Data"
@@ -114,6 +136,11 @@ de = "Liniendiagramm"
 en = "Bar Chart"
 de = "Balkendiagramm"
 
+[graph.legend.time]
+en = "Time"
+de = "Zeit"
+
+# TODO: deprecate this
 [startpoint.menu]
 en = "Start Point"
 de = "Startpunkt"
@@ -127,6 +154,18 @@ en = "Start of June 2021"
 de = "Anfang Juni 2021"
 
 [startpoint.options.c]
+en = "Start of 2022"
+de = "Anfang 2022"
+
+[start-point.startOfData]
+en = "Start of Timeseries"
+de = "Start der Zeitreihe"
+
+[start-point.startOfJune21]
+en = "Start of June 2021"
+de = "Anfang Juni 2021"
+
+[start-point.startOfYear22]
 en = "Start of 2022"
 de = "Anfang 2022"
 

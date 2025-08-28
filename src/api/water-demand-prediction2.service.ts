@@ -8,8 +8,8 @@ const URL = "/api/waterdemand" as const;
 @Injectable({
   providedIn: "root",
 })
-export class WaterDemandPredictionService extends api.service(URL) {
-  fetchMeterInformation(): api.Signal<Self.MeterNames> {
+export class WaterDemandPrediction2Service extends api.service(URL) {
+  fetchMeterInformation(): api.Signal<Self.MeterNames, Self.MeterNames> {
     return api.resource({
       url: `${URL}/meterNames`,
       validate: typia.createValidate<Self.MeterNames>(),
@@ -18,7 +18,7 @@ export class WaterDemandPredictionService extends api.service(URL) {
   }
 
   fetchWeatherCols(
-    capability: api.RequestSignal<string>,
+    capability: api.RequestSignal<Self.WeatherCapability>,
   ): api.Signal<Self.WeatherColumns> {
     let body = api.map(capability, capability => ({capability}));
     return api.resource({
@@ -34,54 +34,58 @@ export class WaterDemandPredictionService extends api.service(URL) {
    *
    * Only send a request when every parameter is defined.
    */
-  fetchSmartmeter(params: {
-    startpoint: api.RequestSignal<string>;
-    name: api.RequestSignal<string>;
-    timeframe: api.RequestSignal<string>;
-    resolution: api.RequestSignal<string>;
-  }): api.Signal<Self.SingleSmartmeter> {
+  fetchSmartmeter(
+    params: api.RequestSignal<{
+      startpoint: string & DateTime;
+      name: string;
+      timeframe: Self.Timeframe;
+      resolution: Self.Resolution;
+    }>,
+  ): api.Signal<Self.SingleSmartmeter> {
     return api.resource({
       url: `${URL}/singleSmartmeter`,
       method: `POST`,
       validate: typia.createValidate<Self.SingleSmartmeter>(),
-      body: api.require(params),
+      body: params,
     });
   }
 
-  trainModel(params: {
-    startpoint: api.RequestSignal<string>;
-    name: api.RequestSignal<string>;
-    timeframe: api.RequestSignal<string>;
-    resolution: api.RequestSignal<string>;
-    weatherCapability: api.RequestSignal<string>;
-    weatherColumn: api.RequestSignal<string>;
-    trigger: api.RequestSignal<boolean>;
-  }): api.Signal<string> {
+  trainModel(
+    params: api.RequestSignal<{
+      startpoint: string & DateTime;
+      name: string;
+      timeframe: Self.Timeframe;
+      resolution: Self.Resolution;
+      weatherCapability: Self.WeatherCapability;
+      weatherColumn: string;
+    }>,
+  ): api.Signal<string> {
     return api.resource({
       url: `${URL}/trainModel`,
       method: `POST`,
       validate: typia.createValidate<string>(),
-      body: api.require(params),
+      body: params,
     });
   }
 
   /** fetch predicted smartmeter data based on requested parameters */
-  fetchPrediction(params: {
-    startpoint: api.RequestSignal<string>;
-    name: api.RequestSignal<string>;
-    timeframe: api.RequestSignal<string>;
-    resolution: api.RequestSignal<string>;
-    weatherCapability: api.RequestSignal<string>;
-    weatherColumn: api.RequestSignal<string>;
-    trigger: api.RequestSignal<boolean>;
-  }): api.Signal<Self.PredictedSmartmeter> {
+  fetchPrediction(
+    params: api.RequestSignal<{
+      startpoint: string & DateTime;
+      name: string;
+      timeframe: Self.Timeframe;
+      resolution: Self.Resolution;
+      weatherCapability: Self.WeatherCapability;
+      weatherColumn: string;
+    }>,
+  ): api.Signal<Self.PredictedSmartmeter> {
     // NOTE: Maybe add an extra identifier if model requested is trained
 
     return api.resource({
       url: `${URL}/loadModelAndPredict`,
       method: `POST`,
       validate: typia.createValidate<Self.PredictedSmartmeter>(),
-      body: api.require(params),
+      body: params,
     });
   }
 }
@@ -93,7 +97,7 @@ type DateTime = tags.TagBase<{
   // validate: '/^"\d{2}.\d{2}.\d{2} \d{2}:\d{2}"$/.test($input)'
 }>;
 
-export namespace WaterDemandPredictionService {
+export namespace WaterDemandPrediction2Service {
   export type Resolution = "hourly" | "daily" | "weekly";
   export type Timeframe =
     | "one day"
@@ -103,6 +107,11 @@ export namespace WaterDemandPredictionService {
     | "six months"
     | "one year"
     | "all";
+  export type WeatherCapability =
+    | "plain"
+    | "air_temperature"
+    | "precipitation"
+    | "moisture";
   export type WeatherColumns = Record<string, string>;
   export type MeterNames = Record<string, string>;
   export type SingleSmartmeter = {
@@ -130,4 +139,4 @@ export namespace WaterDemandPredictionService {
   };
 }
 
-import Self = WaterDemandPredictionService;
+import Self = WaterDemandPrediction2Service;

@@ -1,0 +1,26 @@
+@use "../../../node_modules/bulma/sass/utilities/mixins" as mixins;
+
+.outer-layout {
+  container-type: inline-size;
+  overflow-y: scroll;
+}
+
+.inner-layout {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(8, auto);
+
+  // .cell {
+  //   padding: 12px;
+  //   border: 1px solid #ccc;
+  //   border-radius: 8px;
+  // }
+}
+
+@container (min-width: 700px) {
+  .inner-layout {
+    grid-template-columns: 1fr 1fr;
+    // TODO: check what values are nice here
+    grid-template-rows: auto minmax(10em, 1fr) auto auto;
+  }
+}

@@ -1,1 +1,143 @@
-<p>water-demand-prediction2 works!</p>
+@let chartOptions =
+  {
+    responsive: true,
+    maintainAspectRatio: false,
+    elements: {
+      line: {
+        tension: 0.1,
+      },
+    },
+    scales: {
+      y: {
+        stacked: false,
+        title: {
+          display: true,
+          text: "m^3",
+        },
+        grid: {
+          display: true,
+          color: "#000000",
+          lineWidth: 0.4,
+        },
+      },
+      x: {
+        title: {
+          display: true,
+          text: "water-demand-prediction.graph.legend.time" | translate,
+        },
+        grid: {
+          display: false,
+          color: "#000000",
+          lineWidth: 0.4,
+        },
+      },
+    },
+  };
+
+<div class="outer-layout box is-fullheight">
+  <div class="inner-layout is-fullheight">
+    <div resolution-select class="cell">
+      <div class="buttons has-addons is-right">
+        @for (resolution of resolutions; track resolution) {
+          <button
+            class="button is-small"
+            [class.is-active]="chartResolution() == resolution"
+            (click)="chartResolution.set(resolution)"
+            translate
+          >
+            water-demand-prediction.resolution.{{ resolution }}
+          </button>
+        }
+      </div>
+    </div>
+    <div normal-smartmeter-chart class="cell">
+      <canvas
+        baseChart
+        type="bar"
+        class="is-fullheight is-fullwidth"
+        [options]="chartOptions"
+      ></canvas>
+    </div>
+    <div configure-normal-smartmeter class="cell">
+      <div class="buttons is-centered">
+        <button
+          class="button is-danger"
+          translate="water-demand-prediction.delete.normal"
+        ></button>
+        <button
+          class="button is-danger"
+          translate="water-demand-prediction.request.trainModeltrue"
+        ></button>
+        <button
+          class="button is-primary"
+          translate="water-demand-prediction.request.realdata"
+        ></button>
+      </div>
+    </div>
+    <div select-normal-smartmeter class="cell">
+      <div class="buttons is-centered">
+        <dropdown
+          menuName="water-demand-prediction.choice.resolution"
+          [changeMenuName]="true"
+          [is-up]="true"
+          [options]="options.resolution"
+          kind="hover"
+        ></dropdown>
+        <dropdown
+          menuName="water-demand-prediction.choice.timeframe"
+          [changeMenuName]="true"
+          [is-up]="true"
+          [options]="options.timeframe()"
+          kind="hover"
+        ></dropdown>
+        <dropdown
+          menuName="water-demand-prediction.choice.smartmeter"
+          [changeMenuName]="true"
+          [is-up]="true"
+          [options]="options.smartmeter()"
+          kind="hover"
+        ></dropdown>
+        <dropdown
+          menuName="water-demand-prediction.choice.start-point"
+          [changeMenuName]="true"
+          [is-up]="true"
+          [options]="options.startPoint"
+          kind="hover"
+        ></dropdown>
+        <dropdown
+          menuName="water-demand-prediction.choice.weather"
+          [changeMenuName]="true"
+          [is-up]="true"
+          [options]="options.weatherCapability"
+          kind="hover"
+          [(choice)]="choices.weatherCapability"
+        ></dropdown>
+        <dropdown
+          menuName="water-demand-prediction.choice.weatherColumn"
+          [changeMenuName]="true"
+          [is-up]="true"
+          [options]="options.weatherColumn()"
+          [disabled]="options.weatherColumn() | empty"
+          kind="hover"
+        ></dropdown>
+      </div>
+    </div>
+    <div placeholder class="cell"></div>
+    <div predicted-smartmeter-chart class="cell">
+      <canvas
+        baseChart
+        type="bar"
+        class="is-fullheight is-fullwidth"
+        [options]="chartOptions"
+      ></canvas>
+    </div>
+    <div select-predicted-smartmeter class="cell">
+      <div class="buttons has-addons is-centered">
+        <button class="button">del</button>
+        <button class="button">train</button>
+        <button class="button">show</button>
+      </div>
+    </div>
+    <div predicted-smartmeter-results class="cell"></div>
+  </div>
+</div>
