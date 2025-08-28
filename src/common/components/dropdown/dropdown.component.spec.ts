@@ -1,4 +1,4 @@
-import {Component, Signal} from "@angular/core";
+import {Signal} from "@angular/core";
 import {TestBed, ComponentFixture} from "@angular/core/testing";
 import {By} from "@angular/platform-browser";
 import {provideTranslateService} from "@ngx-translate/core";

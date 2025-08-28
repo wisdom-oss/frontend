@@ -14,11 +14,11 @@ import {ɵSharedStylesHost as SharedStylesHost} from "@angular/platform-browser"
 class NoopSharedStylesHost
   implements Pick<SharedStylesHost, keyof SharedStylesHost>
 {
-  addStyles(styles: string[], urls?: string[]): void {}
-  removeStyles(styles: string[], urls?: string[]): void {}
+  addStyles(): void {}
+  removeStyles(): void {}
   ngOnDestroy(): void {}
-  addHost(hostNode: Node): void {}
-  removeHost(hostNode: Node): void {}
+  addHost(): void {}
+  removeHost(): void {}
 }
 
 /**
