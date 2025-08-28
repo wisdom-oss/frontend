@@ -190,12 +190,6 @@ export function sidebar(): readonly SidebarEntry[] {
           icon: {remixBookLine},
           link: "/oowv/water-demand-prediction",
           services: {WaterDemandPredictionService}
-        },
-        {
-          module: "core.sidebar.category.waterprediction",
-          icon: {remixBookLine},
-          link: "/oowv/water-demand-prediction2",
-          services: {WaterDemandPredictionService}
         }
       ],
     },
