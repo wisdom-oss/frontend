@@ -1,12 +1,14 @@
 <div
   class="dropdown is-fullwidth"
-  [class.is-hoverable]="kind() == 'hover'"
-  [class.is-active]="isActive()"
+  [class.is-up]="isUp()"
+  [class.is-hoverable]="!disabled() && kind() == 'hover'"
+  [class.is-active]="isActive() && !disabled()"
   (mouseenter)="kind() == 'hover' && isActive.set(true)"
   (mouseleave)="kind() == 'hover' && isActive.set(false)"
 >
   <div class="dropdown-trigger is-fullwidth">
     <button
+      [disabled]="disabled()"
       class="button is-rounded is-fullwidth"
       (click)="kind() == 'click' && isActive.set(!isActive())"
     >
@@ -14,8 +16,8 @@
         changeMenuName() ? (choiceName() | translate) : (menuName() | translate)
       }}</span>
       <span class="icon is-small">
-        <ng-icon *ngIf="!isActive()" name="remixArrowUpSLine"></ng-icon>
-        <ng-icon *ngIf="isActive()" name="remixArrowDownSLine"></ng-icon>
+        <ng-icon *ngIf="arrowUp()" name="remixArrowUpSLine"></ng-icon>
+        <ng-icon *ngIf="!arrowUp()" name="remixArrowDownSLine"></ng-icon>
       </span>
     </button>
   </div>

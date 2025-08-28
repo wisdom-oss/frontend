@@ -53,7 +53,21 @@ export class DropdownComponent {
   /** Define the kind of dropdown menu. */
   readonly kind = input.required<"hover" | "click">();
 
+  /** Mark the dropdown as disabled. */
+  readonly disabled = input<boolean>(false);
+
+  /** Make it dropup instead. */
+  readonly isUp = input<boolean>(false, {alias: "is-up"});
+
   protected readonly isActive = signal(false);
+
+  protected arrowUp = computed(() => {
+    let up = this.isUp();
+    let active = this.isActive();
+    let disabled = this.disabled();
+    if (disabled) return !up;
+    return up ? active : !active;
+  });
 
   constructor(private translate: TranslateService) {
     effect(() => {
