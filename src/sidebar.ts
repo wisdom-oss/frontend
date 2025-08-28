@@ -19,6 +19,7 @@ import {GeoDataService} from "./api/geo-data.service";
 import {WaterRightsService} from "./api/water-rights.service";
 import {UsageForecastsService} from "./api/usage-forecasts.service";
 import {BeWaterSmartService} from "./api/be-water-smart.service";
+import {WaterDemandPredictionService} from "./api/water-demand-prediction.service";
 import {extraTags} from "./common/utils/extra-tags";
 import {api} from "./common/api";
 import {AuthService} from "./core/auth/auth.service";
@@ -26,7 +27,6 @@ import {Scopes} from "./core/auth/scopes";
 import {OowvActionMapIconComponent} from "./core/sidebar/icons/oowv-action-map-icon/oowv-action-map-icon.component";
 import {OowvActionMapComponent} from "./modules/oowv/action-map/action-map.component";
 import {PumpModelsComponent} from "./modules/pump-models/pump-models.component";
-import { WaterDemandPredictionService } from "./api/water-demand-prediction.service";
 
 /** Any class that is a {@link Component}. */
 type ComponentClass = new (...args: any[]) => Component;
@@ -189,8 +189,8 @@ export function sidebar(): readonly SidebarEntry[] {
           module: "core.sidebar.category.waterprediction",
           icon: {remixBookLine},
           link: "/oowv/water-demand-prediction",
-          services: {WaterDemandPredictionService}
-        }
+          services: {WaterDemandPredictionService},
+        },
       ],
     },
   ];

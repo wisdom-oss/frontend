@@ -21,7 +21,8 @@
     "greenable",
     "oowv",
     "smartmeter",
-    "Timeframe",
+    "timeframe",
+    "timeframes",
     "typia"
   ],
   "files.watcherExclude": {
