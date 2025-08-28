@@ -1,122 +1,49 @@
 <nav class="box">
   <div class="menu">
-    <p class="menu-label icon-text">
-      <span class="icon">
-        <ng-icon name="remixDrizzleFill"></ng-icon>
-      </span>
-      <span translate>core.sidebar.category.precipitation</span>
-    </p>
-    <ul class="menu-list">
-      <li>
-        <a class="icon-text" routerLink="/weather-data">
-          <span class="icon">
-            <ng-icon name="remixSunCloudyFill"></ng-icon>
-          </span>
-          <span translate>weather-data.display.module</span>
-        </a>
-      </li>
-    </ul>
-    <p class="menu-label icon-text">
-      <span class="icon">
-        <ng-icon name="remixMap2Fill"></ng-icon>
-      </span>
-      <span translate>core.sidebar.category.groundwater</span>
-    </p>
-    <ul class="menu-list">
-      <li>
-        <a class="icon-text" routerLink="/growl">
-          <span class="icon">
-            <ng-icon name="remixDatabase2Fill"></ng-icon>
-          </span>
-          <span>GroWL</span>
-        </a>
-      </li>
-      <li>
-        <a class="icon-text" routerLink="/water-rights">
-          <span class="icon">
-            <ng-icon name="remixFilePaper2Fill"></ng-icon>
-          </span>
-          <span translate>water-rights.display.module</span>
-        </a>
-      </li>
-    </ul>
-    <p class="menu-label icon-text">
-      <span class="icon">
-        <ng-icon name="remixWaterPercentFill"></ng-icon>
-      </span>
-      <span translate>core.sidebar.category.water-usage</span>
-    </p>
-    <ul class="menu-list">
-      <li>
-        <a class="icon-text" routerLink="/long-term-forecast">
-          <span class="icon">
-            <ng-icon name="remixBarChartFill"></ng-icon>
-          </span>
-          <span translate>long-term-forecast.display.module</span>
-        </a>
-      </li>
-      <li>
-        <a class="icon-text" routerLink="/be-water-smart">
-          <span class="icon">
-            <ng-icon name="remixRfidLine"></ng-icon>
-          </span>
-          <span>Be-Water-Smart</span>
-        </a>
-      </li>
-    </ul>
-    <p class="menu-label icon-text">
-      <span class="icon">
-        <ng-icon name="remixBuilding3Fill"></ng-icon>
-      </span>
-      <span translate>core.sidebar.category.waterworks</span>
-    </p>
-    <ul class="menu-list">
-      <li
-        [class.unauthorized]="!authorized.pumpModels()"
-        *ngIf="authorized.pumpModels()"
-      >
-        <a class="icon-text" routerLink="/pump-models">
-          <span class="icon">
-            <ng-icon name="remixInstanceLine"></ng-icon>
-          </span>
-          <span translate>pump-models.display.module</span>
-        </a>
-      </li>
-    </ul>
-    <p class="menu-label icon-text">
-      <span class="icon">
-        <ng-icon name="oowv"></ng-icon>
-      </span>
-      <span>OOWV</span>
-    </p>
-    <ul class="menu-list">
-      <li [class.unauthorized]="!authorized.oowvActionMap()">
-        <a class="icon-text" routerLink="/oowv/action-map">
-          <span class="icon">
-            <ng-icon-stack size="1em">
-              <ng-icon name="remixMapLine"></ng-icon>
-              <span
-                style="
-                  font-size: 0.6em;
-                  font-weight: 700;
-                  position: absolute;
-                  top: -0.3em;
-                "
-                >!</span
+    @for (category of entries; track category) {
+      <p class="menu-label icon-text">
+        <span class="icon">
+          <sidebar-icon [icon]="category.icon"></sidebar-icon>
+        </span>
+        <span [translate]="category.category"></span>
+      </p>
+      <ul class="menu-list">
+        @for (module of category.modules; track module) {
+          @if (module.visible()) {
+            @let showInfo =
+              showStatusInfo[`${category.category}:${module.module}`];
+            <li
+              class="is-flex is-flex-direction-column"
+              [class.unauthorized]="!module.authorized()"
+            >
+              <a
+                class="icon-text is-flex is-gapless"
+                [routerLink]="module.link"
               >
-            </ng-icon-stack>
-          </span>
-          <span translate>oowv-action-map.display.module</span>
-        </a>
-      </li>
-      <li>
-        <a class="icon-text" routerLink="/water-demand-prediction">
-          <span class="icon">
-            <ng-icon name="remixBookLine"></ng-icon>
-          </span>
-          <span translate>core.sidebar.category.waterprediction</span>
-        </a>
-      </li>
-    </ul>
+                <sidebar-icon [icon]="module.icon" class="mr-1"></sidebar-icon>
+                <span class="is-flex-grow-1" [translate]="module.module"></span>
+                @if (module.authorized()) {
+                  <sidebar-status-icon
+                    [services]="module.services"
+                    [status]="serviceStatus()"
+                    (mouseenter)="showInfo.set(true)"
+                    (mouseleave)="showInfo.set(false)"
+                  ></sidebar-status-icon>
+                }
+              </a>
+              @if (
+                showInfo() ||
+                module.module == "water-rights.display.module" + "k"
+              ) {
+                <sidebar-status-info
+                  [services]="module.services"
+                  [status]="serviceStatus()"
+                ></sidebar-status-info>
+              }
+            </li>
+          }
+        }
+      </ul>
+    }
   </div>
 </nav>

@@ -1,7 +1,4 @@
-import {
-  InterpolatableTranslationObject,
-  TranslateService,
-} from "@ngx-translate/core";
+import {TranslationObject, TranslateService} from "@ngx-translate/core";
 
 import {asserts} from "./common/asserts";
 import core from "./core/i18n.toml";
@@ -28,7 +25,7 @@ const modules: NestedStringRecord = {
 };
 
 export function configureTranslations(service: TranslateService) {
-  let defaultLanguage = service.getBrowserLang() ?? "en";
+  let fallbackLanguage = service.getBrowserLang() ?? "en";
   const transformed: NestedStringRecord = {};
 
   function traverse(record: object, path: string[] = []) {
@@ -53,14 +50,11 @@ export function configureTranslations(service: TranslateService) {
 
   service.addLangs(Object.keys(transformed));
   for (let [key, translations] of Object.entries(transformed)) {
-    service.setTranslation(
-      key,
-      translations as InterpolatableTranslationObject,
-    );
+    service.setTranslation(key, translations as TranslationObject);
   }
 
-  service.setDefaultLang(defaultLanguage);
-  service.use(defaultLanguage);
+  service.setFallbackLang(fallbackLanguage);
+  service.use(fallbackLanguage);
 }
 
 type NestedStringRecord = Record<

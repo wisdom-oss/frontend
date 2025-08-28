@@ -1,17 +1,18 @@
 import {HttpClient, HttpContext} from "@angular/common/http";
-import {Injectable} from "@angular/core";
+import {inject, Injectable} from "@angular/core";
 import {firstValueFrom} from "rxjs";
 import typia from "typia";
 
 import {httpContexts} from "../common/http-contexts";
+import {api} from "../common/api";
 
 const URL = "/api/bws" as const;
 
 @Injectable({
   providedIn: "root",
 })
-export class BeWaterSmartService {
-  constructor(private http: HttpClient) {}
+export class BeWaterSmartService extends api.service(URL) {
+  private http = inject(HttpClient);
 
   fetchPhysicalMeters(): Promise<BeWaterSmartService.PhysicalMeters> {
     return firstValueFrom(
