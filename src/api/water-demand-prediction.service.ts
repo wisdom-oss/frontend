@@ -86,6 +86,13 @@ export class WaterDemandPredictionService {
   }
 }
 
+type DateTime = tags.TagBase<{
+  kind: "wdp-date-time",
+  target: "string",
+  value: undefined,
+  // validate: '/^"\d{2}.\d{2}.\d{2} \d{2}:\d{2}"$/.test($input)'
+}>;
+
 export namespace WaterDemandPredictionService {
   export type Resolution = "hourly" | "daily" | "weekly";
   export type Timeframe = "one day" | "one week" | "one month" | "three months" | "six months" | "one year" | "all";
@@ -96,11 +103,11 @@ export namespace WaterDemandPredictionService {
     resolution: Resolution;
     timeframe: Timeframe;
     value: (number & tags.Type<"double">)[];
-    date: (string & tags.Format<"date-time">)[];
+    date: (string & DateTime)[];
   };
   export type PredictedSmartmeter = {
     aic: number & tags.Type<"double">;
-    date: (string & tags.Format<"date-time">)[];
+    date: (string & DateTime)[];
     fitTime: number & tags.Type<"double">;
     lowerConfValues: (number & tags.Type<"double">)[];
     meanAbsoluteError: number & tags.Type<"double">;
