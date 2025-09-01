@@ -1,5 +1,75 @@
 <div>
-  <model-view/>
+  @if(activeView() === 'model') {
+    <model-view/>
+  }
+  @if(activeView() === 'map') {
+    <div map class="is-fullwidth" style="height: 40rem">
+      <div class="card is-fullheight">
+        <div class="card-content p-0 is-fullheight is-clipped">
+          <mgl-map
+            class="is-fullheight"
+            [style]="style"
+            [zoom]="[12]"
+            [center]="{
+              lat: lat(),
+              lon: long(),
+            }"
+          >
+            <ng-container sources>
+             <mgl-geojson-source
+                id="locations-source"
+                [data]="locations"
+              >
+              </mgl-geojson-source>
+            </ng-container>
+            <mgl-layer 
+              id="locations"
+              type="symbol"
+              source="locations-source"
+              [layout]="{'icon-image': 'remixicon:map-pin-2-fill'}"
+            >
+            </mgl-layer>
+          </mgl-map>
+        </div>
+      </div>
+    </div>
+  }
+  @if(activeView() === 'pictures') {
+    <div class="is-fullwidth" style="height: 40rem">
+      <div class="card is-flex is-flex-direction-row is-justify-content-space-between" style="background-color: #eee;">
+        <div class="is-flex is-flex-direction-column is-justify-content-center">
+           <button class="button is-text is-fullheight">
+            <ng-icon name="remixArrowLeftWideLine" size="2rem"/>
+           </button>
+        </div>
+
+        <img src="../../../../../public/images/BrainTankUni.jpg" style="height: 40rem; width: auto;"/>
+
+        <div class="is-flex is-flex-direction-column is-justify-content-center">
+           <button class="button is-text is-fullheight">
+            <ng-icon name="remixArrowRightWideLine" size="2rem"/>
+           </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <div class="is-flex is-flex-direction-row is-justify-content-center">
+    <div class="buttons has-addons">
+      <button [class.is-active]="activeView() === 'model'" (click)="setActiveView('model')" class="button">
+        <ng-icon name="remixCheckboxMultipleBlankFill" size="1.5rem" class="mr-2"/>
+        <span translate>braintank.overview.button.model</span>
+      </button>
+      <button [class.is-active]="activeView() === 'map'" (click)="setActiveView('map')" class="button">
+        <ng-icon name="remixMap2Fill" size="1.5rem" class="mr-2"/>
+        <span translate>braintank.overview.button.map</span>
+      </button>
+      <button [class.is-active]="activeView() === 'pictures'" (click)="setActiveView('pictures')" class="button">
+        <ng-icon name="remixImageFill" size="1.5rem" class="mr-2"/>
+        <span translate>braintank.overview.button.pictures</span>
+      </button>
+    </div>
+  </div>
 
   <div class="card my-4">
     <div class="card-content">
@@ -75,6 +145,9 @@
 
   <div class="is-flex is-flex-direction-row is-fullwidth is-justify-content-center my-4">
     <p class="is-size-3 my-4" translate>braintank.overview.header.daySelection</p>
+    <div class="is-flex is-flex-direction-column is-justify-content-center mx-4">
+      <input type="date" style="height: 2rem;"/>
+    </div>
   </div>
 
   <div class="card my-4">

@@ -21,7 +21,7 @@ import { SimulationComponent } from './tabs/simulation/simulation.component';
   ],
 })
 export class BraintankComponent {
-  activeTab = signal<'overview' | 'simulation'>('overview'); 
+  protected activeTab = signal<'overview' | 'simulation'>('overview'); 
 
   setActiveTab(tab: 'overview' | 'simulation') {
     this.activeTab.set(tab);

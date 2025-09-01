@@ -1,3 +1,15 @@
+[overview.button.model]
+en = "Model"
+de = "Modell"
+
+[overview.button.map]
+en = "Map"
+de = "Karte"
+
+[overview.button.pictures]
+en = "Pictures"
+de = "Bilder"
+
 [overview.header.daySelection]
 en = "Daily Course from:"
 de = "Tagesverlauf vom:"
