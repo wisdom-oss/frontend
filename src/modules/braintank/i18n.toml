@@ -11,8 +11,8 @@ en = "Pictures"
 de = "Bilder"
 
 [overview.header.daySelection]
-en = "Daily Course from:"
-de = "Tagesverlauf vom:"
+en = "Daily Course from"
+de = "Tagesverlauf vom"
 
 [overview.header.drainage]
 en = "Drainage"
@@ -37,6 +37,26 @@ de = "Entwässern seit"
 [overview.draining.no]
 en = "No draining"
 de = "Keine Entwässerung"
+
+[simulation.header.settings]
+en = "Parameter Settings"
+de = "Parametereinstellungen"
+
+[simulation.settings.currentLevel]
+en = "Apply current water level"
+de = "Aktuellen Wasserpegel übernehmen"
+
+[simulation.settings.drainage]
+en = "Activate drainage rules"
+de = "Entwässerungsregeln aktivieren"
+
+[simulation.settings.rainForecast]
+en = "Apply current weather forecast"
+de = "Aktuelle Wetterprognose übernehmen"
+
+[simulation.settings.startLevel]
+en = "Start Level"
+de = "Startpegel"
 
 [tab.overview]
 en = "Overview"

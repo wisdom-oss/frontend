@@ -1,1 +1,88 @@
-<model-view>
+<div>
+  <model-view/>
+  
+  <div class="card my-4">
+    <div class="card-content">
+      <div class="is-fullwidth has-text-centered my-4">
+        <p class="is-size-3 my-4" translate>braintank.simulation.header.settings</p>
+      </div> 
+
+      <div class="is-flex is-flex-direction-row is-fullwidth my-4">
+        <ng-icon name="remixContrastDrop2Line" size="2.5rem"/>
+        <div class="is-flex is-flex-direction-column is-justify-content-center">
+          <span class="is-flex is-flex-direction-row ml-4">
+            <p translate>braintank.simulation.settings.startLevel</p>
+            <p style="width: 4rem;">: {{waterLevel()}}%</p>
+          </span>
+        </div>
+        <input
+          class="slider is-primary m-0" style="width: 20rem;"
+          step="1" min="0" max="100"value="{{waterLevel()}}" type="range"
+          (input)="waterLevel.set($any($event.target).value)"
+        />
+        <div class="is-flex is-flex-direction-column is-justify-content-center">
+          <span class="is-flex is-flex-direction-row mx-4">
+            <p translate>braintank.simulation.settings.currentLevel</p>
+            <p>: </p>
+          </span>
+        </div>
+        <input type="checkbox" [checked]="checkedCurrentLevel()" (click)="onToogleClick($event, checkedCurrentLevel)"/>
+      </div>
+
+      <div class="is-flex is-flex-direction-row is-fullwidth my-4">
+        <ng-icon name="remixWaterPercentLine" size="2.5rem"/>
+        <div class="is-flex is-flex-direction-column is-justify-content-center">
+          <span class="is-flex is-flex-direction-row mx-4">
+            <p translate>braintank.simulation.settings.drainage</p>
+            <p>: </p>
+          </span>
+        </div>
+        <input type="checkbox" [checked]="checkedDrainage()" (click)="onToogleClick($event, checkedDrainage)"/>
+      </div>
+
+      <div class="is-flex is-flex-direction-row is-fullwidth my-4">
+        <ng-icon name="remixRainyLine" size="2.5rem"/>
+        <div class="is-flex is-flex-direction-column is-justify-content-center">
+          <span class="is-flex is-flex-direction-row mx-4">
+            <p translate>braintank.simulation.settings.rainForecast</p>
+            <p>: </p>
+          </span>
+        </div>
+        <input type="checkbox" [checked]="checkedRainForecast()" (click)="onToogleClick($event, checkedRainForecast)"/>
+      </div>
+
+      <ng-container chart>
+        <div class="is-fullwidth" style="height: 16rem;">
+          @let optionsRainForecast = {
+            onClick: onChartClick,
+            scales: {
+              x: {
+                grid: {
+                  display: false,
+                },
+              },
+              y: {
+                grid: {
+                  display: false,
+                },
+                title: {
+                  display: true,
+                  text: 'mm',
+                },
+                beginAtZero: true,
+                suggestedMax: 25,
+              },
+            },
+            plugins: {
+              legend: {
+                display: false,
+              },
+            },
+          };
+          <canvas baseChart style="display: block; width: 100%; height: 100%;" [data]="dataRainForecast" [options]="optionsRainForecast" [type]="'bar'">
+          </canvas>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>

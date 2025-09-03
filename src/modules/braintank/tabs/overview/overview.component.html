@@ -79,32 +79,40 @@
       
       <div class="columns my-4">
         <div class="column is-narrow mx-4">
-          <ng-icon name="remixContrastDrop2Line" size="2.5rem"/>
+          <ng-icon name="remixContrastDrop2Line" size="2.5rem" class="mb-2"/>
           <div class="is-flex is-flex-direction-column-reverse" overflow="hidden"
                style="width: 2.5rem; height:16rem; background-color: #eee; border-radius: 4px;">
               <div style="width: 100%; background-color: #0088aa; border-radius: 4px;" [style.height.%]="waterLevel()"></div>
           </div>
-          <p>{{waterLevel()}}%</p>
+          <p class="is-flex is-flex-direction-row is-justify-content-center mt-2">{{waterLevel()}}%</p>
         </div>
 
         <div class="column is-one-quarter mx-4">
           <div class="is-flex is-flex-direction-column is-fullheight is-justify-content-space-between">
             <div class="is-flex is-flex-direction-row is-justify-content-space-between">
               <ng-icon name="remixTimeLine" size="2.5rem"/>
-              <p>{{time().format('DD.MM.YYYY, HH:mm:ss')}}</p>
+              <div class="is-flex is-flex-direction-column is-justify-content-center">
+                <p>{{time().format('DD.MM.YYYY, HH:mm:ss')}}</p>
+              </div>
             </div>
             <div class="is-flex is-flex-direction-row is-justify-content-space-between">
               <ng-icon name="remixHome8Line" size="2.5rem"/>
-              <p>{{roofSize()}} m²</p>
+              <div class="is-flex is-flex-direction-column is-justify-content-center">
+                <p>{{roofSize()}} m²</p>
+              </div>
             </div>
             <div class="is-flex is-flex-direction-row is-justify-content-space-between">
               <ng-icon name="remixMapPin2Line" size="2.5rem"/>
-              <p>{{lat()}}, {{long()}}</p>
+              <div class="is-flex is-flex-direction-column is-justify-content-center">
+                <p>{{lat()}}, {{long()}}</p>
+              </div>
             </div>
             <div class="is-flex is-flex-direction-row is-justify-content-space-between">
               <ng-icon name="remixWaterPercentLine" size="2.5rem"/>
-              @if(draining()){<p><span translate>braintank.overview.draining.yes</span> {{drainingTime().format('HH:mm:ss')}}</p>}
-              @if(!draining()){<p translate>braintank.overview.draining.no</p>}
+              <div class="is-flex is-flex-direction-column is-justify-content-center">
+                @if(draining()){<p><span translate>braintank.overview.draining.yes</span> {{drainingTime().format('HH:mm:ss')}}</p>}
+                @if(!draining()){<p translate>braintank.overview.draining.no</p>}
+              </div>
             </div>
           </div>
         </div>
@@ -114,7 +122,9 @@
             <div class="is-flex is-flex-direction-column is-justify-content-space-between" style="height: 20rem;">
               <div class="is-flex is-flex-direction-row is-justify-content-center">
                 <ng-icon name="remixRainyLine" size="2.5rem"/>
-                <p class="ml-4" translate>braintank.overview.header.rainForecast</p>
+                <div class="is-flex is-flex-direction-column is-justify-content-center">
+                  <p class="ml-4" translate>braintank.overview.header.rainForecast</p>
+                </div>
               </div>
 
               @let optionsCurrentForecast = {
