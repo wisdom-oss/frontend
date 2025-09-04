@@ -79,6 +79,32 @@ export namespace typeUtils {
   export type Signaled<T> = T extends Signal<infer U> ? U : never;
 
   /**
+   * Extracts the element type T from an Iterable<T>.
+   *
+   * Works with Array, ReadonlyArray, Set, Map (yields [K, V]), string, and 
+   * any custom Iterable.
+   *
+   * @template I The input Iterable we inspect.
+   * @template T The item type yielded when iterating I.
+   *
+   * All generics are inferred from the input. 
+   * Manually naming them is unnecessary and likely an error.
+   *
+   * @example
+   * ```ts
+   * type A = Iterated<number[]>;                 // number
+   * type B = Iterated<ReadonlyArray<boolean>>;   // boolean
+   * type C = Iterated<Set<"a" | "b">>;          // "a" | "b"
+   * type D = Iterated<Map<string, number>>;     // [string, number]
+   * type E = Iterated<string>;                  // string
+   * type F = Iterated<{ a: 1 }>;                // never (not iterable)
+   * ```
+   *
+   * Note: This targets Iterable only, not AsyncIterable.
+   */
+  export type Iterated<I> = I extends Iterable<infer T> ? T : never;
+
+  /**
    * Makes all properties of a type optional and allows them to be `null` or
    * `undefined`.
    *
