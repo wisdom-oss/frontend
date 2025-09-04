@@ -12,8 +12,18 @@ import {
   remixDeleteBin2Line,
   remixPingPongLine,
 } from "@ng-icons/remixicon";
-import {TranslateDirective, TranslatePipe} from "@ngx-translate/core";
-import {ChartDataset as ChartJsDataset, TickOptions} from "chart.js";
+import {
+  TranslateDirective,
+  TranslatePipe,
+  TranslateService,
+} from "@ngx-translate/core";
+import {
+  ChartDataset as ChartJsDataset,
+  LegendItem,
+  LegendOptions,
+  TickOptions,
+} from "chart.js";
+import {Chart} from "chart.js";
 import dayjs from "dayjs";
 import {BaseChartDirective} from "ng2-charts";
 
@@ -53,6 +63,7 @@ type ChartDataset = ChartJsDataset<"bar", {x: string; y: number}[]>;
 export class WaterDemandPrediction2Component {
   protected Service = WaterDemandPrediction2Service;
   private service = inject(WaterDemandPrediction2Service);
+  private translate = inject(TranslateService);
   protected lang = signals.lang();
 
   private meterInformation = this.service.fetchMeterInformation();
@@ -141,15 +152,14 @@ export class WaterDemandPrediction2Component {
     let resolution = this.choices.resolution();
     if (!smartmeter || !resolution) return;
 
-    let colorKey = `${smartmeter.name}:${smartmeter.timeframe}`;
-
     this.chartDatasets.historic[resolution].push({
+      label: `${smartmeter.name}::${smartmeter.timeframe}`,
       data: zip(smartmeter.date, smartmeter.value).map(([date, value]) => ({
         x: date.toISOString(),
         y: value,
       })),
       parsing: false,
-      backgroundColor: RgbaColor.fromString(colorKey)
+      backgroundColor: RgbaColor.fromString(smartmeter.name)
         .with("alpha", 0.5)
         .toString(),
     });
@@ -191,6 +201,26 @@ export class WaterDemandPrediction2Component {
       }
 
       return date.format(format);
+    };
+  }
+
+  protected legendLabel(
+    _lang: string,
+  ): LegendOptions<"bar">["labels"]["generateLabels"] {
+    return chart => {
+      return Chart.defaults.plugins.legend.labels
+        .generateLabels(chart)
+        .map(label => {
+          // require the lang as a param to force loading this translation
+          let [name, timeframe] = label.text.split("::") as [string, Timeframe];
+          let translatedTimeframe = this.options.timeframe()[timeframe];
+          let translatedName = this.translate.instant(
+            "water-demand-prediction.smartmeter." + name,
+          );
+
+          label.text = `${translatedName} - ${translatedTimeframe}`;
+          return label;
+        }) satisfies LegendItem[];
     };
   }
 }
