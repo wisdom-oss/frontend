@@ -12,6 +12,7 @@ import dayjs, {Dayjs, ConfigType, OptionType} from "dayjs";
 import {Duration} from "dayjs/plugin/duration";
 
 import {injections} from "./injections";
+import {typeUtils} from "./utils/type-utils";
 
 const makeDayjs = dayjs;
 
@@ -378,5 +379,96 @@ export namespace signals {
     transform: (value: T) => U,
   ): Signal<U> {
     return computed(() => transform(input()));
+  }
+
+  /** Small helper function to define writable signals that may be undefined. */
+  export function maybe<T>(
+    initial: undefined | T = undefined,
+  ): WritableSignal<undefined | T> {
+    return signal(initial);
+  }
+
+  /**
+   * Requires all given signals to have acceptable values.
+   *
+   * We pass a record of signals. If any current value is in `exclude`, we return
+   * `fallback` instead. Otherwise we return an object with the unwrapped values.
+   *
+   * By default, `exclude` is `[undefined]`.
+   *
+   * Short circuits on the first excluded value. Recomputes when any input signal changes.
+   *
+   * All generic types are inferred from the function arguments.
+   * Manually specifying them is almost always an error.
+   *
+   * @template R The input record of signals. Keys are preserved and each value is a `Signal`.
+   * @template F The fallback value if any input is excluded. Inferred from `options.fallback`. Defaults to `undefined`.
+   * @template E The union of values treated as excluded. Inferred from `options.exclude`. Defaults to `undefined`.
+   *
+   * @param record A record of input signals.
+   * @param options Optional settings.
+   * @param options.fallback Value to return when at least one input is excluded. Defaults to `undefined`.
+   * @param options.exclude Values that count as missing. Defaults to `[undefined]`.
+   * @returns A signal with either the unwrapped record or the fallback:
+   *          `Signal<{[K in keyof R]: Exclude<typeUtils.Signaled<R[K]>, E>} | F>`
+   * 
+   * @example
+   * // Basic: require that both signals are defined
+   * const a = signals.maybe<number>();
+   * const b = signals.maybe<string>();
+   * const both = signals.require({ a, b });
+   * effect(() => {
+   *   const v = both();
+   *   if (v !== undefined) {
+   *     // v.a: number, v.b: string
+   *   }
+   * });
+   *
+   * @example
+   * // With a fallback object
+   * const userId = signals.maybe<string>();
+   * const token = signals.maybe<string>();
+   * const ready = signals.require(
+   *   { userId, token },
+   *   { fallback: { status: 'missing' } as const },
+   * );
+   * // Signal<{ userId: string; token: string } | { status: 'missing' }>
+   *
+   * @example
+   * // Treat null and undefined as missing
+   * const name = signals.maybe<string | null>();
+   * const age = signals.maybe<number | null>();
+   * const present = signals.require(
+   *   { name, age },
+   *   { exclude: [null, undefined] },
+   * );
+   *
+   * @example
+   * // Exclude a sentinel value
+   * const step = signal<number>(0);
+   * const ok = signals.require(
+   *   { step },
+   *   { exclude: [0], fallback: 'not ready' },
+   * );
+   */
+  export function require<
+    R extends Record<string, Signal<any>>,
+    F = undefined,
+    E = undefined,
+  >(
+    record: R,
+    options?: {fallback?: F; exclude?: readonly E[]},
+  ): Signal<{[K in keyof R]: Exclude<typeUtils.Signaled<R[K]>, E>} | F> {
+    return computed(() => {
+      const output: Record<string, any> = {};
+      for (const [key, value] of Object.entries(record)) {
+        const signaled = value();
+        if ((options?.exclude ?? [undefined]).includes(signaled as any)) {
+          return (options?.fallback ?? undefined) as F;
+        }
+        output[key] = signaled;
+      }
+      return output as {[K in keyof R]: Exclude<typeUtils.Signaled<R[K]>, E>};
+    });
   }
 }
