@@ -37,10 +37,10 @@
 <div class="outer-layout box is-fullheight">
   <div class="inner-layout is-fullheight">
     <div resolution-select class="cell">
-      <div class="buttons has-addons is-right">
+      <div class="buttons are-small has-addons is-right">
         @for (resolution of resolutions; track resolution) {
           <button
-            class="button is-small"
+            class="button"
             [class.is-active]="chartResolution() == resolution"
             (click)="chartResolution.set(resolution)"
             translate
@@ -59,29 +59,42 @@
       ></canvas>
     </div>
     <div configure-normal-smartmeter class="cell">
-      <div class="buttons is-centered">
-        <button
-          class="button is-danger"
-          translate="water-demand-prediction.delete.normal"
-        ></button>
-        <button
-          class="button is-danger"
-          translate="water-demand-prediction.request.trainModeltrue"
-        ></button>
-        <button
-          class="button is-primary"
-          translate="water-demand-prediction.request.realdata"
-        ></button>
+      <div
+        class="buttons are-medium is-centered"
+        style="--bulma-control-size: 0.9rem"
+      >
+        <button class="button is-danger">
+          <span translate="water-demand-prediction.delete.normal"></span>
+          <span class="icon is-large">
+            <ng-icon size="1.2em" name="remixDeleteBin2Line"></ng-icon>
+          </span>
+        </button>
+        <button class="button is-primary">
+          <span>Train selected model</span>
+          <span class="icon is-large">
+            <ng-icon size="1.2em" name="remixPingPongLine"></ng-icon>
+          </span>
+        </button>
+        <button class="button is-info" [disabled]="!smartmeter()">
+          <span translate>Add to Graph</span>
+          <span class="icon is-large">
+            <ng-icon size="1.2em" name="remixArrowUpDoubleFill"></ng-icon>
+          </span>
+        </button>
       </div>
     </div>
     <div select-normal-smartmeter class="cell">
-      <div class="buttons is-centered">
+      <div
+        class="buttons are-small is-centered"
+        style="--bulma-control-size: 0.8rem; gap: 0.5rem"
+      >
         <dropdown
           menuName="water-demand-prediction.choice.resolution"
           [changeMenuName]="true"
           [is-up]="true"
           [options]="options.resolution"
           kind="hover"
+          [(choice)]="choices.resolution"
         ></dropdown>
         <dropdown
           menuName="water-demand-prediction.choice.timeframe"
@@ -89,6 +102,7 @@
           [is-up]="true"
           [options]="options.timeframe()"
           kind="hover"
+          [(choice)]="choices.timeframe"
         ></dropdown>
         <dropdown
           menuName="water-demand-prediction.choice.smartmeter"
@@ -96,6 +110,7 @@
           [is-up]="true"
           [options]="options.smartmeter()"
           kind="hover"
+          [(choice)]="choices.smartmeter"
         ></dropdown>
         <dropdown
           menuName="water-demand-prediction.choice.start-point"
@@ -103,6 +118,7 @@
           [is-up]="true"
           [options]="options.startPoint"
           kind="hover"
+          [(choice)]="choices.startPoint"
         ></dropdown>
         <dropdown
           menuName="water-demand-prediction.choice.weather"
@@ -119,6 +135,7 @@
           [options]="options.weatherColumn()"
           [disabled]="options.weatherColumn() | empty"
           kind="hover"
+          [(choice)]="choices.weatherColumn"
         ></dropdown>
       </div>
     </div>
