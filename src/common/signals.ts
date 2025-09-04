@@ -245,7 +245,7 @@ export namespace signals {
    */
   export function array<T>(iterable?: Iterable<T>): ArraySignal<T> {
     let inner = Array.from(iterable ?? []);
-    let innerSignal = signal(inner);
+    let innerSignal = signal(inner, {equal: () => false});
 
     let push = (item: T): void => {
       inner.push(item);
