@@ -38,7 +38,7 @@
   <div class="inner-layout is-fullheight">
     <div resolution-select class="cell">
       <div class="buttons are-small has-addons is-right">
-        @for (resolution of resolutions; track resolution) {
+        @for (resolution of Service.RESOLUTIONS; track resolution) {
           <button
             class="button"
             [class.is-active]="chartResolution() == resolution"
@@ -56,6 +56,8 @@
         type="bar"
         class="is-fullheight is-fullwidth"
         [options]="chartOptions"
+        [labels]="$any(chartLabels())"
+        [datasets]="$any(chartDatasets.historic[chartResolution()]())"
       ></canvas>
     </div>
     <div configure-normal-smartmeter class="cell">
@@ -63,7 +65,7 @@
         class="buttons are-medium is-centered"
         style="--bulma-control-size: 0.9rem"
       >
-        <button class="button is-danger">
+        <button class="button is-danger" (click)="clearSmartmeterDataset()">
           <span translate="water-demand-prediction.delete.normal"></span>
           <span class="icon is-large">
             <ng-icon size="1.2em" name="remixDeleteBin2Line"></ng-icon>
@@ -75,7 +77,11 @@
             <ng-icon size="1.2em" name="remixPingPongLine"></ng-icon>
           </span>
         </button>
-        <button class="button is-info" [disabled]="!smartmeter()">
+        <button
+          class="button is-info"
+          [disabled]="!smartmeter()"
+          (click)="pushSmartmeterDataset()"
+        >
           <span translate>Add to Graph</span>
           <span class="icon is-large">
             <ng-icon size="1.2em" name="remixArrowUpDoubleFill"></ng-icon>

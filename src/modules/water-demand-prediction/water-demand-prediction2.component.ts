@@ -3,6 +3,8 @@ import {
   effect,
   inject,
   signal,
+  viewChild,
+  viewChildren,
   Component,
   Signal,
   WritableSignal,
@@ -14,7 +16,8 @@ import {
   remixPingPongLine,
 } from "@ng-icons/remixicon";
 import {TranslateDirective, TranslatePipe} from "@ngx-translate/core";
-import dayjs from "dayjs";
+import {ChartDataset as ChartJsDataset} from "chart.js";
+import dayjs, {Dayjs} from "dayjs";
 import {Duration} from "dayjs/plugin/duration";
 import {BaseChartDirective} from "ng2-charts";
 
@@ -23,11 +26,14 @@ import {signals} from "../../common/signals";
 import {DropdownComponent} from "../../common/components/dropdown/dropdown.component";
 import {EmptyPipe} from "../../common/pipes/empty.pipe";
 import {fromEntries} from "../../common/utils/from-entries";
+import {RgbaColor} from "../../common/utils/rgba-color";
+import {zip} from "../../common/utils/zip";
 
 type Resolution = WaterDemandPrediction2Service.Resolution;
 type Timeframe = WaterDemandPrediction2Service.Timeframe;
 type WeatherCapability = WaterDemandPrediction2Service.WeatherCapability;
-type StartPoint = keyof WaterDemandPrediction2Component["startPoints"];
+type StartPoint = keyof (typeof WaterDemandPrediction2Service)["START_POINTS"];
+type ChartDataset = ChartJsDataset<"bar", {x: Dayjs; y: number}[]>;
 
 @Component({
   imports: [
@@ -49,39 +55,28 @@ type StartPoint = keyof WaterDemandPrediction2Component["startPoints"];
   ],
 })
 export class WaterDemandPrediction2Component {
+  protected Service = WaterDemandPrediction2Service;
   private service = inject(WaterDemandPrediction2Service);
   private lang = signals.lang();
 
   private meterInformation = this.service.fetchMeterInformation();
 
-  protected readonly resolutions = [
-    "hourly",
-    "daily",
-    "weekly",
-  ] as const satisfies Resolution[];
   protected chartResolution = signal<Resolution>("daily");
-
-  private readonly timeframes = {
-    "one day": dayjs.duration(1, "day"),
-    "one week": dayjs.duration(1, "week"),
-    "one month": dayjs.duration(1, "month"),
-    "three months": dayjs.duration(3, "months"),
-    "six months": dayjs.duration(6, "months"),
-    "one year": dayjs.duration(1, "year"),
-  } as const satisfies Record<Exclude<Timeframe, "all">, Duration>;
-
-  private startPoints = {
-    startOfData: dayjs("2021-05-26"),
-    startOfJune21: dayjs("2021-06-01"),
-    startOfYear22: dayjs("2022-01-01"),
+  protected chartDatasets = {
+    historic: {
+      hourly: signals.array<ChartDataset>(),
+      daily: signals.array<ChartDataset>(),
+      weekly: signals.array<ChartDataset>(),
+    } satisfies Record<Resolution, any>,
   } as const;
-
-  private weatherCapabilities = [
-    "plain",
-    "air_temperature",
-    "precipitation",
-    "moisture",
-  ] as const satisfies WeatherCapability[];
+  protected chartLabels = computed(() => {
+    let resolution = this.chartResolution();
+    let datasets = this.chartDatasets.historic[resolution]();
+    let dates = new Set(
+      datasets.flatMap(dataset => dataset.data.map(data => data.x)),
+    );
+    return Array.from(dates).sort((a, b) => a.valueOf() - b.valueOf());
+  });
 
   protected choices = {
     resolution: signals.maybe<Resolution>(),
@@ -94,15 +89,16 @@ export class WaterDemandPrediction2Component {
 
   protected options = {
     resolution: fromEntries(
-      this.resolutions.map(resolution => [
+      WaterDemandPrediction2Service.RESOLUTIONS.map(resolution => [
         resolution,
         `water-demand-prediction.resolution.${resolution}`,
       ]),
     ) satisfies Record<Resolution, string>,
     timeframe: computed(() => ({
       all: "water-demand-prediction.timeframe.all",
-      ...Object.map(this.timeframes, duration =>
-        duration.locale(this.lang()).humanize(),
+      ...Object.map(
+        WaterDemandPrediction2Service.TIMEFRAME_DURATIONS,
+        duration => duration.locale(this.lang()).humanize(),
       ),
     })) satisfies Signal<Record<Timeframe, string>>,
     smartmeter: computed(() =>
@@ -112,11 +108,11 @@ export class WaterDemandPrediction2Component {
       ),
     ) satisfies Signal<Record<string, string>>,
     startPoint: Object.map(
-      this.startPoints,
+      WaterDemandPrediction2Service.START_POINTS,
       (_, key) => `water-demand-prediction.start-point.${key}`,
     ) satisfies Record<StartPoint, string>,
     weatherCapability: fromEntries(
-      this.weatherCapabilities.map(capability => [
+      WaterDemandPrediction2Service.WEATHER_CAPABILITIES.map(capability => [
         capability,
         `water-demand-prediction.weather.${capability}`,
       ]),
@@ -130,7 +126,7 @@ export class WaterDemandPrediction2Component {
   private fetchStartPoint = computed(() => {
     let startPoint = this.choices.startPoint();
     if (!startPoint) return undefined;
-    return this.startPoints[startPoint];
+    return WaterDemandPrediction2Service.START_POINTS[startPoint];
   });
 
   protected fetchSmartmeterParams = signals.require({
@@ -143,6 +139,33 @@ export class WaterDemandPrediction2Component {
   protected smartmeter = this.service.fetchSmartmeter(
     this.fetchSmartmeterParams,
   );
+
+  protected pushSmartmeterDataset() {
+    let smartmeter = this.smartmeter();
+    let resolution = this.choices.resolution();
+    if (!smartmeter || !resolution) return;
+
+    let colorKey = `${smartmeter.name}:${smartmeter.timeframe}`;
+
+    this.chartDatasets.historic[resolution].push({
+      data: zip(smartmeter.date, smartmeter.value).map(([date, value]) => ({
+        x: date,
+        y: value,
+      })),
+      parsing: false,
+      backgroundColor: RgbaColor.fromString(colorKey)
+        .with("alpha", 0.5)
+        .toString(),
+    });
+
+    this.chartResolution.set(resolution);
+  }
+
+  protected clearSmartmeterDataset() {
+    let resolution = this.choices.resolution();
+    if (!resolution) return;
+    this.chartDatasets.historic[resolution].clear();
+  }
 
   _ = effect(() => console.log(this.smartmeter()));
 }
