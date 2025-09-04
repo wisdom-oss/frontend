@@ -179,6 +179,94 @@ export namespace signals {
   }
 
   /**
+   * A signal around a mutable array with helper methods.
+   *
+   * You always get the same underlying array instance and we mutate it in place.
+   * If you keep a reference like `const ref = arr()`, later pushes and pops will
+   * change that same array. 
+   * If you need a stable snapshot, clone it.
+   *
+   * Do not mutate the returned array directly. 
+   * That will not notify dependents.
+   * Use `push`, `pop`, and `clear` so the signal updates correctly.
+   *
+   * Reading the length works as `array().length`.
+   *
+   * @template T Element type.
+   *
+   * @example
+   * const items = signals.array<number>([1]);
+   * items.push(2);
+   * console.log(items());        // [1, 2]
+   * console.log(items().length); // 2
+   * items.pop();                 // removes 2 and notifies
+   * items.clear();               // [] and notifies
+   *
+   * @example
+   * // Live reference vs snapshot
+   * const live = items();      // live reference to the same array
+   * const snap = [...items()]; // snapshot copy
+   * items.push(3);
+   * console.log(live); // [3]
+   * console.log(snap); // []
+   */
+  export type ArraySignal<T> = Signal<readonly T[]> & {
+    push(item: T): void;
+    pop(): T | undefined;
+    clear(): void;
+  };
+
+  /**
+   * Creates an {@link ArraySignal}.
+   * 
+   * The stored array is mutated in place.
+   *
+   * You always get the same array instance from the getter.
+   * Do not mutate it directly, since that will not trigger updates.
+   * Always use `push`, `pop`, or `clear` so subscribers update.
+   *
+   * Reading length works as `array().length`.
+   *
+   * @template T Element type.
+   * @param iterable Optional initial values.
+   * @returns A signal with array helpers.
+   *
+   * @example
+   * const letters = signals.array(["a"]);
+   * letters.push("b");
+   * console.log(letters());        // ["a", "b"]
+   * console.log(letters().length); // 2
+   *
+   * @example
+   * // Do not mutate the returned array directly
+   * const arrRef = letters();
+   * // arrRef.push("x"); // avoid, this will not notify
+   * letters.push("x");    // do this instead
+   */
+  export function array<T>(iterable?: Iterable<T>): ArraySignal<T> {
+    let inner = Array.from(iterable ?? []);
+    let innerSignal = signal(inner);
+
+    let push = (item: T): void => {
+      inner.push(item);
+      innerSignal.set(inner);
+    };
+
+    let pop = (): T | undefined => {
+      let value = inner.pop();
+      innerSignal.set(inner);
+      return value;
+    };
+
+    let clear = (): void => {
+      inner.length = 0;
+      innerSignal.set(inner);
+    };
+
+    return Object.assign(innerSignal, {push, pop, clear});
+  }
+
+  /**
    * Retrieves the active language signal.
    *
    * This function returns the signal representing the currently selected
