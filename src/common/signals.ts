@@ -411,7 +411,7 @@ export namespace signals {
    * @param options.exclude Values that count as missing. Defaults to `[undefined]`.
    * @returns A signal with either the unwrapped record or the fallback:
    *          `Signal<{[K in keyof R]: Exclude<typeUtils.Signaled<R[K]>, E>} | F>`
-   * 
+   *
    * @example
    * // Basic: require that both signals are defined
    * const a = signals.maybe<number>();

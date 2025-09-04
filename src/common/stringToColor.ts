@@ -5,7 +5,7 @@
  * [StackOverflow reply](https://stackoverflow.com/a/16348977/15800714).
  * @param str A string to generate a hex color for
  * @param map A color map for predefined strings
- * 
+ *
  * @deprecated use `RgbaColor.fromString` instead
  *
  * @returns A hex color code in the style of '#abc123'
