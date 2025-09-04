@@ -3,11 +3,8 @@ import {
   effect,
   inject,
   signal,
-  viewChild,
-  viewChildren,
   Component,
   Signal,
-  WritableSignal,
 } from "@angular/core";
 import {provideIcons, NgIcon} from "@ng-icons/core";
 import {
@@ -17,8 +14,7 @@ import {
 } from "@ng-icons/remixicon";
 import {TranslateDirective, TranslatePipe} from "@ngx-translate/core";
 import {ChartDataset as ChartJsDataset, TickOptions} from "chart.js";
-import dayjs, {Dayjs} from "dayjs";
-import {Duration} from "dayjs/plugin/duration";
+import dayjs from "dayjs";
 import {BaseChartDirective} from "ng2-charts";
 
 import {WaterDemandPrediction2Service} from "../../api/water-demand-prediction2.service";
@@ -171,7 +167,10 @@ export class WaterDemandPrediction2Component {
     console.log(this.chartDatasets.historic[this.chartResolution()]()),
   );
 
-  protected xTicks(resolution: Resolution, lang: string): TickOptions["callback"] {
+  protected xTicks(
+    resolution: Resolution,
+    lang: string,
+  ): TickOptions["callback"] {
     return (_value, index, _ticks) => {
       let labels = this.chartLabels();
       let date = dayjs(labels[index]);
