@@ -1,11 +1,15 @@
-import { zip } from "./zip";
+import {zip} from "./zip";
 
 describe("zip (eager)", () => {
   it("zips two arrays", () => {
     const a = ["x", "y", "z"];
     const b = [1, 2, 3];
     const out = zip(a, b);
-    expect(out).toEqual([["x", 1], ["y", 2], ["z", 3]]);
+    expect(out).toEqual([
+      ["x", 1],
+      ["y", 2],
+      ["z", 3],
+    ]);
   });
 
   it("zips multiple arrays", () => {
@@ -14,7 +18,10 @@ describe("zip (eager)", () => {
     const c = [true, false];
     const d = ["a", "b"];
     const out = zip(a, b, c, d);
-    expect(out).toEqual([["x", 1, true, "a"], ["y", 2, false, "b"]]);
+    expect(out).toEqual([
+      ["x", 1, true, "a"],
+      ["y", 2, false, "b"],
+    ]);
   });
 
   it("stops at the shortest input by default", () => {
@@ -27,7 +34,7 @@ describe("zip (eager)", () => {
   it("pads to the longest with undefined", () => {
     const a = ["x"];
     const b = [1, 2];
-    const out = zip({ longest: true }, a, b);
+    const out = zip({longest: true}, a, b);
     expect(out).toEqual([
       ["x", 1],
       [undefined, 2],
@@ -37,7 +44,7 @@ describe("zip (eager)", () => {
   it("pads to the longest with custom fallback", () => {
     const a = ["x"];
     const b = [1, 2];
-    const out = zip({ longest: true, fallback: 0 }, a, b);
+    const out = zip({longest: true, fallback: 0}, a, b);
     expect(out).toEqual([
       ["x", 1],
       [0, 2],
@@ -71,7 +78,7 @@ describe("zip (eager)", () => {
     const a = [1, 2, 3];
     const b = ["a"];
     const c = [true, false];
-    const out = zip({ longest: true, fallback: null }, a, b, c);
+    const out = zip({longest: true, fallback: null}, a, b, c);
     expect(out).toEqual([
       [1, "a", true],
       [2, null, false],
@@ -84,7 +91,7 @@ describe("zip (eager)", () => {
     const b = [3, 4, 5];
     const snapshotA = [...a];
     const snapshotB = [...b];
-    zip({ longest: true }, a, b);
+    zip({longest: true}, a, b);
     expect(a).toEqual(snapshotA);
     expect(b).toEqual(snapshotB);
   });
@@ -92,15 +99,18 @@ describe("zip (eager)", () => {
   it("handles empty inputs among non-empty with padding", () => {
     const a: number[] = [];
     const b = ["x", "y"];
-    const out = zip({ longest: true }, a, b);
-    expect(out).toEqual([[undefined, "x"], [undefined, "y"]]);
+    const out = zip({longest: true}, a, b);
+    expect(out).toEqual([
+      [undefined, "x"],
+      [undefined, "y"],
+    ]);
   });
 
   it("keeps column alignment with heterogeneous types", () => {
     const names = ["Ada", "Linus"];
     const ages = [36];
     const ids = new Set([1, 2, 3]);
-    const out = zip({ longest: true, fallback: null }, names, ages, ids);
+    const out = zip({longest: true, fallback: null}, names, ages, ids);
     expect(out).toEqual([
       ["Ada", 36, 1],
       ["Linus", null, 2],

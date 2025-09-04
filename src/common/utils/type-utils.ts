@@ -81,13 +81,13 @@ export namespace typeUtils {
   /**
    * Extracts the element type T from an Iterable<T>.
    *
-   * Works with Array, ReadonlyArray, Set, Map (yields [K, V]), string, and 
+   * Works with Array, ReadonlyArray, Set, Map (yields [K, V]), string, and
    * any custom Iterable.
    *
    * @template I The input Iterable we inspect.
    * @template T The item type yielded when iterating I.
    *
-   * All generics are inferred from the input. 
+   * All generics are inferred from the input.
    * Manually naming them is unnecessary and likely an error.
    *
    * @example

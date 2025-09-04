@@ -183,10 +183,10 @@ export namespace signals {
    *
    * You always get the same underlying array instance and we mutate it in place.
    * If you keep a reference like `const ref = arr()`, later pushes and pops will
-   * change that same array. 
+   * change that same array.
    * If you need a stable snapshot, clone it.
    *
-   * Do not mutate the returned array directly. 
+   * Do not mutate the returned array directly.
    * That will not notify dependents.
    * Use `push`, `pop`, and `clear` so the signal updates correctly.
    *
@@ -218,7 +218,7 @@ export namespace signals {
 
   /**
    * Creates an {@link ArraySignal}.
-   * 
+   *
    * The stored array is mutated in place.
    *
    * You always get the same array instance from the getter.

@@ -1,9 +1,14 @@
-import { typeUtils } from "./type-utils";
+import {typeUtils} from "./type-utils";
 
 type MaybeUnion<T, F> = [F] extends [never] ? T : T | F;
 type IterableArray<T = any> = Array<Iterable<T>>;
-type GenElement<I extends IterableArray<any>, F> = { [K in keyof I]: MaybeUnion<typeUtils.Iterated<I[K]>, F> }
-type LazyReturn<I extends IterableArray<any>, F> = Generator<GenElement<I, F>, void>;
+type GenElement<I extends IterableArray<any>, F> = {
+  [K in keyof I]: MaybeUnion<typeUtils.Iterated<I[K]>, F>;
+};
+type LazyReturn<I extends IterableArray<any>, F> = Generator<
+  GenElement<I, F>,
+  void
+>;
 type EagerReturn<I extends IterableArray<any>, F> = GenElement<I, F>[];
 
 /**
@@ -52,12 +57,23 @@ type EagerReturn<I extends IterableArray<any>, F> = GenElement<I, F>[];
  * @see {@link eager}
  */
 function lazy<I extends IterableArray>(...iterables: I): LazyReturn<I, never>;
-function lazy<I extends IterableArray>(options: { longest: true }, ...iterables: I): LazyReturn<I, undefined>;
-function lazy<I extends IterableArray, F>(options: { longest: true; fallback: F }, ...iterables: I): LazyReturn<I, F>;
-function lazy<I extends IterableArray>(options: { longest: boolean; fallback?: any }, ...iterables: I): LazyReturn<I, never>;
-function* lazy<I extends IterableArray, F = undefined>(...args: [{longest: boolean, fallback?: F}, ...I] | I): LazyReturn<I, F> {
+function lazy<I extends IterableArray>(
+  options: {longest: true},
+  ...iterables: I
+): LazyReturn<I, undefined>;
+function lazy<I extends IterableArray, F>(
+  options: {longest: true; fallback: F},
+  ...iterables: I
+): LazyReturn<I, F>;
+function lazy<I extends IterableArray>(
+  options: {longest: boolean; fallback?: any},
+  ...iterables: I
+): LazyReturn<I, never>;
+function* lazy<I extends IterableArray, F = undefined>(
+  ...args: [{longest: boolean; fallback?: F}, ...I] | I
+): LazyReturn<I, F> {
   if (!args.length) return;
-  
+
   let longest = false;
   let fallback = undefined;
   if ("longest" in args[0]) {
@@ -71,7 +87,7 @@ function* lazy<I extends IterableArray, F = undefined>(...args: [{longest: boole
   while (true) {
     let current = [];
     let done = [];
-    
+
     for (let iter of iterators) {
       let next = iter.next();
       if (next.done && !longest) return;
@@ -122,10 +138,22 @@ function* lazy<I extends IterableArray, F = undefined>(...args: [{longest: boole
  * @see {@link lazy}
  */
 function eager<I extends IterableArray>(...iterables: I): EagerReturn<I, never>;
-function eager<I extends IterableArray>(options: { longest: true }, ...iterables: I): EagerReturn<I, undefined>;
-function eager<I extends IterableArray, F>(options: { longest: true; fallback: F }, ...iterables: I): EagerReturn<I, F>;
-function eager<I extends IterableArray>(options: { longest: boolean; fallback?: any }, ...iterables: I): EagerReturn<I, never>;
-function eager<I extends IterableArray, F = undefined>(options?: {longest: boolean, fallback?: F}, ...iterables: I): EagerReturn<I, F> {
+function eager<I extends IterableArray>(
+  options: {longest: true},
+  ...iterables: I
+): EagerReturn<I, undefined>;
+function eager<I extends IterableArray, F>(
+  options: {longest: true; fallback: F},
+  ...iterables: I
+): EagerReturn<I, F>;
+function eager<I extends IterableArray>(
+  options: {longest: boolean; fallback?: any},
+  ...iterables: I
+): EagerReturn<I, never>;
+function eager<I extends IterableArray, F = undefined>(
+  options?: {longest: boolean; fallback?: F},
+  ...iterables: I
+): EagerReturn<I, F> {
   if (options) return Array.from(lazy(options, ...iterables));
   return Array.from(lazy(...iterables));
 }
