@@ -16,7 +16,7 @@ import {
   remixPingPongLine,
 } from "@ng-icons/remixicon";
 import {TranslateDirective, TranslatePipe} from "@ngx-translate/core";
-import {ChartDataset as ChartJsDataset} from "chart.js";
+import {ChartDataset as ChartJsDataset, TickOptions} from "chart.js";
 import dayjs, {Dayjs} from "dayjs";
 import {Duration} from "dayjs/plugin/duration";
 import {BaseChartDirective} from "ng2-charts";
@@ -33,7 +33,7 @@ type Resolution = WaterDemandPrediction2Service.Resolution;
 type Timeframe = WaterDemandPrediction2Service.Timeframe;
 type WeatherCapability = WaterDemandPrediction2Service.WeatherCapability;
 type StartPoint = keyof (typeof WaterDemandPrediction2Service)["START_POINTS"];
-type ChartDataset = ChartJsDataset<"bar", {x: Dayjs; y: number}[]>;
+type ChartDataset = ChartJsDataset<"bar", {x: string; y: number}[]>;
 
 @Component({
   imports: [
@@ -57,7 +57,7 @@ type ChartDataset = ChartJsDataset<"bar", {x: Dayjs; y: number}[]>;
 export class WaterDemandPrediction2Component {
   protected Service = WaterDemandPrediction2Service;
   private service = inject(WaterDemandPrediction2Service);
-  private lang = signals.lang();
+  protected lang = signals.lang();
 
   private meterInformation = this.service.fetchMeterInformation();
 
@@ -75,7 +75,7 @@ export class WaterDemandPrediction2Component {
     let dates = new Set(
       datasets.flatMap(dataset => dataset.data.map(data => data.x)),
     );
-    return Array.from(dates).sort((a, b) => a.valueOf() - b.valueOf());
+    return Array.from(dates).sort();
   });
 
   protected choices = {
@@ -149,7 +149,7 @@ export class WaterDemandPrediction2Component {
 
     this.chartDatasets.historic[resolution].push({
       data: zip(smartmeter.date, smartmeter.value).map(([date, value]) => ({
-        x: date,
+        x: date.toISOString(),
         y: value,
       })),
       parsing: false,
@@ -162,10 +162,36 @@ export class WaterDemandPrediction2Component {
   }
 
   protected clearSmartmeterDataset() {
-    let resolution = this.choices.resolution();
+    let resolution = this.chartResolution();
     if (!resolution) return;
     this.chartDatasets.historic[resolution].clear();
   }
 
-  _ = effect(() => console.log(this.smartmeter()));
+  _ = effect(() =>
+    console.log(this.chartDatasets.historic[this.chartResolution()]()),
+  );
+
+  protected xTicks(resolution: Resolution, lang: string): TickOptions["callback"] {
+    return (_value, index, _ticks) => {
+      let labels = this.chartLabels();
+      let date = dayjs(labels[index]);
+
+      let format: string;
+      switch (resolution) {
+        case "hourly":
+          format = lang === "de" ? "DD.MM.YYYY HH:mm" : "MM/DD/YYYY HH.mm";
+          break;
+        case "daily":
+          format = lang === "de" ? "DD.MM.YYYY" : "MM/DD/YYYY";
+          break;
+        case "weekly":
+          format = "[W]WW YYYY"; // e.g. "W36 2025"
+          break;
+        default:
+          format = "";
+      }
+
+      return date.format(format);
+    };
+  }
 }
