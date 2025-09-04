@@ -26,7 +26,8 @@
             <p>: </p>
           </span>
         </div>
-        <input type="checkbox" [checked]="checkedCurrentLevel()" (click)="onToogleClick($event, checkedCurrentLevel)"/>
+        <input id="checkedCurrentLevel" type="checkbox" class="switch is-rounded" [checked]="checkedCurrentLevel()" (click)="onToogleClick($event, checkedCurrentLevel)"/>
+        <label for="checkedCurrentLevel"></label>
       </div>
 
       <div class="is-flex is-flex-direction-row is-fullwidth my-4">
@@ -37,7 +38,8 @@
             <p>: </p>
           </span>
         </div>
-        <input type="checkbox" [checked]="checkedDrainage()" (click)="onToogleClick($event, checkedDrainage)"/>
+        <input id="checkedDrainage" type="checkbox" class="switch is-rounded" [checked]="checkedDrainage()" (click)="onToogleClick($event, checkedDrainage)"/>
+        <label for="checkedDrainage"></label>
       </div>
 
       <div class="is-flex is-flex-direction-row is-fullwidth my-4">
@@ -48,13 +50,13 @@
             <p>: </p>
           </span>
         </div>
-        <input type="checkbox" [checked]="checkedRainForecast()" (click)="onToogleClick($event, checkedRainForecast)"/>
+        <input id="checkedRainForecast" type="checkbox" class="switch is-rounded" [checked]="checkedRainForecast()" (click)="onToogleClick($event, checkedRainForecast)"/>
+        <label for="checkedRainForecast"></label>
       </div>
 
       <ng-container chart>
         <div class="is-fullwidth" style="height: 16rem;">
           @let optionsRainForecast = {
-            onClick: onChartClick,
             scales: {
               x: {
                 grid: {

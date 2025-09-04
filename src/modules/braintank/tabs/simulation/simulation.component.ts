@@ -48,8 +48,4 @@ export class SimulationComponent {
     event.preventDefault();
     signal.toggle(); 
   };
-
-  protected onChartClick: ChartOptions<"bar">["onClick"] = (_event, elements, _chart,) => {
-    
-  };
 }
