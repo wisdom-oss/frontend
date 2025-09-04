@@ -15,6 +15,25 @@ type HexChar =
  * Use `with()` to create a modified copy with one channel changed.
  */
 export class RgbaColor {
+  // Named CSS Colors
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/named-color
+  static readonly BLACK = RgbaColor.fromHex("#000000");
+  static readonly SILVER = RgbaColor.fromHex("#c0c0c0");
+  static readonly GRAY = RgbaColor.fromHex("#808080");
+  static readonly WHITE = RgbaColor.fromHex("#ffffff");
+  static readonly MAROON = RgbaColor.fromHex("#800000");
+  static readonly RED = RgbaColor.fromHex("#ff0000");
+  static readonly PURPLE = RgbaColor.fromHex("#800080");
+  static readonly FUCHSIA = RgbaColor.fromHex("#ff00ff");
+  static readonly GREEN = RgbaColor.fromHex("#008000");
+  static readonly LIME = RgbaColor.fromHex("#00ff00");
+  static readonly OLIVE = RgbaColor.fromHex("#808000");
+  static readonly YELLOW = RgbaColor.fromHex("#ffff00");
+  static readonly NAVY = RgbaColor.fromHex("#000080");
+  static readonly BLUE = RgbaColor.fromHex("#0000ff");
+  static readonly TEAL = RgbaColor.fromHex("#008080");
+  static readonly AQUA = RgbaColor.fromHex("#00ffff");
+
   constructor(
     readonly r: number,
     readonly g: number,
@@ -44,11 +63,11 @@ export class RgbaColor {
   /**
    * Creates a color from a hex string in the form "#rrggbb".
    *
-   * TypeScript enforces that only valid hex strings are allowed via a template 
+   * TypeScript enforces that only valid hex strings are allowed via a template
    * literal type.
-   * If you pass in something invalid, the compiler may try to expand the 
-   * allowed character union and complain about a "too complex union type". 
-   * In that case, check that the string really matches the "#rrggbb" format 
+   * If you pass in something invalid, the compiler may try to expand the
+   * allowed character union and complain about a "too complex union type".
+   * In that case, check that the string really matches the "#rrggbb" format
    * with only 0–9, a–f, or A–F characters.
    *
    * @example
@@ -61,15 +80,16 @@ export class RgbaColor {
     G0 extends HexChar,
     G1 extends HexChar,
     B0 extends HexChar,
-    B1 extends HexChar
+    B1 extends HexChar,
   >(hex: `#${R0}${R1}${G0}${G1}${B0}${B1}`): RgbaColor {
+    // @ts-ignore don't try to check the union type for hex, it's too complex
     const n = parseInt(hex.slice(1), 16);
     return new RgbaColor((n >> 16) & 255, (n >> 8) & 255, n & 255);
   }
 
   /**
    * Creates a color from a string by hashing its characters
-   * into RGB values in the range 0–255.  
+   * into RGB values in the range 0–255.
    * You can also provide a map of overrides for certain keys.
    *
    * @example
@@ -81,10 +101,7 @@ export class RgbaColor {
    * const c1 = RgbaColor.fromString("hello");   // hashed color
    * const c2 = RgbaColor.fromString("error", overrides); // -> red
    */
-  static fromString(
-    input: string,
-    map?: Record<string, RgbaColor>,
-  ): RgbaColor {
+  static fromString(input: string, map?: Record<string, RgbaColor>): RgbaColor {
     if (map && map[input]) return map[input];
 
     let hash = 0;
