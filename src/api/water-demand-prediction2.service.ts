@@ -12,6 +12,35 @@ const URL = "/api/waterdemand" as const;
   providedIn: "root",
 })
 export class WaterDemandPrediction2Service extends api.service(URL) {
+  static readonly RESOLUTIONS = ["hourly", "daily", "weekly"] as const;
+
+  static readonly TIMEFRAME_DURATIONS = {
+    "one day": dayjs.duration(1, "day"),
+    "one week": dayjs.duration(1, "week"),
+    "one month": dayjs.duration(1, "month"),
+    "three months": dayjs.duration(3, "months"),
+    "six months": dayjs.duration(6, "months"),
+    "one year": dayjs.duration(1, "year"),
+  } as const;
+
+  static readonly TIMEFRAMES = [
+    ...keys(WaterDemandPrediction2Service.TIMEFRAME_DURATIONS),
+    "all",
+  ] as const;
+
+  static readonly WEATHER_CAPABILITIES = [
+    "plain",
+    "air_temperature",
+    "precipitation",
+    "moisture",
+  ] as const;
+
+  static readonly START_POINTS = {
+    startOfData: dayjs("2021-05-26"),
+    startOfJune21: dayjs("2021-06-01"),
+    startOfYear22: dayjs("2022-01-01"),
+  } as const;
+
   fetchMeterInformation(): api.Signal<Self.MeterNames, Self.MeterNames> {
     return api.resource({
       url: `${URL}/meterNames`,
@@ -46,6 +75,8 @@ export class WaterDemandPrediction2Service extends api.service(URL) {
     return api.resource({
       url: `${URL}/singleSmartmeter`,
       method: `POST`,
+      validateRaw: typia.createValidate<Raw.SingleSmartmeter>(),
+      parse: this.parseDate,
       validate: typia.createValidate<Self.SingleSmartmeter>(),
       body: this.mapStartPoint(params),
       cache: dayjs.duration(1, "day"),
@@ -116,6 +147,15 @@ export class WaterDemandPrediction2Service extends api.service(URL) {
       return mapParams(signaled);
     });
   }
+
+  private parseDate<R extends {date: (string & DateTime)[]}>(
+    raw: R,
+  ): {[K in keyof Omit<R, "date">]: R[K]} & {date: Dayjs[]} {
+    return {
+      ...raw,
+      date: raw.date.map(date => dayjs(date, "DD.MM.YY HH:mm")),
+    };
+  }
 }
 
 type DateTime = tags.TagBase<{
@@ -125,21 +165,23 @@ type DateTime = tags.TagBase<{
   // validate: '/^"\d{2}.\d{2}.\d{2} \d{2}:\d{2}"$/.test($input)'
 }>;
 
+namespace Raw {
+  export type SingleSmartmeter = {
+    name: string;
+    resolution: Self.Resolution;
+    timeframe: Self.Timeframe;
+    value: (number & tags.Type<"double">)[];
+    date: (string & DateTime)[];
+  };
+}
+
 export namespace WaterDemandPrediction2Service {
-  export type Resolution = "hourly" | "daily" | "weekly";
+  export type Resolution =
+    (typeof WaterDemandPrediction2Service)["RESOLUTIONS"][number];
   export type Timeframe =
-    | "one day"
-    | "one week"
-    | "one month"
-    | "three months"
-    | "six months"
-    | "one year"
-    | "all";
+    (typeof WaterDemandPrediction2Service)["TIMEFRAMES"][number];
   export type WeatherCapability =
-    | "plain"
-    | "air_temperature"
-    | "precipitation"
-    | "moisture";
+    (typeof WaterDemandPrediction2Service)["WEATHER_CAPABILITIES"][number];
   export type WeatherColumns = Record<string, string>;
   export type MeterNames = Record<string, string>;
   export type SingleSmartmeter = {
@@ -147,7 +189,7 @@ export namespace WaterDemandPrediction2Service {
     resolution: Resolution;
     timeframe: Timeframe;
     value: (number & tags.Type<"double">)[];
-    date: (string & DateTime)[];
+    date: Dayjs[];
   };
   export type PredictedSmartmeter = {
     aic: number & tags.Type<"double">;
@@ -168,3 +210,4 @@ export namespace WaterDemandPrediction2Service {
 }
 
 import Self = WaterDemandPrediction2Service;
+import {keys} from "../common/utils/keys";
