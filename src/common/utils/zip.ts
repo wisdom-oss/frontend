@@ -1,5 +1,11 @@
 import { typeUtils } from "./type-utils";
 
+type MaybeUnion<T, F> = [F] extends [never] ? T : T | F;
+type IterableArray<T = any> = Array<Iterable<T>>;
+type GenElement<I extends IterableArray<any>, F> = { [K in keyof I]: MaybeUnion<typeUtils.Iterated<I[K]>, F> }
+type LazyReturn<I extends IterableArray<any>, F> = Generator<GenElement<I, F>, void>;
+type EagerReturn<I extends IterableArray<any>, F> = GenElement<I, F>[];
+
 /**
  * Lazily zip multiple iterables position-wise.
  *
@@ -45,11 +51,11 @@ import { typeUtils } from "./type-utils";
  *
  * @see {@link eager}
  */
-function lazy<I extends Array<Iterable<any>>>(...iterables: I): Generator<{ [K in keyof I]: typeUtils.Iterated<I[K]> }>;
-function lazy<I extends Array<Iterable<any>>>(options: { longest: true }, ...iterables: I): Generator<{ [K in keyof I]: typeUtils.Iterated<I[K]> | undefined }>;
-function lazy<I extends Array<Iterable<any>>, F>(options: { longest: true; fallback: F }, ...iterables: I): Generator<{ [K in keyof I]: typeUtils.Iterated<I[K]> | F }>;
-function lazy<I extends Array<Iterable<any>>>(options: { longest: boolean; fallback?: any }, ...iterables: I): Generator<{ [K in keyof I]: typeUtils.Iterated<I[K]> }>;
-function* lazy<I extends Array<Iterable<any>>, F = undefined>(...args: [{longest: boolean, fallback?: F}, ...I] | I): Generator<{[K in keyof I]: typeUtils.Iterated<I[K]> | F}> {
+function lazy<I extends IterableArray>(...iterables: I): LazyReturn<I, never>;
+function lazy<I extends IterableArray>(options: { longest: true }, ...iterables: I): LazyReturn<I, undefined>;
+function lazy<I extends IterableArray, F>(options: { longest: true; fallback: F }, ...iterables: I): LazyReturn<I, F>;
+function lazy<I extends IterableArray>(options: { longest: boolean; fallback?: any }, ...iterables: I): LazyReturn<I, never>;
+function* lazy<I extends IterableArray, F = undefined>(...args: [{longest: boolean, fallback?: F}, ...I] | I): LazyReturn<I, F> {
   if (!args.length) return;
   
   let longest = false;
@@ -74,7 +80,7 @@ function* lazy<I extends Array<Iterable<any>>, F = undefined>(...args: [{longest
     }
 
     if (done.every(done => done)) return;
-    yield current as {[K in keyof I]: typeUtils.Iterated<I[K]> | F};
+    yield current as GenElement<I, F>;
   }
 }
 
@@ -115,11 +121,11 @@ function* lazy<I extends Array<Iterable<any>>, F = undefined>(...args: [{longest
  *
  * @see {@link lazy}
  */
-function eager<I extends Array<Iterable<any>>>(...iterables: I): { [K in keyof I]: typeUtils.Iterated<I[K]> }[];
-function eager<I extends Array<Iterable<any>>>(options: { longest: true }, ...iterables: I): { [K in keyof I]: typeUtils.Iterated<I[K]> | undefined }[];
-function eager<I extends Array<Iterable<any>>, F>(options: { longest: true; fallback: F }, ...iterables: I): { [K in keyof I]: typeUtils.Iterated<I[K]> | F }[];
-function eager<I extends Array<Iterable<any>>>(options: { longest: boolean; fallback?: any }, ...iterables: I): { [K in keyof I]: typeUtils.Iterated<I[K]> }[];
-function eager<I extends Array<Iterable<any>>, F = undefined>(options?: {longest: boolean, fallback?: F}, ...iterables: I): {[K in keyof I]: typeUtils.Iterated<I[K]> | F}[] {
+function eager<I extends IterableArray>(...iterables: I): EagerReturn<I, never>;
+function eager<I extends IterableArray>(options: { longest: true }, ...iterables: I): EagerReturn<I, undefined>;
+function eager<I extends IterableArray, F>(options: { longest: true; fallback: F }, ...iterables: I): EagerReturn<I, F>;
+function eager<I extends IterableArray>(options: { longest: boolean; fallback?: any }, ...iterables: I): EagerReturn<I, never>;
+function eager<I extends IterableArray, F = undefined>(options?: {longest: boolean, fallback?: F}, ...iterables: I): EagerReturn<I, F> {
   if (options) return Array.from(lazy(options, ...iterables));
   return Array.from(lazy(...iterables));
 }
