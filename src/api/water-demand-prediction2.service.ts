@@ -1,5 +1,6 @@
 import {Injectable} from "@angular/core";
 import typia, {tags} from "typia";
+import dayjs from "dayjs";
 
 import {api} from "../common/api";
 
@@ -14,6 +15,7 @@ export class WaterDemandPrediction2Service extends api.service(URL) {
       url: `${URL}/meterNames`,
       validate: typia.createValidate<Self.MeterNames>(),
       defaultValue: {},
+      cache: dayjs.duration(1, "day"),
     });
   }
 
@@ -26,14 +28,11 @@ export class WaterDemandPrediction2Service extends api.service(URL) {
       method: `POST`,
       validate: typia.createValidate<Self.WeatherColumns>(),
       body,
+      cache: dayjs.duration(1, "day"),
     });
   }
 
-  /**
-   * Fetch a single smartmeter data based on requested parameters.
-   *
-   * Only send a request when every parameter is defined.
-   */
+  /** Fetch a single smartmeter data based on requested parameters. */
   fetchSmartmeter(
     params: api.RequestSignal<{
       startpoint: string & DateTime;
