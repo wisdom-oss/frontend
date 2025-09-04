@@ -1,6 +1,8 @@
-import {Injectable} from "@angular/core";
+// cspell:ignore startpoint waterdemand
+
+import {computed, isSignal, Injectable} from "@angular/core";
+import dayjs, {Dayjs} from "dayjs";
 import typia, {tags} from "typia";
-import dayjs from "dayjs";
 
 import {api} from "../common/api";
 
@@ -35,7 +37,7 @@ export class WaterDemandPrediction2Service extends api.service(URL) {
   /** Fetch a single smartmeter data based on requested parameters. */
   fetchSmartmeter(
     params: api.RequestSignal<{
-      startpoint: string & DateTime;
+      startPoint: Dayjs;
       name: string;
       timeframe: Self.Timeframe;
       resolution: Self.Resolution;
@@ -45,7 +47,8 @@ export class WaterDemandPrediction2Service extends api.service(URL) {
       url: `${URL}/singleSmartmeter`,
       method: `POST`,
       validate: typia.createValidate<Self.SingleSmartmeter>(),
-      body: params,
+      body: this.mapStartPoint(params),
+      cache: dayjs.duration(1, "day"),
     });
   }
 
@@ -85,6 +88,32 @@ export class WaterDemandPrediction2Service extends api.service(URL) {
       method: `POST`,
       validate: typia.createValidate<Self.PredictedSmartmeter>(),
       body: params,
+    });
+  }
+
+  private mapStartPoint<P extends {startPoint: Dayjs}>(
+    params: api.RequestSignal<P>,
+  ): api.RequestSignal<
+    Omit<P, "startPoint"> & {startpoint: string & DateTime}
+  > {
+    let mapParams = (params: P) => {
+      let mapped: Omit<P, "startPoint"> & {
+        startPoint?: Dayjs;
+        startpoint: string & DateTime;
+      } = {
+        ...params,
+        startpoint: params.startPoint.format("YYYY-MM-DD HH:mm:ss"),
+      };
+      delete mapped.startPoint;
+      return mapped;
+    };
+
+    if (!isSignal(params)) return mapParams(params);
+
+    return computed(() => {
+      let signaled = params();
+      if (!signaled) return undefined;
+      return mapParams(signaled);
     });
   }
 }
