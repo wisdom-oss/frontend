@@ -38,9 +38,17 @@ de = "Entwässern seit"
 en = "No draining"
 de = "Keine Entwässerung"
 
+[simulation.button.simulation]
+en = "Start Simulation"
+de = "Simulation starten"
+
 [simulation.header.settings]
 en = "Parameter Settings"
 de = "Parametereinstellungen"
+
+[simulation.modal.rainForecast]
+en = "Adjust rain forecast"
+de = "Regenprognose anpassen"
 
 [simulation.settings.currentLevel]
 en = "Apply current water level"
@@ -51,8 +59,8 @@ en = "Activate drainage rules"
 de = "Entwässerungsregeln aktivieren"
 
 [simulation.settings.rainForecast]
-en = "Apply current weather forecast"
-de = "Aktuelle Wetterprognose übernehmen"
+en = "Apply current rain forecast"
+de = "Aktuelle Regenprognose übernehmen"
 
 [simulation.settings.startLevel]
 en = "Start Level"

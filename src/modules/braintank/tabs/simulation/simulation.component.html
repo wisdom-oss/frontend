@@ -52,6 +52,9 @@
         </div>
         <input id="checkedRainForecast" type="checkbox" class="switch is-rounded" [checked]="checkedRainForecast()" (click)="onToogleClick($event, checkedRainForecast)"/>
         <label for="checkedRainForecast"></label>
+        <button class="button is-primary is-rounded mx-4">
+          <p translate>braintank.simulation.modal.rainForecast</p>
+        </button>
       </div>
 
       <ng-container chart>
@@ -85,6 +88,12 @@
           </canvas>
         </div>
       </ng-container>
+
+      <div class="is-flex is-flex-direction-row is-justify-content-center my-4">
+        <button class="button is-primary is-large is-rounded">
+          <p translate>braintank.simulation.button.simulation</p>
+        </button>
+      </div>
     </div>
   </div>
 </div>
