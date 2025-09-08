@@ -5,11 +5,26 @@ import { NgIconComponent, provideIcons } from "@ng-icons/core";
 import { 
   remixContrastDrop2Line,
   remixWaterPercentLine,
-  remixRainyLine
+  remixRainyLine,
+  remixArrowUpSLine,
+  remixArrowDownSLine,
+  remixTimeLine,
+  remixHistoryLine,
+  remixEditLine,
+  remixDeleteBin6Line
 } from '@ng-icons/remixicon';
 import { signals } from '../../../../common/signals';
 import { BaseChartDirective } from 'ng2-charts';
-import { ChartData, ChartOptions } from 'chart.js';
+import { ChartData } from 'chart.js';
+
+type DrainageRule = {
+  title: string,
+  rainAmount: number,
+  rainDuration: number,
+  targetLevel: number,
+  drainageForerun: number,
+  open: signals.ToggleableSignal,
+}
 
 @Component({
   selector: "braintank-simulation",
@@ -25,14 +40,20 @@ import { ChartData, ChartOptions } from 'chart.js';
       remixContrastDrop2Line,
       remixWaterPercentLine,
       remixRainyLine,
+      remixArrowUpSLine,
+      remixArrowDownSLine,
+      remixTimeLine,
+      remixHistoryLine,
+      remixEditLine,
+      remixDeleteBin6Line,
     }),
   ],
 })
 export class SimulationComponent {
   protected waterLevel: WritableSignal<number> = signal(50);
-  protected checkedCurrentLevel : signals.ToggleableSignal = signals.toggleable(false);
-  protected checkedDrainage : signals.ToggleableSignal = signals.toggleable(false);
-  protected checkedRainForecast : signals.ToggleableSignal = signals.toggleable(false);
+  protected checkedWaterLevel: signals.ToggleableSignal = signals.toggleable(false);
+  protected checkedDrainage: signals.ToggleableSignal = signals.toggleable(false);
+  protected checkedRainForecast: signals.ToggleableSignal = signals.toggleable(false);
 
   dataRainForecast: ChartData<'bar', {x: string, y: number}[]> = {
     datasets: [{
@@ -43,6 +64,12 @@ export class SimulationComponent {
       },
     }],
   };
+
+  rules: DrainageRule[] = [
+    {title: "Mittelstarker Regenfall", rainAmount: 5, rainDuration: 15, targetLevel: 40, drainageForerun: 10, open: signals.toggleable(true)},
+    {title: "Starkregen", rainAmount: 15, rainDuration: 30, targetLevel: 20, drainageForerun: 30, open: signals.toggleable(false)},
+  ];
+  protected drainageRules: WritableSignal<DrainageRule[]>= signal(this.rules);
   
   onToogleClick(event: MouseEvent, signal: signals.ToggleableSignal) {
     event.preventDefault();

@@ -38,6 +38,10 @@ de = "Entwässern seit"
 en = "No draining"
 de = "Keine Entwässerung"
 
+[simulation.button.addRule]
+en = "Add rule"
+de = "Regel hinzufügen"
+
 [simulation.button.simulation]
 en = "Start Simulation"
 de = "Simulation starten"
@@ -50,21 +54,37 @@ de = "Parametereinstellungen"
 en = "Adjust rain forecast"
 de = "Regenprognose anpassen"
 
-[simulation.settings.currentLevel]
-en = "Apply current water level"
-de = "Aktuellen Wasserpegel übernehmen"
+[simulation.settings.waterLevel]
+en = "Apply water level"
+de = "Wasserpegel übernehmen"
 
 [simulation.settings.drainage]
 en = "Activate drainage rules"
 de = "Entwässerungsregeln aktivieren"
 
 [simulation.settings.rainForecast]
-en = "Apply current rain forecast"
-de = "Aktuelle Regenprognose übernehmen"
+en = "Apply rain forecast"
+de = "Regenprognose übernehmen"
+
+[simulation.settings.drainageForerun]
+en = "Drainage Forerun"
+de = "Entwässerungsvorlauf"
+
+[simulation.settings.rainAmount]
+en = "Rain Amount"
+de = "Regenmenge"
+
+[simulation.settings.rainDuration]
+en = "Rain Duration"
+de = "Regendauer"
 
 [simulation.settings.startLevel]
 en = "Start Level"
 de = "Startpegel"
+
+[simulation.settings.targetLevel]
+en = "Target Level"
+de = "Zielpegel"
 
 [tab.overview]
 en = "Overview"

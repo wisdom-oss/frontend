@@ -18,16 +18,19 @@
         <input
           class="slider is-primary m-0" style="width: 20rem;"
           step="1" min="0" max="100"value="{{waterLevel()}}" type="range"
-          (input)="waterLevel.set($any($event.target).value)"
+          (input)="waterLevel.set($any($event.target).value)" [disabled]="checkedWaterLevel()"
         />
         <div class="is-flex is-flex-direction-column is-justify-content-center">
           <span class="is-flex is-flex-direction-row mx-4">
-            <p translate>braintank.simulation.settings.currentLevel</p>
+            <p translate>braintank.simulation.settings.waterLevel</p>
             <p>: </p>
           </span>
         </div>
-        <input id="checkedCurrentLevel" type="checkbox" class="switch is-rounded" [checked]="checkedCurrentLevel()" (click)="onToogleClick($event, checkedCurrentLevel)"/>
+        <input id="checkedCurrentLevel" type="checkbox" class="switch is-rounded" [checked]="checkedWaterLevel()" (click)="onToogleClick($event, checkedWaterLevel)"/>
         <label for="checkedCurrentLevel"></label>
+        <div class="is-flex is-flex-direction-column is-justify-content-center mx-4">
+          <input type="date" style="height: 2rem;" [disabled]="!checkedWaterLevel()"/>
+        </div>
       </div>
 
       <div class="is-flex is-flex-direction-row is-fullwidth my-4">
@@ -40,6 +43,69 @@
         </div>
         <input id="checkedDrainage" type="checkbox" class="switch is-rounded" [checked]="checkedDrainage()" (click)="onToogleClick($event, checkedDrainage)"/>
         <label for="checkedDrainage"></label>
+        <button class="button is-primary is-rounded mx-4" [disabled]="!checkedDrainage()">
+          <p translate>braintank.simulation.button.addRule</p>
+        </button>
+      </div>
+
+      <div class="is-flex is-flex-direction-column is-fullwidth my-4">
+        @for (rule of drainageRules(); track rule) {
+          <div class="card my-2">
+            <header class="card-header">
+              <p class="card-header-title">{{rule.title}}</p>
+              <button class="card-header-icon" (click)="onToogleClick($event, rule.open)">
+                <ng-icon [name]="rule.open() ? 'remixArrowUpSLine' : 'remixArrowDownSLine'" size="1.5em"/>
+              </button>
+            </header>
+
+            @if (rule.open()) {
+              <div class="card-content">
+                <div class="content">
+                  <div class="columns is-desktop">
+                    <div class="column is-one-fifth">
+                      <div class="is-flex is-flex-direction-row is-fullwidth is-justify-content-center">
+                        <ng-icon name="remixRainyLine" size="1.5em" class="mr-4"/>
+                        <p translate>braintank.simulation.settings.rainAmount</p>
+                        <p style="width: 4rem;">: {{rule.rainAmount}} mm</p>
+                      </div>
+                    </div>
+                    <div class="column is-one-fifth">
+                      <div class="is-flex is-flex-direction-row is-fullwidth is-justify-content-center">
+                        <ng-icon name="remixTimeLine" size="1.5em" class="mr-4"/>
+                        <p translate>braintank.simulation.settings.rainDuration</p>
+                        <p style="width: 4rem;">: {{rule.rainDuration}} min</p>
+                      </div>
+                    </div>
+                    <div class="column is-one-fifth">
+                      <div class="is-flex is-flex-direction-row is-fullwidth is-justify-content-center">
+                        <ng-icon name="remixContrastDrop2Line" size="1.5em" class="mr-4"/>
+                        <p translate>braintank.simulation.settings.targetLevel</p>
+                        <p style="width: 4rem;">: {{rule.targetLevel}} %</p>
+                      </div>
+                    </div>
+                    <div class="column is-one-fifth">
+                      <div class="is-flex is-flex-direction-row is-fullwidth is-justify-content-center">
+                        <ng-icon name="remixHistoryLine" size="1.5em" class="mr-4"/>
+                        <p translate>braintank.simulation.settings.drainageForerun</p>
+                        <p style="width: 4rem;">: {{rule.drainageForerun}} min</p>
+                      </div>
+                    </div>
+                     <div class="column">
+                      <div class="is-flex is-flex-direction-row is-justify-content-space-evenly">
+                        <button>
+                          <ng-icon name="remixEditLine" size="1.5em" class="mr-4"/>
+                        </button>
+                        <button>
+                          <ng-icon name="remixDeleteBin6Line" size="1.5em" class="mr-4"/>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
       </div>
 
       <div class="is-flex is-flex-direction-row is-fullwidth my-4">
@@ -52,7 +118,10 @@
         </div>
         <input id="checkedRainForecast" type="checkbox" class="switch is-rounded" [checked]="checkedRainForecast()" (click)="onToogleClick($event, checkedRainForecast)"/>
         <label for="checkedRainForecast"></label>
-        <button class="button is-primary is-rounded mx-4">
+        <div class="is-flex is-flex-direction-column is-justify-content-center mx-4">
+          <input type="date" style="height: 2rem;" [disabled]="!checkedRainForecast()"/>
+        </div>
+        <button class="button is-primary is-rounded mx-4" [disabled]="checkedRainForecast()">
           <p translate>braintank.simulation.modal.rainForecast</p>
         </button>
       </div>
