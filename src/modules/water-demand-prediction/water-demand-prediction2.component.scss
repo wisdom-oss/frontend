@@ -11,6 +11,10 @@
   grid-template-rows: repeat(8, auto);
   gap: 0.75rem;
 
+  > *:nth-child(4) {
+    padding-bottom: var(--bulma-box-padding);
+  }
+
   // .cell {
   //   padding: 12px;
   //   border: 1px solid #ccc;
