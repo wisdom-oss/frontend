@@ -76,13 +76,21 @@
         class="buttons are-medium is-centered"
         style="--bulma-control-size: 0.9rem"
       >
-        <button class="button is-danger" (click)="clearSmartmeterDataset()">
+        <button
+          class="button is-danger"
+          [disabled]="!chartDatasets.historic[chartResolution()]().length"
+          (click)="clearSmartmeterDataset()"
+        >
           <span translate="water-demand-prediction.delete.normal"></span>
           <span class="icon is-large">
             <ng-icon size="1.2em" name="remixDeleteBin2Line"></ng-icon>
           </span>
         </button>
-        <button class="button is-primary">
+        <button
+          class="button is-primary"
+          [disabled]="!trainModelParams()"
+          (click)="trainModel()"
+        >
           <span>Train selected model</span>
           <span class="icon is-large">
             <ng-icon size="1.2em" name="remixPingPongLine"></ng-icon>

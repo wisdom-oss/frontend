@@ -34,12 +34,19 @@ import {EmptyPipe} from "../../common/pipes/empty.pipe";
 import {fromEntries} from "../../common/utils/from-entries";
 import {RgbaColor} from "../../common/utils/rgba-color";
 import {zip} from "../../common/utils/zip";
+import {typeUtils} from "../../common/utils/type-utils";
 
 type Resolution = WaterDemandPrediction2Service.Resolution;
 type Timeframe = WaterDemandPrediction2Service.Timeframe;
 type WeatherCapability = WaterDemandPrediction2Service.WeatherCapability;
 type StartPoint = keyof (typeof WaterDemandPrediction2Service)["START_POINTS"];
 type ChartDataset = ChartJsDataset<"bar", {x: string; y: number}[]>;
+type TrainModelParams = Exclude<
+  typeUtils.Signaled<
+    Parameters<WaterDemandPrediction2Service["trainModel"]>[0]
+  >,
+  undefined
+>;
 
 @Component({
   imports: [
@@ -171,8 +178,25 @@ export class WaterDemandPrediction2Component {
     this.chartDatasets.historic[resolution].clear();
   }
 
+  protected trainModelParams = signals.require({
+    startPoint: this.fetchStartPoint,
+    name: this.choices.smartmeter,
+    timeframe: this.choices.timeframe,
+    resolution: this.choices.resolution,
+    weatherCapability: this.choices.weatherCapability,
+    weatherColumn: this.choices.weatherColumn,
+  }) satisfies Signal<TrainModelParams | undefined>;
+  private trainModelRequest = signals.maybe<TrainModelParams>();
+  private trainModelResource = this.service.trainModel(this.trainModelRequest);
+
+  protected trainModel() {
+    let params = this.trainModelParams();
+    if (!params) return;
+    this.trainModelRequest.set(params);
+  }
+
   _ = effect(() =>
-    console.log(this.chartDatasets.historic[this.chartResolution()]()),
+    console.log(this.trainModelResource()),
   );
 
   protected xTicks(
