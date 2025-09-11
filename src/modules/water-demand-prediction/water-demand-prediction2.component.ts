@@ -160,7 +160,6 @@ export class WaterDemandPrediction2Component {
       })),
       parsing: false,
       backgroundColor: RgbaColor.fromString(smartmeter.name)
-        .with("alpha", 0.5)
         .toString(),
     });
 
