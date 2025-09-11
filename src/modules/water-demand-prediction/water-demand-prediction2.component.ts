@@ -159,8 +159,7 @@ export class WaterDemandPrediction2Component {
         y: value,
       })),
       parsing: false,
-      backgroundColor: RgbaColor.fromString(smartmeter.name)
-        .toString(),
+      backgroundColor: RgbaColor.fromString(smartmeter.name).toString(),
     });
 
     this.chartResolution.set(resolution);
