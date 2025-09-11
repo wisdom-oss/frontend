@@ -12,7 +12,7 @@
       class="button is-rounded is-fullwidth"
       (click)="kind() == 'click' && isActive.set(!isActive())"
     >
-      <span>{{
+      <span class="is-flex-grow-1">{{
         changeMenuName() ? (choiceName() | translate) : (menuName() | translate)
       }}</span>
       <span class="icon is-small">

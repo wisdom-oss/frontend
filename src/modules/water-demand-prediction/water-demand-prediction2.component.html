@@ -102,11 +102,13 @@
     </div>
     <div select-normal-smartmeter class="cell">
       <div
-        class="buttons are-small is-centered"
+        class="buttons are-small is-centered choices"
         style="--bulma-control-size: 0.8rem; gap: 0.5rem"
       >
+        @let style = "min-width: 10em;";
         <dropdown
           menuName="water-demand-prediction.choice.resolution"
+          [style]="style"
           [changeMenuName]="true"
           [is-up]="true"
           [options]="options.resolution"
@@ -115,6 +117,7 @@
         ></dropdown>
         <dropdown
           menuName="water-demand-prediction.choice.timeframe"
+          [style]="style"
           [changeMenuName]="true"
           [is-up]="true"
           [options]="options.timeframe()"
@@ -123,6 +126,7 @@
         ></dropdown>
         <dropdown
           menuName="water-demand-prediction.choice.smartmeter"
+          [style]="style"
           [changeMenuName]="true"
           [is-up]="true"
           [options]="options.smartmeter()"
@@ -131,6 +135,7 @@
         ></dropdown>
         <dropdown
           menuName="water-demand-prediction.choice.start-point"
+          [style]="style"
           [changeMenuName]="true"
           [is-up]="true"
           [options]="options.startPoint"
@@ -139,6 +144,7 @@
         ></dropdown>
         <dropdown
           menuName="water-demand-prediction.choice.weather"
+          [style]="style"
           [changeMenuName]="true"
           [is-up]="true"
           [options]="options.weatherCapability"
@@ -147,6 +153,7 @@
         ></dropdown>
         <dropdown
           menuName="water-demand-prediction.choice.weatherColumn"
+          [style]="style"
           [changeMenuName]="true"
           [is-up]="true"
           [options]="options.weatherColumn()"
