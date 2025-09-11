@@ -4,6 +4,8 @@ import {computed, isSignal, Injectable} from "@angular/core";
 import dayjs, {Dayjs} from "dayjs";
 import typia, {tags} from "typia";
 
+import {keys} from "../common/utils/keys";
+import {omit} from "../common/utils/omit";
 import {api} from "../common/api";
 
 const URL = "/api/waterdemand" as const;
@@ -39,6 +41,11 @@ export class WaterDemandPrediction2Service extends api.service(URL) {
     startOfData: dayjs("2021-05-26"),
     startOfJune21: dayjs("2021-06-01"),
     startOfYear22: dayjs("2022-01-01"),
+  } as const;
+
+  private static readonly TRAINING_RESULT = {
+    existsAlready: "Model already exists",
+    saved: "Model saved successfully" 
   } as const;
 
   fetchMeterInformation(): api.Signal<Self.MeterNames, Self.MeterNames> {
@@ -92,13 +99,22 @@ export class WaterDemandPrediction2Service extends api.service(URL) {
       weatherCapability: Self.WeatherCapability;
       weatherColumn: string;
     }>,
-  ): api.Signal<void> {
+  ): api.Signal<Self.TrainingResult> {
+    let parse = (raw: Raw.TrainingResult): Self.TrainingResult => {
+      switch (raw) {
+        case WaterDemandPrediction2Service.TRAINING_RESULT.existsAlready: 
+          return "existsAlready";
+        case WaterDemandPrediction2Service.TRAINING_RESULT.saved: 
+          return "saved";
+      }
+    };
+
     return api.resource({
       url: `${URL}/trainModel`,
       method: `POST`,
-      validateRaw: typia.createValidate<"Model saved">(),
-      parse: () => {},
-      validate: typia.createValidate<void>(),
+      validateRaw: typia.createValidate<Raw.TrainingResult>(),
+      parse,
+      validate: typia.createValidate<Self.TrainingResult>(),
       body: this.mapStartPoint(params),
     });
   }
@@ -182,6 +198,7 @@ namespace Raw {
     value: (number & tags.Type<"double">)[];
     date: (string & DateTime)[];
   };
+  export type TrainingResult = typeof Self["TRAINING_RESULT"][keyof typeof Self["TRAINING_RESULT"]];
   export type PredictedSmartmeter = {
     aic: number & tags.Type<"double">;
     date: (string & DateTime)[];
@@ -212,6 +229,7 @@ export namespace WaterDemandPrediction2Service {
   export type SingleSmartmeter = Omit<Raw.SingleSmartmeter, "date"> & {
     date: Dayjs[];
   };
+  export type TrainingResult = keyof typeof Self["TRAINING_RESULT"];
   export type PredictedSmartmeter = Omit<
     Raw.PredictedSmartmeter,
     "date" | "rootOfmeanSquaredError"
@@ -219,6 +237,3 @@ export namespace WaterDemandPrediction2Service {
 }
 
 import Self = WaterDemandPrediction2Service;
-import {keys} from "../common/utils/keys";
-import {typeUtils} from "../common/utils/type-utils";import { omit } from "../common/utils/omit";
-
