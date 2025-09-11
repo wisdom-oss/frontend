@@ -85,26 +85,27 @@ export class WaterDemandPrediction2Service extends api.service(URL) {
 
   trainModel(
     params: api.RequestSignal<{
-      startpoint: string & DateTime;
+      startPoint: Dayjs;
       name: string;
       timeframe: Self.Timeframe;
       resolution: Self.Resolution;
       weatherCapability: Self.WeatherCapability;
       weatherColumn: string;
     }>,
-  ): api.Signal<string> {
+  ): api.Signal<void> {
     return api.resource({
       url: `${URL}/trainModel`,
       method: `POST`,
-      validate: typia.createValidate<string>(),
-      body: params,
+      validateRaw: typia.createValidate<"Model saved">(),
+      parse: () => {},
+      validate: typia.createValidate<void>(),
+      body: this.mapStartPoint(params),
     });
   }
 
-  /** fetch predicted smartmeter data based on requested parameters */
   fetchPrediction(
     params: api.RequestSignal<{
-      startpoint: string & DateTime;
+      startPoint: Dayjs;
       name: string;
       timeframe: Self.Timeframe;
       resolution: Self.Resolution;
@@ -112,13 +113,21 @@ export class WaterDemandPrediction2Service extends api.service(URL) {
       weatherColumn: string;
     }>,
   ): api.Signal<Self.PredictedSmartmeter> {
-    // NOTE: Maybe add an extra identifier if model requested is trained
+    let parse = (raw: Raw.PredictedSmartmeter) => {
+      let mappedDate = this.parseDate(raw);
+      return {
+        ...omit(mappedDate, "rootOfmeanSquaredError"),
+        rootOfMeanSquaredError: mappedDate.rootOfmeanSquaredError,
+      } satisfies Self.PredictedSmartmeter;
+    };
 
     return api.resource({
       url: `${URL}/loadModelAndPredict`,
       method: `POST`,
+      validateRaw: typia.createValidate<Raw.PredictedSmartmeter>(),
+      parse,
       validate: typia.createValidate<Self.PredictedSmartmeter>(),
-      body: params,
+      body: this.mapStartPoint(params),
     });
   }
 
@@ -173,6 +182,22 @@ namespace Raw {
     value: (number & tags.Type<"double">)[];
     date: (string & DateTime)[];
   };
+  export type PredictedSmartmeter = {
+    aic: number & tags.Type<"double">;
+    date: (string & DateTime)[];
+    fitTime: number & tags.Type<"double">;
+    lowerConfValues: (number & tags.Type<"double">)[];
+    meanAbsoluteError: number & tags.Type<"double">;
+    meanSquaredError: number & tags.Type<"double">;
+    name: string;
+    r2: number & tags.Type<"double">;
+    realValue: (number & tags.Type<"double">)[];
+    resolution: Self.Resolution;
+    rootOfmeanSquaredError: number & tags.Type<"double">;
+    timeframe: Self.Timeframe;
+    upperConfValues: (number & tags.Type<"double">)[];
+    value: (number & tags.Type<"double">)[];
+  };
 }
 
 export namespace WaterDemandPrediction2Service {
@@ -184,30 +209,16 @@ export namespace WaterDemandPrediction2Service {
     (typeof WaterDemandPrediction2Service)["WEATHER_CAPABILITIES"][number];
   export type WeatherColumns = Record<string, string>;
   export type MeterNames = Record<string, string>;
-  export type SingleSmartmeter = {
-    name: string;
-    resolution: Resolution;
-    timeframe: Timeframe;
-    value: (number & tags.Type<"double">)[];
+  export type SingleSmartmeter = Omit<Raw.SingleSmartmeter, "date"> & {
     date: Dayjs[];
   };
-  export type PredictedSmartmeter = {
-    aic: number & tags.Type<"double">;
-    date: (string & DateTime)[];
-    fitTime: number & tags.Type<"double">;
-    lowerConfValues: (number & tags.Type<"double">)[];
-    meanAbsoluteError: number & tags.Type<"double">;
-    meanSquaredError: number & tags.Type<"double">;
-    name: string;
-    r2: number & tags.Type<"double">;
-    realValue: (number & tags.Type<"double">)[];
-    resolution: Resolution;
-    rootOfmeanSquaredError: number & tags.Type<"double">;
-    timeframe: Timeframe;
-    upperConfValues: (number & tags.Type<"double">)[];
-    value: (number & tags.Type<"double">)[];
-  };
+  export type PredictedSmartmeter = Omit<
+    Raw.PredictedSmartmeter,
+    "date" | "rootOfmeanSquaredError"
+  > & {date: Dayjs[]; rootOfMeanSquaredError: number & tags.Type<"double">};
 }
 
 import Self = WaterDemandPrediction2Service;
 import {keys} from "../common/utils/keys";
+import {typeUtils} from "../common/utils/type-utils";import { omit } from "../common/utils/omit";
+
