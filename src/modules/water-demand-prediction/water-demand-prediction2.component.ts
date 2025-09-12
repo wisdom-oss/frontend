@@ -5,14 +5,13 @@ import {
   signal,
   Component,
   Signal,
+  WritableSignal,
+  OnInit,
 } from "@angular/core";
 import {provideIcons, NgIcon} from "@ng-icons/core";
 import {
   remixArrowUpDoubleFill,
   remixDeleteBin2Line,
-  remixLoader2Fill,
-  remixLoader3Fill,
-  remixLoader4Fill,
   remixLoader5Fill,
   remixPingPongLine,
 } from "@ng-icons/remixicon";
@@ -39,6 +38,9 @@ import {fromEntries} from "../../common/utils/from-entries";
 import {RgbaColor} from "../../common/utils/rgba-color";
 import {zip} from "../../common/utils/zip";
 import {typeUtils} from "../../common/utils/type-utils";
+import { ActivatedRoute, Params, Router } from "@angular/router";
+import typia from "typia";
+import { keys } from "../../common/utils/keys";
 
 type Resolution = WaterDemandPrediction2Service.Resolution;
 type Timeframe = WaterDemandPrediction2Service.Timeframe;
@@ -72,10 +74,12 @@ type TrainModelParams = Exclude<
     }),
   ],
 })
-export class WaterDemandPrediction2Component {
+export class WaterDemandPrediction2Component implements OnInit {
   protected Service = WaterDemandPrediction2Service;
   private service = inject(WaterDemandPrediction2Service);
   private translate = inject(TranslateService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
   protected lang = signals.lang();
 
   private meterInformation = this.service.fetchMeterInformation();
@@ -208,6 +212,37 @@ export class WaterDemandPrediction2Component {
   }
 
   _ = effect(() => console.log(this.trainModelResource()));
+
+  private storeChoicesEffect = effect(() => {
+    let choices = Object.map(this.choices, val => val());
+    for (let key of keys(choices)) if (!choices[key]) delete choices[key];
+    this.router.navigate([], {
+      queryParams: choices,
+      queryParamsHandling: "replace",
+      replaceUrl: true,
+    });
+  });
+
+  private loadParam<
+    C extends keyof typeof this.choices,
+    T extends typeUtils.Signaled<typeof this.choices[C]>, 
+    I extends (input: unknown) => input is T,
+  >(params: Params, choice: C, is: I): void {
+    let param = params[choice];
+    let signal = this.choices[choice] as WritableSignal<T>;
+    if (param && is(param)) signal.set(param);
+  }
+
+  // prettier-ignore
+  ngOnInit() {
+    let params = this.route.snapshot.queryParams;
+    this.loadParam(params, "resolution", typia.createIs<Resolution>());
+    this.loadParam(params, "timeframe", typia.createIs<Timeframe>());
+    this.loadParam(params, "smartmeter", typia.createIs<string>());
+    this.loadParam(params, "startPoint", typia.createIs<StartPoint>());
+    this.loadParam(params, "weatherCapability", typia.createIs<WeatherCapability>());
+    this.loadParam(params, "weatherColumn", typia.createIs<string>());
+  }
 
   protected xTicks(
     resolution: Resolution,
