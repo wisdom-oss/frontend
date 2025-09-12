@@ -69,14 +69,28 @@ html {
   &.is-slow {
     animation-duration: 2s;
   }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
 }
 
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
+/* 
+ * .has-stack
+ * Creates a stacking layout where all direct children overlap.
+ * - Uses a single-cell grid (grid-area: 1 / 1).
+ * - All children are placed in the same cell, stacking visually.
+ * Great for layering images, text, or overlays in one spot.
+ */
+.has-stack {
+  display: grid;
+
+  > * {
+    grid-area: 1 / 1;
   }
 }
-
