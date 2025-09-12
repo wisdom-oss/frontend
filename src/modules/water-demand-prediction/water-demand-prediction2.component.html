@@ -89,14 +89,13 @@
         @let isTraining = this.isTraining();
         <button
           class="button is-primary"
-          [disabled]="!trainModelParams() || isTraining"
+          [disabled]="!modelParams() || isTraining"
           (click)="trainModel()"
         >
           <span class="has-stack">
-            <span>Training</span>
-            <span class="is-invisible">Train selected model</span>
+            <span [class.is-invisible]="!isTraining">Training</span>
+            <span [class.is-invisible]="isTraining">Train selected model</span>
           </span>
-
           @if (isTraining) {
             <span class="icon is-large">
               @for (i of [1, 2, 3]; track i; let isFirst = $first) {
@@ -125,6 +124,19 @@
           <span translate>Add to Graph</span>
           <span class="icon is-large">
             <ng-icon size="1.2em" name="remixArrowUpDoubleFill"></ng-icon>
+          </span>
+        </button>
+        <button
+          class="button is-success"
+          [disabled]="!smartmeter()"
+          (click)="fetchPrediction()"
+        >
+          <span translate>Add Prediction</span>
+          <span class="icon is-large only-wide">
+            <ng-icon size="1.2em" name="remixArrowRightDoubleFill"></ng-icon>
+          </span>
+          <span class="icon is-large only-narrow">
+            <ng-icon size="1.2em" name="remixArrowDownDoubleFill"></ng-icon>
           </span>
         </button>
       </div>

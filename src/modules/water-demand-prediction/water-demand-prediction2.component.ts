@@ -11,6 +11,8 @@ import {
 import {Params, ActivatedRoute, Router} from "@angular/router";
 import {provideIcons, NgIcon} from "@ng-icons/core";
 import {
+  remixArrowDownDoubleFill,
+  remixArrowRightDoubleFill,
   remixArrowUpDoubleFill,
   remixDeleteBin2Line,
   remixLoader5Fill,
@@ -47,7 +49,7 @@ type Timeframe = WaterDemandPrediction2Service.Timeframe;
 type WeatherCapability = WaterDemandPrediction2Service.WeatherCapability;
 type StartPoint = keyof (typeof WaterDemandPrediction2Service)["START_POINTS"];
 type ChartDataset = ChartJsDataset<"bar", {x: string; y: number}[]>;
-type TrainModelParams = Exclude<
+type ModelParams = Exclude<
   typeUtils.Signaled<
     Parameters<WaterDemandPrediction2Service["trainModel"]>[0]
   >,
@@ -68,6 +70,8 @@ type TrainModelParams = Exclude<
   providers: [
     provideIcons({
       remixArrowUpDoubleFill,
+      remixArrowRightDoubleFill,
+      remixArrowDownDoubleFill,
       remixDeleteBin2Line,
       remixPingPongLine,
       remixLoader: remixLoader5Fill,
@@ -187,31 +191,47 @@ export class WaterDemandPrediction2Component implements OnInit {
     this.chartDatasets.historic[resolution].clear();
   }
 
-  protected trainModelParams = signals.require({
+  protected modelParams = signals.require({
     startPoint: this.fetchStartPoint,
     name: this.choices.smartmeter,
     timeframe: this.choices.timeframe,
     resolution: this.choices.resolution,
     weatherCapability: this.choices.weatherCapability,
     weatherColumn: this.choices.weatherColumn,
-  }) satisfies Signal<TrainModelParams | undefined>;
-  private trainModelRequest = signals.maybe<TrainModelParams>();
+  }) satisfies Signal<ModelParams | undefined>;
+
+  private trainModelRequest = signals.maybe<ModelParams>({equal: () => false});
   private trainModelResource = this.service.trainModel(this.trainModelRequest);
   protected isTraining = signal<boolean>(false);
 
   private _isTrainingReset = effect(() => {
     this.trainModelResource();
-    this.isTraining.set(false);
+    setTimeout(
+      () => this.isTraining.set(false),
+      dayjs.duration(1, "s").asMilliseconds(),
+    );
   });
 
   protected trainModel() {
-    let params = this.trainModelParams();
+    let params = this.modelParams();
     if (!params) return;
     this.isTraining.set(true);
     this.trainModelRequest.set(params);
   }
 
-  _ = effect(() => console.log(this.trainModelResource()));
+  private predictionRequest = signals.maybe<ModelParams>({equal: () => false});
+  private predictionResource = this.service.fetchPrediction(
+    this.predictionRequest,
+  );
+
+  protected fetchPrediction() {
+    let params = this.modelParams();
+    if (!params) return;
+    this.predictionRequest.set(params);
+  }
+
+  _training = effect(() => console.log(this.trainModelResource()));
+  _prediction = effect(() => console.log(this.predictionResource()));
 
   private storeChoicesEffect = effect(() => {
     let choices = Object.map(this.choices, val => val());

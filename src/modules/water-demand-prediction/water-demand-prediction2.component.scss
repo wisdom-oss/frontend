@@ -28,4 +28,14 @@
     // TODO: check what values are nice here
     grid-template-rows: auto minmax(20em, 1fr) auto auto;
   }
+
+  .only-narrow {
+    display: none;
+  }
+}
+
+@container (max-width: calc(700px - 1px)) {
+  .only-wide {
+    display: none;
+  }
 }
