@@ -4,10 +4,11 @@ import {
   inject,
   signal,
   Component,
+  OnInit,
   Signal,
   WritableSignal,
-  OnInit,
 } from "@angular/core";
+import {Params, ActivatedRoute, Router} from "@angular/router";
 import {provideIcons, NgIcon} from "@ng-icons/core";
 import {
   remixArrowUpDoubleFill,
@@ -29,6 +30,7 @@ import {
 import {Chart} from "chart.js";
 import dayjs from "dayjs";
 import {BaseChartDirective} from "ng2-charts";
+import typia from "typia";
 
 import {WaterDemandPrediction2Service} from "../../api/water-demand-prediction2.service";
 import {signals} from "../../common/signals";
@@ -38,9 +40,7 @@ import {fromEntries} from "../../common/utils/from-entries";
 import {RgbaColor} from "../../common/utils/rgba-color";
 import {zip} from "../../common/utils/zip";
 import {typeUtils} from "../../common/utils/type-utils";
-import { ActivatedRoute, Params, Router } from "@angular/router";
-import typia from "typia";
-import { keys } from "../../common/utils/keys";
+import {keys} from "../../common/utils/keys";
 
 type Resolution = WaterDemandPrediction2Service.Resolution;
 type Timeframe = WaterDemandPrediction2Service.Timeframe;
@@ -225,7 +225,7 @@ export class WaterDemandPrediction2Component implements OnInit {
 
   private loadParam<
     C extends keyof typeof this.choices,
-    T extends typeUtils.Signaled<typeof this.choices[C]>, 
+    T extends typeUtils.Signaled<(typeof this.choices)[C]>,
     I extends (input: unknown) => input is T,
   >(params: Params, choice: C, is: I): void {
     let param = params[choice];
