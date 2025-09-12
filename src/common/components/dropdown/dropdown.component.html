@@ -12,9 +12,16 @@
       class="button is-rounded is-fullwidth"
       (click)="kind() == 'click' && isActive.set(!isActive())"
     >
-      <span class="is-flex-grow-1">{{
-        changeMenuName() ? (choiceName() | translate) : (menuName() | translate)
-      }}</span>
+      <span class="has-stack">
+        @if (maxWidth()) {
+@for (possibleDisplay of possibleDisplays(); track possibleDisplay) {
+          <span class="is-invisible" aria-hidden="true">{{possibleDisplay | translate}}</span>
+        }
+        }
+        <span class="is-flex-grow-1">
+          {{changeMenuName() ? (choiceName() | translate) : (menuName() | translate)}}
+        </span>
+      </span>
       <span class="icon is-small">
         <ng-icon *ngIf="arrowUp()" name="remixArrowUpSLine"></ng-icon>
         <ng-icon *ngIf="!arrowUp()" name="remixArrowDownSLine"></ng-icon>

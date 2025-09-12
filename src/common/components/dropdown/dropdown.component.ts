@@ -41,6 +41,13 @@ export class DropdownComponent {
    */
   readonly changeMenuName = input(true);
 
+  /**
+   * Flag, if the trigger should take the size of the maximum size value.
+   * @default false
+   */
+  readonly maxWidth = input(false);
+  protected readonly possibleDisplays = computed(() => [this.menuName(), ...this.optionsIter().map(([_, display]) => display)]);
+
   /** Selected choice. */
   readonly choice = model<string | undefined>(undefined);
   protected choiceOutput = output<string>({alias: "choice"});
