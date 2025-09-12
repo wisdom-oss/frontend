@@ -67,7 +67,7 @@
         type="bar"
         class="is-fullheight is-fullwidth"
         [options]="chartOptions"
-        [labels]="$any(chartLabels())"
+        [labels]="$any(chartLabels.historic())"
         [datasets]="$any(chartDatasets.historic[chartResolution()]())"
       ></canvas>
     </div>
@@ -210,6 +210,8 @@
         type="bar"
         class="is-fullheight is-fullwidth"
         [options]="chartOptions"
+        [labels]="$any(chartLabels.predictions())"
+        [datasets]="$any(chartDatasets.predictions())"
       ></canvas>
     </div>
     <div select-predicted-smartmeter class="cell">

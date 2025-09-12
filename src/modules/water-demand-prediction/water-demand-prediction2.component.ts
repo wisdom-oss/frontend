@@ -24,6 +24,7 @@ import {
   TranslateService,
 } from "@ngx-translate/core";
 import {
+  ChartData,
   ChartDataset as ChartJsDataset,
   LegendItem,
   LegendOptions,
@@ -95,15 +96,20 @@ export class WaterDemandPrediction2Component implements OnInit {
       daily: signals.array<ChartDataset>(),
       weekly: signals.array<ChartDataset>(),
     } satisfies Record<Resolution, any>,
+    predictions: signals.array<ChartDataset>(),
   } as const;
-  protected chartLabels = computed(() => {
-    let resolution = this.chartResolution();
-    let datasets = this.chartDatasets.historic[resolution]();
-    let dates = new Set(
-      datasets.flatMap(dataset => dataset.data.map(data => data.x)),
-    );
-    return Array.from(dates).sort();
-  });
+
+  private makeChartLabels(datasets: Signal<readonly ChartDataset[]>): Signal<string[]> {
+    return computed(() => {
+      let sets = datasets();
+      let dates = new Set(sets.flatMap(set => set.data.map(({x}) => x)));
+      return Array.from(dates).sort();
+    });
+  }
+  protected chartLabels = {
+    historic: this.makeChartLabels(computed(() => this.chartDatasets.historic[this.chartResolution()]())),
+    predictions: this.makeChartLabels(this.chartDatasets.predictions),
+  };
 
   protected choices = {
     resolution: signals.maybe<Resolution>(),
@@ -230,6 +236,21 @@ export class WaterDemandPrediction2Component implements OnInit {
     this.predictionRequest.set(params);
   }
 
+  private _pushPredictionEffect = effect(() => {
+    let prediction = this.predictionResource();
+    if (!prediction) return;
+
+    this.chartDatasets.predictions.push({
+      label: `${prediction.name}::${prediction.timeframe}`,
+      data: zip(prediction.date, prediction.value).map(([date, value]) => ({
+        x: date.toISOString(),
+        y: value,
+      })),
+      parsing: false,
+      backgroundColor: RgbaColor.fromString(prediction.name).toString(),
+    });
+  });
+
   _training = effect(() => console.log(this.trainModelResource()));
   _prediction = effect(() => console.log(this.predictionResource()));
 
@@ -268,9 +289,8 @@ export class WaterDemandPrediction2Component implements OnInit {
     resolution: Resolution,
     lang: string,
   ): TickOptions["callback"] {
-    return (_value, index, _ticks) => {
-      let labels = this.chartLabels();
-      let date = dayjs(labels[index]);
+    return (_value, index, ticks) => {
+      let date = dayjs(ticks[index].label! as string);
 
       let format: string;
       switch (resolution) {
