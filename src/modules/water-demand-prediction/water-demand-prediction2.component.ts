@@ -10,6 +10,10 @@ import {provideIcons, NgIcon} from "@ng-icons/core";
 import {
   remixArrowUpDoubleFill,
   remixDeleteBin2Line,
+  remixLoader2Fill,
+  remixLoader3Fill,
+  remixLoader4Fill,
+  remixLoader5Fill,
   remixPingPongLine,
 } from "@ng-icons/remixicon";
 import {
@@ -64,6 +68,7 @@ type TrainModelParams = Exclude<
       remixArrowUpDoubleFill,
       remixDeleteBin2Line,
       remixPingPongLine,
+      remixLoader: remixLoader5Fill,
     }),
   ],
 })
@@ -188,10 +193,17 @@ export class WaterDemandPrediction2Component {
   }) satisfies Signal<TrainModelParams | undefined>;
   private trainModelRequest = signals.maybe<TrainModelParams>();
   private trainModelResource = this.service.trainModel(this.trainModelRequest);
+  protected isTraining = signal<boolean>(false);
+
+  private _isTrainingReset = effect(() => {
+    this.trainModelResource();
+    this.isTraining.set(false);
+  });
 
   protected trainModel() {
     let params = this.trainModelParams();
     if (!params) return;
+    this.isTraining.set(true);
     this.trainModelRequest.set(params);
   }
 

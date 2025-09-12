@@ -49,3 +49,25 @@ html {
     color-scheme: dark;
   }
 }
+
+.is-spinning {
+  animation: spin 0.8s linear infinite;
+
+  &.is-fast {
+    animation-duration: 0.2s;
+  }
+
+  &.is-slow {
+    animation-duration: 2s;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+

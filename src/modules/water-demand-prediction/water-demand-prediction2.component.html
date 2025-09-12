@@ -86,15 +86,34 @@
             <ng-icon size="1.2em" name="remixDeleteBin2Line"></ng-icon>
           </span>
         </button>
+        @let isTraining = this.isTraining();
         <button
           class="button is-primary"
-          [disabled]="!trainModelParams()"
+          [disabled]="!trainModelParams() || isTraining"
           (click)="trainModel()"
         >
-          <span>Train selected model</span>
-          <span class="icon is-large">
-            <ng-icon size="1.2em" name="remixPingPongLine"></ng-icon>
-          </span>
+          @if (isTraining) {
+            <span>Training</span>
+            <span class="icon is-large">
+              @for (i of [1, 2, 3]; track i; let isFirst = $first) {
+                @let animationDuration = 0.9;
+                <div 
+                  [class.is-position-absolute]="!isFirst" 
+                  class="is-grid is-spinning"
+                  [style.animation-duration.s]="animationDuration"
+                  [style.animation-delay.s]="(-i * animationDuration) / 3"
+                >
+                  <ng-icon size="1.2em" name="remixLoader"></ng-icon>
+                </div>
+              }
+            </span>
+          } 
+          @else {
+            <span>Train selected model</span>
+            <span class="icon is-large">
+              <ng-icon size="1.2em" name="remixPingPongLine"></ng-icon>
+            </span>
+          }
         </button>
         <button
           class="button is-info"
