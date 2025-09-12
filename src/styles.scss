@@ -50,7 +50,16 @@ html {
   }
 }
 
+/* 
+ * .is-spinning
+ * Adds a continuous spin animation to an element.
+ * - Base: spins every 0.8s (infinite loop).
+ * - .is-fast: speeds up spin to 0.2s.
+ * - .is-slow: slows spin to 2s.
+ * Perfect for loaders or rotating icons.
+ */
 .is-spinning {
+  display: grid;
   animation: spin 0.8s linear infinite;
 
   &.is-fast {
