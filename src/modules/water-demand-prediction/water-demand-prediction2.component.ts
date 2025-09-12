@@ -207,9 +207,7 @@ export class WaterDemandPrediction2Component {
     this.trainModelRequest.set(params);
   }
 
-  _ = effect(() =>
-    console.log(this.trainModelResource()),
-  );
+  _ = effect(() => console.log(this.trainModelResource()));
 
   protected xTicks(
     resolution: Resolution,

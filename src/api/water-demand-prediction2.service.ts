@@ -45,7 +45,7 @@ export class WaterDemandPrediction2Service extends api.service(URL) {
 
   private static readonly TRAINING_RESULT = {
     existsAlready: "Model already exists",
-    saved: "Model saved successfully" 
+    saved: "Model saved successfully",
   } as const;
 
   fetchMeterInformation(): api.Signal<Self.MeterNames, Self.MeterNames> {
@@ -102,9 +102,9 @@ export class WaterDemandPrediction2Service extends api.service(URL) {
   ): api.Signal<Self.TrainingResult> {
     let parse = (raw: Raw.TrainingResult): Self.TrainingResult => {
       switch (raw) {
-        case WaterDemandPrediction2Service.TRAINING_RESULT.existsAlready: 
+        case WaterDemandPrediction2Service.TRAINING_RESULT.existsAlready:
           return "existsAlready";
-        case WaterDemandPrediction2Service.TRAINING_RESULT.saved: 
+        case WaterDemandPrediction2Service.TRAINING_RESULT.saved:
           return "saved";
       }
     };
@@ -198,7 +198,8 @@ namespace Raw {
     value: (number & tags.Type<"double">)[];
     date: (string & DateTime)[];
   };
-  export type TrainingResult = typeof Self["TRAINING_RESULT"][keyof typeof Self["TRAINING_RESULT"]];
+  export type TrainingResult =
+    (typeof Self)["TRAINING_RESULT"][keyof (typeof Self)["TRAINING_RESULT"]];
   export type PredictedSmartmeter = {
     aic: number & tags.Type<"double">;
     date: (string & DateTime)[];
@@ -229,7 +230,7 @@ export namespace WaterDemandPrediction2Service {
   export type SingleSmartmeter = Omit<Raw.SingleSmartmeter, "date"> & {
     date: Dayjs[];
   };
-  export type TrainingResult = keyof typeof Self["TRAINING_RESULT"];
+  export type TrainingResult = keyof (typeof Self)["TRAINING_RESULT"];
   export type PredictedSmartmeter = Omit<
     Raw.PredictedSmartmeter,
     "date" | "rootOfmeanSquaredError"

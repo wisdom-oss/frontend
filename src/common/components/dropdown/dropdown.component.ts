@@ -46,7 +46,10 @@ export class DropdownComponent {
    * @default false
    */
   readonly maxWidth = input(false);
-  protected readonly possibleDisplays = computed(() => [this.menuName(), ...this.optionsIter().map(([_, display]) => display)]);
+  protected readonly possibleDisplays = computed(() => [
+    this.menuName(),
+    ...this.optionsIter().map(([_, display]) => display),
+  ]);
 
   /** Selected choice. */
   readonly choice = model<string | undefined>(undefined);
