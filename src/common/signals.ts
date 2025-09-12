@@ -3,6 +3,7 @@ import {
   effect,
   inject,
   signal,
+  CreateSignalOptions,
   Signal,
   WritableSignal,
 } from "@angular/core";
@@ -13,6 +14,7 @@ import {Duration} from "dayjs/plugin/duration";
 
 import {injections} from "./injections";
 import {typeUtils} from "./utils/type-utils";
+import {omit} from "./utils/omit";
 
 const makeDayjs = dayjs;
 
@@ -471,9 +473,12 @@ export namespace signals {
 
   /** Small helper function to define writable signals that may be undefined. */
   export function maybe<T>(
-    initial: undefined | T = undefined,
+    options?: CreateSignalOptions<T | undefined> & {initial?: T},
   ): WritableSignal<undefined | T> {
-    return signal(initial);
+    return signal<undefined | T>(
+      options?.initial,
+      options ? omit(options, "initial") : undefined,
+    );
   }
 
   /**
