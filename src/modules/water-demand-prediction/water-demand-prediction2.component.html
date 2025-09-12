@@ -92,14 +92,18 @@
           [disabled]="!trainModelParams() || isTraining"
           (click)="trainModel()"
         >
-          @if (isTraining) {
+          <span class="has-stack">
             <span>Training</span>
+            <span class="is-invisible">Train selected model</span>
+          </span>
+
+          @if (isTraining) {
             <span class="icon is-large">
               @for (i of [1, 2, 3]; track i; let isFirst = $first) {
                 @let animationDuration = 0.9;
-                <div 
-                  [class.is-position-absolute]="!isFirst" 
-                  class="is-grid is-spinning"
+                <div
+                  [class.is-position-absolute]="!isFirst"
+                  class="is-spinning"
                   [style.animation-duration.s]="animationDuration"
                   [style.animation-delay.s]="(-i * animationDuration) / 3"
                 >
@@ -107,9 +111,7 @@
                 </div>
               }
             </span>
-          } 
-          @else {
-            <span>Train selected model</span>
+          } @else {
             <span class="icon is-large">
               <ng-icon size="1.2em" name="remixPingPongLine"></ng-icon>
             </span>
@@ -129,14 +131,13 @@
     </div>
     <div select-normal-smartmeter class="cell">
       <div
-        class="buttons are-small is-centered choices"
+        class="buttons are-small is-centered"
         style="--bulma-control-size: 0.8rem; gap: 0.5rem"
       >
-        @let style = "min-width: 10em;";
         <dropdown
           menuName="water-demand-prediction.choice.resolution"
-          [style]="style"
           [changeMenuName]="true"
+          [maxWidth]="true"
           [is-up]="true"
           [options]="options.resolution"
           kind="hover"
@@ -144,8 +145,8 @@
         ></dropdown>
         <dropdown
           menuName="water-demand-prediction.choice.timeframe"
-          [style]="style"
           [changeMenuName]="true"
+          [maxWidth]="true"
           [is-up]="true"
           [options]="options.timeframe()"
           kind="hover"
@@ -153,8 +154,8 @@
         ></dropdown>
         <dropdown
           menuName="water-demand-prediction.choice.smartmeter"
-          [style]="style"
           [changeMenuName]="true"
+          [maxWidth]="true"
           [is-up]="true"
           [options]="options.smartmeter()"
           kind="hover"
@@ -162,8 +163,8 @@
         ></dropdown>
         <dropdown
           menuName="water-demand-prediction.choice.start-point"
-          [style]="style"
           [changeMenuName]="true"
+          [maxWidth]="true"
           [is-up]="true"
           [options]="options.startPoint"
           kind="hover"
@@ -171,8 +172,8 @@
         ></dropdown>
         <dropdown
           menuName="water-demand-prediction.choice.weather"
-          [style]="style"
           [changeMenuName]="true"
+          [maxWidth]="true"
           [is-up]="true"
           [options]="options.weatherCapability"
           kind="hover"
@@ -180,8 +181,8 @@
         ></dropdown>
         <dropdown
           menuName="water-demand-prediction.choice.weatherColumn"
-          [style]="style"
           [changeMenuName]="true"
+          [maxWidth]="true"
           [is-up]="true"
           [options]="options.weatherColumn()"
           [disabled]="options.weatherColumn() | empty"
