@@ -564,4 +564,69 @@ export namespace signals {
       return output as {[K in keyof R]: Exclude<typeUtils.Signaled<R[K]>, E>};
     });
   }
+
+  /**
+   * A signal that carries no data and only notifies dependents when triggered.
+   *
+   * Use this when we want to kick off a recomputation manually
+   * (e.g. button click), without passing any payload.
+   *
+   * The signal's value type is `void`. It is not meant to be read for data.
+   *
+   * @note This should never be used directly in API services.
+   *       It is meant for components only.
+   *       If you want to retrigger resources based on this, wrap it in
+   *       a `computed` that listens to this signal and use that to request
+   *       the service.
+   *
+   * @example
+   * // Create a trigger and a derived computation that reruns on trigger
+   * const refresh = signals.trigger();
+   * const time = computed(() => {
+   *   // depends on refresh; recomputes whenever we call refresh.trigger()
+   *   refresh();
+   *   return Date.now();
+   * });
+   *
+   * // Later, from a button or elsewhere:
+   * refresh.trigger(); // forces `time` to recompute
+   */
+  export type TriggerSignal = Signal<void> & {
+    /**
+     * Notifies subscribers and causes dependents to recompute.
+     * Does not carry or change any value.
+     */
+    trigger(): void;
+  };
+
+  /**
+   * Creates a {@link TriggerSignal}.
+   *
+   * The returned signal has a `trigger()` method that fires an update.
+   * It does not hold state and does not deliver a payload.
+   *
+   * @note This should never be used directly in API services.
+   *       It is meant for components only.
+   *       If you want to retrigger resources based on this, wrap it in
+   *       a `computed` that listens to this signal and use that to request
+   *       the service.
+   *
+   * @returns A signal that we can trigger manually.
+   *
+   * @example
+   * const refresh = signals.trigger();
+   *
+   * effect(() => {
+   *   refresh();            // establish dependency
+   *   console.log("run");   // runs each time we call refresh.trigger()
+   * });
+   *
+   * // In a component template:
+   * // <button (click)="refresh.trigger()">Refresh</button>
+   */
+  export function trigger(): TriggerSignal {
+    let inner = signal(null, {equal: () => false});
+    let trigger = () => inner.set(null);
+    return Object.assign(inner as unknown as Signal<void>, {trigger});
+  }
 }

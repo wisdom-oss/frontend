@@ -142,6 +142,7 @@ export class WaterDemandPrediction2Service extends api.service(URL) {
       method: `POST`,
       validateRaw: typia.createValidate<Raw.PredictedSmartmeter>(),
       parse,
+      equal: () => false,
       validate: typia.createValidate<Self.PredictedSmartmeter>(),
       body: this.mapStartPoint(params),
     });

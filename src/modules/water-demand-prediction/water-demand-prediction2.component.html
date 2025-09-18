@@ -1,3 +1,4 @@
+@let chartResolution = this.chartResolution();
 @let chartOptions =
   {
     barThickness: "flex",
@@ -32,7 +33,7 @@
           lineWidth: 0.4,
         },
         ticks: {
-          callback: xTicks(chartResolution(), lang()),
+          callback: xTicks(chartResolution, lang()),
         },
       },
     },
@@ -54,8 +55,8 @@
             @for (resolution of Service.RESOLUTIONS; track resolution) {
               <button
                 class="button"
-                [class.is-active]="chartResolution() == resolution"
-                (click)="chartResolution.set(resolution)"
+                [class.is-active]="chartResolution == resolution"
+                (click)="this.chartResolution.set(resolution)"
                 translate
               >
                 water-demand-prediction.resolution.{{ resolution }}
@@ -73,7 +74,7 @@
         class="is-fullheight is-fullwidth mb-4"
         [options]="chartOptions"
         [labels]="$any(chartLabels.historic())"
-        [datasets]="$any(chartDatasets.historic[chartResolution()]())"
+        [datasets]="$any(chartDatasets.historic[chartResolution]())"
       ></canvas>
     </div>
     <div chart-predicted [style.grid-area]="'chart-predicted'">
@@ -84,7 +85,7 @@
         class="is-fullheight is-fullwidth mb-4"
         [options]="chartOptions"
         [labels]="$any(chartLabels.predictions())"
-        [datasets]="$any(chartDatasets.predictions())"
+        [datasets]="$any(chartDatasets.predictions[chartResolution]())"
       ></canvas>
     </div>
     <div buttons [style.grid-area]="'buttons'">
@@ -93,9 +94,14 @@
         style="--bulma-control-size: 0.9rem"
       >
         <div class="buttons has-addons mb-0">
+          @let disableHistoric =
+            !chartDatasets.historic[chartResolution]().length;
+          @let disablePredictions =
+            !chartDatasets.predictions[chartResolution]().length;
           <button
             class="button is-danger"
-            [disabled]="!chartDatasets.historic[chartResolution()]().length"
+            [disabled]="disableHistoric"
+            (click)="clearSmartmeterDatasets('historic')"
           >
             <span class="icon is-large">
               <ng-icon size="1.2em" name="remixHistoryFill"></ng-icon>
@@ -103,15 +109,19 @@
           </button>
           <button
             class="button is-danger"
-            [disabled]="!chartDatasets.historic[chartResolution()]().length"
-            (click)="clearSmartmeterDataset()"
+            [disabled]="disableHistoric && disablePredictions"
+            (click)="clearSmartmeterDatasets()"
           >
             <span translate="water-demand-prediction.delete.normal"></span>
             <span class="icon is-large">
               <ng-icon size="1.2em" name="remixDeleteBin2Line"></ng-icon>
             </span>
           </button>
-          <button class="button is-danger" disabled>
+          <button
+            class="button is-danger"
+            [disabled]="disablePredictions"
+            (click)="clearSmartmeterDatasets('predictions')"
+          >
             <span class="icon is-large">
               <ng-icon size="1.2em" name="remixSparklingFill"></ng-icon>
             </span>
@@ -120,7 +130,7 @@
         @let isTraining = this.isTraining();
         <button
           class="button is-primary"
-          [disabled]="!modelParams() || isTraining"
+          [disabled]="!params.predictions() || isTraining"
           (click)="trainModel()"
         >
           <span class="has-stack">
@@ -150,7 +160,8 @@
         <div class="buttons has-addons mb-0">
           <button
             class="button is-info"
-            disabled
+            [disabled]="!fetched.historic()"
+            (click)="pushSmartmeterDataset('historic')"
           >
             <span class="icon is-large">
               <ng-icon size="1.2em" name="remixHistoryFill"></ng-icon>
@@ -158,7 +169,7 @@
           </button>
           <button
             class="button is-info"
-            [disabled]="!smartmeter()"
+            [disabled]="!fetched.historic() && !fetched.predictions()"
             (click)="pushSmartmeterDataset()"
           >
             <span translate>Add to Graph</span>
@@ -166,7 +177,11 @@
               <ng-icon size="1.2em" name="remixBarChartFill"></ng-icon>
             </span>
           </button>
-          <button class="button is-info" disabled>
+          <button
+            class="button is-info"
+            [disabled]="!fetched.predictions()"
+            (click)="pushSmartmeterDataset('predictions')"
+          >
             <span class="icon is-large">
               <ng-icon size="1.2em" name="remixSparklingFill"></ng-icon>
             </span>

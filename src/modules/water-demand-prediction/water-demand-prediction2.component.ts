@@ -27,7 +27,6 @@ import {
   TranslateService,
 } from "@ngx-translate/core";
 import {
-  ChartData,
   ChartDataset as ChartJsDataset,
   LegendItem,
   LegendOptions,
@@ -48,17 +47,16 @@ import {zip} from "../../common/utils/zip";
 import {typeUtils} from "../../common/utils/type-utils";
 import {keys} from "../../common/utils/keys";
 
+type Service = WaterDemandPrediction2Service;
 type Resolution = WaterDemandPrediction2Service.Resolution;
+type DataGroup = "historic" | "predictions";
 type Timeframe = WaterDemandPrediction2Service.Timeframe;
 type WeatherCapability = WaterDemandPrediction2Service.WeatherCapability;
 type StartPoint = keyof (typeof WaterDemandPrediction2Service)["START_POINTS"];
 type ChartDataset = ChartJsDataset<"bar", {x: string; y: number}[]>;
-type ModelParams = Exclude<
-  typeUtils.Signaled<
-    Parameters<WaterDemandPrediction2Service["trainModel"]>[0]
-  >,
-  undefined
->;
+type FetchSmartmeterParams = Parameters<Service["fetchSmartmeter"]>[0];
+type FetchPredictionParams = Parameters<Service["fetchPrediction"]>[0];
+type TrainModelParams = Parameters<Service["trainModel"]>[0];
 
 @Component({
   imports: [
@@ -102,24 +100,24 @@ export class WaterDemandPrediction2Component implements OnInit {
       daily: signals.array<ChartDataset>(),
       weekly: signals.array<ChartDataset>(),
     } satisfies Record<Resolution, any>,
-    predictions: signals.array<ChartDataset>(),
-  } as const;
+    predictions: {
+      hourly: signals.array<ChartDataset>(),
+      daily: signals.array<ChartDataset>(),
+      weekly: signals.array<ChartDataset>(),
+    } satisfies Record<Resolution, any>,
+  } as const satisfies Record<DataGroup, any>;
 
-  private makeChartLabels(
-    datasets: Signal<readonly ChartDataset[]>,
-  ): Signal<string[]> {
+  private makeChartLabels(dataGroup: DataGroup): Signal<string[]> {
     return computed(() => {
-      let sets = datasets();
-      let dates = new Set(sets.flatMap(set => set.data.map(({x}) => x)));
+      let datasets = this.chartDatasets[dataGroup][this.chartResolution()]();
+      let dates = new Set(datasets.flatMap(set => set.data.map(({x}) => x)));
       return Array.from(dates).sort();
     });
   }
   protected chartLabels = {
-    historic: this.makeChartLabels(
-      computed(() => this.chartDatasets.historic[this.chartResolution()]()),
-    ),
-    predictions: this.makeChartLabels(this.chartDatasets.predictions),
-  };
+    historic: this.makeChartLabels("historic"),
+    predictions: this.makeChartLabels("predictions"),
+  } as const satisfies Record<DataGroup, any>;
 
   protected choices = {
     resolution: signals.maybe<Resolution>(),
@@ -172,97 +170,105 @@ export class WaterDemandPrediction2Component implements OnInit {
     return WaterDemandPrediction2Service.START_POINTS[startPoint];
   });
 
-  protected fetchSmartmeterParams = signals.require({
+  private historicModelParams = {
     startPoint: this.fetchStartPoint,
     name: this.choices.smartmeter,
     timeframe: this.choices.timeframe,
     resolution: this.choices.resolution,
-  }) satisfies Parameters<WaterDemandPrediction2Service["fetchSmartmeter"]>[0];
+  } as const;
 
-  protected smartmeter = this.service.fetchSmartmeter(
-    this.fetchSmartmeterParams,
-  );
-
-  protected pushSmartmeterDataset() {
-    let smartmeter = this.smartmeter();
-    let resolution = this.choices.resolution();
-    if (!smartmeter || !resolution) return;
-
-    this.chartDatasets.historic[resolution].push({
-      label: `${smartmeter.name}::${smartmeter.timeframe}`,
-      data: zip(smartmeter.date, smartmeter.value).map(([date, value]) => ({
-        x: date.toISOString(),
-        y: value,
-      })),
-      parsing: false,
-      backgroundColor: RgbaColor.fromString(smartmeter.name).toString(),
-    });
-
-    this.chartResolution.set(resolution);
-  }
-
-  protected clearSmartmeterDataset() {
-    let resolution = this.chartResolution();
-    if (!resolution) return;
-    this.chartDatasets.historic[resolution].clear();
-  }
-
-  protected modelParams = signals.require({
-    startPoint: this.fetchStartPoint,
-    name: this.choices.smartmeter,
-    timeframe: this.choices.timeframe,
-    resolution: this.choices.resolution,
+  private predictionModelParams = {
+    ...this.historicModelParams,
     weatherCapability: this.choices.weatherCapability,
     weatherColumn: this.choices.weatherColumn,
-  }) satisfies Signal<ModelParams | undefined>;
+  } as const;
 
-  private trainModelRequest = signals.maybe<ModelParams>({equal: () => false});
+  protected params = {
+    historic: signals.require(
+      this.historicModelParams,
+    ) satisfies FetchSmartmeterParams,
+    predictions: signals.require(
+      this.predictionModelParams,
+    ) satisfies FetchPredictionParams satisfies TrainModelParams,
+  } as const satisfies Record<DataGroup, any>;
+
+  private predictionRetry = signals.trigger();
+
+  protected fetched = {
+    historic: this.service.fetchSmartmeter(this.params.historic),
+    predictions: this.service.fetchPrediction(
+      computed(
+        () => {
+          this.predictionRetry(); // try again after training is done
+          return this.params.predictions();
+        },
+        {equal: () => false},
+      ),
+    ),
+  } as const satisfies Record<DataGroup, any>;
+
+  private dataGroupIter(dataGroup?: DataGroup): Iterable<DataGroup> {
+    return dataGroup ? [dataGroup] : ["historic", "predictions"];
+  }
+
+  protected pushSmartmeterDataset(dataGroup?: DataGroup) {
+    for (let group of this.dataGroupIter(dataGroup)) {
+      let fetched = this.fetched[group]();
+      if (!fetched) continue;
+
+      this.chartDatasets[group][fetched.resolution].push({
+        label: `${fetched.name}::${fetched.timeframe}`,
+        data: zip(fetched.date, fetched.value).map(([date, value]) => ({
+          x: date.toISOString(),
+          y: value,
+        })),
+        parsing: false,
+        backgroundColor: RgbaColor.fromString(fetched.name).toString(),
+      });
+
+      this.chartResolution.set(fetched.resolution);
+    }
+  }
+
+  protected clearSmartmeterDatasets(dataGroup?: DataGroup) {
+    let resolution = this.chartResolution();
+    if (!resolution) return;
+
+    for (let group of this.dataGroupIter(dataGroup)) {
+      this.chartDatasets[group][resolution].clear();
+    }
+  }
+
+  private trainModelRequest = signals.maybe<
+    typeUtils.Signaled<TrainModelParams>
+  >({equal: () => false});
   private trainModelResource = this.service.trainModel(this.trainModelRequest);
   protected isTraining = signal<boolean>(false);
 
-  private _isTrainingReset = effect(() => {
-    this.trainModelResource();
+  private _isTrainingResetEffect = effect(() => {
+    let res = this.trainModelResource();
+    if (!res) return;
     setTimeout(
       () => this.isTraining.set(false),
       dayjs.duration(1, "s").asMilliseconds(),
     );
   });
 
+  private _fetchPredictionAfterTrainingEffect = effect(() => {
+    let res = this.trainModelResource();
+    if (!res) return;
+    this.predictionRetry.trigger();
+  });
+
   protected trainModel() {
-    let params = this.modelParams();
+    let params = this.params.predictions();
     if (!params) return;
     this.isTraining.set(true);
     this.trainModelRequest.set(params);
   }
 
-  private predictionRequest = signals.maybe<ModelParams>({equal: () => false});
-  private predictionResource = this.service.fetchPrediction(
-    this.predictionRequest,
-  );
-
-  protected fetchPrediction() {
-    let params = this.modelParams();
-    if (!params) return;
-    this.predictionRequest.set(params);
-  }
-
-  private _pushPredictionEffect = effect(() => {
-    let prediction = this.predictionResource();
-    if (!prediction) return;
-
-    this.chartDatasets.predictions.push({
-      label: `${prediction.name}::${prediction.timeframe}`,
-      data: zip(prediction.date, prediction.value).map(([date, value]) => ({
-        x: date.toISOString(),
-        y: value,
-      })),
-      parsing: false,
-      backgroundColor: RgbaColor.fromString(prediction.name).toString(),
-    });
-  });
-
   _training = effect(() => console.log(this.trainModelResource()));
-  _prediction = effect(() => console.log(this.predictionResource()));
+  _predictions = effect(() => console.log(this.fetched.predictions()));
 
   private storeChoicesEffect = effect(() => {
     let choices = Object.map(this.choices, val => val());
