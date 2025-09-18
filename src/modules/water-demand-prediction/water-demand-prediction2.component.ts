@@ -15,8 +15,10 @@ import {
   remixArrowRightDoubleFill,
   remixArrowUpDoubleFill,
   remixDeleteBin2Line,
+  remixHistoryFill,
   remixLoader5Fill,
   remixPingPongLine,
+  remixSparklingFill,
 } from "@ng-icons/remixicon";
 import {
   TranslateDirective,
@@ -75,6 +77,8 @@ type ModelParams = Exclude<
       remixArrowDownDoubleFill,
       remixDeleteBin2Line,
       remixPingPongLine,
+      remixHistoryFill,
+      remixSparklingFill,
       remixLoader: remixLoader5Fill,
     }),
   ],
@@ -99,7 +103,9 @@ export class WaterDemandPrediction2Component implements OnInit {
     predictions: signals.array<ChartDataset>(),
   } as const;
 
-  private makeChartLabels(datasets: Signal<readonly ChartDataset[]>): Signal<string[]> {
+  private makeChartLabels(
+    datasets: Signal<readonly ChartDataset[]>,
+  ): Signal<string[]> {
     return computed(() => {
       let sets = datasets();
       let dates = new Set(sets.flatMap(set => set.data.map(({x}) => x)));
@@ -107,7 +113,9 @@ export class WaterDemandPrediction2Component implements OnInit {
     });
   }
   protected chartLabels = {
-    historic: this.makeChartLabels(computed(() => this.chartDatasets.historic[this.chartResolution()]())),
+    historic: this.makeChartLabels(
+      computed(() => this.chartDatasets.historic[this.chartResolution()]()),
+    ),
     predictions: this.makeChartLabels(this.chartDatasets.predictions),
   };
 

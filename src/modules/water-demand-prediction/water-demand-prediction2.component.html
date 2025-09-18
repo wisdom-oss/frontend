@@ -47,45 +47,76 @@
 
 <div class="outer-layout box is-fullheight">
   <div class="inner-layout is-fullheight">
-    <div resolution-select class="cell">
-      <div class="buttons are-small has-addons is-right">
-        @for (resolution of Service.RESOLUTIONS; track resolution) {
-          <button
-            class="button"
-            [class.is-active]="chartResolution() == resolution"
-            (click)="chartResolution.set(resolution)"
-            translate
-          >
-            water-demand-prediction.resolution.{{ resolution }}
-          </button>
-        }
-      </div>
-    </div>
-    <div normal-smartmeter-chart class="cell">
+    <ng-container chart-resolution>
+      @for (i of [0, 1]; track i; let isLast = $last) {
+        <div [style.grid-area]="'resolution-' + i" [class.only-narrow]="isLast">
+          <div class="buttons are-small has-addons is-right">
+            @for (resolution of Service.RESOLUTIONS; track resolution) {
+              <button
+                class="button"
+                [class.is-active]="chartResolution() == resolution"
+                (click)="chartResolution.set(resolution)"
+                translate
+              >
+                water-demand-prediction.resolution.{{ resolution }}
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </ng-container>
+    <div chart-historic-data [style.grid-area]="'chart-historic'">
+      <p class="title is-6 mb-0 has-text-centered">historic</p>
       <canvas
         baseChart
         type="bar"
-        class="is-fullheight is-fullwidth"
+        class="is-fullheight is-fullwidth mb-4"
         [options]="chartOptions"
         [labels]="$any(chartLabels.historic())"
         [datasets]="$any(chartDatasets.historic[chartResolution()]())"
       ></canvas>
     </div>
-    <div configure-normal-smartmeter class="cell">
+    <div chart-predicted [style.grid-area]="'chart-predicted'">
+      <p class="title is-6 mb-0 has-text-centered">predicted</p>
+      <canvas
+        baseChart
+        type="bar"
+        class="is-fullheight is-fullwidth mb-4"
+        [options]="chartOptions"
+        [labels]="$any(chartLabels.predictions())"
+        [datasets]="$any(chartDatasets.predictions())"
+      ></canvas>
+    </div>
+    <div buttons [style.grid-area]="'buttons'">
       <div
         class="buttons are-medium is-centered"
         style="--bulma-control-size: 0.9rem"
       >
-        <button
-          class="button is-danger"
-          [disabled]="!chartDatasets.historic[chartResolution()]().length"
-          (click)="clearSmartmeterDataset()"
-        >
-          <span translate="water-demand-prediction.delete.normal"></span>
-          <span class="icon is-large">
-            <ng-icon size="1.2em" name="remixDeleteBin2Line"></ng-icon>
-          </span>
-        </button>
+        <div class="buttons has-addons mb-0">
+          <button
+            class="button is-danger"
+            [disabled]="!chartDatasets.historic[chartResolution()]().length"
+          >
+            <span class="icon is-large">
+              <ng-icon size="1.2em" name="remixHistoryFill"></ng-icon>
+            </span>
+          </button>
+          <button
+            class="button is-danger"
+            [disabled]="!chartDatasets.historic[chartResolution()]().length"
+            (click)="clearSmartmeterDataset()"
+          >
+            <span translate="water-demand-prediction.delete.normal"></span>
+            <span class="icon is-large">
+              <ng-icon size="1.2em" name="remixDeleteBin2Line"></ng-icon>
+            </span>
+          </button>
+          <button class="button is-danger" disabled>
+            <span class="icon is-large">
+              <ng-icon size="1.2em" name="remixSparklingFill"></ng-icon>
+            </span>
+          </button>
+        </div>
         @let isTraining = this.isTraining();
         <button
           class="button is-primary"
@@ -141,7 +172,7 @@
         </button>
       </div>
     </div>
-    <div select-normal-smartmeter class="cell">
+    <div choices [style.grid-area]="'choices'">
       <div
         class="buttons are-small is-centered"
         style="--bulma-control-size: 0.8rem; gap: 0.5rem"
@@ -203,24 +234,5 @@
         ></dropdown>
       </div>
     </div>
-    <div placeholder class="cell"></div>
-    <div predicted-smartmeter-chart class="cell">
-      <canvas
-        baseChart
-        type="bar"
-        class="is-fullheight is-fullwidth"
-        [options]="chartOptions"
-        [labels]="$any(chartLabels.predictions())"
-        [datasets]="$any(chartDatasets.predictions())"
-      ></canvas>
-    </div>
-    <div select-predicted-smartmeter class="cell">
-      <div class="buttons has-addons is-centered">
-        <button class="button">del</button>
-        <button class="button">train</button>
-        <button class="button">show</button>
-      </div>
-    </div>
-    <div predicted-smartmeter-results class="cell"></div>
   </div>
 </div>
