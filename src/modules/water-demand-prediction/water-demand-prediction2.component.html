@@ -147,29 +147,31 @@
             </span>
           }
         </button>
-        <button
-          class="button is-info"
-          [disabled]="!smartmeter()"
-          (click)="pushSmartmeterDataset()"
-        >
-          <span translate>Add to Graph</span>
-          <span class="icon is-large">
-            <ng-icon size="1.2em" name="remixArrowUpDoubleFill"></ng-icon>
-          </span>
-        </button>
-        <button
-          class="button is-success"
-          [disabled]="!smartmeter()"
-          (click)="fetchPrediction()"
-        >
-          <span translate>Add Prediction</span>
-          <span class="icon is-large only-wide">
-            <ng-icon size="1.2em" name="remixArrowRightDoubleFill"></ng-icon>
-          </span>
-          <span class="icon is-large only-narrow">
-            <ng-icon size="1.2em" name="remixArrowDownDoubleFill"></ng-icon>
-          </span>
-        </button>
+        <div class="buttons has-addons mb-0">
+          <button
+            class="button is-info"
+            disabled
+          >
+            <span class="icon is-large">
+              <ng-icon size="1.2em" name="remixHistoryFill"></ng-icon>
+            </span>
+          </button>
+          <button
+            class="button is-info"
+            [disabled]="!smartmeter()"
+            (click)="pushSmartmeterDataset()"
+          >
+            <span translate>Add to Graph</span>
+            <span class="icon is-large">
+              <ng-icon size="1.2em" name="remixBarChartFill"></ng-icon>
+            </span>
+          </button>
+          <button class="button is-info" disabled>
+            <span class="icon is-large">
+              <ng-icon size="1.2em" name="remixSparklingFill"></ng-icon>
+            </span>
+          </button>
+        </div>
       </div>
     </div>
     <div choices [style.grid-area]="'choices'">

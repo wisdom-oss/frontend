@@ -14,6 +14,7 @@ import {
   remixArrowDownDoubleFill,
   remixArrowRightDoubleFill,
   remixArrowUpDoubleFill,
+  remixBarChartFill,
   remixDeleteBin2Line,
   remixHistoryFill,
   remixLoader5Fill,
@@ -72,14 +73,15 @@ type ModelParams = Exclude<
   styleUrl: "./water-demand-prediction2.component.scss",
   providers: [
     provideIcons({
-      remixArrowUpDoubleFill,
-      remixArrowRightDoubleFill,
       remixArrowDownDoubleFill,
+      remixArrowRightDoubleFill,
+      remixArrowUpDoubleFill,
+      remixBarChartFill,
       remixDeleteBin2Line,
-      remixPingPongLine,
       remixHistoryFill,
-      remixSparklingFill,
       remixLoader: remixLoader5Fill,
+      remixPingPongLine,
+      remixSparklingFill,
     }),
   ],
 })
