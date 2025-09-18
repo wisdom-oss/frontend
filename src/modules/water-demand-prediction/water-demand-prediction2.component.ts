@@ -1,10 +1,15 @@
 import {
   computed,
+  createComponent,
   effect,
   inject,
   signal,
+  viewChild,
+  viewChildren,
   Component,
   OnInit,
+  AfterViewInit,
+  EnvironmentInjector,
   Signal,
   WritableSignal,
 } from "@angular/core";
@@ -27,16 +32,19 @@ import {
   TranslateService,
 } from "@ngx-translate/core";
 import {
+  ChartConfiguration,
   ChartDataset as ChartJsDataset,
-  LegendItem,
+  ChartOptions,
   LegendOptions,
   TickOptions,
+  Plugin,
 } from "chart.js";
 import {Chart} from "chart.js";
 import dayjs from "dayjs";
 import {BaseChartDirective} from "ng2-charts";
 import typia from "typia";
 
+import {LegendItemComponent} from "./legend-item/legend-item.component";
 import {WaterDemandPrediction2Service} from "../../api/water-demand-prediction2.service";
 import {signals} from "../../common/signals";
 import {DropdownComponent} from "../../common/components/dropdown/dropdown.component";
@@ -57,6 +65,13 @@ type ChartDataset = ChartJsDataset<"bar", {x: string; y: number}[]>;
 type FetchSmartmeterParams = Parameters<Service["fetchSmartmeter"]>[0];
 type FetchPredictionParams = Parameters<Service["fetchPrediction"]>[0];
 type TrainModelParams = Parameters<Service["trainModel"]>[0];
+type SingleSmartMeter = WaterDemandPrediction2Service.SingleSmartmeter;
+type PredictedSmartmeter = WaterDemandPrediction2Service.PredictedSmartmeter;
+type LegendItem = typeUtils.UndefinedToOptionals<{
+  -readonly [K in keyof LegendItemComponent]: typeUtils.Signaled<
+    LegendItemComponent[K]
+  >;
+}>;
 
 @Component({
   imports: [
@@ -66,6 +81,7 @@ type TrainModelParams = Parameters<Service["trainModel"]>[0];
     NgIcon,
     TranslateDirective,
     TranslatePipe,
+    LegendItemComponent,
   ],
   templateUrl: "./water-demand-prediction2.component.html",
   styleUrl: "./water-demand-prediction2.component.scss",
@@ -83,13 +99,25 @@ type TrainModelParams = Parameters<Service["trainModel"]>[0];
     }),
   ],
 })
-export class WaterDemandPrediction2Component implements OnInit {
+export class WaterDemandPrediction2Component implements OnInit, AfterViewInit {
+  protected exampleColor = RgbaColor.LIME;
+
   protected Service = WaterDemandPrediction2Service;
   private service = inject(WaterDemandPrediction2Service);
   private translate = inject(TranslateService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   protected lang = signals.lang();
+
+  private charts = viewChildren(BaseChartDirective);
+  protected chart = {
+    historic: signals.maybe<Chart<"bar">>(),
+    predictions: signals.maybe<Chart<"bar">>(),
+  } as const satisfies Record<DataGroup, any>;
+  ngAfterViewInit() {
+    this.chart.historic.set(this.charts()[0].chart);
+    this.chart.predictions.set(this.charts()[1].chart);
+  }
 
   private meterInformation = this.service.fetchMeterInformation();
 
@@ -213,17 +241,30 @@ export class WaterDemandPrediction2Component implements OnInit {
 
   protected pushSmartmeterDataset(dataGroup?: DataGroup) {
     for (let group of this.dataGroupIter(dataGroup)) {
-      let fetched = this.fetched[group]();
+      let fetched = this.fetched[group]() as
+        | (SingleSmartMeter & PredictedSmartmeter)
+        | undefined;
       if (!fetched) continue;
 
+      console.log(fetched);
+
+      let color = RgbaColor.fromString(fetched.name);
       this.chartDatasets[group][fetched.resolution].push({
-        label: `${fetched.name}::${fetched.timeframe}`,
+        label: JSON.stringify({
+          color,
+          smartmeter: fetched.name,
+          resolution: fetched.resolution,
+          mae: fetched.meanAbsoluteError,
+          rmse: fetched.rootOfMeanSquaredError,
+          mse: fetched.meanSquaredError,
+          r2: fetched.r2,
+        } satisfies LegendItem),
         data: zip(fetched.date, fetched.value).map(([date, value]) => ({
           x: date.toISOString(),
           y: value,
         })),
         parsing: false,
-        backgroundColor: RgbaColor.fromString(fetched.name).toString(),
+        backgroundColor: color.toString(),
       });
 
       this.chartResolution.set(fetched.resolution);
@@ -301,6 +342,32 @@ export class WaterDemandPrediction2Component implements OnInit {
     this.loadParam(params, "weatherColumn", typia.createIs<string>());
   }
 
+  private makeLegendItems(dataGroup: DataGroup): Signal<LegendItem[]> {
+    return computed(() => {
+      let chart = this.chart[dataGroup]();
+      if (!chart) return [];
+      let resolution = this.chartResolution();
+      let datasets = this.chartDatasets[dataGroup][resolution]();
+
+      let reviver = (key: string, value: any) => {
+        if (key == "color") return RgbaColor.reviver(key, value);
+        return value;
+      };
+
+      return datasets.map(dataset => {
+        let label = dataset.label;
+        console.log(label);
+        if (!label) throw new Error("missing label");
+        return typia.assert<LegendItem>(JSON.parse(label, reviver));
+      });
+    });
+  }
+
+  protected legendItems = {
+    historic: this.makeLegendItems("historic"),
+    predictions: this.makeLegendItems("predictions"),
+  } as const satisfies Record<DataGroup, any>;
+
   protected xTicks(
     resolution: Resolution,
     lang: string,
@@ -343,7 +410,7 @@ export class WaterDemandPrediction2Component implements OnInit {
 
           label.text = `${translatedName} - ${translatedTimeframe}`;
           return label;
-        }) satisfies LegendItem[];
+        }); // satisfies LegendItem[];
     };
   }
 }

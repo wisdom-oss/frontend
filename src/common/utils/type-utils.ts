@@ -130,4 +130,38 @@ export namespace typeUtils {
   export type Uncertain<T> = {
     [K in keyof T]?: T[K] | null | undefined;
   };
+
+  /**
+   * Turns properties that allow `undefined` into optional properties while
+   * keeping `undefined` in their type.
+   *
+   * This is useful if you want to make a field optional in objects, but still
+   * allow `obj.key = undefined` to type-check.
+   *
+   * @template T The input record type.
+   *
+   * @example
+   * ```ts
+   * type Input = {
+   *   a: string;
+   *   b: string | undefined;
+   *   c: number | undefined;
+   * };
+   *
+   * type Out = UndefinedToOptionals<Input>;
+   * // {
+   * //   a: string;
+   * //   b?: string | undefined;
+   * //   c?: number | undefined;
+   * // }
+   *
+   * const x: Out = { a: "hi" };        // ok
+   * x.b = undefined;                   // ok
+   * ```
+   */
+  export type UndefinedToOptionals<T> = {
+    [K in keyof T as undefined extends T[K] ? K : never]?: T[K];
+  } & {
+    [K in keyof T as undefined extends T[K] ? never : K]: T[K];
+  };
 }

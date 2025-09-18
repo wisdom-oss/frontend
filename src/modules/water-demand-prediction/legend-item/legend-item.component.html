@@ -1,0 +1,38 @@
+<a class="is-inline-flex is-align-items-center" (click)="visible.toggle()">
+  <div>
+    <span class="icon is-medium">
+      <ng-icon
+        name="remixSquareFill"
+        size="1.4em"
+        [style.color]="color()"
+      ></ng-icon>
+    </span>
+  </div>
+  <div
+    style="color: #666; font-size: 0.75rem"
+    [style.text-decoration]="visible() ? '' : 'line-through'"
+    [style.text-decoration-thickness]="visible() ? '' : '0.1em'"
+  >
+    <p>
+      <span class="has-text-weight-extrabold" translate
+        >water-demand-prediction.smartmeter.{{ smartmeter() }}</span
+      >
+      <span [innerText]="' - '"></span>
+      <span translate
+        >water-demand-prediction.resolution.{{ resolution() }}</span
+      >
+    </p>
+
+    @for (metric of metrics; track metric) {
+      @let value = this[metric]();
+      @if (value) {
+        <p>
+          <span translate
+            >water-demand-prediction.metrics.{{ metric | uppercase }}</span
+          >
+          <span>: {{ value | number: "1.4-4" : lang() }}</span>
+        </p>
+      }
+    }
+  </div>
+</a>

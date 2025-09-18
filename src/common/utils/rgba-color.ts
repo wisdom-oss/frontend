@@ -1,8 +1,25 @@
+import typia, {tags} from "typia";
+
 // prettier-ignore
 type HexChar = 
   | "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
   | "a" | "b" | "c" | "d" | "e" | "f"
   | "A" | "B" | "C" | "D" | "E" | "F";
+
+type ColorValue = number &
+  tags.Type<"uint32"> &
+  tags.Minimum<0> &
+  tags.Maximum<255>;
+type AlphaValue = number &
+  tags.Type<"double"> &
+  tags.Minimum<0.0> &
+  tags.Maximum<1.0>;
+type JSONRepresentation = {
+  r: ColorValue;
+  g: ColorValue;
+  b: ColorValue;
+  a?: AlphaValue;
+};
 
 /**
  * Represents an immutable RGBA color.
@@ -147,4 +164,17 @@ export class RgbaColor {
       case "alpha": return new RgbaColor(r, g, b, value);
     }
   }
+
+  toJSON(): JSONRepresentation {
+    let {r, g, b, a} = this;
+    return {r, g, b, a};
+  }
+
+  static reviver: Exclude<Parameters<typeof JSON.parse>[1], undefined> = (
+    _,
+    value,
+  ) => {
+    let {r, g, b, a} = typia.assert<JSONRepresentation>(value);
+    return new RgbaColor(r, g, b, a);
+  };
 }

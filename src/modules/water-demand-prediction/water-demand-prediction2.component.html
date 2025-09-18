@@ -39,6 +39,7 @@
     },
     plugins: {
       legend: {
+        display: false,
         labels: {
           generateLabels: legendLabel(lang()),
         },
@@ -68,6 +69,16 @@
     </ng-container>
     <div chart-historic-data [style.grid-area]="'chart-historic'">
       <p class="title is-6 mb-0 has-text-centered">historic</p>
+      <div class="is-flex is-justify-content-center">
+        @for (item of legendItems.historic(); track item; let idx = $index) {
+          <legend-item
+            [color]="item.color"
+            [smartmeter]="item.smartmeter"
+            [resolution]="item.resolution"
+            (visible)="chart.historic()?.setDatasetVisibility(idx, $event)"
+          ></legend-item>
+        }
+      </div>
       <canvas
         baseChart
         type="bar"
@@ -79,6 +90,20 @@
     </div>
     <div chart-predicted [style.grid-area]="'chart-predicted'">
       <p class="title is-6 mb-0 has-text-centered">predicted</p>
+      <div class="is-flex is-justify-content-center">
+        @for (item of legendItems.predictions(); track item; let idx = $index) {
+          <legend-item
+            [color]="item.color"
+            [smartmeter]="item.smartmeter"
+            [resolution]="item.resolution"
+            [mae]="item.mae"
+            [mse]="item.mse"
+            [rmse]="item.rmse"
+            [r2]="item.r2"
+            (visible)="chart.predictions()?.setDatasetVisibility(idx, $event)"
+          ></legend-item>
+        }
+      </div>
       <canvas
         baseChart
         type="bar"
