@@ -1,9 +1,12 @@
 // cspell:ignore startpoint waterdemand
 
+import {HttpStatusCode} from "@angular/common/http";
 import {computed, isSignal, Injectable} from "@angular/core";
 import dayjs, {Dayjs} from "dayjs";
+import {Duration} from "dayjs/plugin/duration";
 import typia, {tags} from "typia";
 
+import {extraTags} from "../common/utils/extra-tags";
 import {keys} from "../common/utils/keys";
 import {omit} from "../common/utils/omit";
 import {api} from "../common/api";
@@ -41,11 +44,6 @@ export class WaterDemandPrediction2Service extends api.service(URL) {
     startOfData: dayjs("2021-05-26"),
     startOfJune21: dayjs("2021-06-01"),
     startOfYear22: dayjs("2022-01-01"),
-  } as const;
-
-  private static readonly TRAINING_RESULT = {
-    existsAlready: "Model already exists",
-    saved: "Model saved successfully",
   } as const;
 
   fetchMeterInformation(): api.Signal<Self.MeterNames, Self.MeterNames> {
@@ -100,22 +98,23 @@ export class WaterDemandPrediction2Service extends api.service(URL) {
       weatherColumn: string;
     }>,
   ): api.Signal<Self.TrainingResult> {
-    let parse = (raw: Raw.TrainingResult): Self.TrainingResult => {
-      switch (raw) {
-        case WaterDemandPrediction2Service.TRAINING_RESULT.existsAlready:
-          return "existsAlready";
-        case WaterDemandPrediction2Service.TRAINING_RESULT.saved:
-          return "saved";
-      }
-    };
+    let parse = (raw: Raw.TrainingResult): Self.TrainingResult => ({
+      status: raw.status,
+      details: {
+        trainingTime: dayjs.duration(raw.details.trainingTime, "seconds"),
+        modelStartDate: dayjs(raw.details.modelStartDate),
+        modelEndDate: dayjs(raw.details.modelEndDate),
+      },
+    });
 
     return api.resource({
       url: `${URL}/trainModel`,
       method: `POST`,
       validateRaw: typia.createValidate<Raw.TrainingResult>(),
       parse,
-      validate: typia.createValidate<Self.TrainingResult>(),
-      body: this.mapStartPoint(params),
+      validate: this.validateTrainingResult,
+      body: this.mapStartPoint(params, {iso: true}),
+      onError: {409: () => ({status: "model_already_exists"})},
     });
   }
 
@@ -145,11 +144,13 @@ export class WaterDemandPrediction2Service extends api.service(URL) {
       equal: () => false,
       validate: typia.createValidate<Self.PredictedSmartmeter>(),
       body: this.mapStartPoint(params),
+      onError: {424: () => undefined},
     });
   }
 
   private mapStartPoint<P extends {startPoint: Dayjs}>(
     params: api.RequestSignal<P>,
+    options?: {iso?: boolean},
   ): api.RequestSignal<
     Omit<P, "startPoint"> & {startpoint: string & DateTime}
   > {
@@ -159,7 +160,9 @@ export class WaterDemandPrediction2Service extends api.service(URL) {
         startpoint: string & DateTime;
       } = {
         ...params,
-        startpoint: params.startPoint.format("YYYY-MM-DD HH:mm:ss"),
+        startpoint: options?.iso
+          ? params.startPoint.toISOString()
+          : params.startPoint.format("YYYY-MM-DD HH:mm:ss"),
       };
       delete mapped.startPoint;
       return mapped;
@@ -182,6 +185,62 @@ export class WaterDemandPrediction2Service extends api.service(URL) {
       date: raw.date.map(date => dayjs(date, "DD.MM.YY HH:mm")),
     };
   }
+
+  /**
+   * Validation function for `Self.TrainingResult`.
+   *
+   * `typia` has trouble generating such a function as it includes `Duration`.
+   */
+  private validateTrainingResult(
+    input: unknown,
+  ): typia.IValidation<Self.TrainingResult> {
+    type TypiaTrainingResult = {
+      status: Self.TrainingResult["status"];
+      details?: {
+        trainingTime: object;
+        modelStartDate: object;
+        modelEndDate: object;
+      };
+    };
+
+    let simple = typia.validate<TypiaTrainingResult>(input);
+    if (!simple.success) return simple;
+    if (!simple.data.details)
+      return simple as typia.IValidation<Self.TrainingResult>;
+
+    let trainingTime = dayjs.isDuration(simple.data.details.trainingTime);
+    let modelStartDate = dayjs.isDayjs(simple.data.details.modelStartDate);
+    let modelEndDate = dayjs.isDayjs(simple.data.details.modelEndDate);
+
+    if (trainingTime && modelStartDate && modelEndDate)
+      return simple as typia.IValidation<Self.TrainingResult>;
+
+    let errors = [];
+    if (!trainingTime)
+      errors.push({
+        path: "$input.details.trainingTime",
+        expected: "Duration",
+        value: simple.data.details.trainingTime,
+      });
+    if (!modelStartDate)
+      errors.push({
+        path: "$input.details.modelStartDate",
+        expected: "Dajys",
+        value: simple.data.details.modelStartDate,
+      });
+    if (!modelEndDate)
+      errors.push({
+        path: "$input.details.modelEndDate",
+        expected: "Dayjs",
+        value: simple.data.details.modelEndDate,
+      });
+
+    return {
+      success: false,
+      data: input,
+      errors,
+    };
+  }
 }
 
 type DateTime = tags.TagBase<{
@@ -199,8 +258,14 @@ namespace Raw {
     value: (number & tags.Type<"double">)[];
     date: (string & DateTime)[];
   };
-  export type TrainingResult =
-    (typeof Self)["TRAINING_RESULT"][keyof (typeof Self)["TRAINING_RESULT"]];
+  export type TrainingResult = {
+    status: "model_trained";
+    details: {
+      trainingTime: number & tags.Type<"double">; // seconds
+      modelStartDate: string & tags.Format<"date-time">;
+      modelEndDate: string & tags.Format<"date-time">;
+    };
+  };
   export type PredictedSmartmeter = {
     aic: number & tags.Type<"double">;
     date: (string & DateTime)[];
@@ -231,7 +296,14 @@ export namespace WaterDemandPrediction2Service {
   export type SingleSmartmeter = Omit<Raw.SingleSmartmeter, "date"> & {
     date: Dayjs[];
   };
-  export type TrainingResult = keyof (typeof Self)["TRAINING_RESULT"];
+  export type TrainingResult = {
+    status: "model_trained" | "model_already_exists";
+    details?: {
+      trainingTime: Duration;
+      modelStartDate: Dayjs;
+      modelEndDate: Dayjs;
+    };
+  };
   export type PredictedSmartmeter = Omit<
     Raw.PredictedSmartmeter,
     "date" | "rootOfmeanSquaredError"
