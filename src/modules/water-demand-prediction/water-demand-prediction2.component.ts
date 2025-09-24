@@ -194,6 +194,12 @@ export class WaterDemandPrediction2Component implements OnInit, AfterViewInit {
     ) satisfies Signal<Record<string, string>>,
   } as const;
 
+  private _plainWeatherColumnEffect = effect(() => {
+    if (this.choices.weatherCapability() == "plain") {
+      this.choices.weatherColumn.set("");
+    }
+  });
+
   private fetchStartPoint = computed(() => {
     let startPoint = this.choices.startPoint();
     if (!startPoint) return undefined;

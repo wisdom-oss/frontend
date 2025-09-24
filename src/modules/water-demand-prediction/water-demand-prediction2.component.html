@@ -297,6 +297,7 @@
         ></dropdown>
         <dropdown
           menuName="water-demand-prediction.choice.weatherColumn"
+          [class.is-hidden]="choices.weatherCapability() == 'plain'"
           [changeMenuName]="true"
           [maxWidth]="true"
           [is-up]="true"
