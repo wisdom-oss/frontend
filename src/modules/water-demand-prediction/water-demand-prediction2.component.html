@@ -98,7 +98,7 @@
       <canvas
         baseChart
         type="bar"
-        class="is-fullheight is-fullwidth mb-4"
+        class="is-fullheight is-fullwidth"
         [options]="chartOptions"
         [labels]="$any(chartLabels.historic())"
         [datasets]="$any(chartDatasets.historic[chartResolution]())"
@@ -130,7 +130,7 @@
       <canvas
         baseChart
         type="bar"
-        class="is-fullheight is-fullwidth mb-4"
+        class="is-fullheight is-fullwidth"
         [options]="chartOptions"
         [labels]="$any(chartLabels.predictions())"
         [datasets]="$any(chartDatasets.predictions[chartResolution]())"
