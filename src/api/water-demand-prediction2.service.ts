@@ -89,14 +89,7 @@ export class WaterDemandPrediction2Service extends api.service(URL) {
   }
 
   trainModel(
-    params: api.RequestSignal<{
-      startPoint: Dayjs;
-      name: string;
-      timeframe: Self.Timeframe;
-      resolution: Self.Resolution;
-      weatherCapability: Self.WeatherCapability;
-      weatherColumn: string;
-    }>,
+    params: api.RequestSignal<Params.Model>,
   ): api.Signal<Self.TrainingResult> {
     let parse = (raw: Raw.TrainingResult): Self.TrainingResult => ({
       status: raw.status,
@@ -119,14 +112,7 @@ export class WaterDemandPrediction2Service extends api.service(URL) {
   }
 
   fetchPrediction(
-    params: api.RequestSignal<{
-      startPoint: Dayjs;
-      name: string;
-      timeframe: Self.Timeframe;
-      resolution: Self.Resolution;
-      weatherCapability: Self.WeatherCapability;
-      weatherColumn: string;
-    }>,
+    params: api.RequestSignal<Params.Model>,
   ): api.Signal<Self.PredictedSmartmeter> {
     let parse = (raw: Raw.PredictedSmartmeter) => {
       let mappedDate = this.parseDate(raw);
@@ -143,7 +129,7 @@ export class WaterDemandPrediction2Service extends api.service(URL) {
       parse,
       equal: () => false,
       validate: typia.createValidate<Self.PredictedSmartmeter>(),
-      body: this.mapStartPoint(params),
+      body: this.mapStartPoint(params, {iso: true}),
       onError: {424: () => undefined},
     });
   }
@@ -249,6 +235,23 @@ type DateTime = tags.TagBase<{
   value: undefined;
   // validate: '/^"\d{2}.\d{2}.\d{2} \d{2}:\d{2}"$/.test($input)'
 }>;
+
+namespace Params {
+  export type Model = {
+    startPoint: Dayjs;
+    name: string;
+    timeframe: Self.Timeframe;
+    resolution: Self.Resolution;
+  } & (
+    | {
+        weatherCapability: "plain";
+      }
+    | {
+        weatherCapability: Exclude<Self.WeatherCapability, "plain">;
+        weatherColumn: string;
+      }
+  );
+}
 
 namespace Raw {
   export type SingleSmartmeter = {
