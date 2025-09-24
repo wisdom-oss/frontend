@@ -3,6 +3,7 @@ import {
   effect,
   inject,
   signal,
+  CreateSignalOptions,
   Signal,
   WritableSignal,
 } from "@angular/core";
@@ -12,6 +13,8 @@ import dayjs, {Dayjs, ConfigType, OptionType} from "dayjs";
 import {Duration} from "dayjs/plugin/duration";
 
 import {injections} from "./injections";
+import {typeUtils} from "./utils/type-utils";
+import {omit} from "./utils/omit";
 
 const makeDayjs = dayjs;
 
@@ -175,6 +178,94 @@ export namespace signals {
         return result;
       },
     });
+  }
+
+  /**
+   * A signal around a mutable array with helper methods.
+   *
+   * You always get the same underlying array instance and we mutate it in place.
+   * If you keep a reference like `const ref = arr()`, later pushes and pops will
+   * change that same array.
+   * If you need a stable snapshot, clone it.
+   *
+   * Do not mutate the returned array directly.
+   * That will not notify dependents.
+   * Use `push`, `pop`, and `clear` so the signal updates correctly.
+   *
+   * Reading the length works as `array().length`.
+   *
+   * @template T Element type.
+   *
+   * @example
+   * const items = signals.array<number>([1]);
+   * items.push(2);
+   * console.log(items());        // [1, 2]
+   * console.log(items().length); // 2
+   * items.pop();                 // removes 2 and notifies
+   * items.clear();               // [] and notifies
+   *
+   * @example
+   * // Live reference vs snapshot
+   * const live = items();      // live reference to the same array
+   * const snap = [...items()]; // snapshot copy
+   * items.push(3);
+   * console.log(live); // [3]
+   * console.log(snap); // []
+   */
+  export type ArraySignal<T> = Signal<readonly T[]> & {
+    push(item: T): void;
+    pop(): T | undefined;
+    clear(): void;
+  };
+
+  /**
+   * Creates an {@link ArraySignal}.
+   *
+   * The stored array is mutated in place.
+   *
+   * You always get the same array instance from the getter.
+   * Do not mutate it directly, since that will not trigger updates.
+   * Always use `push`, `pop`, or `clear` so subscribers update.
+   *
+   * Reading length works as `array().length`.
+   *
+   * @template T Element type.
+   * @param iterable Optional initial values.
+   * @returns A signal with array helpers.
+   *
+   * @example
+   * const letters = signals.array(["a"]);
+   * letters.push("b");
+   * console.log(letters());        // ["a", "b"]
+   * console.log(letters().length); // 2
+   *
+   * @example
+   * // Do not mutate the returned array directly
+   * const arrRef = letters();
+   * // arrRef.push("x"); // avoid, this will not notify
+   * letters.push("x");    // do this instead
+   */
+  export function array<T>(iterable?: Iterable<T>): ArraySignal<T> {
+    let inner = Array.from(iterable ?? []);
+    let innerSignal = signal(inner, {equal: () => false});
+
+    let push = (item: T): void => {
+      inner.push(item);
+      innerSignal.set(inner);
+    };
+
+    let pop = (): T | undefined => {
+      let value = inner.pop();
+      innerSignal.set(inner);
+      return value;
+    };
+
+    let clear = (): void => {
+      inner.length = 0;
+      innerSignal.set(inner);
+    };
+
+    return Object.assign(innerSignal, {push, pop, clear});
   }
 
   /**
@@ -373,10 +464,214 @@ export namespace signals {
     }
   }
 
+  /**
+   * Derives a new signal by mapping the value of another signal.
+   *
+   * We read `input()` and return `transform(input())`. The result updates
+   * whenever `input` changes. This is a thin wrapper over `computed`.
+   *
+   * @template T Input value type.
+   * @template U Output value type.
+   * @param input Source signal.
+   * @param transform Pure mapping function from T to U.
+   * @returns A read-only signal of the mapped value.
+   *
+   * @example
+   * const count = signal(2);
+   * const doubled = signals.map(count, n => n * 2);
+   * doubled(); // 4
+   *
+   * @example
+   * // Map an optional value to a fallback
+   * const maybeName = signals.maybe<string>();
+   * const label = signals.map(maybeName, n => n ?? "unknown");
+   */
   export function map<T, U>(
     input: Signal<T>,
     transform: (value: T) => U,
   ): Signal<U> {
     return computed(() => transform(input()));
+  }
+
+  /**
+   * Creates a writable signal that may hold `undefined`.
+   *
+   * This is useful for optional values where the signal might be unset
+   * at first and filled later. It works like `signal<T | undefined>` but
+   * with a shorthand `initial` option.
+   *
+   * @template T Value type.
+   * @param options Optional settings, including `initial` for an initial value.
+   *                Other `CreateSignalOptions` are passed through.
+   * @returns A writable signal of type `T | undefined`.
+   *
+   * @example
+   * // Empty at first
+   * const name = signals.maybe<string>();
+   * console.log(name()); // undefined
+   * name.set("Alice");
+   * console.log(name()); // "Alice"
+   *
+   * @example
+   * // With an initial value
+   * const age = signals.maybe<number>({ initial: 18 });
+   * console.log(age()); // 18
+   */
+  export function maybe<T>(
+    options?: CreateSignalOptions<T | undefined> & {initial?: T},
+  ): WritableSignal<undefined | T> {
+    return signal<undefined | T>(
+      options?.initial,
+      options ? omit(options, "initial") : undefined,
+    );
+  }
+
+  /**
+   * Requires all given signals to have acceptable values.
+   *
+   * We pass a record of signals. If any current value is in `exclude`, we return
+   * `fallback` instead. Otherwise we return an object with the unwrapped values.
+   *
+   * By default, `exclude` is `[undefined]`.
+   *
+   * Short circuits on the first excluded value. Recomputes when any input signal changes.
+   *
+   * All generic types are inferred from the function arguments.
+   * Manually specifying them is almost always an error.
+   *
+   * @template R The input record of signals. Keys are preserved and each value is a `Signal`.
+   * @template F The fallback value if any input is excluded. Inferred from `options.fallback`. Defaults to `undefined`.
+   * @template E The union of values treated as excluded. Inferred from `options.exclude`. Defaults to `undefined`.
+   *
+   * @param record A record of input signals.
+   * @param options Optional settings.
+   * @param options.fallback Value to return when at least one input is excluded. Defaults to `undefined`.
+   * @param options.exclude Values that count as missing. Defaults to `[undefined]`.
+   * @returns A signal with either the unwrapped record or the fallback:
+   *          `Signal<{[K in keyof R]: Exclude<typeUtils.Signaled<R[K]>, E>} | F>`
+   *
+   * @example
+   * // Basic: require that both signals are defined
+   * const a = signals.maybe<number>();
+   * const b = signals.maybe<string>();
+   * const both = signals.require({ a, b });
+   * effect(() => {
+   *   const v = both();
+   *   if (v !== undefined) {
+   *     // v.a: number, v.b: string
+   *   }
+   * });
+   *
+   * @example
+   * // With a fallback object
+   * const userId = signals.maybe<string>();
+   * const token = signals.maybe<string>();
+   * const ready = signals.require(
+   *   { userId, token },
+   *   { fallback: { status: 'missing' } as const },
+   * );
+   * // Signal<{ userId: string; token: string } | { status: 'missing' }>
+   *
+   * @example
+   * // Treat null and undefined as missing
+   * const name = signals.maybe<string | null>();
+   * const age = signals.maybe<number | null>();
+   * const present = signals.require(
+   *   { name, age },
+   *   { exclude: [null, undefined] },
+   * );
+   *
+   * @example
+   * // Exclude a sentinel value
+   * const step = signal<number>(0);
+   * const ok = signals.require(
+   *   { step },
+   *   { exclude: [0], fallback: 'not ready' },
+   * );
+   */
+  export function require<
+    R extends Record<string, Signal<any>>,
+    F = undefined,
+    E = undefined,
+  >(
+    record: R,
+    options?: {fallback?: F; exclude?: readonly E[]},
+  ): Signal<{[K in keyof R]: Exclude<typeUtils.Signaled<R[K]>, E>} | F> {
+    return computed(() => {
+      const output: Record<string, any> = {};
+      for (const [key, value] of Object.entries(record)) {
+        const signaled = value();
+        if ((options?.exclude ?? [undefined]).includes(signaled as any)) {
+          return (options?.fallback ?? undefined) as F;
+        }
+        output[key] = signaled;
+      }
+      return output as {[K in keyof R]: Exclude<typeUtils.Signaled<R[K]>, E>};
+    });
+  }
+
+  /**
+   * A signal that carries no data and only notifies dependents when triggered.
+   *
+   * Use this when we want to kick off a recomputation manually
+   * (e.g. button click), without passing any payload.
+   *
+   * The signal's value type is `void`. It is not meant to be read for data.
+   *
+   * @note This should never be used directly in API services.
+   *       It is meant for components only.
+   *       If you want to retrigger resources based on this, wrap it in
+   *       a `computed` that listens to this signal and use that to request
+   *       the service.
+   *
+   * @example
+   * // Create a trigger and a derived computation that reruns on trigger
+   * const refresh = signals.trigger();
+   * const time = computed(() => {
+   *   // depends on refresh; recomputes whenever we call refresh.trigger()
+   *   refresh();
+   *   return Date.now();
+   * });
+   *
+   * // Later, from a button or elsewhere:
+   * refresh.trigger(); // forces `time` to recompute
+   */
+  export type TriggerSignal = Signal<void> & {
+    /**
+     * Notifies subscribers and causes dependents to recompute.
+     * Does not carry or change any value.
+     */
+    trigger(): void;
+  };
+
+  /**
+   * Creates a {@link TriggerSignal}.
+   *
+   * The returned signal has a `trigger()` method that fires an update.
+   * It does not hold state and does not deliver a payload.
+   *
+   * @note This should never be used directly in API services.
+   *       It is meant for components only.
+   *       If you want to retrigger resources based on this, wrap it in
+   *       a `computed` that listens to this signal and use that to request
+   *       the service.
+   *
+   * @returns A signal that we can trigger manually.
+   *
+   * @example
+   * const refresh = signals.trigger();
+   *
+   * effect(() => {
+   *   refresh();            // establish dependency
+   *   console.log("run");   // runs each time we call refresh.trigger()
+   * });
+   *
+   * // In a component template:
+   * // <button (click)="refresh.trigger()">Refresh</button>
+   */
+  export function trigger(): TriggerSignal {
+    let inner = signal(null, {equal: () => false});
+    let trigger = () => inner.set(null);
+    return Object.assign(inner as unknown as Signal<void>, {trigger});
   }
 }
