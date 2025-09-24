@@ -1,16 +1,13 @@
 import {formatNumber} from "@angular/common";
 import {
   computed,
-  createComponent,
   effect,
   inject,
   signal,
-  viewChild,
   viewChildren,
   Component,
   OnInit,
   AfterViewInit,
-  EnvironmentInjector,
   Signal,
   WritableSignal,
 } from "@angular/core";
@@ -34,12 +31,9 @@ import {
 } from "@ngx-translate/core";
 import {
   TooltipCallbacks,
-  ChartConfiguration,
   ChartDataset as ChartJsDataset,
-  ChartOptions,
   LegendOptions,
   TickOptions,
-  Plugin,
 } from "chart.js";
 import {Chart} from "chart.js";
 import dayjs, {Dayjs} from "dayjs";
