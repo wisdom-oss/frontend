@@ -1,4 +1,4 @@
-import {UpperCasePipe, DecimalPipe} from "@angular/common";
+import {DecimalPipe} from "@angular/common";
 import {effect, input, output, Component} from "@angular/core";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {remixSquareFill} from "@ng-icons/remixicon";
@@ -18,7 +18,6 @@ type Resolution = WaterDemandPredictionService.Resolution;
     NgIconComponent,
     TranslateAttrDirective,
     TranslateDirective,
-    UpperCasePipe,
   ],
   templateUrl: "./legend-item.component.html",
   providers: [
