@@ -586,7 +586,7 @@ export namespace api {
     TRaw = TResult,
     TDefault extends TResult | undefined = undefined,
   >(
-    {onError}: ResourceOptions<TResult, TRaw, TDefault>,
+    {onError, defaultValue}: ResourceOptions<TResult, TRaw, TDefault>,
     resourceRef: HttpResourceRef<TResult | TDefault>,
   ): CoreSignal<TResult | TDefault> {
     return computed(() => {
@@ -594,6 +594,7 @@ export namespace api {
       if (error && error instanceof HttpErrorResponse) {
         let handler = onError?.[error.status as HttpStatusCode];
         if (handler) return handler(error);
+        return defaultValue as TDefault;
       }
 
       return resourceRef.value();
