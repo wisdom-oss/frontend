@@ -74,10 +74,10 @@ type LegendItem = typeUtils.UndefinedToOptionals<{
     BaseChartDirective,
     DropdownComponent,
     EmptyPipe,
+    LegendItemComponent,
     NgIcon,
     TranslateDirective,
     TranslatePipe,
-    LegendItemComponent,
   ],
   templateUrl: "./water-demand-prediction.component.html",
   styleUrl: "./water-demand-prediction.component.scss",
@@ -188,7 +188,7 @@ export class WaterDemandPredictionComponent implements OnInit, AfterViewInit {
     ) satisfies Signal<Record<string, string>>,
   } as const;
 
-  private _plainWeatherColumnEffect = effect(() => {
+  private plainWeatherColumnEffect = effect(() => {
     if (this.choices.weatherCapability() == "plain") {
       this.choices.weatherColumn.set("");
     }
@@ -286,7 +286,7 @@ export class WaterDemandPredictionComponent implements OnInit, AfterViewInit {
   private trainModelResource = this.service.trainModel(this.trainModelRequest);
   protected isTraining = signal<boolean>(false);
 
-  private _isTrainingResetEffect = effect(() => {
+  private isTrainingResetEffect = effect(() => {
     let res = this.trainModelResource();
     if (!res) return;
     setTimeout(
@@ -295,7 +295,7 @@ export class WaterDemandPredictionComponent implements OnInit, AfterViewInit {
     );
   });
 
-  private _fetchPredictionAfterTrainingEffect = effect(() => {
+  private fetchPredictionAfterTrainingEffect = effect(() => {
     let res = this.trainModelResource();
     if (!res) return;
     this.predictionRetry.trigger();
