@@ -41,7 +41,7 @@ import {BaseChartDirective} from "ng2-charts";
 import typia from "typia";
 
 import {LegendItemComponent} from "./legend-item/legend-item.component";
-import {WaterDemandPrediction2Service} from "../../api/water-demand-prediction2.service";
+import {WaterDemandPredictionService} from "../../api/water-demand-prediction.service";
 import {signals} from "../../common/signals";
 import {DropdownComponent} from "../../common/components/dropdown/dropdown.component";
 import {EmptyPipe} from "../../common/pipes/empty.pipe";
@@ -51,18 +51,18 @@ import {zip} from "../../common/utils/zip";
 import {typeUtils} from "../../common/utils/type-utils";
 import {keys} from "../../common/utils/keys";
 
-type Service = WaterDemandPrediction2Service;
-type Resolution = WaterDemandPrediction2Service.Resolution;
+type Service = WaterDemandPredictionService;
+type Resolution = WaterDemandPredictionService.Resolution;
 type DataGroup = "historic" | "predictions";
-type Timeframe = WaterDemandPrediction2Service.Timeframe;
-type WeatherCapability = WaterDemandPrediction2Service.WeatherCapability;
-type StartPoint = keyof (typeof WaterDemandPrediction2Service)["START_POINTS"];
+type Timeframe = WaterDemandPredictionService.Timeframe;
+type WeatherCapability = WaterDemandPredictionService.WeatherCapability;
+type StartPoint = keyof (typeof WaterDemandPredictionService)["START_POINTS"];
 type ChartDataset = ChartJsDataset<"bar", {x: string; y: number}[]>;
 type FetchSmartmeterParams = Parameters<Service["fetchSmartmeter"]>[0];
 type FetchPredictionParams = Parameters<Service["fetchPrediction"]>[0];
 type TrainModelParams = Parameters<Service["trainModel"]>[0];
-type SingleSmartMeter = WaterDemandPrediction2Service.SingleSmartmeter;
-type PredictedSmartmeter = WaterDemandPrediction2Service.PredictedSmartmeter;
+type SingleSmartMeter = WaterDemandPredictionService.SingleSmartmeter;
+type PredictedSmartmeter = WaterDemandPredictionService.PredictedSmartmeter;
 type LegendItem = typeUtils.UndefinedToOptionals<{
   -readonly [K in keyof LegendItemComponent]: typeUtils.Signaled<
     LegendItemComponent[K]
@@ -79,8 +79,8 @@ type LegendItem = typeUtils.UndefinedToOptionals<{
     TranslatePipe,
     LegendItemComponent,
   ],
-  templateUrl: "./water-demand-prediction2.component.html",
-  styleUrl: "./water-demand-prediction2.component.scss",
+  templateUrl: "./water-demand-prediction.component.html",
+  styleUrl: "./water-demand-prediction.component.scss",
   providers: [
     provideIcons({
       remixArrowDownDoubleFill,
@@ -95,11 +95,11 @@ type LegendItem = typeUtils.UndefinedToOptionals<{
     }),
   ],
 })
-export class WaterDemandPrediction2Component implements OnInit, AfterViewInit {
+export class WaterDemandPredictionComponent implements OnInit, AfterViewInit {
   protected exampleColor = RgbaColor.LIME;
 
-  protected Service = WaterDemandPrediction2Service;
-  private service = inject(WaterDemandPrediction2Service);
+  protected Service = WaterDemandPredictionService;
+  private service = inject(WaterDemandPredictionService);
   private translate = inject(TranslateService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -154,7 +154,7 @@ export class WaterDemandPrediction2Component implements OnInit, AfterViewInit {
 
   protected options = {
     resolution: fromEntries(
-      WaterDemandPrediction2Service.RESOLUTIONS.map(resolution => [
+      WaterDemandPredictionService.RESOLUTIONS.map(resolution => [
         resolution,
         `water-demand-prediction.resolution.${resolution}`,
       ]),
@@ -162,7 +162,7 @@ export class WaterDemandPrediction2Component implements OnInit, AfterViewInit {
     timeframe: computed(() => ({
       all: "water-demand-prediction.timeframe.all",
       ...Object.map(
-        WaterDemandPrediction2Service.TIMEFRAME_DURATIONS,
+        WaterDemandPredictionService.TIMEFRAME_DURATIONS,
         duration => duration.locale(this.lang()).humanize(),
       ),
     })) satisfies Signal<Record<Timeframe, string>>,
@@ -173,11 +173,11 @@ export class WaterDemandPrediction2Component implements OnInit, AfterViewInit {
       ),
     ) satisfies Signal<Record<string, string>>,
     startPoint: Object.map(
-      WaterDemandPrediction2Service.START_POINTS,
+      WaterDemandPredictionService.START_POINTS,
       (_, key) => `water-demand-prediction.start-point.${key}`,
     ) satisfies Record<StartPoint, string>,
     weatherCapability: fromEntries(
-      WaterDemandPrediction2Service.WEATHER_CAPABILITIES.map(capability => [
+      WaterDemandPredictionService.WEATHER_CAPABILITIES.map(capability => [
         capability,
         `water-demand-prediction.weather.${capability}`,
       ]),
@@ -197,7 +197,7 @@ export class WaterDemandPrediction2Component implements OnInit, AfterViewInit {
   private fetchStartPoint = computed(() => {
     let startPoint = this.choices.startPoint();
     if (!startPoint) return undefined;
-    return WaterDemandPrediction2Service.START_POINTS[startPoint];
+    return WaterDemandPredictionService.START_POINTS[startPoint];
   });
 
   private historicModelParams = {

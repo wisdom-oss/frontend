@@ -14,7 +14,7 @@ const URL = "/api/waterdemand" as const;
 @Injectable({
   providedIn: "root",
 })
-export class WaterDemandPrediction2Service extends api.service(URL) {
+export class WaterDemandPredictionService extends api.service(URL) {
   static readonly RESOLUTIONS = ["hourly", "daily", "weekly"] as const;
 
   static readonly TIMEFRAME_DURATIONS = {
@@ -27,7 +27,7 @@ export class WaterDemandPrediction2Service extends api.service(URL) {
   } as const;
 
   static readonly TIMEFRAMES = [
-    ...keys(WaterDemandPrediction2Service.TIMEFRAME_DURATIONS),
+    ...keys(WaterDemandPredictionService.TIMEFRAME_DURATIONS),
     "all",
   ] as const;
 
@@ -285,13 +285,13 @@ namespace Raw {
   };
 }
 
-export namespace WaterDemandPrediction2Service {
+export namespace WaterDemandPredictionService {
   export type Resolution =
-    (typeof WaterDemandPrediction2Service)["RESOLUTIONS"][number];
+    (typeof WaterDemandPredictionService)["RESOLUTIONS"][number];
   export type Timeframe =
-    (typeof WaterDemandPrediction2Service)["TIMEFRAMES"][number];
+    (typeof WaterDemandPredictionService)["TIMEFRAMES"][number];
   export type WeatherCapability =
-    (typeof WaterDemandPrediction2Service)["WEATHER_CAPABILITIES"][number];
+    (typeof WaterDemandPredictionService)["WEATHER_CAPABILITIES"][number];
   export type WeatherColumns = Record<string, string>;
   export type MeterNames = Record<string, string>;
   export type SingleSmartmeter = Omit<Raw.SingleSmartmeter, "date"> & {
@@ -311,4 +311,4 @@ export namespace WaterDemandPrediction2Service {
   > & {date: Dayjs[]; rootOfMeanSquaredError: number & tags.Type<"double">};
 }
 
-import Self = WaterDemandPrediction2Service;
+import Self = WaterDemandPredictionService;
