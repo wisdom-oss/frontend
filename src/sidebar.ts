@@ -19,7 +19,7 @@ import {GeoDataService} from "./api/geo-data.service";
 import {WaterRightsService} from "./api/water-rights.service";
 import {UsageForecastsService} from "./api/usage-forecasts.service";
 import {BeWaterSmartService} from "./api/be-water-smart.service";
-import {WaterDemandPredictionService} from "./api/water-demand-prediction.service";
+import {WaterDemandPrediction2Service} from "./api/water-demand-prediction2.service";
 import {extraTags} from "./common/utils/extra-tags";
 import {api} from "./common/api";
 import {AuthService} from "./core/auth/auth.service";
@@ -189,7 +189,7 @@ export function sidebar(): readonly SidebarEntry[] {
           module: "core.sidebar.category.waterprediction",
           icon: {remixBookLine},
           link: "/oowv/water-demand-prediction",
-          services: {WaterDemandPredictionService},
+          services: {WaterDemandPrediction2Service},
         },
       ],
     },

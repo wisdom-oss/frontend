@@ -46,7 +46,7 @@ export const routes: Routes = [
       },
       {
         path: "oowv/water-demand-prediction",
-        component: WaterDemandPredictionComponent,
+        component: WaterDemandPrediction2Component,
       },
       {
         path: "oowv/water-demand-prediction2",
