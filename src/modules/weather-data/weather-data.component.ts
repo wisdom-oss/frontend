@@ -5,6 +5,7 @@ import {
   inject,
   model,
   signal,
+  untracked,
   viewChild,
   Component,
   ElementRef,
@@ -38,8 +39,10 @@ import {ResizeMapOnLoadDirective} from "../../common/directives/resize-map-on-lo
 import {ResizeObserverDirective} from "../../common/directives/resize-observer.directive";
 import {MapCursorDirective} from "../../common/directives/map-cursor.directive";
 import {cast} from "../../common/utils/cast";
+import {typeUtils} from "../../common/utils/type-utils";
 
 type Stations = DwdService.V2.Stations;
+type DownloadParams = DwdService.Params.V1.Data;
 
 const MAPPING = {
   product: {
@@ -177,6 +180,8 @@ export class WeatherDataComponent {
   protected productFrom = signals.dayjs(() => this.productFromRaw());
   protected productUntil = signals.dayjs(() => this.productUntilRaw());
 
+  private downloadParams = signals.maybe<DownloadParams>();
+  private downloadResource = this.service.v1.fetchData(this.downloadParams);
   protected downloading = signal(false);
 
   protected util = {
@@ -243,24 +248,31 @@ export class WeatherDataComponent {
     this.downloading.set(true);
 
     let {stationId, product, resolution, from, until} = options;
-    let data = await this.service.v1.fetchData({
+    this.downloadParams.set({
       stationId,
       dataType: product,
       granularity: resolution,
       from,
       until,
     });
+  }
 
+  private downloadedEffect = effect(() => {
+    let data = this.downloadResource();
+    if (!data) return;
     let blob = new Blob([JSON.stringify(data)], {type: "application/json"});
     let url = URL.createObjectURL(blob);
 
     let a = this.downloadAnchor().nativeElement;
     a.href = url;
+    let {dataType: product, granularity: resolution} = untracked(
+      this.downloadParams,
+    )!;
     a.download = `WISdoM_Weather_Data_${this.stationInfo()!.name}_${product}_${resolution}.json`;
     a.click();
 
     this.downloading.set(false);
-  }
+  });
 
   private determineLayers(): Record<
     string,
