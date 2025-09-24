@@ -69,7 +69,9 @@
     </ng-container>
     <div chart-historic-legend [style.grid-area]="'chart-historic-legend'">
       <p class="title is-6 mb-0 has-text-centered">historic</p>
-      <div class="is-flex is-justify-content-center is-align-items-center is-fullheight">
+      <div
+        class="is-flex is-justify-content-center is-align-items-center is-fullheight"
+      >
         @for (item of legendItems.historic(); track item; let idx = $index) {
           <legend-item
             [color]="item.color"
@@ -92,7 +94,9 @@
     </div>
     <div chart-predicted-legend [style.grid-area]="'chart-predicted-legend'">
       <p class="title is-6 mb-0 has-text-centered">predicted</p>
-      <div class="is-flex is-justify-content-center is-align-items-center is-fullheight">
+      <div
+        class="is-flex is-justify-content-center is-align-items-center is-fullheight"
+      >
         @for (item of legendItems.predictions(); track item; let idx = $index) {
           <legend-item
             [color]="item.color"
