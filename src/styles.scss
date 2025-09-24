@@ -49,3 +49,48 @@ html {
     color-scheme: dark;
   }
 }
+
+/* 
+ * .is-spinning
+ * Adds a continuous spin animation to an element.
+ * - Base: spins every 0.8s (infinite loop).
+ * - .is-fast: speeds up spin to 0.2s.
+ * - .is-slow: slows spin to 2s.
+ * Perfect for loaders or rotating icons.
+ */
+.is-spinning {
+  display: grid;
+  animation: spin 0.8s linear infinite;
+
+  &.is-fast {
+    animation-duration: 0.2s;
+  }
+
+  &.is-slow {
+    animation-duration: 2s;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+/* 
+ * .has-stack
+ * Creates a stacking layout where all direct children overlap.
+ * - Uses a single-cell grid (grid-area: 1 / 1).
+ * - All children are placed in the same cell, stacking visually.
+ * Great for layering images, text, or overlays in one spot.
+ */
+.has-stack {
+  display: grid;
+
+  > * {
+    grid-area: 1 / 1;
+  }
+}

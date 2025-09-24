@@ -1,6 +1,7 @@
 import {computed, inject, Component, Signal} from "@angular/core";
 import {
   remixBarChartFill,
+  remixBookLine,
   remixBuilding3Fill,
   remixDatabase2Fill,
   remixDrizzleFill,
@@ -18,6 +19,7 @@ import {GeoDataService} from "./api/geo-data.service";
 import {WaterRightsService} from "./api/water-rights.service";
 import {UsageForecastsService} from "./api/usage-forecasts.service";
 import {BeWaterSmartService} from "./api/be-water-smart.service";
+import {WaterDemandPredictionService} from "./api/water-demand-prediction.service";
 import {extraTags} from "./common/utils/extra-tags";
 import {api} from "./common/api";
 import {AuthService} from "./core/auth/auth.service";
@@ -182,6 +184,12 @@ export function sidebar(): readonly SidebarEntry[] {
           link: "/oowv/action-map",
           services: {GeoDataService},
           scopes: OowvActionMapComponent.SCOPES,
+        },
+        {
+          module: "core.sidebar.category.waterprediction",
+          icon: {remixBookLine},
+          link: "/oowv/water-demand-prediction",
+          services: {WaterDemandPredictionService},
         },
       ],
     },

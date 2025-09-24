@@ -103,7 +103,11 @@ abstract class SidebarStatusBaseComponent {
   ],
   template: `
     @if (thisStatus().show) {
-      <span [class]="thisStatus().hasText" [style.cursor]="'help'">
+      <span
+        [class]="thisStatus().hasText"
+        [style.cursor]="'help'"
+        class="is-grid"
+      >
         <ng-icon [name]="thisStatus().icon"></ng-icon>
       </span>
     }
