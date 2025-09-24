@@ -39,7 +39,6 @@ import {ResizeMapOnLoadDirective} from "../../common/directives/resize-map-on-lo
 import {ResizeObserverDirective} from "../../common/directives/resize-observer.directive";
 import {MapCursorDirective} from "../../common/directives/map-cursor.directive";
 import {cast} from "../../common/utils/cast";
-import {typeUtils} from "../../common/utils/type-utils";
 
 type Stations = DwdService.V2.Stations;
 type DownloadParams = DwdService.Params.V1.Data;
