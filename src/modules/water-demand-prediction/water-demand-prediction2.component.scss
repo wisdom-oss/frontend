@@ -10,6 +10,7 @@
   display: grid;
   grid-template:
     "resolution-0 resolution-0" auto
+    "chart-historic-legend chart-predicted-legend" auto
     "chart-historic chart-predicted" minmax(20em, 1fr)
     "buttons buttons" auto
     "choices choices" auto / 1fr 1fr;
@@ -37,10 +38,12 @@
   .inner-layout {
     grid-template:
       "resolution-0" auto
+      "chart-historic-legend" auto
       "chart-historic" max(20em, 80%)
       "buttons" auto
       "choices" auto
       "resolution-1" auto
+      "chart-predicted-legend" auto
       "chart-predicted" max(20em, 80%) / 1fr;
   }
 

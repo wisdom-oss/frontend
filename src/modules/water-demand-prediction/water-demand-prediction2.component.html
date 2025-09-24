@@ -67,7 +67,7 @@
         </div>
       }
     </ng-container>
-    <div chart-historic-data [style.grid-area]="'chart-historic'">
+    <div chart-historic-legend [style.grid-area]="'chart-historic-legend'">
       <p class="title is-6 mb-0 has-text-centered">historic</p>
       <div class="is-flex is-justify-content-center">
         @for (item of legendItems.historic(); track item; let idx = $index) {
@@ -79,6 +79,8 @@
           ></legend-item>
         }
       </div>
+    </div>
+    <div chart-historic-data [style.grid-area]="'chart-historic'">
       <canvas
         baseChart
         type="bar"
@@ -88,7 +90,7 @@
         [datasets]="$any(chartDatasets.historic[chartResolution]())"
       ></canvas>
     </div>
-    <div chart-predicted [style.grid-area]="'chart-predicted'">
+    <div chart-predicted-legend [style.grid-area]="'chart-predicted-legend'">
       <p class="title is-6 mb-0 has-text-centered">predicted</p>
       <div class="is-flex is-justify-content-center">
         @for (item of legendItems.predictions(); track item; let idx = $index) {
@@ -104,6 +106,8 @@
           ></legend-item>
         }
       </div>
+    </div>
+    <div chart-predicted-data [style.grid-area]="'chart-predicted'">
       <canvas
         baseChart
         type="bar"
