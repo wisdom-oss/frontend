@@ -7,12 +7,19 @@ import {TranslateDirective} from "@ngx-translate/core";
 import {WaterDemandPrediction2Service} from "../../../api/water-demand-prediction2.service";
 import {RgbaColor} from "../../../common/utils/rgba-color";
 import {signals} from "../../../common/signals";
+import {TranslateAttrDirective} from "../../../common/directives/translate-attr.directive";
 
 type Resolution = WaterDemandPrediction2Service.Resolution;
 
 @Component({
   selector: "legend-item",
-  imports: [NgIconComponent, TranslateDirective, UpperCasePipe, DecimalPipe],
+  imports: [
+    DecimalPipe,
+    NgIconComponent,
+    TranslateAttrDirective,
+    TranslateDirective,
+    UpperCasePipe,
+  ],
   templateUrl: "./legend-item.component.html",
   providers: [
     provideIcons({

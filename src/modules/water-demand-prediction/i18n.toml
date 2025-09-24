@@ -1,3 +1,11 @@
+[data-group.historic]
+en = "Historic"
+de = "Historisch"
+
+[data-group.prediction]
+en = "Prediction"
+de = "Vorhersage"
+
 # TODO: remove timeframes handled by dayjs
 [timeframe.one-day]
 en = "one day"
@@ -71,6 +79,22 @@ de = "Ruhestandshaushalt"
 [smartmeter.single-household]
 en = "single household"
 de = "Single Haushalt"
+
+[buttons.delete-charts]
+en = "Delete Charts"
+de = "Lösche Graphen"
+
+[buttons.train-model]
+en = "Train Selected Model"
+de = "Starte Modelltraining"
+
+[buttons.training]
+en = "Training"
+de = "Am Trainieren"
+
+[buttons.add-charts]
+en = "Add to Charts"
+de = "Zum Graphen hinzufügen"
 
 [delete.normal]
 en = "Delete Charts"

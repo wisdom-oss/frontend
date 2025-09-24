@@ -27,7 +27,15 @@
       @let value = this[metric]();
       @if (value) {
         <p>
-          <span translate
+          <span
+            class="has-tooltip-bottom"
+            data-tooltip="lol"
+            translate
+            [translate-attr]="{
+              attr: 'data-tooltip',
+              key:
+                'water-demand-prediction.explanation.' + metric.toUpperCase(),
+            }"
             >water-demand-prediction.metrics.{{ metric | uppercase }}</span
           >
           <span>: {{ value | number: "1.4-4" : lang() }}</span>

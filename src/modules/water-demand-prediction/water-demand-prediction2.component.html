@@ -68,7 +68,10 @@
       }
     </ng-container>
     <div chart-historic-legend [style.grid-area]="'chart-historic-legend'">
-      <p class="title is-6 mb-0 has-text-centered">historic</p>
+      <p
+        class="title is-6 mb-0 has-text-centered"
+        translate="water-demand-prediction.data-group.historic"
+      ></p>
       <div
         class="is-flex is-justify-content-center is-align-items-center is-fullheight"
       >
@@ -93,7 +96,10 @@
       ></canvas>
     </div>
     <div chart-predicted-legend [style.grid-area]="'chart-predicted-legend'">
-      <p class="title is-6 mb-0 has-text-centered">predicted</p>
+      <p
+        class="title is-6 mb-0 has-text-centered"
+        translate="water-demand-prediction.data-group.prediction"
+      ></p>
       <div
         class="is-flex is-justify-content-center is-align-items-center is-fullheight"
       >
@@ -145,7 +151,9 @@
             [disabled]="disableHistoric && disablePredictions"
             (click)="clearSmartmeterDatasets()"
           >
-            <span translate="water-demand-prediction.delete.normal"></span>
+            <span
+              translate="water-demand-prediction.buttons.delete-charts"
+            ></span>
             <span class="icon is-large">
               <ng-icon size="1.2em" name="remixDeleteBin2Line"></ng-icon>
             </span>
@@ -167,8 +175,14 @@
           (click)="trainModel()"
         >
           <span class="has-stack">
-            <span [class.is-invisible]="!isTraining">Training</span>
-            <span [class.is-invisible]="isTraining">Train selected model</span>
+            <span
+              [class.is-invisible]="!isTraining"
+              translate="water-demand-prediction.buttons.training"
+            ></span>
+            <span
+              [class.is-invisible]="isTraining"
+              translate="water-demand-prediction.buttons.train-model"
+            ></span>
           </span>
           @if (isTraining) {
             <span class="icon is-large">
@@ -205,7 +219,7 @@
             [disabled]="!fetched.historic() && !fetched.predictions()"
             (click)="pushSmartmeterDataset()"
           >
-            <span translate>Add to Graph</span>
+            <span translate="water-demand-prediction.buttons.add-charts"></span>
             <span class="icon is-large">
               <ng-icon size="1.2em" name="remixBarChartFill"></ng-icon>
             </span>
