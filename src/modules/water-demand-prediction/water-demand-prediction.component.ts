@@ -248,8 +248,6 @@ export class WaterDemandPredictionComponent implements OnInit, AfterViewInit {
         | undefined;
       if (!fetched) continue;
 
-      console.log(fetched);
-
       let color = RgbaColor.fromString(fetched.name);
       this.chartDatasets[group][fetched.resolution].push({
         label: JSON.stringify({
@@ -310,9 +308,6 @@ export class WaterDemandPredictionComponent implements OnInit, AfterViewInit {
     this.trainModelRequest.set(params);
   }
 
-  _training = effect(() => console.log(this.trainModelResource()));
-  _predictions = effect(() => console.log(this.fetched.predictions()));
-
   private storeChoicesEffect = effect(() => {
     let choices = Object.map(this.choices, val => val());
     for (let key of keys(choices)) if (!choices[key]) delete choices[key];
@@ -362,7 +357,6 @@ export class WaterDemandPredictionComponent implements OnInit, AfterViewInit {
 
       return datasets.map(dataset => {
         let label = dataset.label;
-        console.log(label);
         if (!label) throw new Error("missing label");
         return this.parseLegendItem(label);
       });
@@ -445,7 +439,6 @@ export class WaterDemandPredictionComponent implements OnInit, AfterViewInit {
 
   protected tooltipLabel: TooltipCallbacks<"bar">["label"] = tooltipItem => {
     if (!tooltipItem.dataset.label) return;
-    console.log(tooltipItem);
     let {smartmeter, resolution} = this.parseLegendItem(
       tooltipItem.dataset.label,
     );
