@@ -34,9 +34,9 @@
             [translate-attr]="{
               attr: 'data-tooltip',
               key:
-                'water-demand-prediction.explanation.' + metric.toUpperCase(),
+                'water-demand-prediction.explanation.' + metric,
             }"
-            >water-demand-prediction.metrics.{{ metric | uppercase }}</span
+            >water-demand-prediction.metrics.{{ metric }}</span
           >
           <span>: {{ value | number: "1.4-4" : lang() }}</span>
         </p>
