@@ -14,12 +14,15 @@
         stacked: false,
         title: {
           display: true,
-          text: "m^3",
+          text: "m³",
         },
         grid: {
           display: true,
           color: "#000000",
           lineWidth: 0.4,
+        },
+        ticks: {
+          callback: yTicks(lang()),
         },
       },
       x: {
@@ -42,6 +45,12 @@
         display: false,
         labels: {
           generateLabels: legendLabel(lang()),
+        },
+      },
+      tooltip: {
+        callbacks: {
+          title: tooltipTitle,
+          label: tooltipLabel,
         },
       },
     },

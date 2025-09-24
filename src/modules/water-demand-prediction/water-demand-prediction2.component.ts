@@ -1,3 +1,4 @@
+import {formatNumber} from "@angular/common";
 import {
   computed,
   createComponent,
@@ -32,6 +33,7 @@ import {
   TranslateService,
 } from "@ngx-translate/core";
 import {
+  TooltipCallbacks,
   ChartConfiguration,
   ChartDataset as ChartJsDataset,
   ChartOptions,
@@ -40,7 +42,7 @@ import {
   Plugin,
 } from "chart.js";
 import {Chart} from "chart.js";
-import dayjs from "dayjs";
+import dayjs, {Dayjs} from "dayjs";
 import {BaseChartDirective} from "ng2-charts";
 import typia from "typia";
 
@@ -342,6 +344,15 @@ export class WaterDemandPrediction2Component implements OnInit, AfterViewInit {
     this.loadParam(params, "weatherColumn", typia.createIs<string>());
   }
 
+  private parseLegendItem(json: string): LegendItem {
+    let reviver = (key: string, value: any) => {
+      if (key == "color") return RgbaColor.reviver(key, value);
+      return value;
+    };
+
+    return typia.assert<LegendItem>(JSON.parse(json, reviver));
+  }
+
   private makeLegendItems(dataGroup: DataGroup): Signal<LegendItem[]> {
     return computed(() => {
       let chart = this.chart[dataGroup]();
@@ -349,16 +360,11 @@ export class WaterDemandPrediction2Component implements OnInit, AfterViewInit {
       let resolution = this.chartResolution();
       let datasets = this.chartDatasets[dataGroup][resolution]();
 
-      let reviver = (key: string, value: any) => {
-        if (key == "color") return RgbaColor.reviver(key, value);
-        return value;
-      };
-
       return datasets.map(dataset => {
         let label = dataset.label;
         console.log(label);
         if (!label) throw new Error("missing label");
-        return typia.assert<LegendItem>(JSON.parse(label, reviver));
+        return this.parseLegendItem(label);
       });
     });
   }
@@ -368,29 +374,38 @@ export class WaterDemandPrediction2Component implements OnInit, AfterViewInit {
     predictions: this.makeLegendItems("predictions"),
   } as const satisfies Record<DataGroup, any>;
 
+  private formatDate(date: Dayjs, resolution: Resolution, lang: "en" | "de") {
+    let format: string;
+    switch (resolution) {
+      case "hourly":
+        format = lang === "de" ? "DD.MM.YYYY HH:mm" : "MM/DD/YYYY HH.mm";
+        break;
+      case "daily":
+        format = lang === "de" ? "DD.MM.YYYY" : "MM/DD/YYYY";
+        break;
+      case "weekly":
+        format = "[W]WW YYYY"; // e.g. "W36 2025"
+        break;
+      default:
+        format = "";
+    }
+
+    return date.locale(lang).format(format);
+  }
+
   protected xTicks(
     resolution: Resolution,
-    lang: string,
+    lang: "en" | "de",
   ): TickOptions["callback"] {
     return (_value, index, ticks) => {
       let date = dayjs(ticks[index].label! as string);
+      return this.formatDate(date, resolution, lang);
+    };
+  }
 
-      let format: string;
-      switch (resolution) {
-        case "hourly":
-          format = lang === "de" ? "DD.MM.YYYY HH:mm" : "MM/DD/YYYY HH.mm";
-          break;
-        case "daily":
-          format = lang === "de" ? "DD.MM.YYYY" : "MM/DD/YYYY";
-          break;
-        case "weekly":
-          format = "[W]WW YYYY"; // e.g. "W36 2025"
-          break;
-        default:
-          format = "";
-      }
-
-      return date.format(format);
+  protected yTicks(lang: "en" | "de"): TickOptions["callback"] {
+    return (value, _index, _ticks) => {
+      return formatNumber(value as number, lang, "1.1");
     };
   }
 
@@ -413,4 +428,33 @@ export class WaterDemandPrediction2Component implements OnInit, AfterViewInit {
         }); // satisfies LegendItem[];
     };
   }
+
+  protected tooltipTitle: TooltipCallbacks<"bar">["title"] = tooltipItems => {
+    let date = dayjs(tooltipItems[0].label);
+    let resolution = this.chartResolution();
+    let lang = this.lang();
+    let formattedDate = this.formatDate(date, resolution, lang);
+
+    let data = tooltipItems[0].dataset.data[
+      tooltipItems[0].dataIndex
+    ] as unknown as {x: string; y: number};
+    let formattedValue = formatNumber(data.y, lang);
+
+    return `${formattedValue} m³ - ${formattedDate}`;
+  };
+
+  protected tooltipLabel: TooltipCallbacks<"bar">["label"] = tooltipItem => {
+    if (!tooltipItem.dataset.label) return;
+    console.log(tooltipItem);
+    let {smartmeter, resolution} = this.parseLegendItem(
+      tooltipItem.dataset.label,
+    );
+    let translatedName = this.translate.instant(
+      `water-demand-prediction.smartmeter.${smartmeter}`,
+    );
+    let translatedResolution = this.translate.instant(
+      `water-demand-prediction.resolution.${resolution}`,
+    );
+    return `${translatedName} - ${translatedResolution}`;
+  };
 }
