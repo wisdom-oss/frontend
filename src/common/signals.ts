@@ -464,6 +464,28 @@ export namespace signals {
     }
   }
 
+  /**
+   * Derives a new signal by mapping the value of another signal.
+   *
+   * We read `input()` and return `transform(input())`. The result updates
+   * whenever `input` changes. This is a thin wrapper over `computed`.
+   *
+   * @template T Input value type.
+   * @template U Output value type.
+   * @param input Source signal.
+   * @param transform Pure mapping function from T to U.
+   * @returns A read-only signal of the mapped value.
+   *
+   * @example
+   * const count = signal(2);
+   * const doubled = signals.map(count, n => n * 2);
+   * doubled(); // 4
+   *
+   * @example
+   * // Map an optional value to a fallback
+   * const maybeName = signals.maybe<string>();
+   * const label = signals.map(maybeName, n => n ?? "unknown");
+   */
   export function map<T, U>(
     input: Signal<T>,
     transform: (value: T) => U,
@@ -471,7 +493,30 @@ export namespace signals {
     return computed(() => transform(input()));
   }
 
-  /** Small helper function to define writable signals that may be undefined. */
+  /**
+   * Creates a writable signal that may hold `undefined`.
+   *
+   * This is useful for optional values where the signal might be unset
+   * at first and filled later. It works like `signal<T | undefined>` but
+   * with a shorthand `initial` option.
+   *
+   * @template T Value type.
+   * @param options Optional settings, including `initial` for an initial value.
+   *                Other `CreateSignalOptions` are passed through.
+   * @returns A writable signal of type `T | undefined`.
+   *
+   * @example
+   * // Empty at first
+   * const name = signals.maybe<string>();
+   * console.log(name()); // undefined
+   * name.set("Alice");
+   * console.log(name()); // "Alice"
+   *
+   * @example
+   * // With an initial value
+   * const age = signals.maybe<number>({ initial: 18 });
+   * console.log(age()); // 18
+   */
   export function maybe<T>(
     options?: CreateSignalOptions<T | undefined> & {initial?: T},
   ): WritableSignal<undefined | T> {
