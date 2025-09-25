@@ -186,7 +186,7 @@ export function sidebar(): readonly SidebarEntry[] {
           scopes: OowvActionMapComponent.SCOPES,
         },
         {
-          module: "core.sidebar.category.waterprediction",
+          module: "core.sidebar.category.water-demand-prediction",
           icon: {remixBookLine},
           link: "/oowv/water-demand-prediction",
           services: {WaterDemandPredictionService},
