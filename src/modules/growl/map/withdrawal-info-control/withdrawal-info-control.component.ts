@@ -1,12 +1,13 @@
 import {DecimalPipe} from "@angular/common";
 import {computed, input, Component} from "@angular/core";
+import {TranslatePipe} from "@ngx-translate/core";
 
 import {WaterRightsService} from "../../../../api/water-rights.service";
 import {signals} from "../../../../common/signals";
 
 @Component({
   selector: "growl-withdrawal-info-control",
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, TranslatePipe],
   templateUrl: "./withdrawal-info-control.component.html",
   styles: ``,
 })
