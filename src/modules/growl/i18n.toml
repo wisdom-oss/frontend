@@ -65,3 +65,7 @@ de = "NLWKN Nutzungsorte der Wasserrechte"
 [layer.oldWaterRightUsageLocations]
 en = "NLWKN Water Right Usage Locations (old)"
 de = "NLWKN Nutzungsorte der Wasserrechte (alt)"
+
+[average-withdrawal.na]
+en = "n/a"
+de = "n.a."
