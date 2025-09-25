@@ -68,7 +68,7 @@
     "@angular/build": "^20.0.5",
     "@angular/cli": "^20.3.3",
     "@angular/compiler-cli": "^20.3.2",
-    "@compodoc/compodoc": "^1.1.26",
+    "@compodoc/compodoc": "^1.1.30",
     "@ryoppippi/unplugin-typia": "^2.6.5",
     "@types/didyoumean": "^1.2.3",
     "@types/geojson": "^7946.0.16",
