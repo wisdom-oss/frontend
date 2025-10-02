@@ -1,7 +1,6 @@
 import {NgIf, DOCUMENT} from "@angular/common";
 import {
   computed,
-  effect,
   inject,
   signal,
   Component,
