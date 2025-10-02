@@ -1,4 +1,4 @@
-import {formatNumber} from "@angular/common";
+import {formatNumber, NgClass} from "@angular/common";
 import {
   computed,
   effect,
@@ -50,6 +50,7 @@ import {RgbaColor} from "../../common/utils/rgba-color";
 import {zip} from "../../common/utils/zip";
 import {typeUtils} from "../../common/utils/type-utils";
 import {keys} from "../../common/utils/keys";
+import {api} from "../../common/api";
 
 type Service = WaterDemandPredictionService;
 type Resolution = WaterDemandPredictionService.Resolution;
@@ -78,6 +79,7 @@ type LegendItem = typeUtils.UndefinedToOptionals<{
     NgIcon,
     TranslateDirective,
     TranslatePipe,
+    NgClass,
   ],
   templateUrl: "./water-demand-prediction.component.html",
   styleUrl: "./water-demand-prediction.component.scss",
@@ -104,6 +106,20 @@ export class WaterDemandPredictionComponent implements OnInit, AfterViewInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   protected lang = signals.lang();
+
+  protected error = signals.maybe<Partial<api.Error>>();
+  protected makeError() {
+    this.error.set({
+      type: "https://example.com/errors/invalid-credentials",
+      status: 401,
+      title: "Invalid Authentication Credentials",
+      detail:
+        "Your access token is missing, expired, or malformed. Please log in again to obtain a valid token.",
+      instance: "tag:example.com,2025-10-02:auth-service/req-12345",
+      errors: ["Missing 'Authorization' header", "Bearer token not found"],
+      host: "api.example.com",
+    });
+  }
 
   private charts = viewChildren(BaseChartDirective);
   protected chart = {
