@@ -18,6 +18,7 @@
         [style]="mapData.style"
         [fitBounds]="$any(mapData.fitBounds())"
         [cursor]="mapData.hover() ? 'pointer' : 'grab'"
+        [attributionControl]="false"
         (click)="
           mapData.hover() &&
             document
@@ -30,10 +31,19 @@
           mglNavigation
           [showCompass]="false"
         ></mgl-control>
+        @let attribution = this.attribution();
+        <ng-container *recreateOn="attribution">
+          <mgl-control
+            mglAttribution
+            position="bottom-right"
+            [compact]="true"
+            [customAttribution]="attribution"
+          ></mgl-control>
+        </ng-container>
         @if (mapData.usageLocations()) {
           <mgl-geojson-source
             id="usage-locations-source"
-            [data]="mapData.usageLocations()!"
+            [data]="mapData.usageLocations()!.data"
           ></mgl-geojson-source>
           <mgl-layer
             id="usage-locations-symbol"

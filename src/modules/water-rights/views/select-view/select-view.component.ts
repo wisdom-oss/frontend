@@ -5,6 +5,7 @@ import {
   LayerComponent,
   MapComponent,
   GeoJSONSourceComponent,
+  AttributionControlDirective,
   NavigationControlDirective,
 } from "@maplibre/ngx-maplibre-gl";
 import dayjs from "dayjs";
@@ -19,11 +20,13 @@ import {LayerSelectionControlComponent} from "../../../../common/components/map/
 import {ResizeMapOnLoadDirective} from "../../../../common/directives/resize-map-on-load.directive";
 import {ClusterPolygonSourceDirective} from "../../../../common/directives/cluster-polygon-source.directive";
 import {MapCursorDirective} from "../../../../common/directives/map-cursor.directive";
+import {RecreateOnDirective} from "../../../../common/directives/recreate-on.directive";
 
 type LegalDepartment = WaterRightsService.UsageLocation["legalDepartment"];
 
 @Component({
   imports: [
+    AttributionControlDirective,
     ClusterPolygonSourceDirective,
     ControlComponent,
     GeoJSONSourceComponent,
@@ -32,6 +35,7 @@ type LegalDepartment = WaterRightsService.UsageLocation["legalDepartment"];
     MapComponent,
     MapCursorDirective,
     NavigationControlDirective,
+    RecreateOnDirective,
     ResizeMapOnLoadDirective,
   ],
   templateUrl: "./select-view.component.html",
@@ -45,16 +49,28 @@ export class SelectViewComponent {
 
   protected usageLocations: Signal<
     | undefined
-    | FeatureCollection<
-        Point,
-        {
-          id: number;
-          name: string;
-          legalDepartment: LegalDepartment;
-          waterRight: number;
-        }
-      >
+    | {
+        attribution?: string;
+        attributionURL?: string;
+        data: FeatureCollection<
+          Point,
+          {
+            id: number;
+            name: string;
+            legalDepartment: LegalDepartment;
+            waterRight: number;
+          }
+        >;
+      }
   >;
+
+  protected attribution = computed(() => {
+    let usageLocations = this.usageLocations();
+    if (!usageLocations) return;
+    let {attribution, attributionURL} = usageLocations;
+    if (!attributionURL) return attribution;
+    return `<a href="${attributionURL}" target="_blank">${attribution}</a>`;
+  });
 
   protected selectLegalDepartments: Record<
     LegalDepartment,
@@ -75,19 +91,22 @@ export class SelectViewComponent {
       let usageLocations = this.usageLocations();
       if (!usageLocations) return undefined;
       return {
-        type: "FeatureCollection",
-        features: usageLocations.features.filter(
-          ({properties: {legalDepartment}}) =>
-            this.selectLegalDepartments[legalDepartment](),
-        ),
+        data: {
+          type: "FeatureCollection",
+          features: usageLocations.data.features.filter(
+            ({properties: {legalDepartment}}) =>
+              this.selectLegalDepartments[legalDepartment](),
+          ),
+        },
       };
     });
 
   protected hover = computed(() => {
     let locations = this.usageLocations();
     if (!locations) return;
-    return locations.features.find(location => location.id == this.hoverId())
-      ?.properties;
+    return locations.data.features.find(
+      location => location.id == this.hoverId(),
+    )?.properties;
   });
 
   protected util = {log: console.log};
@@ -104,20 +123,26 @@ export class SelectViewComponent {
         dayjs.duration(1, "day"),
       ),
       locations => ({
-        type: "FeatureCollection",
-        features: (locations?.data ?? []).map(location => ({
-          type: "Feature",
-          id: location.id,
-          geometry: location.geometry as Point,
-          properties: {
+        attribution: locations?.attribution ?? undefined,
+        attributionURL: locations?.attributionURL ?? undefined,
+        data: {
+          type: "FeatureCollection",
+          features: (locations?.data ?? []).map(location => ({
+            type: "Feature",
             id: location.id,
-            name: location.name as string,
-            legalDepartment: location.additionalProperties![
-              "legalDepartment"
-            ]! as LegalDepartment,
-            waterRight: location.additionalProperties!["waterRight"]! as number,
-          },
-        })),
+            geometry: location.geometry as Point,
+            properties: {
+              id: location.id,
+              name: location.name as string,
+              legalDepartment: location.additionalProperties![
+                "legalDepartment"
+              ]! as LegalDepartment,
+              waterRight: location.additionalProperties![
+                "waterRight"
+              ]! as number,
+            },
+          })),
+        },
       }),
     );
   }
