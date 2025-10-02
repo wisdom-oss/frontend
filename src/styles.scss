@@ -2,6 +2,9 @@
 @use "../node_modules/bulma/sass/components/navbar.scss" with (
   $navbar-breakpoint: 690px
 );
+
+@use "../node_modules/bulma/sass/utilities/initial-variables" as iv;
+@use "../node_modules/bulma/sass/utilities/css-variables" as cv;
 @use "../node_modules/bulma/sass/" as bulma;
 
 @use "../node_modules/bulma-slider/src/sass/" as bulma-slider;
@@ -92,5 +95,22 @@ html {
 
   > * {
     grid-area: 1 / 1;
+  }
+}
+
+// Border-only color for messages
+@each $name, $components in bulma.$message-colors {
+  .#{iv.$class-prefix}message.#{iv.$class-prefix}border-is-#{$name} {
+    // Do NOT touch message-h/s/background/text vars here.
+    // Only override the body border color directly.
+    .#{iv.$class-prefix}message-body {
+      border-inline-start-color: hsl(
+        #{cv.getVar($name, "", "-h")},
+        #{cv.getVar($name, "", "-s")},
+        calc(
+          #{cv.getVar($name, "", "-l")} + #{cv.getVar("message-border-l-delta")}
+        )
+      );
+    }
   }
 }
