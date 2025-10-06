@@ -3,6 +3,8 @@ import dayjs from "dayjs";
 import {Duration} from "dayjs/plugin/duration";
 import Dexie from "dexie";
 
+import revision from "../../assets/generated/revision.txt";
+
 /**
  * A simple caching service using IndexedDB via Dexie.
  *
@@ -27,12 +29,23 @@ export class CacheService extends Dexie {
     string
   >;
 
+  private meta: Dexie.Table<{key: string; value: string}, string>;
+
   constructor() {
     super("CacheDB");
+
     this.version(1).stores({
       cache: "key", // use "key" as primary key
     });
+    this.version(2).stores({
+      cache: "key",
+      meta: "key",
+    });
+
     this.cache = this.table("cache");
+    this.meta = this.table("meta");
+
+    this.open().then(() => this.ensureRevision());
   }
 
   /**
@@ -69,5 +82,15 @@ export class CacheService extends Dexie {
   /** Clears all entries from the cache. */
   async clear(): Promise<void> {
     await this.cache.clear();
+  }
+
+  private async ensureRevision(): Promise<void> {
+    const stored = await this.meta.get("revision");
+    if (!stored || stored.value != revision) {
+      await this.transaction("readwrite", this.cache, this.meta, async () => {
+        await this.cache.clear();
+        await this.meta.put({key: "revision", value: revision});
+      });
+    }
   }
 }
