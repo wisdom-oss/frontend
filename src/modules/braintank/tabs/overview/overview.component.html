@@ -74,173 +74,69 @@
   <div class="card my-4">
     <div class="card-content">
       <div class="is-fullwidth has-text-centered my-4">
+          <p class="is-size-3 my-4" translate>braintank.overview.header.currentValues</p>
+      </div>
+      
+      <div class="columns my-4">
+        <div class="column is-half">
+          <div class="is-flex is-flex-direction-row">
+            <ng-icon name="remixTimeLine" size="2.5rem" class="mx-4"/>
+            <div class="is-flex is-flex-direction-column is-justify-content-center">
+              <p>{{time().format('DD.MM.YYYY, HH:mm:ss')}}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="column is-half">
+          <div class="is-flex is-flex-direction-row">
+            <ng-icon name="remixContrastDrop2Line" size="2.5rem" class="mx-4"/>
+            <div class="is-flex is-flex-direction-column is-justify-content-center">
+              <p>{{waterLevel()}}%</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="columns my-4">
+        <div class="column is-half">
+          <div class="is-flex is-flex-direction-row">
+            <ng-icon name="remixWaterPercentLine" size="2.5rem" class="mx-4"/>
+            <div class="is-flex is-flex-direction-column is-justify-content-center">
+              @if(draining()){<p><span translate>braintank.overview.draining.yes</span> {{drainingTime().format('HH:mm:ss')}}</p>}
+              @if(!draining()){<p translate>braintank.overview.draining.no</p>}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card my-4">
+    <div class="card-content">
+      <div class="is-fullwidth has-text-centered my-4">
           <p class="is-size-3 my-4" translate>braintank.overview.header.features</p>
       </div>
       
       <div class="columns my-4">
-        <div class="column is-narrow mx-4">
-          <ng-icon name="remixContrastDrop2Line" size="2.5rem" class="mb-2"/>
-          <div class="is-flex is-flex-direction-column-reverse" overflow="hidden"
-               style="width: 2.5rem; height:16rem; background-color: #eee; border-radius: 4px;">
-              <div style="width: 100%; background-color: #0088aa; border-radius: 4px;" [style.height.%]="waterLevel()"></div>
-          </div>
-          <p class="is-flex is-flex-direction-row is-justify-content-center mt-2">{{waterLevel()}}%</p>
-        </div>
-
-        <div class="column is-one-quarter mx-4">
-          <div class="is-flex is-flex-direction-column is-fullheight is-justify-content-space-between">
-            <div class="is-flex is-flex-direction-row is-justify-content-space-between">
-              <ng-icon name="remixTimeLine" size="2.5rem"/>
-              <div class="is-flex is-flex-direction-column is-justify-content-center">
-                <p>{{time().format('DD.MM.YYYY, HH:mm:ss')}}</p>
-              </div>
-            </div>
-            <div class="is-flex is-flex-direction-row is-justify-content-space-between">
-              <ng-icon name="remixHome8Line" size="2.5rem"/>
-              <div class="is-flex is-flex-direction-column is-justify-content-center">
-                <p>{{roofSize()}} m²</p>
-              </div>
-            </div>
-            <div class="is-flex is-flex-direction-row is-justify-content-space-between">
-              <ng-icon name="remixMapPin2Line" size="2.5rem"/>
-              <div class="is-flex is-flex-direction-column is-justify-content-center">
-                <p>{{lat()}}, {{long()}}</p>
-              </div>
-            </div>
-            <div class="is-flex is-flex-direction-row is-justify-content-space-between">
-              <ng-icon name="remixWaterPercentLine" size="2.5rem"/>
-              <div class="is-flex is-flex-direction-column is-justify-content-center">
-                @if(draining()){<p><span translate>braintank.overview.draining.yes</span> {{drainingTime().format('HH:mm:ss')}}</p>}
-                @if(!draining()){<p translate>braintank.overview.draining.no</p>}
-              </div>
+        <div class="column is-half">
+          <div class="is-flex is-flex-direction-row">
+            <ng-icon name="remixHome8Line" size="2.5rem" class="mx-4"/>
+            <div class="is-flex is-flex-direction-column is-justify-content-center">
+              <p>{{roofSize()}} m²</p>
             </div>
           </div>
         </div>
-        
-        <div class="column mx-4">
-          <ng-container chart>
-            <div class="is-flex is-flex-direction-column is-justify-content-space-between" style="height: 20rem;">
-              <div class="is-flex is-flex-direction-row is-justify-content-center">
-                <ng-icon name="remixRainyLine" size="2.5rem"/>
-                <div class="is-flex is-flex-direction-column is-justify-content-center">
-                  <p class="ml-4" translate>braintank.overview.header.rainForecast</p>
-                </div>
-              </div>
 
-              @let optionsCurrentForecast = {
-                scales: {
-                  x: {
-                    grid: {
-                      display: false,
-                    },
-                  },
-                  y: {
-                    grid: {
-                      display: false,
-                    },
-                    title: {
-                      display: true,
-                      text: 'mm',
-                    },
-                    beginAtZero: true,
-                    suggestedMax: 10,
-                  },
-                },
-                plugins: {
-                  legend: {
-                    display: false,
-                  },
-                },
-              };
-              <canvas baseChart style="display: block; width: 100%; height: 100%;" [data]="dataCurrentForecast" [options]="optionsCurrentForecast" [type]="'bar'"></canvas>
+        <div class="column is-half">
+          <div class="is-flex is-flex-direction-row">
+            <ng-icon name="remixMapPin2Line" size="2.5rem" class="mx-4"/>
+            <div class="is-flex is-flex-direction-column is-justify-content-center">
+              <p>{{lat()}}, {{long()}}</p>
             </div>
-          </ng-container>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-
-  <div class="is-flex is-flex-direction-row is-fullwidth is-justify-content-center my-4">
-    <p class="is-size-3 my-4" translate>braintank.overview.header.daySelection</p>
-    <div class="is-flex is-flex-direction-column is-justify-content-center mx-4">
-      <input type="date" style="height: 2rem;"/>
-    </div>
-  </div>
-
-  <div class="card my-4">
-    <div class="card-content">
-      <div class="is-fullwidth has-text-centered my-4">
-          <p class="is-size-3 my-4" translate>braintank.overview.header.waterLevel</p>
-      </div>
-      
-      <ng-container chart>
-        <div class="is-fullwidth" style="height: 22rem;">
-          @let optionsWaterLevel = {
-            scales: {
-              x: {
-                grid: {
-                  display: false,
-                },
-              },
-              y: {
-                grid: {
-                  display: false,
-                },
-                title: {
-                  display: true,
-                  text: '%',
-                },
-                suggestedMin: 0,
-                suggestedMax: 100,
-              },
-            },
-            plugins: {
-              legend: {
-                display: false,
-              },
-            },
-          };
-          <canvas baseChart style="display: block; width: 100%; height: 100%;" [data]="dataWaterLevel" [options]="optionsWaterLevel" [type]="'line'"></canvas>
-        </div>
-      </ng-container>
-  </div>
-
-  <div class="card my-4">
-    <div class="card-content">
-      <div class="is-fullwidth has-text-centered my-4">
-          <p class="is-size-3 my-4" translate>braintank.overview.header.drainage</p>
-      </div>
-      
-      <ng-container chart>
-        <div class="is-fullwidth" style="height: 22rem;">
-          @let optionsDrainage = {
-            scales: {
-              x: {
-                grid: {
-                  display: false,
-                },
-              },
-              y: {
-                grid: {
-                  display: false,
-                },
-                title: {
-                  display: true,
-                  text: 'min',
-                },
-                beginAtZero: true,
-                suggestedMax: 60,
-              },
-            },
-            plugins: {
-              legend: {
-                display: false,
-              },
-            },
-          };
-          <canvas baseChart style="display: block; width: 100%; height: 100%;" [data]="dataDrainage" [options]="optionsDrainage" [type]="'bar'"></canvas>
-        </div>
-      </ng-container>
   </div>
 
   <div class="card my-4">
@@ -251,7 +147,7 @@
       
       <ng-container chart>
         <div class="is-fullwidth" style="height: 22rem;">
-          @let optionsRainForecast = {
+          @let optionsCurrentForecast = {
             scales: {
               x: {
                 grid: {
@@ -267,7 +163,7 @@
                   text: 'mm',
                 },
                 beginAtZero: true,
-                suggestedMax: 25,
+                suggestedMax: 10,
               },
             },
             plugins: {
@@ -276,7 +172,7 @@
               },
             },
           };
-          <canvas baseChart style="display: block; width: 100%; height: 100%;" [data]="dataRainForecast" [options]="optionsRainForecast" [type]="'bar'"></canvas>
+          <canvas baseChart style="display: block; width: 100%; height: 100%;" [data]="dataCurrentForecast" [options]="optionsCurrentForecast" [type]="'bar'"></canvas>
         </div>
       </ng-container>
   </div>

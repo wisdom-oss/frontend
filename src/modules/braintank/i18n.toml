@@ -1,3 +1,15 @@
+[history.header.daySelection]
+en = "Daily Course from"
+de = "Tagesverlauf vom"
+
+[history.header.drainage]
+en = "Drainage"
+de = "Entwässerung"
+
+[history.header.waterLevel]
+en = "Water Level"
+de = "Wasserspiegel"
+
 [overview.button.model]
 en = "Model"
 de = "Modell"
@@ -10,25 +22,17 @@ de = "Karte"
 en = "Pictures"
 de = "Bilder"
 
-[overview.header.daySelection]
-en = "Daily Course from"
-de = "Tagesverlauf vom"
-
-[overview.header.drainage]
-en = "Drainage"
-de = "Entwässerung"
+[overview.header.currentValues]
+en = "Current Values"
+de = "Aktuelle Messwerte"
 
 [overview.header.features]
-en = "Current Values & Properties"
-de = "Aktuelle Messwerte & Eigenschaften"
+en = "Features"
+de = "Eigenschaften"
 
 [overview.header.rainForecast]
 en = "Rain Forecast"
 de = "Regenvorhersage"
-
-[overview.header.waterLevel]
-en = "Water Level"
-de = "Wasserspiegel"
 
 [overview.draining.yes]
 en = "Draining since"
@@ -46,17 +50,9 @@ de = "Regel hinzufügen"
 en = "Start Simulation"
 de = "Simulation starten"
 
-[simulation.header.settings]
-en = "Parameter Settings"
-de = "Parametereinstellungen"
-
 [simulation.modal.rainForecast]
 en = "Adjust rain forecast"
 de = "Regenprognose anpassen"
-
-[simulation.settings.waterLevel]
-en = "Apply water level"
-de = "Wasserpegel übernehmen"
 
 [simulation.settings.drainage]
 en = "Activate drainage rules"
@@ -64,7 +60,11 @@ de = "Entwässerungsregeln aktivieren"
 
 [simulation.settings.rainForecast]
 en = "Apply rain forecast"
-de = "Regenprognose übernehmen"
+de = "Regenvorhersage übernehmen"
+
+[simulation.settings.rainForecastDate]
+en = "Apply forecast from time"
+de = "Vorhersage übernehmen vom Zeitpunkt"
 
 [simulation.settings.drainageForerun]
 en = "Drainage Forerun"
@@ -78,13 +78,17 @@ de = "Regenmenge"
 en = "Rain Duration"
 de = "Regendauer"
 
-[simulation.settings.startLevel]
-en = "Start Level"
-de = "Startpegel"
+[simulation.settings.setStartLevel]
+en = "Set starting water level"
+de = "Startwasserpegel einstellen"
 
 [simulation.settings.targetLevel]
 en = "Target Level"
 de = "Zielpegel"
+
+[tab.history]
+en = "History"
+de = "Historie"
 
 [tab.overview]
 en = "Overview"

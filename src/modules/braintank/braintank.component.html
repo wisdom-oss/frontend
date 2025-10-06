@@ -4,9 +4,17 @@
       <li [class.is-active]="activeTab() === 'overview'" (click)="setActiveTab('overview')">
         <a>
           <span class="icon">
-            <ng-icon name="remixLineChartLine"></ng-icon>
+            <ng-icon name="remixProfileLine"></ng-icon>
           </span>
           <span translate>braintank.tab.overview</span>
+        </a>
+      </li>
+      <li [class.is-active]="activeTab() === 'history'" (click)="setActiveTab('history')">
+        <a>
+          <span class="icon">
+            <ng-icon name="remixLineChartLine"></ng-icon>
+          </span>
+          <span translate>braintank.tab.history</span>
         </a>
       </li>
       <li [class.is-active]="activeTab() === 'simulation'" (click)="setActiveTab('simulation')">
@@ -22,6 +30,10 @@
 
   @if(activeTab() === 'overview') {
     <braintank-overview/>
+  }
+
+   @if(activeTab() === 'history') {
+    <braintank-history/>
   }
 
   @if(activeTab() === 'simulation') {

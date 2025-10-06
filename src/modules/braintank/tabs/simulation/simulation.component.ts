@@ -51,9 +51,9 @@ type DrainageRule = {
 })
 export class SimulationComponent {
   protected waterLevel: WritableSignal<number> = signal(50);
-  protected checkedWaterLevel: signals.ToggleableSignal = signals.toggleable(false);
-  protected checkedDrainage: signals.ToggleableSignal = signals.toggleable(false);
   protected checkedRainForecast: signals.ToggleableSignal = signals.toggleable(false);
+  protected drainageRulesModalOpen: signals.ToggleableSignal = signals.toggleable(false);
+  protected rainForecastModalOpen: signals.ToggleableSignal = signals.toggleable(false);
 
   dataRainForecast: ChartData<'bar', {x: string, y: number}[]> = {
     datasets: [{
