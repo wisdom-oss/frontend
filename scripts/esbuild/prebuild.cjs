@@ -33,10 +33,10 @@ function prebuildPlugin(_options = {}) {
 }
 
 module.exports = Object.assign(prebuildPlugin, {
-    buildNlwknMeasurementClassificationColorSvgs,
-    extractRemixicons,
-    buildSpritesheets,
-    storeGitCommitSHA,
+  buildNlwknMeasurementClassificationColorSvgs,
+  extractRemixicons,
+  buildSpritesheets,
+  storeGitCommitSHA,
 });
 
 // ------------------------------------
