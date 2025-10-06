@@ -136,8 +136,12 @@ async function buildSpritesheets() {
 
 /** Stores the current git commit sha in `src/assets/generated/revision.txt`. */
 async function storeGitCommitSHA() {
-  const execAsync = promisify(exec);
-  let {stdout: sha} = await execAsync("git rev-parse HEAD");
+  let sha = process.env.GIT_COMMIT_SHA?.trim();
+  if (!sha) {
+    const execAsync = promisify(exec);
+    await execAsync("git rev-parse HEAD").then(({stdout}) => (sha = stdout));
+  }
+
   await writeFile("src/assets/generated/revision.txt", sha.trim());
 }
 
