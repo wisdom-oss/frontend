@@ -32,7 +32,12 @@ function prebuildPlugin(_options = {}) {
   };
 }
 
-module.exports = prebuildPlugin;
+module.exports = Object.assign(prebuildPlugin, {
+    buildNlwknMeasurementClassificationColorSvgs,
+    extractRemixicons,
+    buildSpritesheets,
+    storeGitCommitSHA,
+});
 
 // ------------------------------------
 // Prebuild Subroutines
