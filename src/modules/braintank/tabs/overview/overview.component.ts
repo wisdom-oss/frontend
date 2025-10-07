@@ -62,7 +62,7 @@ export class OverviewComponent {
   draining : WritableSignal<boolean> = signal(true);
   drainingTime: WritableSignal<Dayjs> = signal(dayjs().subtract(30, 'minutes'));
 
-   dataCurrentForecast: ChartData<'bar', {x: string, y: number}[]> = {
+  dataCurrentForecast: ChartData<'bar', {x: string, y: number}[]> = {
     datasets: [{
       data: [{x: '16:00', y: 0}, {x: '16:15', y: 0}, {x: '16:30', y: 3}, {x: '16:45', y: 2}, {x: '17:00', y: 0}, {x: '17:15', y: 0}, {x: '17:30', y: 6}, {x: '17:45', y: 8}],
       parsing: {

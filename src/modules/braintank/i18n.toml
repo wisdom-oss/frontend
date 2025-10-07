@@ -1,90 +1,109 @@
-[history.header.daySelection]
-en = "Daily Course from"
-de = "Tagesverlauf vom"
-
-[history.header.drainage]
-en = "Drainage"
-de = "Entwässerung"
-
-[history.header.waterLevel]
-en = "Water Level"
-de = "Wasserspiegel"
-
-[overview.button.model]
-en = "Model"
-de = "Modell"
-
-[overview.button.map]
-en = "Map"
-de = "Karte"
-
-[overview.button.pictures]
-en = "Pictures"
-de = "Bilder"
-
-[overview.header.currentValues]
-en = "Current Values"
-de = "Aktuelle Messwerte"
-
-[overview.header.features]
-en = "Features"
-de = "Eigenschaften"
-
-[overview.header.rainForecast]
-en = "Rain Forecast"
-de = "Regenvorhersage"
-
-[overview.draining.yes]
-en = "Draining since"
-de = "Entwässern seit"
-
-[overview.draining.no]
-en = "No draining"
-de = "Keine Entwässerung"
-
-[simulation.button.addRule]
+[button.addRule]
 en = "Add rule"
 de = "Regel hinzufügen"
 
-[simulation.button.simulation]
+[button.adjustRainForecast]
+en = "Adjust rain forecast"
+de = "Regenvorhersage anpassen"
+
+[button.cancel]
+en = "Cancel"
+de = "Abbrechen"
+
+[button.confirm]
+en = "Confirm"
+de = "Bestätigen"
+
+[button.model]
+en = "Model"
+de = "Modell"
+
+[button.map]
+en = "Map"
+de = "Karte"
+
+[button.pictures]
+en = "Pictures"
+de = "Bilder"
+
+[button.startSimulation]
 en = "Start Simulation"
 de = "Simulation starten"
 
-[simulation.modal.rainForecast]
-en = "Adjust rain forecast"
-de = "Regenprognose anpassen"
 
-[simulation.settings.drainage]
-en = "Activate drainage rules"
-de = "Entwässerungsregeln aktivieren"
+[header.currentValues]
+en = "Current Values"
+de = "Aktuelle Messwerte"
 
-[simulation.settings.rainForecast]
-en = "Apply rain forecast"
-de = "Regenvorhersage übernehmen"
+[header.daySelection]
+en = "Daily Course from"
+de = "Tagesverlauf vom"
 
-[simulation.settings.rainForecastDate]
-en = "Apply forecast from time"
-de = "Vorhersage übernehmen vom Zeitpunkt"
+[header.drainage]
+en = "Drainage"
+de = "Entwässerung"
 
-[simulation.settings.drainageForerun]
+[header.features]
+en = "Features"
+de = "Eigenschaften"
+
+[header.rainForecast]
+en = "Rain Forecast"
+de = "Regenvorhersage"
+
+[header.waterLevel]
+en = "Water Level"
+de = "Wasserpegel"
+
+
+[label.drainage.yes]
+en = "Draining since"
+de = "Entwässern seit"
+
+[label.drainage.no]
+en = "No draining"
+de = "Keine Entwässerung"
+
+[label.drainageForerun]
 en = "Drainage Forerun"
 de = "Entwässerungsvorlauf"
 
-[simulation.settings.rainAmount]
+[label.location]
+en = "Location"
+de = "Standort"
+
+[label.rainAmount]
 en = "Rain Amount"
 de = "Regenmenge"
 
-[simulation.settings.rainDuration]
+[label.rainDuration]
 en = "Rain Duration"
 de = "Regendauer"
 
-[simulation.settings.setStartLevel]
+[label.rainForecast]
+en = "Apply rain forecast"
+de = "Regenvorhersage übernehmen"
+
+[label.rainForecastDate]
+en = "Apply forecast from time"
+de = "Vorhersage übernehmen vom Zeitpunkt"
+
+[label.roofSize]
+en = "Roof Size"
+de = "Dachgröße"
+
+[label.setStartLevel]
 en = "Set starting water level"
 de = "Startwasserpegel einstellen"
 
-[simulation.settings.targetLevel]
+[label.targetLevel]
 en = "Target Level"
 de = "Zielpegel"
+
+[label.time]
+en = "Time"
+de = "Zeitpunkt"
+
 
 [tab.history]
 en = "History"

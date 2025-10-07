@@ -3,23 +3,20 @@
 
   <div class="is-flex is-flex-direction-row is-justify-content-center my-4">
     <button class="button is-primary is-large is-rounded my-4">
-      <p translate>braintank.simulation.button.simulation</p>
+      <p translate>braintank.button.startSimulation</p>
     </button>
   </div>
   
   <div class="card my-4">
     <div class="card-content">
       <div class="is-fullwidth has-text-centered my-4">
-        <p class="is-size-3 my-4" translate>braintank.history.header.waterLevel</p>
+        <p class="is-size-3 my-4" translate>braintank.header.waterLevel</p>
       </div> 
 
       <div class="is-flex is-flex-direction-row is-fullwidth my-4">
         <ng-icon name="remixContrastDrop2Line" size="2.5rem"/>
         <div class="is-flex is-flex-direction-column is-justify-content-center">
-          <span class="is-flex is-flex-direction-row ml-4">
-            <p translate>braintank.simulation.settings.setStartLevel</p>
-            <p class="mr-4">:</p>
-          </span>
+          <p class="mx-4"><span translate>braintank.label.setStartLevel</span>: </p>
         </div>
         <input
           class="slider is-primary m-0 mx-4" style="width: 20rem;"
@@ -36,14 +33,14 @@
   <div class="card my-4">
     <div class="card-content">
       <div class="is-fullwidth has-text-centered my-4">
-        <p class="is-size-3 my-4" translate>braintank.history.header.drainage</p>
+        <p class="is-size-3 my-4" translate>braintank.header.drainage</p>
       </div>
 
       <div class="modal" [class.is-active]="drainageRulesModalOpen()">
         <div class="modal-background"></div>
         <div class="modal-card">
           <header class="modal-card-head">
-            <p class="modal-card-title" translate>braintank.simulation.button.addRule</p>
+            <p class="modal-card-title" translate>braintank.button.addRule</p>
             <button class="delete" aria-label="close" (click)="drainageRulesModalOpen.set(false)"></button>
           </header>
           <section class="modal-card-body">
@@ -51,8 +48,8 @@
           </section>
           <footer class="modal-card-foot">
             <div class="buttons">
-              <button class="button is-success">Save changes</button>
-              <button class="button" (click)="onToogleClick($event, drainageRulesModalOpen)">Cancel</button>
+              <button class="button is-success" (click)="drainageRulesModalOpen.set(false)" translate>braintank.button.confirm</button>
+              <button class="button" (click)="drainageRulesModalOpen.set(false)" translate>braintank.button.cancel</button>
             </div>
           </footer>
         </div>
@@ -75,7 +72,7 @@
                     <div class="column is-one-fifth">
                       <div class="is-flex is-flex-direction-row is-fullwidth is-justify-content-center">
                         <ng-icon name="remixRainyLine" size="1.5em" class="mr-4"/>
-                        <p translate>braintank.simulation.settings.rainAmount</p>
+                        <p translate>braintank.label.rainAmount</p>
                       </div>
                       <div class="is-flex is-flex-direction-row is-fullwidth is-justify-content-center mt-2">
                         <p style="font-size: large; font-weight: bold;">{{rule.rainAmount}} mm</p>
@@ -84,7 +81,7 @@
                     <div class="column is-one-fifth">
                       <div class="is-flex is-flex-direction-row is-fullwidth is-justify-content-center">
                         <ng-icon name="remixTimeLine" size="1.5em" class="mr-4"/>
-                        <p translate>braintank.simulation.settings.rainDuration</p>
+                        <p translate>braintank.label.rainDuration</p>
                       </div>
                       <div class="is-flex is-flex-direction-row is-fullwidth is-justify-content-center mt-2">
                         <p style="font-size: large; font-weight: bold;">{{rule.rainDuration}} min</p>
@@ -93,7 +90,7 @@
                     <div class="column is-one-fifth">
                       <div class="is-flex is-flex-direction-row is-fullwidth is-justify-content-center">
                         <ng-icon name="remixContrastDrop2Line" size="1.5em" class="mr-4"/>
-                        <p translate>braintank.simulation.settings.targetLevel</p>
+                        <p translate>braintank.label.targetLevel</p>
                       </div>
                       <div class="is-flex is-flex-direction-row is-fullwidth is-justify-content-center mt-2">
                         <p style="font-size: large; font-weight: bold;">{{rule.targetLevel}} %</p>
@@ -102,7 +99,7 @@
                     <div class="column is-one-fifth">
                       <div class="is-flex is-flex-direction-row is-fullwidth is-justify-content-center">
                         <ng-icon name="remixHistoryLine" size="1.5em" class="mr-4"/>
-                        <p translate>braintank.simulation.settings.drainageForerun</p>
+                        <p translate>braintank.label.drainageForerun</p>
                       </div>
                       <div class="is-flex is-flex-direction-row is-fullwidth is-justify-content-center mt-2">
                         <p style="font-size: large; font-weight: bold;">{{rule.drainageForerun}} min</p>
@@ -127,8 +124,8 @@
       </div>
 
       <div class="is-flex is-flex-direction-row is-fullwidth my-4 is-justify-content-center">
-        <button class="button is-primary is-rounded mx-4" (click)="onToogleClick($event, drainageRulesModalOpen)">
-          <p translate>braintank.simulation.button.addRule</p>
+        <button class="button is-primary is-rounded mx-4" (click)="drainageRulesModalOpen.set(true)">
+          <p translate>braintank.button.addRule</p>
         </button>
       </div>
     </div>
@@ -137,16 +134,14 @@
   <div class="card my-4">
     <div class="card-content">
       <div class="is-fullwidth has-text-centered my-4">
-        <p class="is-size-3 my-4" translate>braintank.overview.header.rainForecast</p>
+        <p class="is-size-3 my-4" translate>braintank.header.rainForecast</p>
       </div>
 
       <div class="is-flex is-flex-direction-row is-fullwidth my-4 is-justify-content-space-between">
         <div class="is-flex is-flex-direction-row">
+          <ng-icon name="remixRainyLine" size="2.5rem"/>
           <div class="is-flex is-flex-direction-column is-justify-content-center">
-            <span class="is-flex is-flex-direction-row mx-4">
-              <p translate>braintank.simulation.settings.rainForecast</p>
-              <p>: </p>
-            </span>
+            <p class="mx-4"><span translate>braintank.label.rainForecast</span>: </p>
           </div>
           <input id="checkedRainForecast" type="checkbox" class="switch is-rounded" [checked]="checkedRainForecast()" (click)="onToogleClick($event, checkedRainForecast)"/>
           <label for="checkedRainForecast"></label>
@@ -154,15 +149,15 @@
         
         <div>
           @if(!checkedRainForecast()) {
-            <button class="button is-primary is-rounded mx-4" (click)="onToogleClick($event, rainForecastModalOpen)">
-              <p translate>braintank.simulation.modal.rainForecast</p>
+            <button class="button is-primary is-rounded" (click)="rainForecastModalOpen.set(true)">
+              <p translate>braintank.button.adjustRainForecast</p>
             </button>
           }
 
           @if(checkedRainForecast()) {
             <div class="is-flex is-flex-direction-row">
-              <span class="is-flex is-flex-direction-row mx-4">
-                <p translate>braintank.simulation.settings.rainForecastDate</p>
+              <span class="is-flex is-flex-direction-row">
+                <p translate>braintank.label.rainForecastDate</p>
                 <p>: </p>
               </span>
               <div class="is-flex is-flex-direction-column is-justify-content-center mx-4">
@@ -173,20 +168,20 @@
         </div>
       </div>
 
-      <div [class]="rainForecastModalOpen() ? 'modal is-active': 'modal'">
+      <div class="modal" [class.is-active]="rainForecastModalOpen()">
         <div class="modal-background"></div>
         <div class="modal-card">
           <header class="modal-card-head">
-            <p class="modal-card-title" translate>braintank.simulation.modal.rainForecast</p>
-            <button class="delete" aria-label="close" (click)="onToogleClick($event, rainForecastModalOpen)"></button>
+            <p class="modal-card-title" translate>braintank.button.adjustRainForecast</p>
+            <button class="delete" aria-label="close" (click)="rainForecastModalOpen.set(false)"></button>
           </header>
           <section class="modal-card-body">
             <!-- Content ... -->
           </section>
           <footer class="modal-card-foot">
             <div class="buttons">
-              <button class="button is-success">Save changes</button>
-              <button class="button" (click)="onToogleClick($event, rainForecastModalOpen)">Cancel</button>
+              <button class="button is-success" (click)="rainForecastModalOpen.set(false)" translate>braintank.button.confirm</button>
+              <button class="button" (click)="rainForecastModalOpen.set(false)" translate>braintank.button.cancel</button>
             </div>
           </footer>
         </div>
