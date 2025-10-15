@@ -104,6 +104,10 @@ de = "Zielpegel"
 en = "Time"
 de = "Zeitpunkt"
 
+[label.title]
+en = "Title"
+de = "Titel"
+
 
 [tab.history]
 en = "History"
