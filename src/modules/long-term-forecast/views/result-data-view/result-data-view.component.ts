@@ -1,8 +1,8 @@
 import {NgIf, NgForOf, TitleCasePipe, KeyValuePipe} from "@angular/common";
 import {
   computed,
+  inject,
   model,
-  resource,
   signal,
   viewChild,
   Component,
@@ -17,26 +17,45 @@ import {BaseChartDirective} from "ng2-charts";
 
 import {UsageForecastsService} from "../../../../api/usage-forecasts.service";
 import {GeoDataService} from "../../../../api/geo-data.service";
-import {signals} from "../../../../common/signals";
 import {EmptyPipe} from "../../../../common/pipes/empty.pipe";
 import {RgbaColor} from "../../../../common/utils/rgba-color";
 import {defaults} from "../../../../common/utils/defaults";
+import {typeUtils} from "../../../../common/utils/type-utils";
 
 type ChartDatasets = ChartDataset<"bar", {x: string; y: number}[]>[];
+type ForecastRequest = typeUtils.Signaled<
+  Parameters<UsageForecastsService["fetchForecast"]>[0]
+>;
+
+const HISTORIC_DATA_COLOR = new RgbaColor(62, 120, 178, 0.4);
+const FORECAST_DATA_COLOR = new RgbaColor(238, 66, 102, 0.4);
+const HIGHLIGHT_DATA_COLOR = new RgbaColor(255, 69, 0, 0.8);
+
+const CHART_COLORS = {
+  history: HISTORIC_DATA_COLOR.toString(),
+  forecast: FORECAST_DATA_COLOR.toString(),
+  highlight: HIGHLIGHT_DATA_COLOR.toString(),
+
+  hover: {
+    history: HISTORIC_DATA_COLOR.with("alpha", 1).toString(),
+    forecast: FORECAST_DATA_COLOR.with("alpha", 1).toString(),
+    highlight: HIGHLIGHT_DATA_COLOR.with("alpha", 1).toString(),
+  },
+};
 
 @Component({
   imports: [
     BaseChartDirective,
-    EmptyPipe,
     FormsModule,
-    KeyValuePipe,
-    NgForOf,
-    NgIcon,
     NgIf,
+    NgForOf,
+    KeyValuePipe,
     TitleCasePipe,
     TranslateDirective,
     TranslatePipe,
+    NgIcon,
     NgIconComponent,
+    EmptyPipe,
   ],
   templateUrl: "./result-data-view.component.html",
   styleUrl: "./result-data-view.component.scss",
@@ -49,9 +68,13 @@ type ChartDatasets = ChartDataset<"bar", {x: string; y: number}[]>[];
   ],
 })
 export class ResultDataViewComponent {
+  private service = inject(UsageForecastsService);
+  private geoDataService = inject(GeoDataService);
+
   protected keys: string[];
   protected parameters: Record<string, Record<string, any>> = defaults({});
-  protected availableAlgorithms;
+
+  protected availableAlgorithms = this.service.fetchAvailableAlgorithms();
   protected selectedAlgorithmIdentifier = model("exponential");
   protected selectedAlgorithm = computed(() => {
     let available = this.availableAlgorithms() ?? [];
@@ -59,65 +82,21 @@ export class ResultDataViewComponent {
     return available.find(algo => algo.identifier == id);
   });
 
-  protected forecastResult = signal<undefined | UsageForecastsService.Result>(
-    undefined,
-  );
-  protected datasets = resource({
-    request: () => this.forecastResult(),
-    loader: ({request: result}) => this.formatDatasets(result),
-  });
-
-  private chart = viewChild(BaseChartDirective);
-  protected highlights = new Set<number>();
-
-  constructor(
-    private service: UsageForecastsService,
-    route: ActivatedRoute,
-    private geoDataService: GeoDataService,
-    private router: Router,
-  ) {
-    this.availableAlgorithms = signals.fromPromise(
-      service.fetchAvailableAlgorithms(),
-    );
-
-    this.keys = route.snapshot.queryParamMap.getAll("key"); // ensured by query params guard
-    let queryAlgorithm = route.snapshot.queryParamMap.get("algorithm");
-    if (queryAlgorithm) this.selectedAlgorithmIdentifier.set(queryAlgorithm);
-    let algorithm = this.selectedAlgorithmIdentifier();
-    let queryParameters = route.snapshot.queryParamMap.get("parameters");
-    if (queryParameters)
-      this.parameters[algorithm] = JSON.parse(queryParameters);
-
-    this.fetchForecast();
-  }
-
-  protected async fetchForecast() {
-    let algorithm = this.selectedAlgorithmIdentifier();
-    // we need to set the value here instead of using signals.fromPromise to
-    // not break reactivity detection
-    this.forecastResult.set(undefined);
-    let parameters = this.parameters[algorithm];
-    this.router.navigate([], {
-      queryParams: {
-        key: this.keys,
-        algorithm: algorithm,
-        parameters: JSON.stringify(parameters),
-      },
-    });
-    let result = await this.service.fetchForecast(algorithm, this.keys, {
-      parameters,
-    });
-    this.forecastResult.set(result);
-  }
-
-  private async formatDatasets(
-    result?: UsageForecastsService.Result,
-  ): Promise<ChartDatasets> {
-    if (!result) return [];
-
+  private forecastRequest = signal<ForecastRequest>(undefined);
+  protected forecastResult = this.service.fetchForecast(this.forecastRequest);
+  private forecastResultLabels = computed(() => {
+    let result = this.forecastResult();
+    if (!result) return undefined;
     let labels = new Set<string>();
     for (let date of result.data) labels.add(date.label);
-    let identities = await this.geoDataService.identify(labels);
+    return labels;
+  });
+  private identities = this.geoDataService.identify(this.forecastResultLabels);
+  protected datasets = computed(() => {
+    let result = this.forecastResult();
+    let identities = this.identities();
+    if (!result || !identities) return [];
+
     let names: Record<string, string | null> = {};
     for (let [key, entry] of Object.entries(identities["nds_municipals"])) {
       names[key] = entry.name;
@@ -153,6 +132,46 @@ export class ResultDataViewComponent {
     }
 
     return Object.values(datasets);
+  });
+
+  private chart = viewChild(BaseChartDirective);
+
+  protected highlights = new Set<number>();
+
+  constructor(
+    route: ActivatedRoute,
+    private router: Router,
+  ) {
+    this.keys = route.snapshot.queryParamMap.getAll("key"); // ensured by query params guard
+
+    let queryAlgorithm = route.snapshot.queryParamMap.get("algorithm");
+    if (queryAlgorithm) this.selectedAlgorithmIdentifier.set(queryAlgorithm);
+
+    let algorithm = this.selectedAlgorithmIdentifier();
+    let queryParameters = route.snapshot.queryParamMap.get("parameters");
+    if (queryParameters)
+      this.parameters[algorithm] = JSON.parse(queryParameters);
+
+    this.fetchForecast();
+  }
+
+  protected async fetchForecast() {
+    let algorithm = this.selectedAlgorithmIdentifier();
+    let parameters = this.parameters[algorithm];
+
+    this.router.navigate([], {
+      queryParams: {
+        key: this.keys,
+        algorithm: algorithm,
+        parameters: JSON.stringify(parameters),
+      },
+    });
+
+    this.forecastRequest.set({
+      scriptIdentifier: algorithm,
+      key: this.keys,
+      options: {parameters},
+    });
   }
 
   protected onChartClick: ChartOptions<"bar">["onClick"] = (
@@ -168,19 +187,3 @@ export class ResultDataViewComponent {
     }
   };
 }
-
-const HISTORIC_DATA_COLOR = new RgbaColor(62, 120, 178, 0.4);
-const FORECAST_DATA_COLOR = new RgbaColor(238, 66, 102, 0.4);
-const HIGHLIGHT_DATA_COLOR = new RgbaColor(255, 69, 0, 0.8);
-
-const CHART_COLORS = {
-  history: HISTORIC_DATA_COLOR.toString(),
-  forecast: FORECAST_DATA_COLOR.toString(),
-  highlight: HIGHLIGHT_DATA_COLOR.toString(),
-
-  hover: {
-    history: HISTORIC_DATA_COLOR.with("alpha", 1).toString(),
-    forecast: FORECAST_DATA_COLOR.with("alpha", 1).toString(),
-    highlight: HIGHLIGHT_DATA_COLOR.with("alpha", 1).toString(),
-  },
-};

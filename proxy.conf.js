@@ -61,6 +61,8 @@ const PROXY_CONFIG = {
     target: "https://wisdom-demo.uol.de/api",
     secure: false,
     changeOrigin: true,
+    ws: true,
+    rewriteWsOrigin: true,
     rewrite: path => path.replace(/^\/api/, ""),
   },
 };

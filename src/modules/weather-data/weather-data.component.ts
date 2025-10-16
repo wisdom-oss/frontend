@@ -4,8 +4,8 @@ import {
   effect,
   inject,
   model,
-  resource,
   signal,
+  untracked,
   viewChild,
   Component,
   ElementRef,
@@ -41,6 +41,7 @@ import {MapCursorDirective} from "../../common/directives/map-cursor.directive";
 import {cast} from "../../common/utils/cast";
 
 type Stations = DwdService.V2.Stations;
+type DownloadParams = DwdService.Params.V1.Data;
 
 const MAPPING = {
   product: {
@@ -104,8 +105,14 @@ const MAPPING = {
   ],
 })
 export class WeatherDataComponent {
+  private service = inject(DwdService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
   protected lang = signals.lang();
   protected document = inject(DOCUMENT);
+  private selectDiv = viewChild<ElementRef<HTMLDivElement>>("select");
+  protected selectDivWidth = signal(0);
   private downloadAnchor =
     viewChild.required<ElementRef<HTMLAnchorElement>>("downloadAnchor");
 
@@ -136,10 +143,7 @@ export class WeatherDataComponent {
     );
   });
 
-  protected stationInfo = resource({
-    request: () => this.selectedStationId(),
-    loader: ({request: stationId}) => this.service.v1.fetchStation(stationId),
-  }).value.asReadonly();
+  protected stationInfo = this.service.v1.fetchStation(this.selectedStationId);
 
   protected selectedProduct = signal<
     undefined | keyof (typeof MAPPING)["product"]
@@ -175,6 +179,8 @@ export class WeatherDataComponent {
   protected productFrom = signals.dayjs(() => this.productFromRaw());
   protected productUntil = signals.dayjs(() => this.productUntilRaw());
 
+  private downloadParams = signals.maybe<DownloadParams>();
+  private downloadResource = this.service.v1.fetchData(this.downloadParams);
   protected downloading = signal(false);
 
   protected util = {
@@ -182,12 +188,8 @@ export class WeatherDataComponent {
     log: (...args: any[]) => console.log(...args),
   };
 
-  constructor(
-    private service: DwdService,
-    private route: ActivatedRoute,
-    private router: Router,
-  ) {
-    this.selectedStationId.set(route.snapshot.queryParams["station"]);
+  constructor() {
+    this.selectedStationId.set(this.route.snapshot.queryParams["station"]);
     effect(() =>
       this.router.navigate([], {
         relativeTo: this.route,
@@ -195,11 +197,16 @@ export class WeatherDataComponent {
       }),
     );
 
-    this.stations = signals.fromPromise(this.service.v2.fetchStations());
+    this.stations = this.service.v2.fetchStations();
 
     effect(() => {
       let selected = this.selectedStation();
       if (!selected) return;
+
+      // only update bounds if select div is rendered
+      let selectDiv = this.selectDiv();
+      let selectDivWidth = this.selectDivWidth();
+      if (!selectDiv || !selectDivWidth) return;
 
       let bbox = turf.bbox(selected.geometry);
       let padding = 0.01;
@@ -207,11 +214,9 @@ export class WeatherDataComponent {
       bbox[1] -= padding;
       bbox[2] += padding;
       bbox[3] += padding;
+
       // update map after selector appeared
       setTimeout(() => this.fitBounds.set(bbox));
-
-      // force update again when info loaded
-      this.stationInfo();
     });
 
     effect(() => {
@@ -242,24 +247,31 @@ export class WeatherDataComponent {
     this.downloading.set(true);
 
     let {stationId, product, resolution, from, until} = options;
-    let data = await this.service.v1.fetchData({
+    this.downloadParams.set({
       stationId,
       dataType: product,
       granularity: resolution,
       from,
       until,
     });
+  }
 
+  private downloadedEffect = effect(() => {
+    let data = this.downloadResource();
+    if (!data) return;
     let blob = new Blob([JSON.stringify(data)], {type: "application/json"});
     let url = URL.createObjectURL(blob);
 
     let a = this.downloadAnchor().nativeElement;
     a.href = url;
+    let {dataType: product, granularity: resolution} = untracked(
+      this.downloadParams,
+    )!;
     a.download = `WISdoM_Weather_Data_${this.stationInfo()!.name}_${product}_${resolution}.json`;
     a.click();
 
     this.downloading.set(false);
-  }
+  });
 
   private determineLayers(): Record<
     string,
@@ -295,11 +307,15 @@ export class WeatherDataComponent {
     }
 
     let features = stations.features.filter(feature => {
-      for (let product in feature.properties.products) {
-        if (activeLayers.has(product)) return true;
+      let productKeys = Object.keys(feature.properties.products);
+      if (productKeys.length < activeLayers.size) return false;
+
+      let products = new Set(productKeys);
+      for (let layer of activeLayers) {
+        if (!products.has(layer)) return false;
       }
 
-      return false;
+      return true;
     });
 
     return {type: "FeatureCollection", features};

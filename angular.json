@@ -9,28 +9,38 @@
         "@schematics/angular:component": {
           "skipTests": true,
           "style": "none",
-          "skipSelector": true
+          "skipSelector": true,
+          "type": "component"
         },
         "@schematics/angular:class": {
           "skipTests": true
         },
         "@schematics/angular:directive": {
-          "skipTests": true
+          "skipTests": true,
+          "type": "directive"
         },
         "@schematics/angular:guard": {
-          "skipTests": true
+          "skipTests": true,
+          "typeSeparator": "."
         },
         "@schematics/angular:module": {
-          "skipTests": true
+          "skipTests": true,
+          "typeSeparator": "."
         },
         "@schematics/angular:pipe": {
-          "skipTests": true
+          "skipTests": true,
+          "typeSeparator": "."
         },
         "@schematics/angular:service": {
-          "skipTests": true
+          "skipTests": true,
+          "type": "service"
         },
         "@schematics/angular:interceptor": {
-          "skipTests": true
+          "skipTests": true,
+          "typeSeparator": "."
+        },
+        "@schematics/angular:resolver": {
+          "typeSeparator": "."
         }
       },
       "root": "",
@@ -48,7 +58,8 @@
               {
                 "path": "scripts/esbuild/prebuild.cjs",
                 "options": {}
-              }
+              },
+              "scripts/esbuild/unplugin.cjs"
             ],
             "outputPath": "dist/wisdom-oss/frontend",
             "index": "src/index.html",
@@ -89,7 +100,8 @@
               "skmeans",
               "concaveman",
               "fast-deep-equal",
-              "earcut"
+              "earcut",
+              "typia/lib/internal"
             ],
             "stylePreprocessorOptions": {
               "sass": {
@@ -102,8 +114,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "5MB",
-                  "maximumError": "10MB"
+                  "maximumWarning": "10MB",
+                  "maximumError": "20MB"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -111,7 +123,8 @@
                   "maximumError": "4kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "sourceMap": true
             },
             "development": {
               "optimization": false,

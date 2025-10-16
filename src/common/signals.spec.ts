@@ -108,3 +108,61 @@ describe("signals.not", () => {
     expect(inverted()).toBe(false);
   });
 });
+
+describe("signals.require", () => {
+  it("should require both signals to be defined", () => {
+    const a = signals.maybe<number>();
+    const b = signals.maybe<string>();
+    const both = signals.require({a, b});
+
+    expect(both()).toBeUndefined();
+
+    a.set(42);
+    expect(both()).toBeUndefined();
+
+    b.set("hello");
+    expect(both()).toEqual({a: 42, b: "hello"});
+  });
+
+  it("should support a fallback object", () => {
+    const userId = signals.maybe<string>();
+    const token = signals.maybe<string>();
+    const ready = signals.require(
+      {userId, token},
+      {fallback: {status: "missing"} as const},
+    );
+
+    expect(ready()).toEqual({status: "missing"});
+
+    userId.set("u123");
+    token.set("t456");
+
+    expect(ready()).toEqual({userId: "u123", token: "t456"});
+  });
+
+  it("should treat null and undefined as missing", () => {
+    const name = signals.maybe<string | null>();
+    const age = signals.maybe<number | null>();
+    const present = signals.require({name, age}, {exclude: [null, undefined]});
+
+    expect(present()).toBeUndefined();
+
+    name.set("Squidward");
+    age.set(7);
+
+    expect(present()).toEqual({name: "Squidward", age: 7});
+
+    name.set(null);
+    expect(present()).toBeUndefined();
+  });
+
+  it("should allow excluding a sentinel value", () => {
+    const step = signal<number>(0);
+    const ok = signals.require({step}, {exclude: [0], fallback: "not ready"});
+
+    expect(ok()).toBe("not ready");
+
+    step.set(1);
+    expect(ok()).toEqual({step: 1});
+  });
+});

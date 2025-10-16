@@ -1,172 +1,105 @@
-import {
-  HttpClient,
-  HttpStatusCode,
-  HttpContext,
-  HttpErrorResponse,
-} from "@angular/common/http";
-import {Injectable} from "@angular/core";
-import {JTDDataType} from "ajv/dist/core";
+import {HttpStatusCode} from "@angular/common/http";
+import {computed, Injectable} from "@angular/core";
 import dayjs from "dayjs";
-import {GeoJSON} from "geojson";
-import {firstValueFrom} from "rxjs";
+import {Geometry} from "geojson";
+import typia from "typia";
 
-import {httpContexts} from "../common/http-contexts";
+import {api} from "../common/api";
 
 const URL = "/api/geodata" as const;
 
 @Injectable({
   providedIn: "root",
 })
-export class GeoDataService {
-  constructor(private http: HttpClient) {}
-
-  fetchAvailableLayers(): Promise<GeoDataService.AvailableLayers> {
-    return firstValueFrom(
-      this.http.get<GeoDataService.AvailableLayers>(`${URL}/v2/`, {
-        context: new HttpContext().set(
-          httpContexts.validateSchema,
-          AVAILABLE_LAYERS_SCHEMA,
-        ),
-      }),
-    );
+export class GeoDataService extends api.service(URL) {
+  fetchAvailableLayers(): api.Signal<GeoDataService.AvailableLayers> {
+    return api.resource({
+      url: `${URL}/v2/`,
+      validate: typia.createValidate<GeoDataService.AvailableLayers>(),
+    });
   }
 
-  async fetchLayerInformation(
-    layerRef: string,
-  ): Promise<GeoDataService.LayerInformation | null> {
-    try {
-      return await firstValueFrom(
-        this.http.get<GeoDataService.LayerInformation>(
-          `${URL}/v2/${layerRef}`,
-          {
-            context: new HttpContext().set(
-              httpContexts.validateSchema,
-              LAYER_INFORMATION,
-            ),
-          },
-        ),
-      );
-    } catch (error) {
-      if (!(error instanceof HttpErrorResponse)) throw error;
-      if (error.status === HttpStatusCode.NotFound) return null;
-      throw error;
-    }
+  fetchLayerInformation(
+    layerRef: api.RequestSignal<string>,
+  ): api.Signal<GeoDataService.LayerInformation | null> {
+    return api.resource({
+      url: api.url`${URL}/v1/${layerRef}`,
+      validate: typia.createValidate<GeoDataService.LayerInformation>(),
+      onError: {[HttpStatusCode.NotFound]: () => null},
+    });
   }
 
-  async fetchLayerContents(
-    layerRef: string,
-    filter?: {
+  fetchLayerContents(
+    layerRef: api.RequestSignal<string>,
+    filter?: api.RequestSignal<{
       relation: "within" | "overlaps" | "contains";
       otherLayer: string;
       key: string[];
-    },
+    }>,
     cacheTtl = dayjs.duration(1, "week"),
-  ): Promise<GeoDataService.LayerContents | null> {
-    try {
-      let url = `${URL}/v2/content/${layerRef}`;
-      if (filter) {
-        let queryParams = [];
-        for (let [key, value] of Object.entries({
-          relation: filter.relation,
-          other_layer: filter.otherLayer,
-          key: filter.key,
-        }))
-          queryParams.push(`${key}=${value}`);
-        url += `/filtered?${queryParams.join("&")}`;
-      }
+  ): api.Signal<GeoDataService.LayerContents | null, null> {
+    let filterParam = computed(() => {
+      let filterOptions = api.toSignal(filter)();
+      if (!filterOptions) return "";
+      let {relation, otherLayer, key} = filterOptions;
+      return `/filtered?relation=${relation}&other_layer=${otherLayer}&key=${key}`;
+    });
 
-      let context = new HttpContext()
-        .set(httpContexts.validateSchema, LAYER_CONTENTS)
-        .set(httpContexts.cache, [url, cacheTtl]);
-
-      return await firstValueFrom(
-        this.http.get<GeoDataService.LayerContents>(url, {context}),
-      );
-    } catch (error) {
-      if (!(error instanceof HttpErrorResponse)) throw error;
-      if (error.status === HttpStatusCode.NotFound) return null;
-      throw error;
-    }
+    return api.resource({
+      url: api.url`${URL}/v2/content/${layerRef}${filterParam}`,
+      validate: typia.createValidate<GeoDataService.LayerContents>(),
+      cache: cacheTtl,
+      defaultValue: null,
+      onError: {[HttpStatusCode.NotFound]: () => null},
+    });
   }
 
-  identify(keys: Iterable<string>): Promise<GeoDataService.IdentifiedObjects> {
-    let queryParams: string[] = [];
-    for (let key of keys) queryParams.push(`key=${key}`);
-    let url = `${URL}/v1/identify?${queryParams.join("&")}`;
-    return firstValueFrom(
-      this.http.get<GeoDataService.IdentifiedObjects>(url, {
-        context: new HttpContext().set(
-          httpContexts.validateSchema,
-          IDENTIFIED_OBJECTS,
-        ),
-      }),
-    );
+  identify(
+    keys: api.RequestSignal<Iterable<string>>,
+  ): api.Signal<GeoDataService.IdentifiedObjects> {
+    let url = computed(() => {
+      let queryParams = [];
+      let iter = api.toSignal(keys)();
+      if (iter === undefined) return undefined;
+      for (let key of iter) queryParams.push(`key=${key}`);
+      return `${URL}/v1/identify?${queryParams.join("&")}`;
+    });
+
+    return api.resource({
+      url,
+      validate: typia.createValidate<GeoDataService.IdentifiedObjects>(),
+      cache: dayjs.duration(6, "months"),
+    });
   }
 }
 
 export namespace GeoDataService {
-  export type LayerInformation = JTDDataType<typeof LAYER_INFORMATION>;
-  export type AvailableLayers = JTDDataType<typeof AVAILABLE_LAYERS_SCHEMA>;
-  export type LayerContent = Omit<
-    JTDDataType<typeof LAYER_CONTENT>,
-    "geometry"
-  > & {geometry: GeoJSON};
-  export type LayerContents = Omit<
-    JTDDataType<typeof LAYER_CONTENTS>,
-    "data"
-  > & {data: LayerContent[]};
-  export type IdentifiedObjects = JTDDataType<typeof IDENTIFIED_OBJECTS>;
+  export type LayerInformation = {
+    id: string;
+    name: string;
+    key: string;
+    description?: string;
+    attribution?: string;
+    attributionURL?: string | null;
+    crs?: number & typia.tags.Type<"uint32">;
+    private?: boolean;
+  };
+
+  export type AvailableLayers = LayerInformation[];
+
+  export type LayerContent = {
+    name: string | null;
+    id: number & typia.tags.Type<"uint32">;
+    key: string;
+    geometry: Geometry;
+    additionalProperties: Record<string, any> | null;
+  };
+
+  export type LayerContents = {
+    data: LayerContent[];
+    attribution?: string | null;
+    attributionURL?: string | null;
+  };
+
+  export type IdentifiedObjects = Record<string, Record<string, LayerContent>>;
 }
-
-const LAYER_INFORMATION = {
-  properties: {
-    id: {type: "string"},
-    name: {type: "string"},
-    key: {type: "string"},
-  },
-  optionalProperties: {
-    description: {type: "string"},
-    attribution: {type: "string"},
-    attributionURL: {type: "string"},
-    crs: {type: "uint32"},
-    private: {type: "boolean"},
-  },
-} as const;
-
-const AVAILABLE_LAYERS_SCHEMA = {
-  elements: LAYER_INFORMATION,
-} as const;
-
-const LAYER_CONTENT = {
-  properties: {
-    name: {type: "string", nullable: true},
-    id: {type: "uint32"},
-    key: {type: "string"},
-    geometry: {
-      optionalProperties: {},
-      additionalProperties: true,
-    },
-  },
-  optionalProperties: {
-    additionalProperties: {
-      optionalProperties: {},
-      additionalProperties: true,
-    },
-  },
-} as const;
-
-const LAYER_CONTENTS = {
-  properties: {
-    data: {elements: LAYER_CONTENT},
-  },
-  optionalProperties: {
-    attribution: {type: "string", nullable: true},
-    attributionURL: {type: "string", nullable: true},
-  },
-} as const;
-
-const IDENTIFIED_OBJECTS = {
-  values: {
-    values: LAYER_CONTENT,
-  },
-} as const;

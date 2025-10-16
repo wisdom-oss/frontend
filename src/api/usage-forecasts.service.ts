@@ -1,70 +1,73 @@
-import {HttpClient, HttpContext, HttpParams} from "@angular/common/http";
+import {HttpParams} from "@angular/common/http";
 import {Injectable} from "@angular/core";
-import {JTDDataType} from "ajv/dist/core";
 import dayjs from "dayjs";
-import {firstValueFrom} from "rxjs";
+import typia from "typia";
 
-import {httpContexts} from "../common/http-contexts";
+import {api} from "../common/api";
 
 const URL = "/api/water-usage-forecasts" as const;
 
 @Injectable({
   providedIn: "root",
 })
-export class UsageForecastsService {
-  constructor(private http: HttpClient) {}
-
-  fetchAvailableAlgorithms(): Promise<AvailableAlgorithms> {
-    return firstValueFrom(
-      this.http.get<AvailableAlgorithms>(`${URL}/`, {
-        context: new HttpContext()
-          .set(httpContexts.cache, [URL, dayjs.duration(1, "day")])
-          .set(httpContexts.validateSchema, AVAILABLE_ALGORITHMS),
-      }),
-    );
+export class UsageForecastsService extends api.service(URL) {
+  fetchAvailableAlgorithms(): api.Signal<Self.AvailableAlgorithms> {
+    return api.resource({
+      url: `${URL}/`,
+      validate: typia.createValidate<Self.AvailableAlgorithms>(),
+      cache: dayjs.duration(1, "day"),
+    });
   }
 
   fetchForecast(
-    scriptIdentifier: string,
-    key: string | string[],
-    options?: {
-      consumerGroup?: null | ConsumerGroup | ConsumerGroup[];
-      parameters?: null | Record<string, any>;
-    } | null,
-  ): Promise<Result> {
-    let params = new HttpParams(); // remember, params operations are always copy
-    for (let paramKey of [key].flat()) params = params.append("key", paramKey);
-    for (let consumerGroupKey of [options?.consumerGroup ?? []].flat()) {
-      params = params.append("consumerGroup", consumerGroupKey);
-    }
+    options: api.RequestSignal<{
+      scriptIdentifier: string;
+      key: string | string[];
+      options?: {
+        consumerGroup?: null | Self.ConsumerGroup | Self.ConsumerGroup[];
+        parameters?: null | Record<string, any>;
+      } | null;
+    }>,
+  ): api.Signal<Self.Result> {
+    let params = api.map(options, options => {
+      let params = new HttpParams();
+      for (let key of [options.key].flat()) params = params.append("key", key);
+      for (let key of [options?.options?.consumerGroup ?? []].flat()) {
+        params = params.append("consumerGroup", key);
+      }
 
-    let formData: FormData | undefined = undefined;
-    if (options?.parameters && Object.values(options.parameters).length) {
-      formData = new FormData();
+      return params;
+    });
+
+    let formData = api.map(options, ({options}) => {
+      if (!(options?.parameters && Object.values(options.parameters).length))
+        return api.NONE;
+
+      let formData = new FormData();
       for (let [key, value] of Object.entries(options.parameters)) {
         formData.append(key, value);
       }
-    }
 
-    let context = new HttpContext()
-      .set(httpContexts.validateSchema, RESULT)
-      .set(httpContexts.cache, [
-        JSON.stringify({URL, key, scriptIdentifier, options}),
-        dayjs.duration(1, "day"),
-      ]);
+      return formData;
+    });
 
-    return firstValueFrom(
-      this.http.post<Result>(`${URL}/${scriptIdentifier}`, formData, {
-        params,
-        context,
-      }),
+    let scriptIdentifier = api.map(
+      options,
+      ({scriptIdentifier}) => scriptIdentifier,
     );
+
+    return api.resource({
+      method: "POST",
+      url: api.url`${URL}/${scriptIdentifier}`,
+      validate: typia.createValidate<Self.Result>(),
+      cache: dayjs.duration(1, "day"),
+      params,
+      body: formData,
+    });
   }
 }
 
 export namespace UsageForecastsService {
-  export type AvailableAlgorithms = JTDDataType<typeof AVAILABLE_ALGORITHMS>;
-  export type Result = JTDDataType<typeof RESULT>;
   export type ConsumerGroup =
     | "businesses"
     | "households"
@@ -74,86 +77,49 @@ export namespace UsageForecastsService {
     | "standpipes"
     | "tourism"
     | "resellers";
+
+  export type AvailableAlgorithms = Array<{
+    identifier: string;
+    displayName: string;
+    description: string;
+    parameter: Record<
+      string,
+      | {
+          type: "str";
+          default: string;
+          description: string;
+          enums?: string[];
+        }
+      | {
+          type: "int";
+          default: number & typia.tags.Type<"int32">;
+          description: string;
+          max?: number & typia.tags.Type<"int32">;
+          min?: number & typia.tags.Type<"int32">;
+        }
+      | {
+          type: "float";
+          default: number & typia.tags.Type<"double">;
+          description: string;
+          max?: number & typia.tags.Type<"double">;
+          min?: number & typia.tags.Type<"double">;
+        }
+    >;
+  }>;
+
+  export type Result = {
+    meta: {
+      rScores: Record<string, number & typia.tags.Type<"double">>;
+      realDataUntil: Record<string, number & typia.tags.Type<"uint32">>;
+      curves?: Record<string, string>;
+    };
+    data: Array<{
+      label: string;
+      x: string | number;
+      y: number & typia.tags.Type<"double">;
+      uncertainty?: (number & typia.tags.Type<"double">)[];
+    }>;
+  };
 }
 
-type AvailableAlgorithms = UsageForecastsService.AvailableAlgorithms;
-type Result = UsageForecastsService.Result;
-type ConsumerGroup = UsageForecastsService.ConsumerGroup;
-
-const AVAILABLE_ALGORITHMS = {
-  elements: {
-    properties: {
-      identifier: {type: "string"},
-      displayName: {type: "string"},
-      description: {type: "string"},
-      parameter: {
-        values: {
-          discriminator: "type",
-          mapping: {
-            str: {
-              properties: {
-                default: {type: "string"},
-                description: {type: "string"},
-              },
-              optionalProperties: {
-                enums: {
-                  elements: {type: "string"},
-                },
-              },
-            },
-            int: {
-              properties: {
-                default: {type: "int32"},
-                description: {type: "string"},
-              },
-              optionalProperties: {
-                max: {type: "int32"},
-                min: {type: "int32"},
-              },
-            },
-            float: {
-              properties: {
-                default: {type: "float64"},
-                description: {type: "string"},
-              },
-              optionalProperties: {
-                max: {type: "float64"},
-                min: {type: "float64"},
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-} as const;
-
-const RESULT = {
-  properties: {
-    meta: {
-      properties: {
-        rScores: {values: {type: "float64"}},
-        realDataUntil: {values: {type: "uint32"}},
-      },
-      optionalProperties: {
-        curves: {values: {type: "string"}},
-      },
-    },
-    data: {
-      elements: {
-        properties: {
-          label: {type: "string"},
-          x: {}, // we don't know if the service responds correctly
-          y: {type: "float64"},
-        },
-        optionalProperties: {
-          uncertainty: {
-            elements: {
-              type: "float64",
-            },
-          },
-        },
-      },
-    },
-  },
-} as const;
+import Self = UsageForecastsService;

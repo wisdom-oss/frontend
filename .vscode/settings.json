@@ -23,10 +23,15 @@
     "greenable",
     "monday",
     "oowv",
+    "oowv",
     "saturday",
     "sunday",
     "thursday",
     "tuesday",
-    "wednesday"
-  ]
+    "typia",
+    "wednesday",
+  ],
+  "files.watcherExclude": {
+    "**/target": true
+  }
 }

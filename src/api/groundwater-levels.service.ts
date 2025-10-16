@@ -1,56 +1,41 @@
-import {HttpClient, HttpContext} from "@angular/common/http";
-import {Injectable} from "@angular/core";
-import {JTDDataType} from "ajv/dist/core";
+import {computed, Injectable} from "@angular/core";
 import dayjs, {Dayjs} from "dayjs";
 import {Point} from "geojson";
-import {firstValueFrom} from "rxjs";
+import typia from "typia";
 
-import {typeUtils} from "../common/utils/type-utils";
-import {httpContexts} from "../common/http-contexts";
+import {api} from "../common/api";
+import {signals} from "../common/signals";
 
 const URL = "/api/groundwater-levels" as const;
 
 @Injectable({
   providedIn: "root",
 })
-export class GroundwaterLevelsService {
-  constructor(private http: HttpClient) {}
-
+export class GroundwaterLevelsService extends api.service(URL) {
   fetchRecorderLocation(
-    stationId: string,
-  ): Promise<GroundwaterLevelsService.RecorderLocation> {
-    return firstValueFrom(
-      this.http.get<GroundwaterLevelsService.RecorderLocation>(
-        `${URL}/${stationId}`,
-        {
-          context: new HttpContext().set(
-            httpContexts.validateSchema,
-            RECORDER_LOCATION,
-          ),
-        },
-      ),
-    );
+    stationId: api.RequestSignal<string>,
+  ): api.Signal<Self.RecorderLocation> {
+    return api.resource({
+      url: api.url`${URL}/${stationId}`,
+      validate: typia.createValidate<Self.RecorderLocation>(),
+    });
   }
 
-  fetchRecorderLocations(): Promise<GroundwaterLevelsService.RecorderLocations> {
-    return firstValueFrom(
-      this.http.get<GroundwaterLevelsService.RecorderLocations>(`${URL}/`, {
-        context: new HttpContext().set(
-          httpContexts.validateSchema,
-          RECORDER_LOCATIONS,
-        ),
-      }),
-    );
+  fetchRecorderLocations(): api.Signal<Self.RecorderLocations> {
+    return api.resource({
+      url: `${URL}/`,
+      validate: typia.createValidate<Self.RecorderLocations>(),
+    });
   }
 
-  async fetchMeasurementClassifications(
-    date: Dayjs = dayjs(),
-  ): Promise<Record<string, GroundwaterLevelsService.Measurement>> {
-    let url = `${URL}/graphql`;
-    let query = `{
+  fetchMeasurementClassifications(
+    date: api.RequestSignal<Dayjs> = dayjs(),
+  ): api.Signal<Record<string, Self.Measurement>> {
+    let dateIso = signals.map(api.toSignal(date), date => date?.toISOString());
+    let query = api.url`{
       measurements(
-        from: "${date.toISOString()}"
-        until: "${date.toISOString()}"
+        from: "${dateIso}"
+        until: "${dateIso}"
       ) {
         station
         date
@@ -60,47 +45,48 @@ export class GroundwaterLevelsService {
       }
     }`;
 
-    let context = new HttpContext()
-      .set(httpContexts.validateSchema, MEASUREMENT_CLASSIFICATIONS_RESPONSE)
-      .set(httpContexts.cache, [`${url}:${query}`, dayjs.duration(8, "hours")]);
+    let parse = ({
+      data: {measurements},
+    }: MeasurementClassificationResponse): Record<string, Self.Measurement> => {
+      return Object.fromEntries(
+        measurements.map(m => [
+          m.station,
+          {
+            station: m.station,
+            date: dayjs(m.date),
+            classification: m.classification || null,
+            waterLevelNHN: m.waterLevelNHN,
+            waterLevelGOK: m.waterLevelGOK,
+          },
+        ]),
+      );
+    };
 
-    let response = await firstValueFrom(
-      this.http.post<JTDDataType<typeof MEASUREMENT_CLASSIFICATIONS_RESPONSE>>(
-        url,
-        {query},
-        {context},
-      ),
-    );
-
-    let measurements = response.data.measurements.map(m => ({
-      station: m.station,
-      date: dayjs(m.date),
-      classification: m.classification || null,
-      waterLevelNHN: m.waterLevelNHN,
-      waterLevelGOK: m.waterLevelGOK,
-    }));
-
-    return Object.fromEntries(measurements.map(m => [m.station, m]));
+    return api.resource({
+      url: `${URL}/graphql`,
+      method: "POST",
+      body: computed(() => ({query: query()})),
+      cache: dayjs.duration(8, "hours"),
+      parse,
+      validateRaw: typia.createValidate<MeasurementClassificationResponse>(),
+      validate: typia.createValidate<Record<string, Self.Measurement>>(),
+    });
   }
 }
 
-export namespace GroundwaterLevelsService {
-  export type RecorderLocation = Omit<
-    JTDDataType<typeof RECORDER_LOCATION>,
-    "location"
-  > & {location: Point};
-  export type RecorderLocations = typeUtils.UpdateElements<
-    JTDDataType<typeof RECORDER_LOCATIONS>,
-    "location",
-    {location: Point}
-  >;
-  export type Measurement = Omit<
-    JTDDataType<
-      (typeof MEASUREMENT_CLASSIFICATIONS_RESPONSE)["properties"]["data"]["properties"]["measurements"]["elements"]
-    >,
-    "classification" | "date"
-  > & {classification: MeasurementClassification | null; date: Dayjs};
+type MeasurementClassificationResponse = {
+  data: {
+    measurements: Array<{
+      station: string;
+      date: string & typia.tags.Format<"date-time">;
+      classification: GroundwaterLevelsService.MeasurementClassification | "";
+      waterLevelNHN?: (number & typia.tags.Type<"double">) | null;
+      waterLevelGOK?: (number & typia.tags.Type<"double">) | null;
+    }>;
+  };
+};
 
+export namespace GroundwaterLevelsService {
   /**
    * Measurement classifications according to NLWKN.
    *
@@ -115,55 +101,21 @@ export namespace GroundwaterLevelsService {
     VERY_LOW = "sehr niedrig",
     MIN_UNDERSHOT = "Niedrigstwert unterschritten",
   }
+
+  export type RecorderLocation = {
+    websiteID: string;
+    publicID: string;
+    name: string;
+    operator: string;
+    location: Point;
+  };
+
+  export type RecorderLocations = RecorderLocation[];
+
+  export type Measurement = Omit<
+    MeasurementClassificationResponse["data"]["measurements"][0],
+    "classification" | "date"
+  > & {classification: MeasurementClassification | null; date: Dayjs};
 }
 
-const RECORDER_LOCATION = {
-  properties: {
-    websiteID: {type: "string"},
-    publicID: {type: "string"},
-    name: {type: "string"},
-    operator: {type: "string"},
-    location: {
-      optionalProperties: {},
-      additionalProperties: true,
-    },
-  },
-} as const;
-
-const RECORDER_LOCATIONS = {
-  elements: RECORDER_LOCATION,
-} as const;
-
-const MC = GroundwaterLevelsService.MeasurementClassification;
-const MEASUREMENT_CLASSIFICATIONS_RESPONSE = {
-  properties: {
-    data: {
-      properties: {
-        measurements: {
-          elements: {
-            properties: {
-              station: {type: "string"},
-              date: {type: "timestamp"},
-              classification: {
-                enum: [
-                  MC.MAX_EXCEEDED,
-                  MC.VERY_HIGH,
-                  MC.HIGH,
-                  MC.NORMAL,
-                  MC.LOW,
-                  MC.VERY_LOW,
-                  MC.MIN_UNDERSHOT,
-                  "",
-                ],
-              },
-            },
-            optionalProperties: {
-              waterLevelNHN: {type: "float64", nullable: true},
-              waterLevelGOK: {type: "float64", nullable: true},
-            },
-          },
-        },
-      },
-    },
-  },
-} as const;
+import Self = GroundwaterLevelsService;

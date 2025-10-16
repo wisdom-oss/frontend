@@ -2,6 +2,7 @@ import {NgIf, DatePipe, KeyValuePipe} from "@angular/common";
 import {
   computed,
   effect,
+  inject,
   resource,
   signal,
   viewChild,
@@ -28,12 +29,15 @@ import {DisplayInfoControlComponent} from "./map/display-info-control/display-in
 import {LegendControlComponent} from "./map/legend-control/legend-control.component";
 import {GrowlService} from "./growl.service";
 import {WithdrawalInfoControlComponent} from "./map/withdrawal-info-control/withdrawal-info-control.component";
-import {WaterRightsServiceService} from "../../api/water-rights-service.service";
+import {WaterRightsService} from "../../api/water-rights.service";
 import nlwknMeasurementClassificationColors from "../../assets/nlwkn-measurement-classification-colors.toml";
 import colorful from "../../assets/map/styles/colorful.json";
 import {LayerSelectionControlComponent} from "../../common/components/map/layer-selection-control/layer-selection-control.component";
 import {ResizeMapOnLoadDirective} from "../../common/directives/resize-map-on-load.directive";
 import {signals} from "../../common/signals";
+import {RecreateOnDirective} from "../../common/directives/recreate-on.directive";
+import {keys} from "../../common/utils/keys";
+import {omit} from "../../common/utils/omit";
 
 @Component({
   imports: [
@@ -50,20 +54,18 @@ import {signals} from "../../common/signals";
     MapComponent,
     NavigationControlDirective,
     NgIf,
+    RecreateOnDirective,
     ResizeMapOnLoadDirective,
     WithdrawalInfoControlComponent,
   ],
   templateUrl: "./growl.component.html",
 })
 export class GrowlComponent {
+  protected service = inject(GrowlService);
+  private waterRightsService = inject(WaterRightsService);
+
   protected style = colorful as any as StyleSpecification;
   protected measurementColors = nlwknMeasurementClassificationColors;
-
-  readonly attribution = signal(`
-    <a href="https://www.nlwkn.niedersachsen.de/opendata" target="_blank">
-      2024 Niedersächsischer Landesbetrieb für Wasserwirtschaft, Küsten- und Naturschutz (NLWKN)
-    </a>
-  `);
 
   // prettier-ignore
   protected hoveredFeatures = {
@@ -84,6 +86,21 @@ export class GrowlComponent {
   } as const;
   protected selectedLayersUpdate = signal(false);
 
+  protected attribution = computed(() => {
+    return keys(omit(this.selectedLayers, "groundwaterLevelStations"))
+      .filter(key => this.selectedLayers[key]())
+      .map(key => this.service.data[key]())
+      .filter(({attribution}) => !!attribution)
+      .map(({attribution, attributionURL}) => {
+        if (!attributionURL) return attribution;
+        return `<a href="${attributionURL}" target="_blank">${attribution}</a>`;
+      })
+      .reduce((attributions, value) => {
+        if (!attributions?.includes(value!)) attributions.push(value!);
+        return attributions;
+      }, [] as string[]);
+  });
+
   protected fitBounds = signal<BBox | undefined>(undefined);
 
   protected waterRightUsageLocationsSource: Signal<GeoJSONSourceComponent> =
@@ -94,24 +111,51 @@ export class GrowlComponent {
   // additional delay to fix angular error for outputting event data of destroyed component
   protected hoverClusterPolygonDelay;
 
-  protected averageWithdrawals = signal<{
-    name: string;
-    key: string;
-    withdrawals: Signal<WaterRightsServiceService.AverageWithdrawals | null>;
-  } | null>(null);
+  protected groundwaterBodyRequest = signal<GroundwaterBodyFeature | null>(
+    null,
+  );
+  protected averageWithdrawalsRequest = computed(() => {
+    let groundwaterBody = this.groundwaterBodyRequest();
+    if (this.hoverClusterPolygon.hasValue()) return;
+
+    for (let body of this.service.data.groundwaterBodies().data.features) {
+      if (groundwaterBody?.id == body.id) {
+        return body;
+      }
+    }
+
+    return null;
+  });
+  protected averageWithdrawalsResponse =
+    this.waterRightsService.fetchAverageWithdrawals(
+      computed(() => {
+        let geometry = this.averageWithdrawalsRequest()?.geometry;
+        return geometry ? [geometry] : undefined;
+      }),
+    );
+  protected averageWithdrawals = computed(() => {
+    let withdrawals = this.averageWithdrawalsResponse();
+    if (!withdrawals) return null;
+
+    let request = this.averageWithdrawalsRequest();
+    if (!request) return null;
+
+    return {
+      name: request.properties.name ?? request.properties.key,
+      key: request.properties.key,
+      withdrawals,
+    };
+  });
 
   protected lang = signals.lang();
   private initialLoad = computed(() => {
     return (
       !!this.service.data.groundwaterMeasurementStations().features.length &&
-      !!this.service.data.groundwaterBodies().features.length
+      !!this.service.data.groundwaterBodies().data.features.length
     );
   });
 
-  constructor(
-    protected service: GrowlService,
-    private waterRightsService: WaterRightsServiceService,
-  ) {
+  constructor() {
     effect(() => {
       // force layer order by redrawing them on every update
       this.initialLoad();
@@ -171,35 +215,9 @@ export class GrowlComponent {
     this.service.selectMeasurementsDay.set(value);
   }
 
-  protected updateAverageWithdrawals(
-    groundwaterBody: GroundwaterBodyFeature | null,
-  ) {
-    if (this.hoverClusterPolygon.hasValue()) return;
-
-    for (let body of this.service.data.groundwaterBodies().features) {
-      if (groundwaterBody?.id == body.id) {
-        let withdrawalData = {
-          name: body.properties.name ?? body.properties.key,
-          key: body.properties.key,
-          withdrawals:
-            signal<WaterRightsServiceService.AverageWithdrawals | null>(null),
-        };
-
-        this.waterRightsService
-          .fetchAverageWithdrawals(body.geometry)
-          .then(data => withdrawalData.withdrawals.set(data));
-
-        this.averageWithdrawals.set(withdrawalData);
-        return;
-      }
-    }
-
-    return this.averageWithdrawals.set(null);
-  }
-
   private hoverClusterPolygonResource() {
     return resource({
-      request: () => {
+      params: () => {
         let cluster = this.hoveredFeatures.waterRightUsageLocationCluster();
         if (!cluster) return null;
 
@@ -220,8 +238,8 @@ export class GrowlComponent {
           | null
         >,
       ): Promise<Feature<Polygon> | undefined> => {
-        if (!param.request) return undefined;
-        let [[source, oldSource], cluster] = param.request;
+        if (!param.params) return undefined;
+        let [[source, oldSource], cluster] = param.params;
         let points;
         try {
           points = await this.getClusterChildrenRecursive(

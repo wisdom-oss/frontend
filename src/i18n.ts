@@ -1,16 +1,15 @@
-import {
-  InterpolatableTranslationObject,
-  TranslateService,
-} from "@ngx-translate/core";
+import {TranslationObject, TranslateService} from "@ngx-translate/core";
 
 import {asserts} from "./common/asserts";
 import common from "./common/i18n.toml";
+import {StorageService} from "./common/storage.service";
 import core from "./core/i18n.toml";
 import beWaterSmart from "./modules/be-water-smart/i18n.toml";
 import growl from "./modules/growl/i18n.toml";
 import longTermForecast from "./modules/long-term-forecast/i18n.toml";
 import oowvActionMap from "./modules/oowv/action-map/i18n.toml";
 import pumpModels from "./modules/pump-models/i18n.toml";
+import waterRights from "./modules/water-rights/i18n.toml";
 import weatherData from "./modules/weather-data/i18n.toml";
 
 // add translations to this record
@@ -22,11 +21,17 @@ const modules: NestedStringRecord = {
   "long-term-forecast": longTermForecast,
   "oowv-action-map": oowvActionMap,
   "pump-models": pumpModels,
+  "water-rights": waterRights,
   "weather-data": weatherData,
 };
 
-export function configureTranslations(service: TranslateService) {
-  let defaultLanguage = service.getBrowserLang() ?? "en";
+export function configureTranslations(
+  service: TranslateService,
+  storage: StorageService,
+) {
+  let storages = storage.instance(TranslateService);
+  let fallbackLanguage =
+    storages.local.get("lang") ?? service.getBrowserLang() ?? "en";
   const transformed: NestedStringRecord = {};
 
   function traverse(record: object, path: string[] = []) {
@@ -51,14 +56,12 @@ export function configureTranslations(service: TranslateService) {
 
   service.addLangs(Object.keys(transformed));
   for (let [key, translations] of Object.entries(transformed)) {
-    service.setTranslation(
-      key,
-      translations as InterpolatableTranslationObject,
-    );
+    service.setTranslation(key, translations as TranslationObject);
   }
 
-  service.setDefaultLang(defaultLanguage);
-  service.use(defaultLanguage);
+  service.setFallbackLang(fallbackLanguage);
+  service.use(fallbackLanguage);
+  service.onLangChange.subscribe(({lang}) => storages.local.set("lang", lang));
 }
 
 type NestedStringRecord = Record<

@@ -58,7 +58,7 @@ export class OowvActionMapComponent {
     this.geoData = Object.fromEntries(
       Object.keys(this.selectedLayers).map(key => [
         key,
-        signals.fromPromise(
+        signals.map(
           geo.fetchLayerContents(key, undefined, dayjs.duration(3, "months")),
           this.intoFeatureCollection,
         ),
