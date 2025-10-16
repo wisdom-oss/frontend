@@ -48,14 +48,13 @@
           position="top-left"
         ></mgl-control>
         @let attribution = this.attribution();
-        <ng-container *recreateOn="attribution">
-          <mgl-control
-            mglAttribution
-            position="bottom-right"
-            [compact]="true"
-            [customAttribution]="attribution"
-          ></mgl-control>
-        </ng-container>
+        <mgl-control
+          *recreateOn="attribution"
+          mglAttribution
+          position="bottom-right"
+          [compact]="true"
+          [customAttribution]="attribution"
+        ></mgl-control>
         <!-- using ng-containers we can ensure this ordering -->
         <ng-container>
           @if (selectedLayers.groundwaterLevelStations()) {
