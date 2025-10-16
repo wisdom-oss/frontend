@@ -59,6 +59,10 @@
                 "path": "scripts/esbuild/prebuild.cjs",
                 "options": {}
               },
+              {
+                "path": "scripts/esbuild/load-txt.cjs",
+                "options": {}
+              },
               "scripts/esbuild/unplugin.cjs"
             ],
             "outputPath": "dist/wisdom-oss/frontend",
