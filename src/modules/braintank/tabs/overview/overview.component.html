@@ -36,21 +36,10 @@
   }
   @if(activeView() === 'pictures') {
     <div class="is-fullwidth" style="height: 40rem">
-      <div class="card is-flex is-flex-direction-row is-justify-content-space-between" style="background-color: #eee;">
-        <div class="is-flex is-flex-direction-column is-justify-content-center">
-          <button class="button is-text is-fullheight">
-            <ng-icon name="remixArrowLeftWideLine" size="2rem"/>
-          </button>
-        </div>
-
-        <img src="../../../../../public/images/BrainTankUni.jpg" style="height: 40rem; width: auto;"/>
-
-        <div class="is-flex is-flex-direction-column is-justify-content-center">
-          <button class="button is-text is-fullheight">
-            <ng-icon name="remixArrowRightWideLine" size="2rem"/>
-          </button>
-        </div>
-      </div>
+      <app-carousel 
+        [images]="['../../../../../public/images/BrainTankUni.jpg', '../../../../../public/favicon.ico']"
+        [autoPlay]="false">
+      </app-carousel>
     </div>
   }
 

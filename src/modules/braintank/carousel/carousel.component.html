@@ -1,0 +1,28 @@
+<div class="carousel">
+  <div class="carousel-inner">
+    <div class="carousel-image-wrapper">
+      @for (image of images; track image) {
+        @if ($index === currentIndex) {
+          <img [src]="image" alt="carousel image" class="carousel-image"/>
+        }
+      }
+    </div>
+
+    <!-- Overlay controls -->
+    <div class="carousel-controls">
+      <button class="button is-light" (click)="prev()">
+        <ng-icon name="remixArrowLeftWideLine" size="1.5rem"/>
+      </button>
+      <button class="button is-light" (click)="next()">
+        <ng-icon name="remixArrowRightWideLine" size="1.5rem"/>
+      </button>
+    </div>
+
+    <!-- Overlay dots -->
+    <div class="carousel-indicators">
+      @for (image of images; track image) {
+        <span class="dot" [class.is-active]="$index === currentIndex" (click)="goTo($index)"></span>
+      }
+    </div>
+  </div>
+</div>

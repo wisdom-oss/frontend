@@ -22,6 +22,7 @@ import { ChartData } from 'chart.js';
 import { MapComponent, LayerComponent, GeoJSONSourceComponent } from "@maplibre/ngx-maplibre-gl";
 import { StyleSpecification } from 'maplibre-gl';
 import colorful from "../../../../assets/map/styles/colorful.json";
+import { CarouselComponent } from "../../carousel/carousel.component";
 
 
 @Component({
@@ -33,8 +34,9 @@ import colorful from "../../../../assets/map/styles/colorful.json";
     BaseChartDirective,
     MapComponent,
     LayerComponent,
-    GeoJSONSourceComponent
-  ],
+    GeoJSONSourceComponent,
+    CarouselComponent
+],
   templateUrl: './overview.component.html',
   providers: [
     provideIcons({
