@@ -31,6 +31,11 @@ en = "Start Simulation"
 de = "Simulation starten"
 
 
+[display.module.rrb]
+en = "Rain Retention Basin"
+de = "Regenrückhaltebecken"
+
+
 [header.currentValues]
 en = "Current Values"
 de = "Aktuelle Messwerte"
@@ -108,6 +113,10 @@ de = "Zeitpunkt"
 en = "Title"
 de = "Titel"
 
+
+[tab.control]
+en = "Control"
+de = "Steuerung"
 
 [tab.history]
 en = "History"

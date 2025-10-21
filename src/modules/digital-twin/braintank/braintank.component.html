@@ -1,0 +1,42 @@
+<div class="is-fullwidth is is-fullheight" style="overflow: auto">
+  <div class="tabs is-toggle is-medium is-fullwidth">
+    <ul>
+      <li [class.is-active]="activeTab() === 'overview'" (click)="setActiveTab('overview')">
+        <a>
+          <span class="icon">
+            <ng-icon name="remixProfileLine"></ng-icon>
+          </span>
+          <span translate>digitalTwin.tab.overview</span>
+        </a>
+      </li>
+      <li [class.is-active]="activeTab() === 'history'" (click)="setActiveTab('history')">
+        <a>
+          <span class="icon">
+            <ng-icon name="remixLineChartLine"></ng-icon>
+          </span>
+          <span translate>digitalTwin.tab.history</span>
+        </a>
+      </li>
+      <li [class.is-active]="activeTab() === 'simulation'" (click)="setActiveTab('simulation')">
+        <a>
+          <span class="icon">
+            <ng-icon name="remixMovieLine"></ng-icon>
+          </span>
+          <span translate>digitalTwin.tab.simulation</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  @if(activeTab() === 'overview') {
+    <braintank-overview/>
+  }
+
+   @if(activeTab() === 'history') {
+    <braintank-history/>
+  }
+
+  @if(activeTab() === 'simulation') {
+    <braintank-simulation/>
+  }
+</div>

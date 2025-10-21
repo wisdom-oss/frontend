@@ -32,6 +32,7 @@ import {
   remixSunCloudyFill,
   remixSwap2Line,
   remixWaterPercentFill,
+  remixHeavyShowersLine,
 } from "@ng-icons/remixicon";
 import {TranslateDirective} from "@ngx-translate/core";
 import {filter} from "rxjs";
@@ -73,6 +74,7 @@ import {AuthService} from "../auth/auth.service";
       remixSunCloudyFill,
       remixSwap2Line,
       remixWaterPercentFill,
+      remixHeavyShowersLine,
     }),
     provideNgIconLoader(name => {
       if (name != "oowv") return "";

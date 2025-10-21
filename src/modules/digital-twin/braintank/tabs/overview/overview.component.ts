@@ -21,8 +21,8 @@ import { BaseChartDirective } from 'ng2-charts';
 import { ChartData } from 'chart.js';
 import { MapComponent, LayerComponent, GeoJSONSourceComponent } from "@maplibre/ngx-maplibre-gl";
 import { StyleSpecification } from 'maplibre-gl';
-import colorful from "../../../../assets/map/styles/colorful.json";
-import { CarouselComponent } from "../../carousel/carousel.component";
+import colorful from "../../../../../assets/map/styles/colorful.json";
+import { CarouselComponent } from "../../../common/carousel/carousel.component";
 
 
 @Component({

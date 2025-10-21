@@ -12,11 +12,11 @@ import oowvActionMap from "./modules/oowv/action-map/i18n.toml";
 import pumpModels from "./modules/pump-models/i18n.toml";
 import waterRights from "./modules/water-rights/i18n.toml";
 import weatherData from "./modules/weather-data/i18n.toml";
-import braintank from "./modules/braintank/i18n.toml";
+import digitalTwin from "./modules/digital-twin/common/i18n.toml";
 
 // add translations to this record
 const modules: NestedStringRecord = {
-  braintank,
+  digitalTwin,
   core,
   growl,
   "be-water-smart": beWaterSmart,

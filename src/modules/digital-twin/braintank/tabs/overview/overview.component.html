@@ -47,15 +47,15 @@
     <div class="buttons has-addons">
       <button [class.is-active]="activeView() === 'model'" (click)="setActiveView('model')" class="button">
         <ng-icon name="remixCheckboxMultipleBlankFill" size="1.5rem" class="mr-2"/>
-        <span translate>braintank.button.model</span>
+        <span translate>digitalTwin.button.model</span>
       </button>
       <button [class.is-active]="activeView() === 'map'" (click)="setActiveView('map')" class="button">
         <ng-icon name="remixMap2Fill" size="1.5rem" class="mr-2"/>
-        <span translate>braintank.button.map</span>
+        <span translate>digitalTwin.button.map</span>
       </button>
       <button [class.is-active]="activeView() === 'pictures'" (click)="setActiveView('pictures')" class="button">
         <ng-icon name="remixImageFill" size="1.5rem" class="mr-2"/>
-        <span translate>braintank.button.pictures</span>
+        <span translate>digitalTwin.button.pictures</span>
       </button>
     </div>
   </div>
@@ -63,7 +63,7 @@
   <div class="card my-4">
     <div class="card-content">
       <div class="is-fullwidth has-text-centered my-4">
-          <p class="is-size-3 my-4" translate>braintank.header.currentValues</p>
+          <p class="is-size-3 my-4" translate>digitalTwin.header.currentValues</p>
       </div>
       
       <div class="columns my-4">
@@ -71,7 +71,7 @@
           <div class="is-flex is-flex-direction-row">
             <ng-icon name="remixTimeLine" size="2.5rem" class="mx-4"/>
             <div class="is-flex is-flex-direction-column is-justify-content-center">
-              <p><span translate>braintank.label.time</span>: {{time().format('DD.MM.YYYY, HH:mm:ss')}}</p>
+              <p><span translate>digitalTwin.label.time</span>: {{time().format('DD.MM.YYYY, HH:mm:ss')}}</p>
             </div>
           </div>
         </div>
@@ -80,7 +80,7 @@
           <div class="is-flex is-flex-direction-row">
             <ng-icon name="remixContrastDrop2Line" size="2.5rem" class="mx-4"/>
             <div class="is-flex is-flex-direction-column is-justify-content-center">
-              <p><span translate>braintank.header.waterLevel</span>: {{waterLevel()}}%</p>
+              <p><span translate>digitalTwin.header.waterLevel</span>: {{waterLevel()}}%</p>
             </div>
           </div>
         </div>
@@ -91,8 +91,8 @@
           <div class="is-flex is-flex-direction-row">
             <ng-icon name="remixWaterPercentLine" size="2.5rem" class="mx-4"/>
             <div class="is-flex is-flex-direction-column is-justify-content-center">
-              @if(draining()){<p><span translate>braintank.label.drainage.yes</span>: {{drainingTime().format('HH:mm:ss')}}</p>}
-              @if(!draining()){<p translate>braintank.label.drainage.no</p>}
+              @if(draining()){<p><span translate>digitalTwin.label.drainage.yes</span>: {{drainingTime().format('HH:mm:ss')}}</p>}
+              @if(!draining()){<p translate>digitalTwin.label.drainage.no</p>}
             </div>
           </div>
         </div>
@@ -103,7 +103,7 @@
   <div class="card my-4">
     <div class="card-content">
       <div class="is-fullwidth has-text-centered my-4">
-        <p class="is-size-3 my-4" translate>braintank.header.features</p>
+        <p class="is-size-3 my-4" translate>digitalTwin.header.features</p>
       </div>
       
       <div class="columns my-4">
@@ -111,7 +111,7 @@
           <div class="is-flex is-flex-direction-row">
             <ng-icon name="remixHome8Line" size="2.5rem" class="mx-4"/>
             <div class="is-flex is-flex-direction-column is-justify-content-center">
-              <p><span translate>braintank.label.roofSize</span>: {{roofSize()}} m²</p>
+              <p><span translate>digitalTwin.label.roofSize</span>: {{roofSize()}} m²</p>
             </div>
           </div>
         </div>
@@ -120,7 +120,7 @@
           <div class="is-flex is-flex-direction-row">
             <ng-icon name="remixMapPin2Line" size="2.5rem" class="mx-4"/>
             <div class="is-flex is-flex-direction-column is-justify-content-center">
-              <p><span translate>braintank.label.location</span>: {{lat()}}, {{long()}}</p>
+              <p><span translate>digitalTwin.label.location</span>: {{lat()}}, {{long()}}</p>
             </div>
           </div>
         </div>
@@ -131,7 +131,7 @@
   <div class="card my-4">
     <div class="card-content">
       <div class="is-fullwidth has-text-centered my-4">
-        <p class="is-size-3 my-4" translate>braintank.header.rainForecast</p>
+        <p class="is-size-3 my-4" translate>digitalTwin.header.rainForecast</p>
       </div>
       
       <ng-container chart>

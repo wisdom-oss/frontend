@@ -14,7 +14,7 @@ import {
   remixDeleteBin6Line,
   remixBookMarkedLine
 } from '@ng-icons/remixicon';
-import { signals } from '../../../../common/signals';
+import { signals } from '../../../../../common/signals';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartData } from 'chart.js';
 

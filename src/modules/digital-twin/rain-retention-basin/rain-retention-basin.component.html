@@ -6,7 +6,7 @@
           <span class="icon">
             <ng-icon name="remixProfileLine"></ng-icon>
           </span>
-          <span translate>braintank.tab.overview</span>
+          <span translate>digitalTwin.tab.overview</span>
         </a>
       </li>
       <li [class.is-active]="activeTab() === 'history'" (click)="setActiveTab('history')">
@@ -14,7 +14,7 @@
           <span class="icon">
             <ng-icon name="remixLineChartLine"></ng-icon>
           </span>
-          <span translate>braintank.tab.history</span>
+          <span translate>digitalTwin.tab.history</span>
         </a>
       </li>
       <li [class.is-active]="activeTab() === 'simulation'" (click)="setActiveTab('simulation')">
@@ -22,21 +22,33 @@
           <span class="icon">
             <ng-icon name="remixMovieLine"></ng-icon>
           </span>
-          <span translate>braintank.tab.simulation</span>
+          <span translate>digitalTwin.tab.simulation</span>
+        </a>
+      </li>
+      <li [class.is-active]="activeTab() === 'control'" (click)="setActiveTab('control')">
+        <a>
+          <span class="icon">
+            <ng-icon name="remixGamepadLine"></ng-icon>
+          </span>
+          <span translate>digitalTwin.tab.control</span>
         </a>
       </li>
     </ul>
   </div>
 
   @if(activeTab() === 'overview') {
-    <braintank-overview/>
+    <rrb-overview/>
   }
 
    @if(activeTab() === 'history') {
-    <braintank-history/>
+    <rrb-history/>
   }
 
   @if(activeTab() === 'simulation') {
-    <braintank-simulation/>
+    <rrb-simulation/>
+  }
+
+  @if(activeTab() === 'control') {
+    <rrb-control/>
   }
 </div>
