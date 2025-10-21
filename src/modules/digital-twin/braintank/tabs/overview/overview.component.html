@@ -3,35 +3,8 @@
     <model-view/>
   }
   @if(activeView() === 'map') {
-    <div map class="is-fullwidth" style="height: 40rem">
-      <div class="card is-fullheight">
-        <div class="card-content p-0 is-fullheight is-clipped">
-          <mgl-map
-            class="is-fullheight"
-            [style]="style"
-            [zoom]="[12]"
-            [center]="{
-              lat: lat(),
-              lon: long(),
-            }"
-          >
-            <ng-container sources>
-             <mgl-geojson-source
-                id="locations-source"
-                [data]="locations"
-              >
-              </mgl-geojson-source>
-            </ng-container>
-            <mgl-layer 
-              id="locations"
-              type="symbol"
-              source="locations-source"
-              [layout]="{'icon-image': 'remixicon:map-pin-2-fill'}"
-            >
-            </mgl-layer>
-          </mgl-map>
-        </div>
-      </div>
+    <div class="is-fullwidth" style="height: 40rem">
+      <map-view [locations]="locations" [center]="{lon: long(), lat: lat()}"></map-view>
     </div>
   }
   @if(activeView() === 'pictures') {

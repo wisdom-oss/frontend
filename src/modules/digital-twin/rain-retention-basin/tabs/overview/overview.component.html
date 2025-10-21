@@ -1,1 +1,124 @@
-<p>overview works!</p>
+<div>
+  @if(activeView() === 'model') {
+    <div style="height: 40rem; width: 100%; background-color: lightgray;"></div>
+  }
+  @if(activeView() === 'map') {
+    <div map class="is-fullwidth" style="height: 40rem">
+      <div class="is-fullwidth" style="height: 40rem">
+        <map-view [locations]="locations" [center]="{lon: long(), lat: lat()}"></map-view>
+      </div>
+    </div>
+  }
+  @if(activeView() === 'pictures') {
+    <div class="is-fullwidth" style="height: 40rem">
+      <app-carousel 
+        [images]="[]"
+        [autoPlay]="false">
+      </app-carousel>
+    </div>
+  }
+
+  <div class="is-flex is-flex-direction-row is-justify-content-center">
+    <div class="buttons has-addons">
+      <button [class.is-active]="activeView() === 'model'" (click)="setActiveView('model')" class="button">
+        <ng-icon name="remixCheckboxMultipleBlankFill" size="1.5rem" class="mr-2"/>
+        <span translate>digitalTwin.button.model</span>
+      </button>
+      <button [class.is-active]="activeView() === 'map'" (click)="setActiveView('map')" class="button">
+        <ng-icon name="remixMap2Fill" size="1.5rem" class="mr-2"/>
+        <span translate>digitalTwin.button.map</span>
+      </button>
+      <button [class.is-active]="activeView() === 'pictures'" (click)="setActiveView('pictures')" class="button">
+        <ng-icon name="remixImageFill" size="1.5rem" class="mr-2"/>
+        <span translate>digitalTwin.button.pictures</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="card my-4">
+    <div class="card-content">
+      <div class="is-fullwidth has-text-centered my-4">
+          <p class="is-size-3 my-4" translate>digitalTwin.header.currentValues</p>
+      </div>
+      
+      <div class="columns my-4">
+        <div class="column is-half">
+          <div class="is-flex is-flex-direction-row">
+            <ng-icon name="remixTimeLine" size="2.5rem" class="mx-4"/>
+            <div class="is-flex is-flex-direction-column is-justify-content-center">
+              <p><span translate>digitalTwin.label.time</span>: {{time().format('DD.MM.YYYY, HH:mm:ss')}}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="column is-half">
+          <div class="is-flex is-flex-direction-row">
+            <ng-icon name="remixContrastDrop2Line" size="2.5rem" class="mx-4"/>
+            <div class="is-flex is-flex-direction-column is-justify-content-center">
+              <p><span translate>digitalTwin.header.waterLevel</span>: {{waterLevel()}}%</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card my-4">
+    <div class="card-content">
+      <div class="is-fullwidth has-text-centered my-4">
+        <p class="is-size-3 my-4" translate>digitalTwin.header.features</p>
+      </div>
+      
+      <div class="columns my-4">
+        <div class="column is-half">
+          <div class="is-flex is-flex-direction-row">
+            <ng-icon name="remixMapPin2Line" size="2.5rem" class="mx-4"/>
+            <div class="is-flex is-flex-direction-column is-justify-content-center">
+              <p><span translate>digitalTwin.label.location</span>: {{lat()}}, {{long()}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card my-4">
+    <div class="card-content">
+      <div class="is-fullwidth has-text-centered my-4">
+        <p class="is-size-3 my-4" translate>digitalTwin.header.rainForecast</p>
+      </div>
+      
+      <ng-container chart>
+        <div class="is-fullwidth" style="height: 22rem;">
+          @let optionsCurrentForecast = {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                grid: {
+                  display: false,
+                },
+              },
+              y: {
+                grid: {
+                  display: false,
+                },
+                title: {
+                  display: true,
+                  text: 'mm',
+                },
+                beginAtZero: true,
+                suggestedMax: 10,
+              },
+            },
+            plugins: {
+              legend: {
+                display: false,
+              },
+            },
+          };
+          <canvas baseChart class="is-fullheight is-fullwidth" [data]="dataCurrentForecast" [options]="optionsCurrentForecast" [type]="'bar'"></canvas>
+        </div>
+      </ng-container>
+  </div>
+</div>

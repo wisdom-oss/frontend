@@ -1,0 +1,10 @@
+<div map class="card is-fullheight">
+  <div class="card-content p-0 is-fullheight is-clipped">
+    <mgl-map class="is-fullheight" [style]="style" [zoom]="[zoom]" [center]="center">
+      <ng-container sources>
+        <mgl-geojson-source id="locations-source" [data]="locations"></mgl-geojson-source>
+      </ng-container>
+      <mgl-layer id="locations" type="symbol" source="locations-source" [layout]="{'icon-image': 'remixicon:map-pin-2-fill'}"></mgl-layer>
+    </mgl-map>
+  </div>
+</div>

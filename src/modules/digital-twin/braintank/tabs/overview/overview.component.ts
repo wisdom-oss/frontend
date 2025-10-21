@@ -19,10 +19,10 @@ import { ModelViewComponent } from "../../model-view/model-view.component";
 import dayjs, { Dayjs } from 'dayjs';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartData } from 'chart.js';
-import { MapComponent, LayerComponent, GeoJSONSourceComponent } from "@maplibre/ngx-maplibre-gl";
 import { StyleSpecification } from 'maplibre-gl';
 import colorful from "../../../../../assets/map/styles/colorful.json";
 import { CarouselComponent } from "../../../common/carousel/carousel.component";
+import { MapViewComponent } from "../../../common/map-view/map-view.component";
 
 
 @Component({
@@ -32,10 +32,8 @@ import { CarouselComponent } from "../../../common/carousel/carousel.component";
     TranslateDirective,
     NgIconComponent,
     BaseChartDirective,
-    MapComponent,
-    LayerComponent,
-    GeoJSONSourceComponent,
-    CarouselComponent
+    CarouselComponent,
+    MapViewComponent
 ],
   templateUrl: './overview.component.html',
   providers: [
@@ -56,11 +54,17 @@ import { CarouselComponent } from "../../../common/carousel/carousel.component";
   ],
 })
 export class OverviewComponent {
+  protected activeView = signal<'model' | 'map' | 'pictures'>('model'); 
+
+  setActiveView(view: 'model' | 'map' | 'pictures') {
+    this.activeView.set(view);
+  }
+
   waterLevel : WritableSignal<number> = signal(30);
   time : WritableSignal<Dayjs> = signal(dayjs());
   roofSize : WritableSignal<number> = signal(160);
-  lat : WritableSignal<number> = signal(53.146);
-  long : WritableSignal<number> = signal(8.185);
+  lat : WritableSignal<number> = signal(53.146170);
+  long : WritableSignal<number> = signal(8.185751);
   draining : WritableSignal<boolean> = signal(true);
   drainingTime: WritableSignal<Dayjs> = signal(dayjs().subtract(30, 'minutes'));
 
@@ -73,12 +77,6 @@ export class OverviewComponent {
       },
     }],
   };
-
-  protected activeView = signal<'model' | 'map' | 'pictures'>('model'); 
-
-  setActiveView(view: 'model' | 'map' | 'pictures') {
-    this.activeView.set(view);
-  }
 
   protected style = colorful as any as StyleSpecification;
 
