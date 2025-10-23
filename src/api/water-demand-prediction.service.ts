@@ -32,7 +32,6 @@ export class WaterDemandPredictionService extends api.service(URL) {
   ] as const;
 
   static readonly WEATHER_CAPABILITIES = [
-    "plain",
     "air_temperature",
     "precipitation",
     "moisture",
@@ -44,24 +43,28 @@ export class WaterDemandPredictionService extends api.service(URL) {
     startOfYear22: dayjs("2022-01-01"),
   } as const;
 
-  fetchMeterInformation(): api.Signal<Self.MeterNames, Self.MeterNames> {
+  fetchMeterNames(): api.Signal<Self.MeterNames, Self.MeterNames> {
     return api.resource({
-      url: `${URL}/meterNames`,
+      url: `${URL}/meter-names`,
       validate: typia.createValidate<Self.MeterNames>(),
-      defaultValue: {},
+      defaultValue: [],
       cache: dayjs.duration(1, "day"),
     });
   }
 
-  fetchWeatherCols(
-    capability: api.RequestSignal<Self.WeatherCapability>,
+  fetchWeatherColumns(
+    params: api.RequestSignal<{
+      capability?: Self.WeatherCapability[];
+      resolution?: Self.Resolution;
+      start?: Dayjs;
+      end?: Dayjs;
+    }>,
   ): api.Signal<Self.WeatherColumns> {
-    let body = api.map(capability, capability => ({capability}));
     return api.resource({
-      url: `${URL}/weatherColumns`,
+      url: `${URL}/weather-columns`,
       method: `POST`,
       validate: typia.createValidate<Self.WeatherColumns>(),
-      body,
+      params: api.QueryParams.from(params),
       cache: dayjs.duration(1, "day"),
     });
   }
@@ -293,7 +296,7 @@ export namespace WaterDemandPredictionService {
   export type WeatherCapability =
     (typeof WaterDemandPredictionService)["WEATHER_CAPABILITIES"][number];
   export type WeatherColumns = Record<string, string>;
-  export type MeterNames = Record<string, string>;
+  export type MeterNames = {id: string; name: string}[];
   export type SingleSmartmeter = Omit<Raw.SingleSmartmeter, "date"> & {
     date: Dayjs[];
   };

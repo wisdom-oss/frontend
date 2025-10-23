@@ -131,7 +131,7 @@ export class WaterDemandPredictionComponent implements OnInit, AfterViewInit {
     this.chart.predictions.set(this.charts()[1].chart);
   }
 
-  private meterInformation = this.service.fetchMeterInformation();
+  private meterInformation = this.service.fetchMeterNames();
 
   protected chartResolution = signal<Resolution>("daily");
   protected chartDatasets = {
@@ -199,7 +199,7 @@ export class WaterDemandPredictionComponent implements OnInit, AfterViewInit {
       ]),
     ) satisfies Record<WeatherCapability, string>,
     weatherColumn: signals.map(
-      this.service.fetchWeatherCols(this.choices.weatherCapability),
+      this.service.fetchWeatherColumns(this.choices.weatherCapability),
       cols => cols ?? {},
     ) satisfies Signal<Record<string, string>>,
   } as const;

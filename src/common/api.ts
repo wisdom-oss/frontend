@@ -9,12 +9,15 @@ import {
   HttpErrorResponse,
 } from "@angular/common/http";
 import {computed, isSignal, signal, Signal as CoreSignal} from "@angular/core";
+import dayjs, {Dayjs} from "dayjs";
 import {Duration} from "dayjs/plugin/duration";
 import {isTypedArray} from "three/src/animation/AnimationUtils.js";
 import typia from "typia";
 
 import {httpContexts} from "./http-contexts";
 import {Once} from "./utils/once";
+import {fromEntries} from "./utils/from-entries";
+import {keys} from "./utils/keys";
 
 /**
  * Toolkit to build API services.
@@ -208,6 +211,125 @@ export namespace api {
   export const NONE = Symbol("api.NONE");
   export type NONE = typeof NONE;
 
+  export namespace QueryParams {
+    /** Value compatible with query params. */
+    export type Value = string | number | boolean | Dayjs | Duration;
+  }
+
+  /**
+   * Container type to hold query parameters.
+   * 
+   * This replaces the {@link HttpParams} class used by Angular regularly and adds behavior for more data types than just primitives.
+   * For additional supported types, check {@link QueryParams.Value}.
+   * 
+   * This container type is designed to work hand in hand with the `api` namespace.
+   * It provides a static `from` method that converts a {@link RequestSignal} of parameters into a `RequestSignal<QueryParams>`, allowing easy usage when sending query parameters.
+   * 
+   * All methods that modify the container also return the container itself, this allows the usage of the builder pattern but also regular modifying the query params.
+   * Different to the {@link HttpParams}, this container is **not** immutable and will change.
+   * But in most code the immutability of `HttpParams` were surprising as everything else isn't immutable.
+   */
+  export class QueryParams {
+    private map = new Map();
+
+    /**
+     * Construct a query params container from a record holding compatible values.
+     * @param params A record with values to be sent.
+     */
+    constructor(
+      params: Record<string, QueryParams.Value | QueryParams.Value[]> = {},
+    ) {
+      for (let [key, val] of Object.entries(params)) {
+        if (!this.map.has(key)) this.map.set(key, []);
+        if (Array.isArray(val)) val.forEach(val => this.map.get(key).push(val));
+        else this.map.get(key).push(val);
+      }
+    }
+
+    /**
+     * Alternative constructor useful for {@link resource} usage. 
+     * @param params Raw query parameters or a signal maybe containing them.
+     * @returns Query parameters or a signal maybe containing them.
+     */
+    static from(
+      params: RequestSignal<
+        Record<string, QueryParams.Value | QueryParams.Value[]>
+      >,
+    ): RequestSignal<QueryParams> {
+      return map(params, params => new QueryParams(params));
+    }
+
+    private static serialize(
+      value: QueryParams.Value,
+    ): string | boolean | number {
+      if (dayjs.isDayjs(value)) return value.toISOString();
+      if (dayjs.isDuration(value)) return value.toISOString();
+      return value;
+    }
+
+    has(param: string): boolean {
+      return this.map.get(param)?.length > 0;
+    }
+
+    get(param: string): QueryParams.Value | null {
+      return this.map.get(param)?.[0] ?? null;
+    }
+
+    getAll(param: string): QueryParams.Value[] | null {
+      return this.map.get(param) ?? null;
+    }
+
+    keys(): string[] {
+      return Array.from(this.map.keys());
+    }
+
+    append(param: string, value: QueryParams.Value): QueryParams {
+      if (!this.map.has(param)) this.map.set(param, [value]);
+      else this.map.get(param).push(value);
+      return this;
+    }
+
+    appendAll(params: {
+      [param: string]: QueryParams.Value | QueryParams.Value[];
+    }): QueryParams {
+      for (let [key, val] of Object.entries(params)) {
+        if (!this.map.has(key)) this.map.set(key, []);
+        if (Array.isArray(val)) val.forEach(val => this.map.get(key).push(val));
+        this.map.get(key).push(val);
+      }
+      return this;
+    }
+
+    set(param: string, value: QueryParams.Value): QueryParams {
+      this.map.set(param, [value]);
+      return this;
+    }
+
+    delete(param: string): QueryParams {
+      this.map.delete(param);
+      return this;
+    }
+
+    toString(): string {
+      return this.toHttpParams().toString();
+    }
+
+    toHttpParams(): HttpParams {
+      return new HttpParams().appendAll(
+        Object.fromEntries(
+          Object.entries(this.map).map(([key, val]) => [
+            key,
+            val.map(QueryParams.serialize),
+          ]),
+        ),
+      );
+    }
+
+    toJSON(): Record<string, QueryParams.Value> {
+      return Object.fromEntries(Object.entries(this.map));
+    }
+  }
+
   type Request = {
     [K in keyof Omit<
       HttpResourceRequest,
@@ -217,6 +339,7 @@ export namespace api {
       | "withCredentials"
       | "transferCache"
       | "cache"
+      | "params"
     >]: RequestSignal<HttpResourceRequest[K]>;
   };
 
@@ -374,6 +497,8 @@ export namespace api {
        * Add another type to the replace function if necessary.
        */
       cache?: Duration;
+
+      params?: RequestSignal<QueryParams>;
 
       /**
        * Custom error handler for specific HTTP status codes.
@@ -972,4 +1097,14 @@ export namespace api {
       return f(value);
     });
   }
+
+  // export function serialize<T extends Record<string, any>>(
+  //   request: RequestSignal<T>,
+  // ): RequestSignal<{[K in keyof T]: any}> {
+  //   function serializeValues(record: T) {
+  //     return fromEntries(Object.entries(record).map(([key, val]) => {
+  //       return [key, val];
+  //     }));
+  //   }
+  // }
 }
