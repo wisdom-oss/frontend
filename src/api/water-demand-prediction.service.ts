@@ -78,15 +78,16 @@ export class WaterDemandPredictionService extends api.service(URL) {
       resolution: Self.Resolution;
     }>,
   ): api.Signal<Self.SingleSmartmeter> {
-    return api.resource({
-      url: `${URL}/singleSmartmeter`,
-      method: `POST`,
-      validateRaw: typia.createValidate<Raw.SingleSmartmeter>(),
-      parse: this.parseDate,
-      validate: typia.createValidate<Self.SingleSmartmeter>(),
-      body: this.mapStartPoint(params),
-      cache: dayjs.duration(1, "day"),
-    });
+    // return api.resource({
+    //   url: `${URL}/singleSmartmeter`,
+    //   method: `POST`,
+    //   validateRaw: typia.createValidate<Raw.SingleSmartmeter>(),
+    //   parse: this.parseDate,
+    //   validate: typia.createValidate<Self.SingleSmartmeter>(),
+    //   body: this.mapStartPoint(params),
+    //   cache: dayjs.duration(1, "day"),
+    // });
+    return null as any;
   }
 
   trainModel(

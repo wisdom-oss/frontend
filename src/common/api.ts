@@ -12,7 +12,7 @@ import {computed, isSignal, signal, Signal as CoreSignal} from "@angular/core";
 import dayjs, {Dayjs} from "dayjs";
 import {Duration} from "dayjs/plugin/duration";
 import {isTypedArray} from "three/src/animation/AnimationUtils.js";
-import typia from "typia";
+import typia, {tags} from "typia";
 
 import {httpContexts} from "./http-contexts";
 import {Once} from "./utils/once";
@@ -213,18 +213,24 @@ export namespace api {
 
   export namespace QueryParams {
     /** Value compatible with query params. */
-    export type Value = string | number | boolean | Dayjs | Duration;
+    export type Value =
+      | undefined
+      | string
+      | number
+      | boolean
+      | Dayjs
+      | Duration;
   }
 
   /**
    * Container type to hold query parameters.
-   * 
+   *
    * This replaces the {@link HttpParams} class used by Angular regularly and adds behavior for more data types than just primitives.
    * For additional supported types, check {@link QueryParams.Value}.
-   * 
+   *
    * This container type is designed to work hand in hand with the `api` namespace.
    * It provides a static `from` method that converts a {@link RequestSignal} of parameters into a `RequestSignal<QueryParams>`, allowing easy usage when sending query parameters.
-   * 
+   *
    * All methods that modify the container also return the container itself, this allows the usage of the builder pattern but also regular modifying the query params.
    * Different to the {@link HttpParams}, this container is **not** immutable and will change.
    * But in most code the immutability of `HttpParams` were surprising as everything else isn't immutable.
@@ -247,7 +253,7 @@ export namespace api {
     }
 
     /**
-     * Alternative constructor useful for {@link resource} usage. 
+     * Alternative constructor useful for {@link resource} usage.
      * @param params Raw query parameters or a signal maybe containing them.
      * @returns Query parameters or a signal maybe containing them.
      */
@@ -261,7 +267,7 @@ export namespace api {
 
     private static serialize(
       value: QueryParams.Value,
-    ): string | boolean | number {
+    ): undefined | string | boolean | number {
       if (dayjs.isDayjs(value)) return value.toISOString();
       if (dayjs.isDuration(value)) return value.toISOString();
       return value;
@@ -382,7 +388,7 @@ export namespace api {
     TResult,
     TRaw,
     TDefault extends TResult | undefined,
-  > = Request &
+  > = (Request &
     Options<TResult, TRaw> & {
       /**
        * URL for the request.
@@ -404,17 +410,45 @@ export namespace api {
        *
        * If the requested service returns a structure that doesn't directly
        * match `TResult`, use the `parse` option to transform from `TRaw` to
-       * `TResult`.
-       * This `validate` function will always run on the result of `parse`.
+       * `TResult`. This `validate` function will always run on the result
+       * of `parse`.
+       *
+       * Optional, but either this or the pair (`validateRaw` + `parse`)
+       * must be provided.
        */
-      validate: (input: unknown) => typia.IValidation<TResult>;
+      validate?: (input: unknown) => typia.IValidation<TResult>;
+
+      /**
+       * Validator for the raw response type (`TRaw`), before parsing.
+       *
+       * Just like `validate`, this is also a {@link typia}-generated validator,
+       * but it runs on the raw response, before the `parse` function is applied.
+       *
+       * This is useful when you're working with custom response formats and
+       * want to make sure that what you feed into `parse` is safe.
+       *
+       * Optional, but if you don't provide `validate`, then both this and
+       * `parse` must be provided.
+       */
+      validateRaw?: (input: unknown) => typia.IValidation<TRaw>;
+
+      /**
+       * Convert the raw response (`TRaw`) into the final shape (`TResult`).
+       *
+       * Runs before `validate` on the final result.
+       * If the server already gives you a `TResult`, you can skip this.
+       *
+       * Optional, but if you don't provide `validate`, then both this and
+       * `validateRaw` must be provided.
+       */
+      parse?: (raw: TRaw) => TResult;
 
       /**
        * HTTP method to use.
        *
        * Defaults to "GET".
        */
-      method?: "GET" | "POST";
+      method?: "GET" | "POST" | "PUT";
 
       /**
        * Controls the raw response type returned by the server.
@@ -434,17 +468,6 @@ export namespace api {
        * By using `parse`, you can convert these raw values into a `TResult`.
        */
       responseType?: "arrayBuffer" | "blob" | "text";
-
-      /**
-       * Validator for the raw response type (`TRaw`), before parsing.
-       *
-       * Just like `validate`, this is also a {@link typia}-generated validator,
-       * but it runs on the raw response, before the `parse` function is applied.
-       *
-       * This is optional, but highly recommended when you're parsing structured
-       * data manually, to make sure your `parse` input is safe and expected.
-       */
-      validateRaw?: (input: unknown) => typia.IValidation<TRaw>;
 
       /**
        * The default value returned before a response is available.
@@ -472,7 +495,7 @@ export namespace api {
        * authentication if the user is logged in.
        *
        * You can override this by explicitly setting this to:
-       * - `true` - force-authenticate, even if the URL doesn’t start with `/api/`
+       * - `true` - force-authenticate, even if the URL doesn't start with `/api/`
        * - `false` - explicitly skip authentication
        */
       authenticate?: boolean;
@@ -523,7 +546,20 @@ export namespace api {
       onError?: Partial<
         Record<HttpStatusCode, (err: HttpErrorResponse) => TResult>
       >;
-    };
+    }) &
+    // Enforce that either `validate` is present,
+    // or `validateRaw` and `parse` are both present.
+    (| {
+          validate: (input: unknown) => typia.IValidation<TResult>;
+          validateRaw?: (input: unknown) => typia.IValidation<TRaw>;
+          parse?: (raw: TRaw) => TResult;
+        }
+      | {
+          validate?: (input: unknown) => typia.IValidation<TResult>;
+          validateRaw: (input: unknown) => typia.IValidation<TRaw>;
+          parse: (raw: TRaw) => TResult;
+        }
+    );
 
   /**
    * Our custom wrapper around Angular's {@link httpResource}.
@@ -722,10 +758,12 @@ export namespace api {
         result = parse(raw);
       }
 
-      let validResult = validate(result);
-      if (!validResult.success) {
-        console.error(validResult.errors);
-        throw new Error("Invalid type on response");
+      if (validate) {
+        let validResult = validate(result);
+        if (!validResult.success) {
+          console.error(validResult.errors);
+          throw new Error("Invalid type on response");
+        }
       }
 
       return result;
@@ -1098,13 +1136,20 @@ export namespace api {
     });
   }
 
-  // export function serialize<T extends Record<string, any>>(
-  //   request: RequestSignal<T>,
-  // ): RequestSignal<{[K in keyof T]: any}> {
-  //   function serializeValues(record: T) {
-  //     return fromEntries(Object.entries(record).map(([key, val]) => {
-  //       return [key, val];
-  //     }));
-  //   }
-  // }
+  /** @deprecated */
+  export type DeserializedRecord<T> = {
+    [K in keyof T]: T[K] extends string & tags.Format<"date-time">
+      ? Dayjs
+      : T[K] extends string & tags.Format<"duration">
+        ? Duration
+        : T[K];
+  };
+
+  export type RawRecord<T> = {
+    [K in keyof T]: T[K] extends Dayjs
+      ? string & tags.Format<"date-time">
+      : T[K] extends Duration
+        ? string & tags.Format<"duration">
+        : T[K];
+  };
 }
