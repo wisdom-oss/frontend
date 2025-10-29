@@ -20,10 +20,10 @@ export class PmdArimaPredictionService extends api.service(URL) {
   ] as const;
 
   static readonly START_POINTS = {
-      startOfData: dayjs("2021-05-26"),
-      startOfJune21: dayjs("2021-06-01"),
-      startOfYear22: dayjs("2022-01-01"),
-    } as const;
+    startOfData: dayjs("2021-05-26"),
+    startOfJune21: dayjs("2021-06-01"),
+    startOfYear22: dayjs("2022-01-01"),
+  } as const;
 
   fetchPrediction(
     modelId: api.RequestSignal<string>,
