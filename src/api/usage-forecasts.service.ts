@@ -61,7 +61,7 @@ export class UsageForecastsService extends api.service(URL) {
       url: api.url`${URL}/${scriptIdentifier}`,
       validate: typia.createValidate<Self.Result>(),
       cache: dayjs.duration(1, "day"),
-      params,
+      params: params as any,
       body: formData,
     });
   }

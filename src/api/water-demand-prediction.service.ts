@@ -32,6 +32,7 @@ export class WaterDemandPredictionService extends api.service(URL) {
   ] as const;
 
   static readonly WEATHER_CAPABILITIES = [
+    "plain",
     "air_temperature",
     "precipitation",
     "moisture",
@@ -43,28 +44,24 @@ export class WaterDemandPredictionService extends api.service(URL) {
     startOfYear22: dayjs("2022-01-01"),
   } as const;
 
-  fetchMeterNames(): api.Signal<Self.MeterNames, Self.MeterNames> {
+  fetchMeterInformation(): api.Signal<Self.MeterNames, Self.MeterNames> {
     return api.resource({
-      url: `${URL}/meter-names`,
+      url: `${URL}/meterNames`,
       validate: typia.createValidate<Self.MeterNames>(),
-      defaultValue: [],
+      defaultValue: {},
       cache: dayjs.duration(1, "day"),
     });
   }
 
-  fetchWeatherColumns(
-    params: api.RequestSignal<{
-      capability?: Self.WeatherCapability[];
-      resolution?: Self.Resolution;
-      start?: Dayjs;
-      end?: Dayjs;
-    }>,
+  fetchWeatherCols(
+    capability: api.RequestSignal<Self.WeatherCapability>,
   ): api.Signal<Self.WeatherColumns> {
+    let body = api.map(capability, capability => ({capability}));
     return api.resource({
-      url: `${URL}/weather-columns`,
+      url: `${URL}/weatherColumns`,
       method: `POST`,
       validate: typia.createValidate<Self.WeatherColumns>(),
-      params: api.QueryParams.from(params),
+      body,
       cache: dayjs.duration(1, "day"),
     });
   }
@@ -78,16 +75,15 @@ export class WaterDemandPredictionService extends api.service(URL) {
       resolution: Self.Resolution;
     }>,
   ): api.Signal<Self.SingleSmartmeter> {
-    // return api.resource({
-    //   url: `${URL}/singleSmartmeter`,
-    //   method: `POST`,
-    //   validateRaw: typia.createValidate<Raw.SingleSmartmeter>(),
-    //   parse: this.parseDate,
-    //   validate: typia.createValidate<Self.SingleSmartmeter>(),
-    //   body: this.mapStartPoint(params),
-    //   cache: dayjs.duration(1, "day"),
-    // });
-    return null as any;
+    return api.resource({
+      url: `${URL}/singleSmartmeter`,
+      method: `POST`,
+      validateRaw: typia.createValidate<Raw.SingleSmartmeter>(),
+      parse: this.parseDate,
+      validate: typia.createValidate<Self.SingleSmartmeter>(),
+      body: this.mapStartPoint(params),
+      cache: dayjs.duration(1, "day"),
+    }) as any;
   }
 
   trainModel(
@@ -297,7 +293,7 @@ export namespace WaterDemandPredictionService {
   export type WeatherCapability =
     (typeof WaterDemandPredictionService)["WEATHER_CAPABILITIES"][number];
   export type WeatherColumns = Record<string, string>;
-  export type MeterNames = {id: string; name: string}[];
+  export type MeterNames = Record<string, string>;
   export type SingleSmartmeter = Omit<Raw.SingleSmartmeter, "date"> & {
     date: Dayjs[];
   };
