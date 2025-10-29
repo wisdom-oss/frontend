@@ -16,8 +16,6 @@ import typia, {tags} from "typia";
 
 import {httpContexts} from "./http-contexts";
 import {Once} from "./utils/once";
-import {fromEntries} from "./utils/from-entries";
-import {keys} from "./utils/keys";
 
 /**
  * Toolkit to build API services.
