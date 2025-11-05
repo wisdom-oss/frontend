@@ -9,10 +9,18 @@ import {api} from "../common/api";
 
 const URL = "/api/pmdarima-prediction" as const;
 
+class SmartMeterId extends api.Id<string> {}
+class ModelId extends api.Id<string> {}
+class TrainingId extends api.Id<string> {}
+
 @Injectable({
   providedIn: "root",
 })
 export class PmdArimaPredictionService extends api.service(URL) {
+  static readonly SmartMeterId = SmartMeterId;
+  static readonly ModelId = ModelId;
+  static readonly TrainingId = TrainingId;
+
   static readonly SUPPORTED_CAPABILITIES = [
     "air_temperature",
     "precipitation",
@@ -26,7 +34,7 @@ export class PmdArimaPredictionService extends api.service(URL) {
   } as const;
 
   fetchPrediction(
-    modelId: api.RequestSignal<string>,
+    modelId: api.RequestSignal<ModelId>,
     params: api.RequestSignal<{
       forecastLength?: Duration;
       interval?: Duration;
@@ -49,12 +57,14 @@ export class PmdArimaPredictionService extends api.service(URL) {
   fetchMeterNames(): api.Signal<Self.SmartMeter[]> {
     return api.resource({
       url: `${URL}/meter-names`,
-      validate: typia.createValidate<Self.SmartMeter[]>(),
+      validateRaw: typia.createValidate<Raw.SmartMeter[]>(),
+      parse: meters =>
+        meters.map(({name, id}) => ({name, id: new SmartMeterId(id)})),
     });
   }
 
   fetchMeasuredData(
-    meterId: api.RequestSignal<string>,
+    meterId: api.RequestSignal<SmartMeterId>,
     params: api.RequestSignal<{
       bucketSize?: Duration;
       start?: Dayjs;
@@ -71,23 +81,30 @@ export class PmdArimaPredictionService extends api.service(URL) {
 
   readonly training = {
     start: (
-      meterId: api.RequestSignal<string>,
+      meterId: api.RequestSignal<SmartMeterId>,
       params: api.RequestSignal<{
         startPoint?: Dayjs;
         timeSpan?: Duration;
         weatherCapability?: Self.SupportedCapability;
         weatherColumnName?: string;
       }>,
-    ): api.Signal<{modelId: string; trainingId: string}> => {
+    ): api.Signal<{modelId: ModelId; trainingId: TrainingId}> => {
       return api.resource({
         url: api.url`${URL}/training/start/${meterId}`,
         method: "PUT",
         params: api.QueryParams.from(params),
-        validate: typia.createValidate<{modelId: string; trainingId: string}>(),
+        validateRaw: typia.createValidate<{
+          modelId: string;
+          trainingId: string;
+        }>(),
+        parse: ({modelId, trainingId}) => ({
+          modelId: new ModelId(modelId),
+          trainingId: new TrainingId(trainingId),
+        }),
       });
     },
 
-    status: (trainingId: string): api.Socket<string, void> => {
+    status: (trainingId: TrainingId): api.Socket<string, void> => {
       return api.socket({
         url: `${URL}/training/status/${trainingId}`,
         validate: typia.createValidate<string>(),
@@ -121,11 +138,11 @@ export class PmdArimaPredictionService extends api.service(URL) {
       capability?: Self.SupportedCapability[];
       resolution?: "hourly";
       start?: Dayjs;
-      end: Dayjs;
+      end?: Dayjs;
     }>,
   ): api.Signal<(Self.WeatherCapability & {columns: Self.WeatherColumn[]})[]> {
     return api.resource({
-      url: `${URL}/weather-capabilities`,
+      url: `${URL}/weather-columns`,
       validateRaw:
         typia.createValidate<
           (Raw.WeatherCapability & {columns: Raw.WeatherColumn[]})[]
@@ -155,6 +172,8 @@ namespace Raw {
     datapoints: ConfidenceDataPoint[];
   };
 
+  export type SmartMeter = Omit<Self.SmartMeter, "id"> & {id: string};
+
   export type WeatherColumn = api.RawRecord<Self.WeatherColumn>;
 
   export type WeatherCapability = Omit<
@@ -164,6 +183,10 @@ namespace Raw {
 }
 
 export namespace PmdArimaPredictionService {
+  export type SmartMeterId = InstanceType<typeof SmartMeterId>;
+  export type ModelId = InstanceType<typeof ModelId>;
+  export type TrainingId = InstanceType<typeof TrainingId>;
+
   export type DataPoint = {
     time: Dayjs;
     value: number;
@@ -186,7 +209,7 @@ export namespace PmdArimaPredictionService {
   };
 
   export type SmartMeter = {
-    id: string;
+    id: SmartMeterId;
     name: string;
   };
 
