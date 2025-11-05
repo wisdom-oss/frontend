@@ -76,7 +76,7 @@
     "@types/three": "~0.178.0",
     "didyoumean": "^1.2.2",
     "esbuild-plugin-toml": "^0.0.1",
-    "fake-indexeddb": "^6.2.3",
+    "fake-indexeddb": "^6.2.4",
     "fast-xml-parser": "^5.3.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
