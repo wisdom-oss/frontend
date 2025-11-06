@@ -16,6 +16,7 @@ import typia, {tags} from "typia";
 
 import {httpContexts} from "./http-contexts";
 import {Once} from "./utils/once";
+import {Id} from "./id";
 
 /**
  * Toolkit to build API services.
@@ -152,47 +153,6 @@ export namespace api {
         return url;
       }
     };
-  }
-
-  /**
-   * New-type for IDs.
-   *
-   * Use this type in API to clearly type IDs when they are numbers or strings.
-   * This helps making the API more stable.
-   *
-   * This class is marked abstract as all IDs should be uniquely typed and
-   * therefore have to derive from this.
-   * `Id` is also valid as body or params for requests.
-   */
-  export abstract class Id<T extends string | number> {
-    constructor(private value: T) {}
-
-    get(): T {
-      return this.value;
-    }
-
-    equals(other: Id<string | number>): boolean {
-      let prototypeEqual =
-        Object.getPrototypeOf(this) == Object.getPrototypeOf(other);
-      let valueEqual = this.get() == other.get();
-      return prototypeEqual && valueEqual;
-    }
-
-    toJSON(): T {
-      return this.get();
-    }
-
-    toString(): string {
-      return this.get().toString();
-    }
-
-    valueOf(): T {
-      return this.get();
-    }
-
-    [Symbol.toPrimitive](): T {
-      return this.get();
-    }
   }
 
   /**

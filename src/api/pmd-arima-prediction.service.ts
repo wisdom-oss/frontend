@@ -6,12 +6,13 @@ import {Duration} from "dayjs/plugin/duration";
 import typia, {tags} from "typia";
 
 import {api} from "../common/api";
+import {Id} from "../common/id";
 
 const URL = "/api/pmdarima-prediction" as const;
 
-class SmartMeterId extends api.Id<string> {}
-class ModelId extends api.Id<string> {}
-class TrainingId extends api.Id<string> {}
+class SmartMeterId extends Id<string> {}
+class ModelId extends Id<string> {}
+class TrainingId extends Id<string> {}
 
 @Injectable({
   providedIn: "root",
@@ -59,7 +60,7 @@ export class PmdArimaPredictionService extends api.service(URL) {
       url: `${URL}/meter-names`,
       validateRaw: typia.createValidate<Raw.SmartMeter[]>(),
       parse: meters =>
-        meters.map(({name, id}) => ({name, id: new SmartMeterId(id)})),
+        meters.map(({name, id}) => ({name, id: SmartMeterId.of(id)})),
     });
   }
 
@@ -98,8 +99,8 @@ export class PmdArimaPredictionService extends api.service(URL) {
           trainingId: string;
         }>(),
         parse: ({modelId, trainingId}) => ({
-          modelId: new ModelId(modelId),
-          trainingId: new TrainingId(trainingId),
+          modelId: ModelId.of(modelId),
+          trainingId: TrainingId.of(trainingId),
         }),
       });
     },
