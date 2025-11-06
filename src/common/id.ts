@@ -17,7 +17,7 @@ export abstract class Id<V extends string | number> {
     _: typeof SECRET,
   ) {}
 
-  protected static REGISTRY = new Map<
+  private static REGISTRY = new Map<
     IdConstructor,
     Map<string | number, WeakRef<Id<string | number>>>
   >();
