@@ -14,9 +14,9 @@ type IdConstructor = new (value: any, _: typeof SECRET) => Id<any>;
 export abstract class Id<V extends string | number> {
   /**
    * Internal constructor to define IDs.
-   * 
+   *
    * Do not use this constructor for any use of IDs, use {@link of} instead.
-   * @param value Internal value. 
+   * @param value Internal value.
    * @param _ Secret.
    * @internal Use {@link of} instead.
    */
@@ -32,17 +32,17 @@ export abstract class Id<V extends string | number> {
 
   /**
    * Constructor for IDs.
-   * 
-   * The IDs coming from this method are interned, meaning they are all the same 
+   *
+   * The IDs coming from this method are interned, meaning they are all the same
    * instances.
    * This allows them to strictly compare them and use in Maps as proper keys.
-   * 
+   *
    * @example
    * class SomeId extends Id<number> {}
    * let a = SomeId.of(1)
    * let b = SomeId.of(1)
    * a === b // true
-   * 
+   *
    * @param this Polymorphic `this`, not needed when calling.
    * @param value Value of the ID.
    * @returns New interned ID.
