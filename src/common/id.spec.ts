@@ -75,9 +75,9 @@ describe("Id", () => {
     expect(uid.toString()).toBe("10");
     expect(`${uid}`).toBe("10");
     expect(+uid).toBe(10);
-    // @ts-ignore
+    // @ts-expect-error coercion not directly allowed by types but works
     expect(uid == 10).toBe(true);
-    // @ts-ignore
+    // @ts-expect-error won't coerce, so it should be false
     expect(uid === 10).toBe(false);
   });
 
