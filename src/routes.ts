@@ -10,6 +10,7 @@ import {longTermForecastRoutes} from "./modules/long-term-forecast/routes";
 import {OowvActionMapComponent} from "./modules/oowv/action-map/action-map.component";
 import {PumpModelsComponent} from "./modules/pump-models/pump-models.component";
 import {WaterDemandPredictionComponent} from "./modules/water-demand-prediction/water-demand-prediction.component";
+import {WaterDemandPrediction2Component} from "./modules/water-demand-prediction/water-demand-prediction2.component";
 import {WaterRightsComponent} from "./modules/water-rights/water-rights.component";
 import {waterRightsRoutes} from "./modules/water-rights/routes";
 import {WeatherDataComponent} from "./modules/weather-data/weather-data.component";
@@ -46,6 +47,10 @@ export const routes: Routes = [
       {
         path: "oowv/water-demand-prediction",
         component: WaterDemandPredictionComponent,
+      },
+      {
+        path: "oowv/water-demand-prediction2",
+        component: WaterDemandPrediction2Component,
       },
     ],
   },

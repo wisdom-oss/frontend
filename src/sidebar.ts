@@ -1,6 +1,7 @@
 import {computed, inject, Component, Signal} from "@angular/core";
 import {
   remixBarChartFill,
+  remixBook2Line,
   remixBookLine,
   remixBuilding3Fill,
   remixDatabase2Fill,
@@ -20,6 +21,7 @@ import {WaterRightsService} from "./api/water-rights.service";
 import {UsageForecastsService} from "./api/usage-forecasts.service";
 import {BeWaterSmartService} from "./api/be-water-smart.service";
 import {WaterDemandPredictionService} from "./api/water-demand-prediction.service";
+import {PmdArimaPredictionService} from "./api/pmd-arima-prediction.service";
 import {extraTags} from "./common/utils/extra-tags";
 import {api} from "./common/api";
 import {AuthService} from "./core/auth/auth.service";
@@ -190,6 +192,12 @@ export function sidebar(): readonly SidebarEntry[] {
           icon: {remixBookLine},
           link: "/oowv/water-demand-prediction",
           services: {WaterDemandPredictionService},
+        },
+        {
+          module: "core.sidebar.category.water-demand-prediction",
+          icon: {remixBook2Line},
+          link: "/oowv/water-demand-prediction2",
+          services: {PmdArimaPredictionService},
         },
       ],
     },
