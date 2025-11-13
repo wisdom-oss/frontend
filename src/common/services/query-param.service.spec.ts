@@ -1,8 +1,9 @@
-import { TestBed } from "@angular/core/testing";
-import { QueryParamService } from "./query-param.service";
-import { provideRouter, Router } from "@angular/router";
-import { Component } from "@angular/core";
+import {Component} from "@angular/core";
+import {TestBed} from "@angular/core/testing";
+import {provideRouter, Router} from "@angular/router";
 import {RouterTestingHarness} from "@angular/router/testing";
+
+import {QueryParamService} from "./query-param.service";
 
 @Component({})
 class TestComponent {}
@@ -19,10 +20,11 @@ describe("QueryParamService", () => {
         QueryParamService,
         provideRouter([
           {
-            path: "", component: TestComponent 
-          }
-        ])
-      ]
+            path: "",
+            component: TestComponent,
+          },
+        ]),
+      ],
     });
 
     service = TestBed.inject(QueryParamService);
@@ -92,7 +94,7 @@ describe("QueryParamService", () => {
     expect(router.url).toBe("/?values=c&values=b");
   });
 
-    it("should parse and serialize a single numeric query param", async () => {
+  it("should parse and serialize a single numeric query param", async () => {
     let page = service.signal("page", {
       parse: raw => Number(raw),
       serialize: value => String(value),

@@ -19,9 +19,9 @@ import {image as gravatar} from "gravatar-gen";
 import {signals} from "../../../common/signals";
 import {AuthService} from "../../auth/auth.service";
 import {UserService} from "../../user.service";
-import {StorageService} from "../../../common/services/storage.service";
 import {IsAutoHideDirective} from "../../../common/directives/is-auto-hide.directive";
 import {TranslateAttrDirective} from "../../../common/directives/translate-attr.directive";
+import {StorageService} from "../../../common/services/storage.service";
 
 const REMEMBER_LOGIN_KEY = "remember";
 
