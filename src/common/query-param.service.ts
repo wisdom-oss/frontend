@@ -9,6 +9,7 @@ import {ActivatedRoute, Params, Router} from "@angular/router";
 export class QueryParamService {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private queryParamMap = toSignal(this.route.queryParamMap);
 
   // no options -> single string or undefined
   signal(param: string): QueryParamSignal<string | undefined>;
@@ -33,9 +34,8 @@ export class QueryParamService {
       serialize?: (value: T) => string;
     }
   ): QueryParamSignal<string | string [] | T | T[] | undefined> {
-    let paramMap = toSignal(this.route.queryParamMap);
     let read = computed(() => {
-      let params = paramMap();
+      let params = this.queryParamMap();
       if (!params) {
         if (options?.multi) return [];
         return options?.default;
@@ -58,7 +58,7 @@ export class QueryParamService {
         else queryParams[param] = options.serialize(value);
       }
 
-      this.router.navigate([], {
+      return this.router.navigate([], {
         queryParams, 
         queryParamsHandling: "merge", 
         replaceUrl: true
@@ -70,7 +70,7 @@ export class QueryParamService {
 }
 
 type QueryParamSignal<T> = Signal<T> & {
-  set(value: T | T[]): void;
+  set(value: T): Promise<boolean>;
 };
 
 export namespace QueryParamService {
