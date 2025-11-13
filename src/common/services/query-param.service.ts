@@ -36,9 +36,10 @@ export class QueryParamService {
   ): QueryParamSignal<string | string [] | T | T[] | undefined> {
     let read = computed(() => {
       let params = this.queryParamMap();
-      if (!params) {
+      if (!params || !params.has(param)) {
+        if (options?.default) return options.default;
         if (options?.multi) return [];
-        return options?.default;
+        return undefined;
       }
       if (options?.multi) {
         let values = params.getAll(param);
