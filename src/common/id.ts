@@ -81,3 +81,22 @@ export abstract class Id<V extends string | number> {
     return this.get();
   }
 }
+
+export namespace Id {
+  /**
+   * Extracts the raw value type from an `Id` instance type.
+   *
+   * We use this to get the underlying `string` or `number` from an `Id`
+   * subclass without reaching into its internals.
+   *
+   * @example
+   * ```ts
+   * class MyId extends Id<number> {}
+   *
+   * type MyIdValue = Id.Value<MyId>; // number
+   * ```
+   *
+   * @typeParam T `Id` instance type to extract the value type from.
+   */
+  export type Value<T extends Id<any>> = T extends Id<infer V> ? V : never;
+}
