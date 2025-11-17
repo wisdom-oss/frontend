@@ -166,23 +166,20 @@ export namespace typeUtils {
   };
 
   type OptionalKeys<T> = {
-    [K in keyof T]: {} extends Pick<T, K> ? K : never
+    [K in keyof T]: {} extends Pick<T, K> ? K : never;
   }[keyof T];
 
   type UndefinedKeys<T> = {
-    [K in keyof T]: undefined extends T[K] ? K : never
+    [K in keyof T]: undefined extends T[K] ? K : never;
   }[keyof T];
 
   type NullKeys<T> = {
-    [K in keyof T]: null extends T[K] ? K : never
+    [K in keyof T]: null extends T[K] ? K : never;
   }[keyof T];
 
-  type LooseOptionalKeys<T> =
-    | OptionalKeys<T>
-    | UndefinedKeys<T>
-    | NullKeys<T>;
+  type LooseOptionalKeys<T> = OptionalKeys<T> | UndefinedKeys<T> | NullKeys<T>;
 
-    /**
+  /**
    * Makes properties that are already optional, `undefined`, or `null`
    * into "loose" optionals:
    *
@@ -217,10 +214,11 @@ export namespace typeUtils {
   export type LooseOptionals<T> = {
     // keys that should become loose optionals
     [K in keyof T as K extends LooseOptionalKeys<T> ? K : never]?:
-      T[K] | null | undefined;
+      | T[K]
+      | null
+      | undefined;
   } & {
     // everything else stays as is
-    [K in keyof T as K extends LooseOptionalKeys<T> ? never : K]:
-      T[K];
+    [K in keyof T as K extends LooseOptionalKeys<T> ? never : K]: T[K];
   };
 }

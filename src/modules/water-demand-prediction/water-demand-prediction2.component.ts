@@ -1,5 +1,6 @@
-import {Component, effect, inject} from "@angular/core";
-import { PmdArimaPredictionService } from "../../api/pmd-arima-prediction.service";
+import {effect, inject, Component} from "@angular/core";
+
+import {PmdArimaPredictionService} from "../../api/pmd-arima-prediction.service";
 
 type Service = PmdArimaPredictionService;
 
