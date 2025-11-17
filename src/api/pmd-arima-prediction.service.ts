@@ -195,7 +195,9 @@ namespace Raw {
     datapoints: ConfidenceDataPoint[];
   };
 
-  export type SmartMeter = Omit<Self.SmartMeter, "id"> & {id: string};
+  export type SmartMeter = typeUtils.LooseOptionals<
+    api.RawRecord<Self.SmartMeter>
+  >;
 
   export type ModelMetaData = typeUtils.LooseOptionals<
     api.RawRecord<Self.ModelMetaData>

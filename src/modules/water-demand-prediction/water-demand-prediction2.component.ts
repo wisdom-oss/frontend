@@ -12,6 +12,8 @@ export class WaterDemandPrediction2Component {
   private service = inject(PmdArimaPredictionService);
 
   protected models = this.service.fetchModels();
+  protected meters = this.service.fetchMeters();
 
-  _ = effect(() => console.log(this.models()));
+  _models = effect(() => console.log(this.models()));
+  _meters = effect(() => console.log(this.meters()));
 }
