@@ -10,8 +10,8 @@ import {Id} from "../common/id";
 
 const URL = "/api/pmdarima-prediction" as const;
 
-class SmartMeterId extends Id<string> {}
-class ModelId extends Id<string> {}
+class SmartMeterId extends Id<string & tags.Format<"uuid">> {}
+class ModelId extends Id<string & tags.Format<"uuid">> {}
 class TrainingId extends Id<string> {}
 
 @Injectable({
@@ -55,16 +55,33 @@ export class PmdArimaPredictionService extends api.service(URL) {
     });
   }
 
-  fetchMeterNames(): api.Signal<Self.SmartMeter[]> {
+  fetchMeters(): api.Signal<Self.SmartMeter[]> {
     return api.resource({
-      url: `${URL}/meter-names`,
+      url: `${URL}/meters`,
       validateRaw: typia.createValidate<Raw.SmartMeter[]>(),
       parse: meters =>
         meters.map(({name, id}) => ({name, id: SmartMeterId.of(id)})),
     });
   }
 
-  fetchMeasuredData(
+  fetchModels(): api.Signal<Self.ModelMetaData[]> {
+    return api.resource({
+      url: `${URL}/models`,
+      validateRaw: typia.createValidate<Raw.ModelMetaData[]>(),
+      parse: list =>
+        list.map(item => ({
+          ...item,
+          id: ModelId.of(item.id),
+          meterId: SmartMeterId.of(item.meterId),
+          dataStartsAt: dayjs(item.dataStartsAt),
+          dataEndsAt: dayjs(item.dataStartsAt),
+          trainingTime: dayjs.duration(item.trainingTime),
+          trainedAt: dayjs(item.trainedAt),
+        })),
+    });
+  }
+
+  fetchRecordedUsages(
     meterId: api.RequestSignal<SmartMeterId>,
     params: api.RequestSignal<{
       bucketSize?: Duration;
@@ -73,7 +90,7 @@ export class PmdArimaPredictionService extends api.service(URL) {
     }>,
   ): api.Signal<Self.DataPoint[]> {
     return api.resource({
-      url: api.url`${URL}/measured-data/${meterId}`,
+      url: api.url`${URL}/meters/${meterId}/recorded-usages`,
       validateRaw: typia.createValidate<Raw.DataPoint[]>(),
       parse: dts => dts.map(dt => ({...dt, time: dayjs(dt.time)})),
       params: api.QueryParams.from(params),
@@ -88,16 +105,14 @@ export class PmdArimaPredictionService extends api.service(URL) {
         timeSpan?: Duration;
         weatherCapability?: Self.SupportedCapability;
         weatherColumnName?: string;
+        comment?: string;
       }>,
-    ): api.Signal<{modelId: ModelId; trainingId: TrainingId}> => {
+    ): api.Signal<Self.TrainingInitiation> => {
       return api.resource({
         url: api.url`${URL}/training/start/${meterId}`,
         method: "PUT",
         params: api.QueryParams.from(params),
-        validateRaw: typia.createValidate<{
-          modelId: string;
-          trainingId: string;
-        }>(),
+        validateRaw: typia.createValidate<Raw.TrainingInitiation>(),
         parse: ({modelId, trainingId}) => ({
           modelId: ModelId.of(modelId),
           trainingId: TrainingId.of(trainingId),
@@ -105,7 +120,7 @@ export class PmdArimaPredictionService extends api.service(URL) {
       });
     },
 
-    status: (trainingId: TrainingId): api.Socket<string, void> => {
+    status: (trainingId: TrainingId): api.Socket<string, never> => {
       return api.socket({
         url: `${URL}/training/status/${trainingId}`,
         validate: typia.createValidate<string>(),
@@ -175,12 +190,16 @@ namespace Raw {
 
   export type SmartMeter = Omit<Self.SmartMeter, "id"> & {id: string};
 
+  export type ModelMetaData = api.RawRecord<Self.ModelMetaData>;
+
   export type WeatherColumn = api.RawRecord<Self.WeatherColumn>;
 
   export type WeatherCapability = Omit<
     api.RawRecord<Self.WeatherCapability>,
     "columns"
   > & {columns: WeatherColumn[]};
+
+  export type TrainingInitiation = api.RawRecord<Self.TrainingInitiation>;
 }
 
 export namespace PmdArimaPredictionService {
@@ -212,6 +231,19 @@ export namespace PmdArimaPredictionService {
   export type SmartMeter = {
     id: SmartMeterId;
     name: string;
+    description?: string;
+  };
+
+  export type ModelMetaData = {
+    id: ModelId;
+    meterId: SmartMeterId;
+    dataStartsAt: Dayjs;
+    dataEndsAt: Dayjs;
+    weatherCapability?: SupportedCapability;
+    capabilityColumn: string;
+    trainingTime: Duration;
+    trainedAt: Dayjs;
+    comment?: string;
   };
 
   export type SupportedCapability =
@@ -230,6 +262,11 @@ export namespace PmdArimaPredictionService {
     availableUntil: Dayjs;
     columns?: WeatherColumn[];
     resolution: "hourly";
+  };
+
+  export type TrainingInitiation = {
+    modelId: ModelId;
+    trainingId: TrainingId;
   };
 }
 
