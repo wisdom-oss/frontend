@@ -46,31 +46,13 @@ const OPTIONAL_PROXY_CONFIGS = {
       rewrite: path => path.replace(/^\/api\/bws/, ""),
     },
   ],
-  wdp_local: [
-    "/api/waterdemand/**",
+  pmdarima: [
+    "/api/pmdarima-prediction/**",
     {
-      target: "http://localhost:8090",
+      target: "http://localhost:8000",
       secure: false,
       changeOrigin: true,
-      rewrite: path => path.replace(/^\/api/, ""),
-    },
-  ],
-  wdp_local_docker: [
-    "/api/waterdemand/**",
-    {
-      target: "http://localhost:9120",
-      secure: false,
-      changeOrigin: true,
-      rewrite: path => path.replace(/^\/api/, ""),
-    },
-  ],
-  wdp_dev_training: [
-    "/api/waterdemand/**",
-    {
-      target: "http://wisdom-dev.vlba.uni-oldenburg.de:9120",
-      secure: false,
-      changeOrigin: true,
-      rewrite: path => path.replace(/^\/api/, ""),
+      rewrite: path => path.replace(/^\/api\/pmdarima-prediction/, ""),
     },
   ],
 };
