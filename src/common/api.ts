@@ -193,6 +193,13 @@ export namespace api {
     // The `value` is not *really* omitted in the output but avoids accidentally
     // calling `.value()`.
     resource: Omit<HttpResourceRef<T | D>, "value">;
+
+    /**
+     * Reloads the signal.
+     *
+     * Shorthand to `.resource.reload()`.
+     */
+    reload(): boolean;
   };
 
   /**
@@ -613,7 +620,10 @@ export namespace api {
       equal,
     }) as HttpResourceRef<TResult | TDefault>;
     let value = buildResourceErrorHandler(options, resourceRef);
-    return Object.assign(value, {resource: resourceRef});
+    return Object.assign(value, {
+      resource: resourceRef,
+      reload: () => resourceRef.reload(),
+    });
   }
 
   /**
