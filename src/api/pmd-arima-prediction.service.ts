@@ -75,7 +75,7 @@ export class PmdArimaPredictionService extends api.service(URL) {
           dataStartsAt: dayjs(item.dataStartsAt),
           dataEndsAt: dayjs(item.dataEndsAt),
           weatherCapability: item.weatherCapability ?? undefined,
-          capabilityColumn: item.capabilityColumn,
+          capabilityColumn: item.capabilityColumn ?? undefined,
           trainingTime: dayjs.duration(item.trainingTime),
           trainedAt: dayjs(item.trainedAt),
           comment: item.comment ?? undefined,
@@ -242,7 +242,7 @@ export namespace PmdArimaPredictionService {
     dataStartsAt: Dayjs;
     dataEndsAt: Dayjs;
     weatherCapability?: SupportedCapability;
-    capabilityColumn: string;
+    capabilityColumn?: string;
     trainingTime: Duration;
     trainedAt: Dayjs;
     comment?: string;
