@@ -1149,10 +1149,10 @@ export namespace api {
   export type RawRecord<T> = {
     [K in keyof T]: T[K] extends Id<any>
       ? Id.Value<T[K]>
-      : T[K] extends Dayjs
-        ? string & tags.Format<"date-time">
-        : T[K] extends Duration
-          ? string & tags.Format<"duration">
+      : T[K] extends Dayjs | undefined
+        ? (string & tags.Format<"date-time">) | Extract<T[K], undefined>
+        : T[K] extends Duration | undefined
+          ? (string & tags.Format<"duration">) | Extract<T[K], undefined>
           : T[K];
   };
 }
