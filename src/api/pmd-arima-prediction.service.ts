@@ -78,7 +78,9 @@ export class PmdArimaPredictionService extends api.service(URL) {
               dataEndsAt: dayjs(item.dataEndsAt),
               weatherCapability: item.weatherCapability ?? undefined,
               capabilityColumn: item.capabilityColumn ?? undefined,
-              trainingTime: dayjs.duration(item.trainingTime),
+              trainingTime: item.trainingTime
+                ? dayjs.duration(item.trainingTime)
+                : undefined,
               trainedAt: dayjs(item.trainedAt),
               comment: item.comment ?? undefined,
             }) satisfies Self.ModelMetaData,
@@ -244,12 +246,12 @@ export namespace PmdArimaPredictionService {
   export type ModelMetaData = {
     modelId: ModelId;
     meterId: SmartMeterId;
-    dataStartsAt: Dayjs;
-    dataEndsAt: Dayjs;
+    dataStartsAt?: Dayjs;
+    dataEndsAt?: Dayjs;
     weatherCapability?: SupportedCapability;
     capabilityColumn?: string;
-    trainingTime: Duration;
-    trainedAt: Dayjs;
+    trainingTime?: Duration;
+    trainedAt?: Dayjs;
     comment?: string;
   };
 
