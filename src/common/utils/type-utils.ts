@@ -164,4 +164,63 @@ export namespace typeUtils {
   } & {
     [K in keyof T as undefined extends T[K] ? never : K]: T[K];
   };
+
+  type OptionalKeys<T> = {
+    [K in keyof T]: {} extends Pick<T, K> ? K : never
+  }[keyof T];
+
+  type UndefinedKeys<T> = {
+    [K in keyof T]: undefined extends T[K] ? K : never
+  }[keyof T];
+
+  type NullKeys<T> = {
+    [K in keyof T]: null extends T[K] ? K : never
+  }[keyof T];
+
+  type LooseOptionalKeys<T> =
+    | OptionalKeys<T>
+    | UndefinedKeys<T>
+    | NullKeys<T>;
+
+    /**
+   * Makes properties that are already optional, `undefined`, or `null`
+   * into "loose" optionals:
+   *
+   * - they may be missing (optional)
+   * - they may be explicitly `undefined`
+   * - they may be explicitly `null`
+   *
+   * All other properties stay required and unchanged.
+   *
+   * @template T The input record type.
+   *
+   * @example
+   * ```ts
+   * type Input = {
+   *   a: string;
+   *   b?: number;
+   *   c: boolean | undefined;
+   *   d: string | null;
+   *   e?: string | null;
+   * };
+   *
+   * type Out = LooseOptionals<Input>;
+   * // {
+   * //   a: string;
+   * //   b?: number | null | undefined;
+   * //   c?: boolean | null | undefined;
+   * //   d?: string | null | undefined;
+   * //   e?: string | null | undefined;
+   * // }
+   * ```
+   */
+  export type LooseOptionals<T> = {
+    // keys that should become loose optionals
+    [K in keyof T as K extends LooseOptionalKeys<T> ? K : never]?:
+      T[K] | null | undefined;
+  } & {
+    // everything else stays as is
+    [K in keyof T as K extends LooseOptionalKeys<T> ? never : K]:
+      T[K];
+  };
 }

@@ -70,14 +70,16 @@ export class PmdArimaPredictionService extends api.service(URL) {
       validateRaw: typia.createValidate<Raw.ModelMetaData[]>(),
       parse: list =>
         list.map(item => ({
-          ...item,
-          id: ModelId.of(item.id),
+          modelId: ModelId.of(item.modelId),
           meterId: SmartMeterId.of(item.meterId),
           dataStartsAt: dayjs(item.dataStartsAt),
-          dataEndsAt: dayjs(item.dataStartsAt),
+          dataEndsAt: dayjs(item.dataEndsAt),
+          weatherCapability: item.weatherCapability ?? undefined,
+          capabilityColumn: item.capabilityColumn,
           trainingTime: dayjs.duration(item.trainingTime),
           trainedAt: dayjs(item.trainedAt),
-        })),
+          comment: item.comment ?? undefined,
+        } satisfies Self.ModelMetaData)),
     });
   }
 
@@ -190,7 +192,7 @@ namespace Raw {
 
   export type SmartMeter = Omit<Self.SmartMeter, "id"> & {id: string};
 
-  export type ModelMetaData = api.RawRecord<Self.ModelMetaData>;
+  export type ModelMetaData = typeUtils.LooseOptionals<api.RawRecord<Self.ModelMetaData>>;
 
   export type WeatherColumn = api.RawRecord<Self.WeatherColumn>;
 
@@ -235,7 +237,7 @@ export namespace PmdArimaPredictionService {
   };
 
   export type ModelMetaData = {
-    id: ModelId;
+    modelId: ModelId;
     meterId: SmartMeterId;
     dataStartsAt: Dayjs;
     dataEndsAt: Dayjs;
@@ -270,4 +272,5 @@ export namespace PmdArimaPredictionService {
   };
 }
 
-import Self = PmdArimaPredictionService;
+import Self = PmdArimaPredictionService;import { typeUtils } from "../common/utils/type-utils";
+
