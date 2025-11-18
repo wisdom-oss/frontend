@@ -46,6 +46,7 @@ export class PmdArimaPredictionService extends api.service(URL) {
       validateRaw: typia.createValidate<Raw.Prediction>(),
       parse: raw => ({
         ...raw,
+        madeWithModel: ModelId.of(raw.madeWithModel),
         datapoints: raw.datapoints.map(dt => ({
           ...dt,
           time: dayjs(dt.time),
@@ -191,7 +192,7 @@ namespace Raw {
 
   export type ConfidenceDataPoint = api.RawRecord<Self.ConfidenceDataPoint>;
 
-  export type Prediction = Omit<Self.Prediction, "datapoints"> & {
+  export type Prediction = Omit<api.RawRecord<Self.Prediction>, "datapoints"> & {
     datapoints: ConfidenceDataPoint[];
   };
 
@@ -231,7 +232,7 @@ export namespace PmdArimaPredictionService {
   };
 
   export type Prediction = {
-    madeWithModel: string;
+    madeWithModel: ModelId;
     mae: number & tags.Type<"double">;
     mse: number & tags.Type<"double">;
     rmse: number & tags.Type<"double">;
