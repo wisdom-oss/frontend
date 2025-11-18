@@ -98,4 +98,14 @@ describe("Id", () => {
     expect(a == b).toBe(false);
     expect(a === b).toBe(false);
   });
+
+  test("different ids are different", () => {
+    class IdA extends Id<number> {}
+    class IdB extends Id<number> {}
+
+    const map = new Map<IdA, string>();
+    map.set(IdA.of(1), "lol");
+    // @ts-expect-error unequal types
+    map.get(IdB.of(1));
+  });
 });

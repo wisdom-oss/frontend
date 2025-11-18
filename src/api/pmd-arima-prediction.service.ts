@@ -192,7 +192,10 @@ namespace Raw {
 
   export type ConfidenceDataPoint = api.RawRecord<Self.ConfidenceDataPoint>;
 
-  export type Prediction = Omit<api.RawRecord<Self.Prediction>, "datapoints"> & {
+  export type Prediction = Omit<
+    api.RawRecord<Self.Prediction>,
+    "datapoints"
+  > & {
     datapoints: ConfidenceDataPoint[];
   };
 

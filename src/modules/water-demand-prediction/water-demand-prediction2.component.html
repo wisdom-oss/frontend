@@ -1,2 +1,37 @@
-<p>water-demand-prediction2 works!</p>
-<button (click)="models.reload()" class="button">update</button>
+<div class="is-position-relative is-fullheight is-fullwidth">
+  <div
+    class="box is-position-absolute"
+    style="
+      margin: 2rem;
+      height: calc(100% - 4rem);
+      width: calc(100% - 4rem);
+      z-index: 10;
+    "
+  >
+    <p>Select Model</p>
+    <div class="grid">
+
+      @for (model of models().values(); track model.modelId) {
+        @let meter = meters().get(model.meterId);
+        <div class="cell">
+          <div class="card">
+            <div class="card-header">
+              <p class="card-header-title">{{ meter?.id }}</p>
+              <p class="card-header-icon">
+                <span class="icon">
+                  <ng-icon name="remixAiGenerate"></ng-icon>
+                </span>
+              </p>
+            </div>
+            <div class="card-content"></div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="box is-fullheight" style="filter: brightness(0.75)">
+    <p>water-demand-prediction2 works!</p>
+    <!-- <button (click)="models.reload()" class="button">update</button> -->
+  </div>
+</div>
