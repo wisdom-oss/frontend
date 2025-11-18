@@ -15,7 +15,7 @@
     "compodoc:build": "compodoc -p tsconfig.doc.json",
     "compodoc:build-and-serve": "compodoc -p tsconfig.doc.json -s",
     "compodoc:serve": "compodoc -s",
-    "docker:build": "docker build -t wisdom-oss/frontend .",
+    "docker:build": "bash -c 'docker build -t wisdom-oss/frontend --build-arg GIT_COMMIT_SHA=$(git rev-parse HEAD) .'",
     "docker:start": "npm run docker:run",
     "docker:run": "docker run --rm -p 5000:5000 wisdom-oss/frontend",
     "git-hooks": "husky"

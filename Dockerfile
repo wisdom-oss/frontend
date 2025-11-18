@@ -1,16 +1,19 @@
 ARG VOLTA_VERSION=2.0.2
 ARG DUFS_VERSION=0.43.0
+ARG GIT_COMMIT_SHA
 
 
 # build the app via volta to use the correct node version
 FROM --platform=$BUILDPLATFORM debian:bookworm AS build-app
+ARG VOLTA_VERSION
+ARG GIT_COMMIT_SHA
+
 RUN apt update -y && apt upgrade -y
 RUN apt install -y curl
 WORKDIR /app
 
 # install volta to install correct node version
 RUN curl -o install-volta.sh -L --proto "=https" --tlsv1.2 -sSf https://get.volta.sh
-ARG VOLTA_VERSION
 ENV VOLTA_HOME="/.volta"
 RUN bash install-volta.sh --version ${VOLTA_VERSION}
 ENV PATH="$VOLTA_HOME/bin:$PATH"
@@ -27,6 +30,7 @@ RUN volta run npm ci
 
 # build the app
 COPY --link . .
+ENV GIT_COMMIT_SHA=${GIT_COMMIT_SHA}
 RUN volta run npm run build
 
 
