@@ -8,7 +8,7 @@ import typia, {tags} from "typia";
 import {api} from "../common/api";
 import {Id} from "../common/id";
 
-const URL = "/api/pmdarima-prediction" as const;
+const URL = "/api/pmdarima-predictions" as const;
 
 class SmartMeterId extends Id<string & tags.Format<"uuid">> {}
 class ModelId extends Id<string & tags.Format<"uuid">> {}

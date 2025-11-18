@@ -47,12 +47,12 @@ const OPTIONAL_PROXY_CONFIGS = {
     },
   ],
   pmdarima: [
-    "/api/pmdarima-prediction/**",
+    "/api/pmdarima-predictions/**",
     {
       target: "http://localhost:8000",
       secure: false,
       changeOrigin: true,
-      rewrite: path => path.replace(/^\/api\/pmdarima-prediction/, ""),
+      rewrite: path => path.replace(/^\/api\/pmdarima-predictions/, ""),
     },
   ],
 };
