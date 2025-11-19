@@ -1,20 +1,34 @@
-import {effect, inject, Component, Signal, computed} from "@angular/core";
+import {
+  computed,
+  effect,
+  inject,
+  signal,
+  Component,
+  Signal,
+} from "@angular/core";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
-import {remixAiGenerate} from "@ng-icons/remixicon";
+import {remixResetRightLine} from "@ng-icons/remixicon";
+import dayjs from "dayjs";
 
-import {PmdArimaPredictionService} from "../../api/pmd-arima-prediction.service";
-import { signals } from "../../common/signals";
-import { api } from "../../common/api";
-import { equal } from "three/src/nodes/TSL.js";
+import {PmdArimaPredictionService as Service} from "../../api/pmd-arima-prediction.service";
+import {signals} from "../../common/signals";
+import {api} from "../../common/api";
+import {QueryParamService} from "../../common/services/query-param.service";
 
-function makeMap<K, V>(signal: api.Signal<V[]>, key: (value: V) => K): Signal<Map<K, V>> & {reload(): boolean} {
+function makeMap<K, V>(
+  signal: api.Signal<V[]>,
+  key: (value: V) => K,
+): Signal<Map<K, V>> & {reload(): boolean} {
   let map = new Map();
-  let s = computed(() => {
-    let values = signal();
-    map.clear();
-    for (let value of values ?? []) map.set(key(value), value);
-    return map;
-  }, {equal: () => false});
+  let s = computed(
+    () => {
+      let values = signal();
+      map.clear();
+      for (let value of values ?? []) map.set(key(value), value);
+      return map;
+    },
+    {equal: () => false},
+  );
   return Object.assign(s, {reload: () => signal.reload()});
 }
 
@@ -23,20 +37,39 @@ function makeMap<K, V>(signal: api.Signal<V[]>, key: (value: V) => K): Signal<Ma
   templateUrl: "./water-demand-prediction2.component.html",
   providers: [
     provideIcons({
-      remixAiGenerate,
+      remixResetRightLine,
     }),
   ],
 })
 export class WaterDemandPrediction2Component {
-  private service = inject(PmdArimaPredictionService);
+  private service = inject(Service);
+  private queryParams = inject(QueryParamService);
 
-  protected models = makeMap(this.service.fetchModels(), m => m.modelId);
+  protected lang = signals.lang();
+
+  private fetchModels = this.service.fetchModels();
+
+  protected models = makeMap(this.fetchModels, m => m.modelId);
   protected meters = makeMap(this.service.fetchMeters(), m => m.id);
 
-  _something = effect(() => {
-    for (let [modelId, model] of this.models()) {
-      console.log(this.meters().get(model.modelId));
-    }
+  protected modelId = this.queryParams.signal("modelId", {
+    parse: raw => Service.ModelId.of(raw),
+    serialize: id => id.toString(),
+  });
+
+  protected model = computed(() => {
+    let models = this.models();
+    let modelId = this.modelId();
+    if (!modelId) return undefined;
+    return models.get(modelId);
+  });
+
+  protected modelsLoading = signal(true);
+  private modelsDelayed = signals.delay(this.models, dayjs.duration(0.8, "s"));
+  private modelsLoaded = effect(() => {
+    let models = this.modelsDelayed();
+    if (!models) return;
+    this.modelsLoading.set(false);
   });
 
   _models = effect(() => console.log(this.models()));

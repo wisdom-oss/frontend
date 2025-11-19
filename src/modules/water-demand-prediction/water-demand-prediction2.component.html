@@ -1,36 +1,106 @@
+@let lang = this.lang();
 <div class="is-position-relative is-fullheight is-fullwidth">
   <div
+    [class.is-hidden]="model()"
     class="box is-position-absolute"
     style="
       margin: 2rem;
       height: calc(100% - 4rem);
       width: calc(100% - 4rem);
       z-index: 10;
+      overflow-y: auto;
     "
   >
-    <p>Select Model</p>
-    <div class="grid">
-
+    <div class="level mb-4">
+      <div class="level-left">
+        <div class="level-item">
+          <p class="title is-4 mb-0">Select Model</p>
+        </div>
+      </div>
+      <div class="level-right">
+        <div class="level-item">
+          <button
+            class="button"
+            (click)="modelsLoading.set(true); models.reload()"
+          >
+            <span class="icon" [class.is-spinning]="modelsLoading()">
+              <div>
+                <ng-icon name="remixResetRightLine"></ng-icon>
+              </div>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="grid is-col-min-20">
       @for (model of models().values(); track model.modelId) {
         @let meter = meters().get(model.meterId);
         <div class="cell">
           <div class="card">
-            <div class="card-header">
-              <p class="card-header-title">{{ meter?.id }}</p>
-              <p class="card-header-icon">
-                <span class="icon">
-                  <ng-icon name="remixAiGenerate"></ng-icon>
-                </span>
-              </p>
+            <div class="card-content">
+              <table>
+                <tbody>
+                  @for (
+                    entry of [
+                      ["ID", model.modelId],
+                      ["Meter", meter?.name],
+                      [
+                        "data starts at",
+                        model.dataStartsAt?.locale(lang)?.format("LLL"),
+                      ],
+                      [
+                        "data ends at",
+                        model.dataEndsAt?.locale(lang)?.format("LLL"),
+                      ],
+                      ["weather capability", model.weatherCapability],
+                      [
+                        "training time",
+                        model.trainingTime?.locale(lang)?.humanize(),
+                      ],
+                      [
+                        "trained at",
+                        model.trainedAt?.locale(lang)?.format("LLL"),
+                      ],
+                    ];
+                    track entry[0]
+                  ) {
+                    @let key = entry[0];
+                    @let value = entry[1];
+                    @if (value) {
+                      <tr>
+                        <th>{{ key }}</th>
+                        <td style="padding-left: 1rem">{{ value }}</td>
+                      </tr>
+                    }
+                  }
+                </tbody>
+                @if (model.comment) {
+                  <tfoot>
+                    {{
+                      model.comment
+                    }}
+                  </tfoot>
+                }
+              </table>
             </div>
-            <div class="card-content"></div>
+            <div class="card-footer">
+              <button
+                (click)="modelId.set(model.modelId)"
+                class="card-footer-item"
+              >
+                Select
+              </button>
+            </div>
           </div>
         </div>
       }
     </div>
   </div>
 
-  <div class="box is-fullheight" style="filter: brightness(0.75)">
+  <div
+    class="box is-fullheight"
+    [style.filter]="!model() ? 'brightness(0.75)' : ''"
+  >
     <p>water-demand-prediction2 works!</p>
     <!-- <button (click)="models.reload()" class="button">update</button> -->
   </div>
