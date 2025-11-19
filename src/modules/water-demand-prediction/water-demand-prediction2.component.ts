@@ -7,8 +7,13 @@ import {
   Signal,
 } from "@angular/core";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
-import {remixResetRightLine} from "@ng-icons/remixicon";
+import {
+  remixArrowRightFill,
+  remixLoader4Fill,
+  remixResetRightLine,
+} from "@ng-icons/remixicon";
 import dayjs from "dayjs";
+import {BaseChartDirective} from "ng2-charts";
 
 import {PmdArimaPredictionService as Service} from "../../api/pmd-arima-prediction.service";
 import {signals} from "../../common/signals";
@@ -18,13 +23,14 @@ import {QueryParamService} from "../../common/services/query-param.service";
 function makeMap<K, V>(
   signal: api.Signal<V[]>,
   key: (value: V) => K,
-): Signal<Map<K, V>> & {reload(): boolean} {
+): Signal<Map<K, V> | undefined> & {reload(): boolean} {
   let map = new Map();
   let s = computed(
     () => {
       let values = signal();
       map.clear();
-      for (let value of values ?? []) map.set(key(value), value);
+      if (!values) return;
+      for (let value of values) map.set(key(value), value);
       return map;
     },
     {equal: () => false},
@@ -33,11 +39,13 @@ function makeMap<K, V>(
 }
 
 @Component({
-  imports: [NgIconComponent],
+  imports: [NgIconComponent, BaseChartDirective],
   templateUrl: "./water-demand-prediction2.component.html",
   providers: [
     provideIcons({
       remixResetRightLine,
+      remixArrowRightFill,
+      remixLoader4Fill,
     }),
   ],
 })
@@ -47,9 +55,7 @@ export class WaterDemandPrediction2Component {
 
   protected lang = signals.lang();
 
-  private fetchModels = this.service.fetchModels();
-
-  protected models = makeMap(this.fetchModels, m => m.modelId);
+  protected models = makeMap(this.service.fetchModels(), m => m.modelId);
   protected meters = makeMap(this.service.fetchMeters(), m => m.id);
 
   protected modelId = this.queryParams.signal("modelId", {
@@ -60,7 +66,7 @@ export class WaterDemandPrediction2Component {
   protected model = computed(() => {
     let models = this.models();
     let modelId = this.modelId();
-    if (!modelId) return undefined;
+    if (!models || !modelId) return undefined;
     return models.get(modelId);
   });
 

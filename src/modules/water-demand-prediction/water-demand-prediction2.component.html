@@ -1,107 +1,156 @@
 @let lang = this.lang();
+@let meters = this.meters();
+@let models = this.models();
+@let model = this.model();
+
 <div class="is-position-relative is-fullheight is-fullwidth">
-  <div
-    [class.is-hidden]="model()"
-    class="box is-position-absolute"
-    style="
-      margin: 2rem;
-      height: calc(100% - 4rem);
-      width: calc(100% - 4rem);
-      z-index: 10;
-      overflow-y: auto;
-    "
-  >
-    <div class="level mb-4">
-      <div class="level-left">
-        <div class="level-item">
-          <p class="title is-4 mb-0">Select Model</p>
-        </div>
-      </div>
-      <div class="level-right">
-        <div class="level-item">
-          <button
-            class="button"
-            (click)="modelsLoading.set(true); models.reload()"
-          >
-            <span class="icon" [class.is-spinning]="modelsLoading()">
-              <div>
-                <ng-icon name="remixResetRightLine"></ng-icon>
-              </div>
-            </span>
-          </button>
-        </div>
-      </div>
-    </div>
-    <div class="grid is-col-min-20">
-      @for (model of models().values(); track model.modelId) {
-        @let meter = meters().get(model.meterId);
-        <div class="cell">
-          <div class="card">
-            <div class="card-content">
-              <table>
-                <tbody>
-                  @for (
-                    entry of [
-                      ["ID", model.modelId],
-                      ["Meter", meter?.name],
-                      [
-                        "data starts at",
-                        model.dataStartsAt?.locale(lang)?.format("LLL"),
-                      ],
-                      [
-                        "data ends at",
-                        model.dataEndsAt?.locale(lang)?.format("LLL"),
-                      ],
-                      ["weather capability", model.weatherCapability],
-                      [
-                        "training time",
-                        model.trainingTime?.locale(lang)?.humanize(),
-                      ],
-                      [
-                        "trained at",
-                        model.trainedAt?.locale(lang)?.format("LLL"),
-                      ],
-                    ];
-                    track entry[0]
-                  ) {
-                    @let key = entry[0];
-                    @let value = entry[1];
-                    @if (value) {
-                      <tr>
-                        <th>{{ key }}</th>
-                        <td style="padding-left: 1rem">{{ value }}</td>
-                      </tr>
-                    }
-                  }
-                </tbody>
-                @if (model.comment) {
-                  <tfoot>
-                    {{
-                      model.comment
-                    }}
-                  </tfoot>
-                }
-              </table>
-            </div>
-            <div class="card-footer">
-              <button
-                (click)="modelId.set(model.modelId)"
-                class="card-footer-item"
-              >
-                Select
-              </button>
-            </div>
+  @if (models && !model) {
+    <div
+      class="box is-position-absolute"
+      style="
+        margin: 2rem;
+        height: calc(100% - 4rem);
+        width: calc(100% - 4rem);
+        z-index: 10;
+        overflow-y: auto;
+      "
+    >
+      <div class="level mb-4">
+        <div class="level-left">
+          <div class="level-item">
+            <p class="title is-4 mb-0">Select Model</p>
           </div>
         </div>
-      }
+        <div class="level-right">
+          <div class="level-item">
+            <button
+              class="button"
+              (click)="modelsLoading.set(true); this.models.reload()"
+            >
+              <span class="icon" [class.is-spinning]="modelsLoading()">
+                <div>
+                  <ng-icon name="remixResetRightLine"></ng-icon>
+                </div>
+              </span>
+            </button>
+          </div>
+          <div class="level-item">
+            <button class="button is-primary">
+              <span>New Model</span>
+              <span class="icon">
+                <div><ng-icon name="remixArrowRightFill"></ng-icon></div>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="grid is-col-min-20">
+        @for (model of models.values(); track model.modelId) {
+          @let meter = meters?.get(model.meterId);
+          <div class="cell">
+            <div class="card">
+              <div class="card-content">
+                <table>
+                  <tbody>
+                    @for (
+                      entry of [
+                        ["ID", model.modelId],
+                        ["Meter", meter?.name],
+                        [
+                          "data starts at",
+                          model.dataStartsAt?.locale(lang)?.format("LLL"),
+                        ],
+                        [
+                          "data ends at",
+                          model.dataEndsAt?.locale(lang)?.format("LLL"),
+                        ],
+                        ["weather capability", model.weatherCapability],
+                        [
+                          "training time",
+                          model.trainingTime?.locale(lang)?.humanize(),
+                        ],
+                        [
+                          "trained at",
+                          model.trainedAt?.locale(lang)?.format("LLL"),
+                        ],
+                      ];
+                      track entry[0]
+                    ) {
+                      @let key = entry[0];
+                      @let value = entry[1];
+                      @if (value) {
+                        <tr>
+                          <th>{{ key }}</th>
+                          <td style="padding-left: 1rem">{{ value }}</td>
+                        </tr>
+                      }
+                    }
+                  </tbody>
+                  @if (model.comment) {
+                    <tfoot>
+                      {{
+                        model.comment
+                      }}
+                    </tfoot>
+                  }
+                </table>
+              </div>
+              <div class="card-footer">
+                <button
+                  #button
+                  (mouseover)="button.classList.add('has-text-primary')"
+                  (mouseout)="button.classList.remove('has-text-primary')"
+                  (click)="modelId.set(model.modelId)"
+                  class="card-footer-item"
+                >
+                  <span class="has-text-weight-bold">Select</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
     </div>
-  </div>
+  }
+
+  @if (!models) {
+    <div
+      class="is-position-absolute is-fullheight is-fullwidth is-flex is-justify-content-center is-align-items-center"
+    >
+      <div>
+        @let size = "7rem";
+        <span
+          class="icon is-spinning"
+          [style.height]="size"
+          [style.width]="size"
+        >
+          <div>
+            <ng-icon [size]="size" name="remixLoader4Fill"></ng-icon>
+          </div>
+        </span>
+      </div>
+    </div>
+  }
 
   <div
     class="box is-fullheight"
-    [style.filter]="!model() ? 'brightness(0.75)' : ''"
+    [style.filter]="!model ? 'brightness(0.75)' : ''"
   >
-    <p>water-demand-prediction2 works!</p>
-    <!-- <button (click)="models.reload()" class="button">update</button> -->
+    <div class="columns">
+      <div class="column">
+        <canvas
+          baseChart
+          type="bar"
+          class="is-fullheight is-fullwidth"
+        ></canvas>
+      </div>
+      <div class="column">
+        <canvas
+          baseChart
+          type="bar"
+          class="is-fullheight is-fullwidth"
+        ></canvas>
+      </div>
+    </div>
   </div>
 </div>
