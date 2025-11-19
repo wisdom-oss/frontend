@@ -10,9 +10,17 @@ import {Id} from "../common/id";
 
 const URL = "/api/pmdarima-predictions" as const;
 
-class SmartMeterId extends Id<string & tags.Format<"uuid">> {}
-class ModelId extends Id<string & tags.Format<"uuid">> {}
-class TrainingId extends Id<string> {}
+const SMART_METER = Symbol();
+class SmartMeterId extends Id<
+  string & tags.Format<"uuid">,
+  typeof SMART_METER
+> {}
+
+const MODEL = Symbol();
+class ModelId extends Id<string & tags.Format<"uuid">, typeof MODEL> {}
+
+const TRAINING = Symbol();
+class TrainingId extends Id<string, typeof TRAINING> {}
 
 @Injectable({
   providedIn: "root",

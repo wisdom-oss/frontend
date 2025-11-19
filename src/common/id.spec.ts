@@ -2,8 +2,17 @@ import {Id} from "./id";
 
 describe("Id", () => {
   // Concrete test classes
-  class UserId extends Id<number> {}
-  class PostId extends Id<string> {}
+  const USER = Symbol();
+  class UserId extends Id<number, typeof USER> {}
+
+  const POST = Symbol();
+  class PostId extends Id<string, typeof POST> {}
+
+  const A = Symbol();
+  class IdA extends Id<number, typeof A> {}
+
+  const B = Symbol();
+  class IdB extends Id<number, typeof B> {}
 
   test("of returns the same interned instance for same value and class", () => {
     const a = UserId.of(1);
@@ -29,20 +38,19 @@ describe("Id", () => {
   });
 
   test("ids with same underlying value but different classes are not equal", () => {
-    class IdA extends Id<number> {}
-    class IdB extends Id<number> {}
-
     const a = IdA.of(42);
     const b = IdB.of(42);
 
     expect(a).not.toBe(b);
+    // @ts-expect-error different types
     expect(a === b).toBe(false);
+    // @ts-expect-error different types
     expect(a == b).toBe(false);
     expect(a.get()).toBe(b.get());
   });
 
   test("Map keys: interning lets Map get by re-created Id", () => {
-    const map = new Map<Id<number>, string>();
+    const map = new Map<Id<number, any>, string>();
     const k1 = UserId.of(42);
     map.set(k1, "answer");
 
@@ -52,7 +60,7 @@ describe("Id", () => {
   });
 
   test("Map keys: different subclasses are separate keys", () => {
-    const map = new Map<Id<any>, string>();
+    const map = new Map<Id<any, any>, string>();
     map.set(UserId.of(7), "user-7");
     map.set(PostId.of("7"), "post-7");
     expect(map.size).toBe(2);
@@ -100,12 +108,10 @@ describe("Id", () => {
   });
 
   test("different ids are different", () => {
-    class IdA extends Id<number> {}
-    class IdB extends Id<number> {}
-
     const map = new Map<IdA, string>();
     map.set(IdA.of(1), "lol");
     // @ts-expect-error unequal types
-    map.get(IdB.of(1));
+    expect(map.get(IdB.of(1))).toBeUndefined();
+    expect(map.get(IdA.of(1))).toBe("lol");
   });
 });

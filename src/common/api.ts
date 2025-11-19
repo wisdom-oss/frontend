@@ -226,7 +226,7 @@ export namespace api {
       | boolean
       | Dayjs
       | Duration
-      | Id<string | number>;
+      | Id<string | number, any>;
   }
 
   /**
@@ -1099,7 +1099,9 @@ export namespace api {
    */
   export function url(
     template: TemplateStringsArray,
-    ...args: RequestSignal<string | number | boolean | Id<string | number>>[]
+    ...args: RequestSignal<
+      string | number | boolean | Id<string | number, any>
+    >[]
   ): CoreSignal<string | undefined> {
     return computed(() => {
       let url = template[0];
@@ -1157,7 +1159,7 @@ export namespace api {
   };
 
   export type RawRecord<T> = {
-    [K in keyof T]: T[K] extends Id<any>
+    [K in keyof T]: T[K] extends Id<any, any>
       ? Id.Value<T[K]>
       : T[K] extends Dayjs | undefined
         ? (string & tags.Format<"date-time">) | Extract<T[K], undefined>

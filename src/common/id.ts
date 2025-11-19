@@ -1,17 +1,40 @@
 const SECRET = Symbol();
-type IdConstructor = new (value: any, _: typeof SECRET) => Id<any>;
+type IdConstructor = new (value: any, _: typeof SECRET) => Id<any, any>;
 
 /**
- * New-type for IDs.
+ * Newtype wrapper for IDs.
  *
- * Use this type in API to clearly type IDs when they are numbers or strings.
- * This helps making the API more stable.
+ * Use this type in API code to give numbers or strings a clear ID type.
+ * This keeps the API stable and avoids mixing unrelated IDs by accident.
  *
- * This class is marked abstract as all IDs should be uniquely typed and
- * therefore have to derive from this.
- * `Id` is also valid as body or params for requests.
+ * This class is abstract because every ID type should define its own subclass.
+ * Subclasses can also be used as request bodies or params.
+ *
+ * The {@link Branding} type parameter makes each ID type unique.
+ * Without it, Typescript's structural typing would treat different ID classes
+ * as compatible whenever the underlying value type matches.
+ * A unique branding avoids this.
+ * Typescript cannot create this dynamically, so you need to define a standalone
+ * {@link Symbol} as a `unique symbol`.
+ *
+ * The {@link V} type is usually a string or number, but it can be more specific.
+ * With `typia`, you can use refined formats such as `tags.Format<"uuid">`
+ * to enforce stricter value shapes.
+ *
+ * @example Create a new ID type
+ * ```ts
+ * const SOME = Symbol();
+ * class SomeId extends Id<number, typeof SOME> {}
+ * ```
  */
-export abstract class Id<V extends string | number> {
+export abstract class Id<V extends string | number, Branding extends symbol> {
+  /**
+   * Branding used to tell ID subclasses apart when their {@link V} matches.
+   * The value is always `null`, but that is enough for branding.
+   * @internal
+   */
+  private branding: Branding = null as any;
+
   /**
    * Internal constructor to define IDs.
    *
@@ -27,15 +50,15 @@ export abstract class Id<V extends string | number> {
 
   private static REGISTRY = new Map<
     IdConstructor,
-    Map<string | number, WeakRef<Id<string | number>>>
+    Map<string | number, WeakRef<Id<string | number, any>>>
   >();
 
   /**
-   * Constructor for IDs.
+   * Create or return an interned ID.
    *
-   * The IDs coming from this method are interned, meaning they are all the same
-   * instances.
-   * This allows them to strictly compare them and use in Maps as proper keys.
+   * Returned IDs are interned, meaning the same value produces the same
+   * instance.
+   * This lets you compare them with `===` and use them as stable keys in Maps.
    *
    * @example
    * class SomeId extends Id<number> {}
@@ -43,9 +66,8 @@ export abstract class Id<V extends string | number> {
    * let b = SomeId.of(1)
    * a === b // true
    *
-   * @param this Polymorphic `this`, not needed when calling.
-   * @param value Value of the ID.
-   * @returns New interned ID.
+   * @param value Raw value for the ID.
+   * @returns Interned ID instance.
    */
   static of<P extends IdConstructor>(
     this: P,
@@ -84,10 +106,10 @@ export abstract class Id<V extends string | number> {
 
 export namespace Id {
   /**
-   * Extracts the raw value type from an `Id` instance type.
+   * Extract the raw value from an `Id` type.
    *
-   * We use this to get the underlying `string` or `number` from an `Id`
-   * subclass without reaching into its internals.
+   * Useful when you want the underlying `string` or `number`
+   * without touching the internals of the ID class.
    *
    * @example
    * ```ts
@@ -95,8 +117,7 @@ export namespace Id {
    *
    * type MyIdValue = Id.Value<MyId>; // number
    * ```
-   *
-   * @typeParam T `Id` instance type to extract the value type from.
    */
-  export type Value<T extends Id<any>> = T extends Id<infer V> ? V : never;
+  export type Value<T extends Id<any, any>> =
+    T extends Id<infer V, any> ? V : never;
 }
