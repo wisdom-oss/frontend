@@ -301,7 +301,7 @@ export namespace signals {
    * delayedSignal(); // Updates after a 500ms delay
    */
   export function delay<T>(s: Signal<T>, delay?: Duration): Signal<T> {
-    let delayed = signal(s());
+    let delayed = signal(s(), {equal: () => false});
     effect(() => {
       let value = s();
       setTimeout(() => delayed.set(value), delay?.asMilliseconds());
