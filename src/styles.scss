@@ -73,6 +73,10 @@ html {
     animation-duration: 2s;
   }
 
+  &.once {
+    animation-iteration-count: 1;
+  }
+
   @keyframes spin {
     from {
       transform: rotate(0deg);
