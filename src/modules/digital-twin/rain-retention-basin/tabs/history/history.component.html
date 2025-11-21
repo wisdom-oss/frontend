@@ -1,1 +1,14 @@
-<p>history works!</p>
+<div>
+  <div class="is-flex is-flex-direction-row is-fullwidth is-justify-content-center my-4">
+    <p class="is-size-3 my-4" translate>digitalTwin.header.daySelection</p>
+    <div class="is-flex is-flex-direction-column is-justify-content-center mx-4">
+      <input type="date" style="height: 2rem;"/>
+    </div>
+  </div>
+
+  <chart header="digitalTwin.header.waterLevel" [chartData]="dataWaterLevel" text="%" [suggestedMax]="100" chartType="line"/>
+
+  <chart header="digitalTwin.header.drainage" [chartData]="dataDrainage" text="min" [suggestedMax]="60" chartType="bar"/>
+
+  <chart header="digitalTwin.label.rainAmount" [chartData]="dataRainForecast" text="mm" [suggestedMax]="25" chartType="bar"/>
+</div>

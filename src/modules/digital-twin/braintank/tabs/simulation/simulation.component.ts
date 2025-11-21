@@ -1,5 +1,5 @@
 import { Component, effect, signal, viewChild, WritableSignal } from '@angular/core';
-import { ModelViewComponent } from "../../model-view/model-view.component";
+import { ModelViewComponent } from "../../../common/model-view/model-view.component";
 import { TranslateDirective } from '@ngx-translate/core';
 import { NgIconComponent, provideIcons } from "@ng-icons/core";
 import { 

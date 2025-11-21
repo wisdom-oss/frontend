@@ -1,6 +1,6 @@
 <div>
   @if(activeView() === 'model') {
-    <div style="height: 40rem; width: 100%; background-color: lightgray;"></div>
+    <model-view filename="RRB_Damme.glb" [cam]="{x: 0, y: 10, z: 50}"/>
   }
   @if(activeView() === 'map') {
     <div map class="is-fullwidth" style="height: 40rem">
@@ -12,7 +12,7 @@
   @if(activeView() === 'pictures') {
     <div class="is-fullwidth" style="height: 40rem">
       <app-carousel 
-        [images]="[]"
+        [images]="['../../../../../public/images/GroßerGrieche.JPG', '../../../../../public/images/KleinerGrieche.JPG']"
         [autoPlay]="false">
       </app-carousel>
     </div>

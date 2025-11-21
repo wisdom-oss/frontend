@@ -15,7 +15,7 @@ import {
   remixArrowRightWideLine
 } from '@ng-icons/remixicon';
 import { TranslateDirective } from '@ngx-translate/core';
-import { ModelViewComponent } from "../../model-view/model-view.component";
+import { ModelViewComponent } from "../../../common/model-view/model-view.component";
 import dayjs, { Dayjs } from 'dayjs';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartData } from 'chart.js';

@@ -1,0 +1,39 @@
+<div class="card my-4">
+    <div class="card-content">
+      <div class="is-fullwidth has-text-centered my-4">
+        <p class="is-size-3 my-4" translate>{{header}}</p>
+      </div>
+      
+      <ng-container chart>
+        <div class="is-fullwidth" style="height: 22rem;">
+          @let options = {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                grid: {
+                  display: false,
+                },
+              },
+              y: {
+                grid: {
+                  display: false,
+                },
+                title: {
+                  display: true,
+                  text: text,
+                },
+                beginAtZero: true,
+                suggestedMax: suggestedMax,
+              },
+            },
+            plugins: {
+              legend: {
+                display: false,
+              },
+            },
+          };
+          <canvas baseChart class="is-fullheight is-fullwidth" [data]="chartData" [options]="options" [type]="chartType"></canvas>
+        </div>
+      </ng-container>
+</div>

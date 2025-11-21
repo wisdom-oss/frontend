@@ -6,6 +6,10 @@ de = "Regel hinzufügen"
 en = "Adjust rain forecast"
 de = "Regenvorhersage anpassen"
 
+[button.automatic]
+en = "Automatic"
+de = "Automatisch"
+
 [button.cancel]
 en = "Cancel"
 de = "Abbrechen"
@@ -22,9 +26,17 @@ de = "Modell"
 en = "Map"
 de = "Karte"
 
+[button.manual]
+en = "Manual"
+de = "Manuell"
+
 [button.pictures]
 en = "Pictures"
 de = "Bilder"
+
+[button.semiAutomatic]
+en = "Semi-automatic"
+de = "Halbautomatisch"
 
 [button.startSimulation]
 en = "Start Simulation"

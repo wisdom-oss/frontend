@@ -1,6 +1,6 @@
 <div>
   @if(activeView() === 'model') {
-    <model-view/>
+    <model-view filename="IBC.glb" [cam]="{x: 0, y: 0.25, z: 2}"/>
   }
   @if(activeView() === 'map') {
     <div class="is-fullwidth" style="height: 40rem">
@@ -10,7 +10,7 @@
   @if(activeView() === 'pictures') {
     <div class="is-fullwidth" style="height: 40rem">
       <app-carousel 
-        [images]="['../../../../../public/images/BrainTankUni.jpg', '../../../../../public/favicon.ico']"
+        [images]="['../../../../../public/images/BrainTankUni.jpg']"
         [autoPlay]="false">
       </app-carousel>
     </div>

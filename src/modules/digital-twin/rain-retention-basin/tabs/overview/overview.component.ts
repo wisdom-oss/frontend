@@ -22,6 +22,7 @@ import colorful from "../../../../../assets/map/styles/colorful.json";
 import { TranslateDirective } from '@ngx-translate/core';
 import { BaseChartDirective } from 'ng2-charts';
 import { MapViewComponent } from "../../../common/map-view/map-view.component";
+import { ModelViewComponent } from "../../../common/model-view/model-view.component";
 
 @Component({
   selector: "rrb-overview",
@@ -30,7 +31,8 @@ import { MapViewComponent } from "../../../common/map-view/map-view.component";
     NgIconComponent,
     BaseChartDirective,
     CarouselComponent,
-    MapViewComponent
+    MapViewComponent,
+    ModelViewComponent
 ],
   templateUrl: './overview.component.html',
   providers: [

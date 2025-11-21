@@ -1,1 +1,164 @@
-<drainage-rules [rules]="rules"></drainage-rules>
+<div>
+   <model-view filename="RRB_Damme.glb" [cam]="{x: 0, y: 10, z: 50}"/>
+
+   <div class="is-flex is-flex-direction-row is-justify-content-center my-4">
+    <button class="button is-primary is-large is-rounded my-4">
+      <p translate>digitalTwin.button.startSimulation</p>
+    </button>
+  </div>
+  
+  <div class="card my-4">
+    <div class="card-content">
+      <div class="is-fullwidth has-text-centered my-4">
+        <p class="is-size-3 my-4" translate>digitalTwin.header.waterLevel</p>
+      </div> 
+
+      <div class="is-flex is-flex-direction-row is-fullwidth my-4">
+        <ng-icon name="remixContrastDrop2Line" size="2.5rem"/>
+        <div class="is-flex is-flex-direction-column is-justify-content-center">
+          <p class="mx-4"><span translate>digitalTwin.label.setStartLevel</span>: </p>
+        </div>
+        <input
+          class="slider is-primary m-0 mx-4" style="width: 20rem;"
+          step="1" min="0" max="100" value="{{waterLevel()}}" type="range"
+          (input)="waterLevel.set($any($event.target).value)"
+        />
+        <div class="is-flex is-flex-direction-column is-justify-content-center">
+          <p class="ml-4">{{waterLevel()}}%</p>
+        </div>
+      </div>
+    </div>
+   </div>
+   
+   <drainage-rules [rules]="rules"></drainage-rules>
+
+    <div class="card my-4">
+    <div class="card-content">
+      <div class="is-fullwidth has-text-centered my-4">
+        <p class="is-size-3 my-4" translate>digitalTwin.header.rainForecast</p>
+      </div>
+
+      <div class="is-flex is-flex-direction-row is-fullwidth my-4 is-justify-content-space-between">
+        <div class="is-flex is-flex-direction-row">
+          <ng-icon name="remixRainyLine" size="2.5rem"/>
+          <div class="is-flex is-flex-direction-column is-justify-content-center">
+            <p class="mx-4"><span translate>digitalTwin.label.rainForecast</span>: </p>
+          </div>
+          <input id="checkedRainForecast" type="checkbox" class="switch is-rounded" [checked]="checkedRainForecast()" 
+                 (click)="onToogleClick($event, checkedRainForecast)"/>
+          <label for="checkedRainForecast"></label>
+        </div>
+        
+        <div>
+          @if(!checkedRainForecast()) {
+            <button class="button is-primary is-rounded" 
+                    (click)="copyForecast(rainForecastModal, rainForecast); rainForecastModalOpen.set(true)">
+              <p translate>digitalTwin.button.adjustRainForecast</p>
+            </button>
+          }
+
+          @if(checkedRainForecast()) {
+            <div class="is-flex is-flex-direction-row">
+              <span class="is-flex is-flex-direction-row">
+                <p translate>digitalTwin.label.rainForecastDate</p>
+                <p>: </p>
+              </span>
+              <div class="is-flex is-flex-direction-column is-justify-content-center mx-4">
+                <input type="date" style="height: 2rem;"/>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="modal" [class.is-active]="rainForecastModalOpen()">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+          <header class="modal-card-head">
+            <p class="modal-card-title" translate>digitalTwin.button.adjustRainForecast</p>
+            <button class="delete" aria-label="close" 
+                    (click)="copyForecast(rainForecastModal, rainForecast); rainForecastModalOpen.set(false)"></button>
+          </header>
+          <section class="modal-card-body">
+            <div class="columns">
+              <div class="column is-1"></div>
+              <div class="column is-narrow">
+                <ng-icon name="remixTimeLine" size="1.5em"/>
+              </div>
+              <div class="column is-narrow">
+                <p translate>digitalTwin.label.time</p>
+              </div>
+              <div class="column"></div>
+              <div class="column is-narrow">
+                <ng-icon name="remixRainyLine" size="1.5em"/>
+              </div>
+              <div class="column is-narrow">
+                <p><span translate>digitalTwin.label.rainAmount</span> (mm) </p>
+              </div>
+              <div class="column is-1"></div>
+            </div>
+
+            @for (forecast of rainForecastModal(); track forecast) {
+              <div class="columns">
+                <div class="column is-1"></div>
+                <div class="column is-one-third has-text-centered">
+                  <p>{{forecast.x}}</p>
+                </div>
+                <div class="column"></div>
+                <div class="column is-one-third">
+                  <input class="input is-rounded" type="number" min="0" max="100" [value]="forecast.y"
+                        (input)="updateForecastModal($index, $any($event.target).valueAsNumber)"/>
+                </div>
+                <div class="column is-1"></div>
+              </div>
+            }
+          </section>
+          <footer class="modal-card-foot">
+            <div class="buttons">
+              <button class="button is-success" 
+                     (click)="copyForecast(rainForecast, rainForecastModal); rainForecastModalOpen.set(false)" 
+                     translate>digitalTwin.button.confirm</button>
+              <button class="button" 
+                      (click)="copyForecast(rainForecastModal, rainForecast); rainForecastModalOpen.set(false)" 
+                      translate>digitalTwin.button.cancel</button>
+            </div>
+          </footer>
+        </div>
+      </div>
+
+      <div class="is-fullwidth" style="height: 16rem;">
+        <ng-container chart>
+          @let optionsRainForecast = {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                grid: {
+                  display: false,
+                },
+              },
+              y: {
+                grid: {
+                  display: false,
+                },
+                title: {
+                  display: true,
+                  text: 'mm',
+                },
+                beginAtZero: true,
+                suggestedMax: 25,
+              },
+            },
+            plugins: {
+              legend: {
+                display: false,
+              },
+            },
+          };
+          <canvas baseChart class="is-fullheight is-fullwidth" [data]="dataRainForecast" [options]="optionsRainForecast" [type]="'bar'">
+          </canvas>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

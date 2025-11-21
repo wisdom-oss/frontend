@@ -1,15 +1,14 @@
 import { Component } from '@angular/core';
-import { BaseChartDirective } from 'ng2-charts';
 import { ChartData } from 'chart.js';
 import { TranslateDirective } from '@ngx-translate/core';
+import { ChartComponent } from '../../../common/chart/chart.component';
 
 @Component({
   selector: 'braintank-history',
   imports: [
-    BaseChartDirective,
     TranslateDirective,
-    
-  ],
+    ChartComponent
+],
   templateUrl: './history.component.html'
 })
 export class HistoryComponent {
