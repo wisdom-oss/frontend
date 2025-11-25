@@ -8,8 +8,12 @@ import type {Config} from "jest";
  * tests.
  */
 const config: Config = {
+  globalSetup: "<rootDir>/scripts/jest/global-setup.cjs",
   setupFiles: ["fake-indexeddb/auto", "<rootDir>/src/tests/setup.ts"],
   testEnvironment: "./src/tests/setup.ts",
+  transform: {
+    "\\.txt$": "<rootDir>/src/tests/txt-transformer.ts",
+  },
 };
 
 export default config;
