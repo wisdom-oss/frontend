@@ -120,7 +120,7 @@ export class QueryParamService {
 
     let set = (value: T | T[]) => {
       let queryParams: Params = {[param]: value}; 
-      if (options?.serialize) {
+      if (value && options?.serialize) {
         if (Array.isArray(value)) queryParams[param] = value.map(options.serialize);
         else queryParams[param] = options.serialize(value);
       }
