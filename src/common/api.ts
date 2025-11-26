@@ -331,7 +331,7 @@ export namespace api {
     toHttpParams(): HttpParams {
       return new HttpParams().appendAll(
         Object.fromEntries(
-          Object.entries(this.map).map(([key, val]) => [
+          Array.from(this.map.entries()).map(([key, val]) => [
             key,
             val.map(QueryParams.serialize),
           ]),
@@ -715,7 +715,6 @@ export namespace api {
       for (let key of [
         "method",
         "body",
-        "params",
         "headers",
         "reportProgress",
       ] as const) {
@@ -729,6 +728,14 @@ export namespace api {
 
         // @ts-ignore here too
         request[key] = options[key];
+      }
+
+      if (options.params) {
+        if (isSignal(options.params)) {
+          let params = options.params();
+          if (params === undefined) return undefined;
+          request.params = params.toHttpParams();
+        } else request.params = options.params.toHttpParams();
       }
 
       return {context, ...request};
