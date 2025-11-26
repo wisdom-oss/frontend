@@ -41,6 +41,7 @@ function makeMap<K, V>(
 @Component({
   imports: [NgIconComponent, BaseChartDirective],
   templateUrl: "./water-demand-prediction2.component.html",
+  styleUrl: "./water-demand-prediction2.component.scss",
   providers: [
     provideIcons({
       remixResetRightLine,
@@ -78,6 +79,14 @@ export class WaterDemandPrediction2Component {
     this.modelsLoading.set(false);
   });
 
+  protected recordedUsages = this.service.fetchRecordedUsages(
+    computed(() => this.model()?.meterId),
+  );
+
+  protected prediction = this.service.fetchPrediction(this.modelId);
+
   _models = effect(() => console.log(this.models()));
   _meters = effect(() => console.log(this.meters()));
+  _recordedUsages = effect(() => console.log(this.recordedUsages()));
+  _prediction = effect(() => console.log(this.prediction()));
 }

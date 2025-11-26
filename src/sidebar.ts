@@ -1,7 +1,6 @@
 import {computed, inject, Component, Signal} from "@angular/core";
 import {
   remixBarChartFill,
-  remixBook2Line,
   remixBookLine,
   remixBuilding3Fill,
   remixDatabase2Fill,
@@ -9,6 +8,7 @@ import {
   remixFilePaper2Fill,
   remixInstanceLine,
   remixMap2Fill,
+  remixNumbersFill,
   remixRfidLine,
   remixSunCloudyFill,
   remixWaterPercentFill,
@@ -195,7 +195,7 @@ export function sidebar(): readonly SidebarEntry[] {
         },
         {
           module: "core.sidebar.category.water-demand-prediction",
-          icon: {remixBook2Line},
+          icon: {remixNumbersFill},
           link: "/oowv/water-demand-prediction2",
           services: {PmdArimaPredictionService},
         },

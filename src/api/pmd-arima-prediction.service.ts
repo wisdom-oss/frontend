@@ -44,7 +44,7 @@ export class PmdArimaPredictionService extends api.service(URL) {
 
   fetchPrediction(
     modelId: api.RequestSignal<ModelId>,
-    params: api.RequestSignal<{
+    params?: api.RequestSignal<{
       forecastLength?: Duration;
       interval?: Duration;
     }>,
@@ -60,7 +60,7 @@ export class PmdArimaPredictionService extends api.service(URL) {
           time: dayjs(dt.time),
         })),
       }),
-      params: api.QueryParams.from(params),
+      params: api.QueryParams.from(params ?? {}),
     });
   }
 
@@ -99,7 +99,7 @@ export class PmdArimaPredictionService extends api.service(URL) {
 
   fetchRecordedUsages(
     meterId: api.RequestSignal<SmartMeterId>,
-    params: api.RequestSignal<{
+    params?: api.RequestSignal<{
       bucketSize?: Duration;
       start?: Dayjs;
       end?: Dayjs;
@@ -109,7 +109,7 @@ export class PmdArimaPredictionService extends api.service(URL) {
       url: api.url`${URL}/meters/${meterId}/recorded-usages`,
       validateRaw: typia.createValidate<Raw.DataPoint[]>(),
       parse: dts => dts.map(dt => ({...dt, time: dayjs(dt.time)})),
-      params: api.QueryParams.from(params),
+      params: api.QueryParams.from(params ?? {}),
     });
   }
 

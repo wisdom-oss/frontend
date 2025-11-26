@@ -133,18 +133,28 @@
   }
 
   <div
-    class="box is-fullheight"
+    class="box is-fullheight chart-box"
     [style.filter]="!model ? 'brightness(0.75)' : ''"
   >
-    <div class="columns">
-      <div class="column">
+    <div class="chart-content is-fullheight">
+      @for (title of ["historic", "prediction"]; track title) {
+        <div
+          [style.grid-area]="'title-' + title"
+          class="is-flex is-justify-content-center"
+        >
+          <p class="title is-4">{{ title }}</p>
+        </div>
+      }
+      <div [style.grid-area]="'legend-historic'"></div>
+      <div [style.grid-area]="'legend-prediction'"></div>
+      <div [style.grid-area]="'chart-historic'">
         <canvas
           baseChart
           type="bar"
           class="is-fullheight is-fullwidth"
         ></canvas>
       </div>
-      <div class="column">
+      <div [style.grid-area]="'chart-prediction'">
         <canvas
           baseChart
           type="bar"
