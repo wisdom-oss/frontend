@@ -33,7 +33,7 @@ export abstract class Id<V extends string | number, Branding extends symbol> {
    * The value is always `null`, but that is enough for branding.
    * @internal
    */
-  private branding: Branding = null as any;
+  private branding?: Branding;
 
   /**
    * Internal constructor to define IDs.
@@ -46,7 +46,11 @@ export abstract class Id<V extends string | number, Branding extends symbol> {
   constructor(
     private value: V,
     _: typeof SECRET,
-  ) {}
+  ) {
+    // Remove the branding from the actual values, this removes clutters from 
+    // the console logs.
+    delete this.branding;
+  }
 
   private static REGISTRY = new Map<
     IdConstructor,
