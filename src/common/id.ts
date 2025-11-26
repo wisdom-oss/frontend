@@ -47,7 +47,7 @@ export abstract class Id<V extends string | number, Branding extends symbol> {
     private value: V,
     _: typeof SECRET,
   ) {
-    // Remove the branding from the actual values, this removes clutters from 
+    // Remove the branding from the actual values, this removes clutters from
     // the console logs.
     delete this.branding;
   }
