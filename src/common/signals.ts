@@ -3,6 +3,8 @@ import {
   effect,
   inject,
   signal,
+  ValueEqualityFn,
+  CreateComputedOptions,
   CreateSignalOptions,
   Signal,
   WritableSignal,
@@ -176,6 +178,174 @@ export namespace signals {
         let result = inner.delete(value);
         if (result) s.set(inner); // Notify only on actual removal
         return result;
+      },
+    });
+  }
+
+  /**
+   * A specialized signal for managing a map of key value pairs.
+   *
+   * Unlike using a {@link WritableSignal<Map<K, V>>}, this signal provides
+   * built-in methods and derived signals for reading and updating the map
+   * without requiring explicit updates.
+   *
+   * @template K The type of keys in the map.
+   * @template V The type of values in the map.
+   */
+  export type MapSignal<K, V> = Signal<Map<K, V>> & {
+    /**
+     * A signal that tracks the number of entries in the map.
+     */
+    size: Signal<number>;
+
+    /**
+     * Clears all entries from the map.
+     *
+     * Always notifies subscribers.
+     */
+    clear(): void;
+
+    /**
+     * Deletes an entry for the given key.
+     *
+     * Always notifies subscribers.
+     *
+     * @returns `true` if the key existed and was removed, `false` otherwise.
+     */
+    delete(key: K): boolean;
+
+    /**
+     * A signal that exposes the map's entries iterator.
+     *
+     * Recomputes whenever the map changes.
+     */
+    entries(): Signal<MapIterator<[K, V]>>;
+
+    /**
+     * A signal that reads the value for a given key.
+     *
+     * Recomputes whenever the map changes.
+     *
+     * @param key The key to look up.
+     * @param options Optional computed options for the derived signal.
+     */
+    get(
+      key: K,
+      options?: CreateComputedOptions<V | undefined>,
+    ): Signal<V | undefined>;
+
+    /**
+     * A signal that indicates whether the given key exists in the map.
+     *
+     * Recomputes whenever the map changes.
+     *
+     * @param key The key to test.
+     */
+    has(key: K): Signal<boolean>;
+
+    /**
+     * A signal that exposes the map's keys iterator.
+     *
+     * Recomputes whenever the map changes.
+     */
+    keys(): Signal<MapIterator<K>>;
+
+    /**
+     * Sets the value for a key in the map.
+     *
+     * Always notifies subscribers.
+     *
+     * @param key The key to set.
+     * @param value The value to store.
+     * @returns The same `MapSignal` instance, for chaining.
+     */
+    set(key: K, value: V): MapSignal<K, V>;
+
+    /**
+     * A signal that exposes the map's values iterator.
+     *
+     * Recomputes whenever the map changes.
+     */
+    values(): Signal<MapIterator<V>>;
+  };
+
+  /**
+   * Creates a `MapSignal`, a signal that manages a `Map<K, V>`.
+   *
+   * Unlike a {@link WritableSignal<Map<K, V>>}, which requires manually
+   * calling a signal update when modifying it, this signal provides built-in
+   * methods and derived signals:
+   *
+   * - `set`, `delete`, and `clear` always notify subscribers
+   * - `size` tracks the number of entries
+   * - `get`, `has`, `entries`, `keys`, and `values` expose computed views
+   *
+   * @template K The type of keys in the map.
+   * @template V The type of values in the map.
+   * @param iterable Optional initial entries for the map.
+   *
+   * @example
+   * // Creating an empty map signal
+   * const users = signals.map<string, { name: string }>();
+   *
+   * users.set("alice", { name: "Alice" });
+   * console.log(users().get("alice")); // { name: "Alice" }
+   *
+   * // Derived signals
+   * const hasAlice = users.has("alice");
+   * const size = users.size;
+   *
+   * effect(() => {
+   *   console.log("Has alice:", hasAlice());
+   *   console.log("Size:", size());
+   * });
+   *
+   * // Creating a map with initial entries
+   * const fruits = signals.map<string, number>([
+   *   ["apple", 1],
+   *   ["banana", 2],
+   * ]);
+   *
+   * fruits.delete("banana"); // Removes "banana" and notifies
+   * fruits.clear(); // Empties the map and notifies
+   */
+  export function map<K, V>(iterable?: Iterable<[K, V]>): MapSignal<K, V> {
+    let inner = new Map(iterable);
+
+    // We mutate `inner` in place and always call `set(inner)` to notify.
+    // `equal: () => false` ensures each call is treated as a change.
+    let s = signal(inner, {equal: () => false});
+
+    function update<C extends (...args: any[]) => any>(
+      op: C,
+    ): (...args: Parameters<C>) => ReturnType<C> {
+      return (...args) => {
+        let ret = op(...args);
+        s.set(inner);
+        return ret;
+      };
+    }
+
+    // Computed signals do not have the set method, this way we can avoid
+    // accidentally overriding the set method of the underlying writable signal.
+    let mapSignal = computed(() => s(), {equal: () => false});
+
+    return Object.assign(mapSignal, {
+      size: computed(() => s().size),
+      entries: () => computed(() => s().entries()),
+      get: (key: K, options?: CreateComputedOptions<V | undefined>) =>
+        computed(() => s().get(key), options),
+      has: (key: K) => computed(() => s().has(key)),
+      keys: () => computed(() => s().keys()),
+      values: () => computed(() => s().values()),
+      clear: update(() => inner.clear()),
+      delete: update((key: K) => inner.delete(key)),
+      set(key: K, value: V) {
+        inner.set(key, value);
+        s.set(inner);
+        // mapSignal here will be a valid MapSignal after the Object.assign
+        // also we do not want to return the Map but rather the MapSignal
+        return mapSignal as unknown as MapSignal<K, V>;
       },
     });
   }
