@@ -478,15 +478,15 @@ export namespace signals {
    *
    * @example
    * const count = signal(2);
-   * const doubled = signals.map(count, n => n * 2);
+   * const doubled = signals.mapTo(count, n => n * 2);
    * doubled(); // 4
    *
    * @example
    * // Map an optional value to a fallback
    * const maybeName = signals.maybe<string>();
-   * const label = signals.map(maybeName, n => n ?? "unknown");
+   * const label = signals.mapTo(maybeName, n => n ?? "unknown");
    */
-  export function map<T, U>(
+  export function mapTo<T, U>(
     input: Signal<T>,
     transform: (value: T) => U,
   ): Signal<U> {

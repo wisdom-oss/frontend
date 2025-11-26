@@ -31,7 +31,9 @@ export class GroundwaterLevelsService extends api.service(URL) {
   fetchMeasurementClassifications(
     date: api.RequestSignal<Dayjs> = dayjs(),
   ): api.Signal<Record<string, Self.Measurement>> {
-    let dateIso = signals.map(api.toSignal(date), date => date?.toISOString());
+    let dateIso = signals.mapTo(api.toSignal(date), date =>
+      date?.toISOString(),
+    );
     let query = api.url`{
       measurements(
         from: "${dateIso}"

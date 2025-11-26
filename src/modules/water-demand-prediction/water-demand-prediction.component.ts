@@ -198,7 +198,7 @@ export class WaterDemandPredictionComponent implements OnInit, AfterViewInit {
         `water-demand-prediction.weather.${capability}`,
       ]),
     ) satisfies Record<WeatherCapability, string>,
-    weatherColumn: signals.map(
+    weatherColumn: signals.mapTo(
       this.service.fetchWeatherCols(this.choices.weatherCapability),
       cols => cols ?? {},
     ) satisfies Signal<Record<string, string>>,
