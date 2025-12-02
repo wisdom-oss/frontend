@@ -1,15 +1,34 @@
-import { Component, ElementRef, OnDestroy, OnInit, AfterViewInit, viewChild, Input } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, AfterViewInit, viewChild, Input, signal, WritableSignal, OnChanges, SimpleChanges, effect } from '@angular/core';
 import * as THREE from 'three';
 import { GLTFLoader, OrbitControls } from 'three-stdlib';
+import { gsap } from 'gsap';
+import { NgIconComponent, provideIcons } from '@ng-icons/core';
+import { TranslateDirective } from '@ngx-translate/core';
+import { remixCalendar2Line, remixContrastDrop2Line, remixRainyLine, remixTimeLine } from '@ng-icons/remixicon';
+import dayjs, { Dayjs } from 'dayjs';
 
 @Component({
   selector: 'model-view',
-  imports: [],
+  imports: [
+    NgIconComponent,
+    TranslateDirective
+  ],
   templateUrl: './model-view.component.html',
+  providers: [
+    provideIcons({
+      remixRainyLine,
+      remixTimeLine,
+      remixCalendar2Line,
+      remixContrastDrop2Line
+    }),
+  ],
 })
 export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
-  @Input() filename : string = '';
+  @Input() filename: string = '';
   @Input() cam: {x: number, y: number, z: number} = {x: 0, y: 0, z: 0};
+  @Input() isSimulation: boolean = false;
+  @Input() waterLevel: WritableSignal<number> = signal(20);
+  @Input() waterLevels: number[]  = [10, 15, 20, 18, 22];
 
   rendererContainer = viewChild<ElementRef<HTMLDivElement>>('rendererContainer');
   
@@ -20,6 +39,10 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
   private animationFrameId!: number;
   private resizeObserver!: ResizeObserver;
   private resizeRaf!: number | null;
+  
+  private originalY: number = 1;
+  protected time: WritableSignal<Dayjs> = signal(dayjs());
+  protected rainAmount: WritableSignal<number> = signal(0);
   
   ngOnInit(): void {
     this.scene = new THREE.Scene();
@@ -49,7 +72,7 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
       this.scene.add(model);
       this.setColorMesh(model, 'Water', 0x0000ff);
       this.setColorMesh(model, 'Pool', 0xffffff);
-      this.setScaleYWater(model, 0.66);
+      this.setScaleYWater(model, this.waterLevel());
       model.rotation.y = - Math.PI / 4;
     });
   
@@ -98,18 +121,54 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
   
   private setScaleYWater = (model: THREE.Group<THREE.Object3DEventMap>, scaleY: number) => {
     const water = model.getObjectByName('Water') as THREE.Mesh;
-    const originalY = water.scale.y;
-    let newY = scaleY * originalY;
+    this.originalY = water.scale.y;
+    let newY = (scaleY / 100) * this.originalY;
   
-    if (newY < 0 || newY > originalY) {
+    if (newY < 0 || newY > this.originalY) {
       newY = 0;
     }
   
     if (water) {
       water.scale.set(water.scale.x, newY, water.scale.z);
-      water.position.y = originalY * originalY * (newY - originalY);
+      water.position.y = this.originalY * this.originalY * (newY - this.originalY);
     } 
   
     water.renderOrder = 1;
+  };
+
+  private animateWaterToLevel(newScale: number) {
+    const water = this.scene.getObjectByName('Water') as THREE.Mesh;
+
+    gsap.to(water.scale, {
+      y: (newScale / 100) * this.originalY,
+      duration: 0.5,
+      ease: "power2.out"
+    });
+
+    // keep bottom anchored
+    gsap.to(water.position, {
+      y: this.originalY * this.originalY * (((newScale / 100) * this.originalY) - this.originalY),
+      duration: 0.5,
+      ease: "power2.out"
+    });
+
+    this.waterLevel.set(newScale);
+  };
+
+  protected startWaterSimulation() {
+    let index = 0;
+    
+    const runStep = () => {
+      const nextLevel = this.waterLevels[index];
+      
+      this.animateWaterToLevel(nextLevel);
+
+      index++;
+      if (index < this.waterLevels.length) {
+        setTimeout(runStep, 1000);
+      }
+    };
+
+    runStep();
   };
 }

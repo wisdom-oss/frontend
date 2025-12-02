@@ -4,4 +4,49 @@
     class="is-fullwidth is-fullheight"
     style="position: absolute;">
   </div>
+
+  @if(isSimulation) {
+    <div class="card" style="position: absolute; width: 20rem; z-index: 10; top: 1rem; left: 1rem;">
+      <div class="card-content">
+        <div class="is-fullwidth has-text-centered">
+          <p class="is-size-5" translate>digitalTwin.header.simulationValues</p>
+        </div> 
+
+        <div class="mt-4">
+          <div class="columns">
+            <div class="column is-2">
+              <ng-icon name="remixTimeLine" size="1.5em"/>
+            </div>
+            <div class="column">
+              <p><span translate>digitalTwin.label.time</span>: {{time().format('HH:mm')}}</p>
+            </div>
+          </div>
+
+          <div class="columns">
+            <div class="column is-2">
+              <ng-icon name="remixRainyLine" size="1.5em"/>
+            </div>
+            <div class="column">
+              <p><span translate>digitalTwin.label.rainAmount</span>: {{rainAmount()}} mm</p>
+            </div>
+          </div>
+
+          <div class="columns">
+            <div class="column is-2">
+              <ng-icon name="remixContrastDrop2Line" size="1.5em"/>
+            </div>
+            <div class="column">
+              <p><span translate>digitalTwin.header.waterLevel</span>: {{waterLevel()}} %</p>
+            </div>
+          </div>
+
+          <div class="is-flex is-flex-direction-row is-justify-content-center mt-4">
+            <button class="button is-primary is-medium is-rounded my-4" (click)="startWaterSimulation()">
+              <p translate>digitalTwin.button.startSimulation</p>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
 </div>

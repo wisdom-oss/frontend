@@ -44,7 +44,9 @@ export class SimulationComponent {
   }
 
   protected chart = viewChild(BaseChartDirective);
-  protected waterLevel: WritableSignal<number> = signal(50);
+  
+  protected waterLevel: WritableSignal<number> = signal(20);
+
   protected checkedRainForecast: signals.ToggleableSignal = signals.toggleable(false);
   protected rainForecastModalOpen: signals.ToggleableSignal = signals.toggleable(false);
   
