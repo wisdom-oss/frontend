@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, OnInit, AfterViewInit, viewChild, Input, signal, WritableSignal, OnChanges, SimpleChanges, effect } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, AfterViewInit, viewChild, Input, signal, WritableSignal, effect, Signal, computed } from '@angular/core';
 import * as THREE from 'three';
 import { GLTFLoader, OrbitControls } from 'three-stdlib';
 import { gsap } from 'gsap';
@@ -43,6 +43,13 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
   private originalY: number = 1;
   protected time: WritableSignal<Dayjs> = signal(dayjs());
   protected rainAmount: WritableSignal<number> = signal(0);
+  
+  constructor() {
+    effect(() => {
+      const newLevel = this.waterLevel();
+      this.animateWaterToLevel(newLevel);
+    });
+  };
   
   ngOnInit(): void {
     this.scene = new THREE.Scene();
@@ -105,7 +112,7 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
     this.renderer.setSize(width, height);
   };
 
-    private animate = () => {
+  private animate = () => {
     this.animationFrameId = requestAnimationFrame(this.animate);
     this.controls.update();
     this.renderer.render(this.scene, this.camera);
@@ -120,7 +127,10 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
   };
   
   private setScaleYWater = (model: THREE.Group<THREE.Object3DEventMap>, scaleY: number) => {
-    const water = model.getObjectByName('Water') as THREE.Mesh;
+    const water = model.getObjectByName('Water');
+
+    if (!water) return;
+
     this.originalY = water.scale.y;
     let newY = (scaleY / 100) * this.originalY;
   
@@ -137,7 +147,9 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   private animateWaterToLevel(newScale: number) {
-    const water = this.scene.getObjectByName('Water') as THREE.Mesh;
+    const water = this.scene.getObjectByName('Water');
+
+    if (!water) return;
 
     gsap.to(water.scale, {
       y: (newScale / 100) * this.originalY,

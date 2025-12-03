@@ -117,6 +117,10 @@ de = "Dachgröße"
 en = "Set starting water level"
 de = "Startwasserpegel einstellen"
 
+[label.simulationDuration]
+en = "Simulation duration in hours"
+de = "Simualtionsdauer in Stunden"
+
 [label.targetLevel]
 en = "Target Level"
 de = "Zielpegel"

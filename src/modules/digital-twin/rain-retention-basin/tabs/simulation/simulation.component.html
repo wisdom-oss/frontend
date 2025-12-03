@@ -75,7 +75,20 @@
                     (click)="copyForecast(rainForecastModal, rainForecast); rainForecastModalOpen.set(false)"></button>
           </header>
           <section class="modal-card-body">
-            <div class="columns">
+            <div class="columns mt-4">
+              <div class="column is-1"></div>
+              <div class="column is-narrow">
+                <p><span translate>digitalTwin.label.simulationDuration</span>: </p>
+              </div>
+              <div class="column"></div>
+              <div class="column is-one-third">
+                <input class="input is-rounded" type="number" min="0" max="100" [value]="durationForecast()"
+                      (input)="durationForecast.set($any($event.target).valueAsNumber)"/>
+              </div>
+              <div class="column is-1"></div>
+            </div>
+
+            <div class="columns mt-4">
               <div class="column is-1"></div>
               <div class="column is-narrow">
                 <ng-icon name="remixTimeLine" size="1.5em"/>

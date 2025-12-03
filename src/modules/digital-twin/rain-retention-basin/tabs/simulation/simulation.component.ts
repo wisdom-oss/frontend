@@ -51,7 +51,8 @@ export class SimulationComponent {
   protected rainForecastModalOpen: signals.ToggleableSignal = signals.toggleable(false);
   
   protected rainForecastModal: WritableSignal<{x: string, y: number}[]> = signal([]);
-  protected rainForecast: WritableSignal<{x: string, y: number}[]> = signal([{x: '16:00', y: 0}, {x: '16:15', y: 0}, {x: '16:30', y: 3}, {x: '16:45', y: 2}, {x: '17:00', y: 0}, {x: '17:15', y: 0}, {x: '17:30', y: 6}, {x: '17:45', y: 8}]);
+  protected durationForecast: WritableSignal<number> = signal(12);
+  protected rainForecast: WritableSignal<{x: string, y: number}[]> = signal(Array.from({length: 12}, (_, i) => ({x: (i+1).toString(), y: 0})));
 
   dataRainForecast: ChartData<'bar', {x: string, y: number}[]> = {
     datasets: [{
@@ -73,14 +74,27 @@ export class SimulationComponent {
     signal.toggle(); 
   };
 
+  changeForecast(currentForecast: WritableSignal<{x: string, y: number}[]>) {
+    const length = currentForecast().length;
+    const duration = this.durationForecast();
+
+    if (length < duration) {
+      let forecast = currentForecast();
+      for (let i=length; i < duration; i++) {
+        forecast.concat({x: (i+1).toString(), y: 0});
+      }
+      currentForecast.set(forecast);
+    }
+  };
+
   updateForecastModal(index: number, newY: number) {
     const updated = this.rainForecastModal().map((item, i) =>
       i === index ? { ...item, y: newY } : item
     );
     this.rainForecastModal.set(updated);
-  }
+  };
 
   copyForecast(copy: WritableSignal<{x: string, y: number}[]>, copied: WritableSignal<{x: string, y: number}[]>) {
     copy.set(copied().map(item => ({ ...item })));
-  }
+  };
 }
