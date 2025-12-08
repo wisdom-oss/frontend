@@ -12,6 +12,12 @@ import { TranslateDirective } from '@ngx-translate/core';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartData } from 'chart.js';
 
+export type SimulationParameter = {
+  time: string,
+  rainAmount: number, 
+  waterLevel: number
+}
+
 @Component({
   selector: "rrb-simulation",
   imports: [
@@ -45,26 +51,30 @@ export class SimulationComponent {
     effect(() => {
       this.waterLevel.set(this.waterLevelSlider());
     });
+
+    effect(() => {
+      this.updateLengthForecastModal(this.durationForecast());
+    });
   }
 
   protected chart = viewChild(BaseChartDirective);
   
-  protected waterLevelSlider: WritableSignal<number> = signal(20);
+  protected waterLevelSlider: WritableSignal<number> = signal(0);
   protected waterLevel: WritableSignal<number> = signal(this.waterLevelSlider());
 
   protected checkedRainForecast: signals.ToggleableSignal = signals.toggleable(false);
   protected rainForecastModalOpen: signals.ToggleableSignal = signals.toggleable(false);
   
-  protected rainForecastModal: WritableSignal<{x: string, y: number}[]> = signal([]);
   protected durationForecast: WritableSignal<number> = signal(12);
-  protected rainForecast: WritableSignal<{x: string, y: number}[]> = signal(Array.from({length: 12}, (_, i) => ({x: (i+1).toString(), y: 0})));
+  protected rainForecast: WritableSignal<SimulationParameter[]> = signal(Array.from({length: 12}, (_, i) => ({time: (i+1).toString(), rainAmount: 2, waterLevel: (i+1)*5})));
+  protected rainForecastModal: WritableSignal<SimulationParameter[]> = signal(this.rainForecast());
 
-  dataRainForecast: ChartData<'bar', {x: string, y: number}[]> = {
+  dataRainForecast: ChartData<'bar', SimulationParameter[]> = {
     datasets: [{
       data: this.rainForecast(),
       parsing: {
-        xAxisKey: 'x',
-        yAxisKey: 'y'
+        xAxisKey: 'time',
+        yAxisKey: 'rainAmount'
       },
     }],
   };
@@ -79,27 +89,32 @@ export class SimulationComponent {
     signal.toggle(); 
   };
 
-  changeForecast(currentForecast: WritableSignal<{x: string, y: number}[]>) {
-    const length = currentForecast().length;
-    const duration = this.durationForecast();
-
-    if (length < duration) {
-      let forecast = currentForecast();
-      for (let i=length; i < duration; i++) {
-        forecast.concat({x: (i+1).toString(), y: 0});
-      }
-      currentForecast.set(forecast);
-    }
-  };
-
-  updateForecastModal(index: number, newY: number) {
+  updateForecastModal(index: number, newRainAmount: number) {
     const updated = this.rainForecastModal().map((item, i) =>
-      i === index ? { ...item, y: newY } : item
+      i === index ? { ...item, rainAmount: newRainAmount } : item
     );
     this.rainForecastModal.set(updated);
   };
 
-  copyForecast(copy: WritableSignal<{x: string, y: number}[]>, copied: WritableSignal<{x: string, y: number}[]>) {
+  updateLengthForecastModal(duration: number) {
+    const length = this.rainForecastModal().length;
+
+    if (length < duration) {
+      console.log("Length: " + length + ", Duration: " + this.durationForecast());
+
+      const newArray = Array.from({length: duration - length}, (_, i) => ({time: (i+1+length).toString(), rainAmount: 0, waterLevel: 0}));
+      this.rainForecastModal.set(this.rainForecastModal().concat(newArray));
+    }
+
+    if (length > duration) {
+      console.log("Length: " + length + ", Duration: " + this.durationForecast());
+
+      const newArray = this.rainForecastModal().filter((_, i) => i < duration);
+      this.rainForecastModal.set(newArray);
+    }
+  }
+
+  copyForecast(copy: WritableSignal<SimulationParameter[]>, copied: WritableSignal<SimulationParameter[]>) {
     copy.set(copied().map(item => ({ ...item })));
   };
 }

@@ -1,11 +1,11 @@
-import { Component, ElementRef, OnDestroy, OnInit, AfterViewInit, viewChild, Input, signal, WritableSignal, effect, Signal, computed } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, AfterViewInit, viewChild, Input, signal, WritableSignal, effect, Signal } from '@angular/core';
 import * as THREE from 'three';
 import { GLTFLoader, OrbitControls } from 'three-stdlib';
 import { gsap } from 'gsap';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import { TranslateDirective } from '@ngx-translate/core';
 import { remixCalendar2Line, remixContrastDrop2Line, remixRainyLine, remixTimeLine } from '@ng-icons/remixicon';
-import dayjs, { Dayjs } from 'dayjs';
+import { SimulationParameter } from '../../rain-retention-basin/tabs/simulation/simulation.component';
 
 @Component({
   selector: 'model-view',
@@ -28,7 +28,7 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() cam: {x: number, y: number, z: number} = {x: 0, y: 0, z: 0};
   @Input() isSimulation: boolean = false;
   @Input() waterLevel: WritableSignal<number> = signal(20);
-  @Input() waterLevels: number[]  = [10, 15, 20, 18, 22];
+  @Input() simulationParameter: Signal<SimulationParameter[]>  = signal([]);
 
   rendererContainer = viewChild<ElementRef<HTMLDivElement>>('rendererContainer');
   
@@ -41,7 +41,7 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
   private resizeRaf!: number | null;
   
   private originalY: number = 1;
-  protected time: WritableSignal<Dayjs> = signal(dayjs());
+  protected time: WritableSignal<string> = signal('0');
   protected rainAmount: WritableSignal<number> = signal(0);
   
   constructor() {
@@ -171,12 +171,14 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
     let index = 0;
     
     const runStep = () => {
-      const nextLevel = this.waterLevels[index];
+      const nextLevel = this.simulationParameter()[index];
       
-      this.animateWaterToLevel(nextLevel);
+      this.animateWaterToLevel(nextLevel.waterLevel);
+      this.time.set(nextLevel.time);
+      this.rainAmount.set(nextLevel.rainAmount);
 
       index++;
-      if (index < this.waterLevels.length) {
+      if (index < this.simulationParameter().length) {
         setTimeout(runStep, 1000);
       }
     };

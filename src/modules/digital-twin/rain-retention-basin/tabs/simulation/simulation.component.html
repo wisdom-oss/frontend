@@ -1,6 +1,6 @@
 <div>
   <model-view filename="RRB_Damme.glb" [cam]="{x: 0, y: 10, z: 50}" [isSimulation]="true" 
-              [waterLevel]="waterLevel" [waterLevels]="[40, 60, 80, 100, 80, 60, 40, 20]"/>
+              [waterLevel]="waterLevel" [simulationParameter]="rainForecast"/>
   
   <div class="card my-4">
     <div class="card-content">
@@ -106,15 +106,15 @@
               <div class="column is-1"></div>
             </div>
 
-            @for (forecast of rainForecastModal(); track forecast) {
+            @for (forecast of rainForecastModal(); track forecast.time) {
               <div class="columns">
                 <div class="column is-1"></div>
                 <div class="column is-one-third has-text-centered">
-                  <p>{{forecast.x}}</p>
+                  <p>{{forecast.time}}</p>
                 </div>
                 <div class="column"></div>
                 <div class="column is-one-third">
-                  <input class="input is-rounded" type="number" min="0" max="100" [value]="forecast.y"
+                  <input class="input is-rounded" type="number" min="0" max="100" [value]="forecast.rainAmount"
                         (input)="updateForecastModal($index, $any($event.target).valueAsNumber)"/>
                 </div>
                 <div class="column is-1"></div>
