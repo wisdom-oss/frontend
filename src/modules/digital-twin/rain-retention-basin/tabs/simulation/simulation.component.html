@@ -15,11 +15,11 @@
         </div>
         <input
           class="slider is-primary m-0 mx-4" style="width: 20rem;"
-          step="1" min="0" max="100" value="{{waterLevel()}}" type="range"
-          (input)="waterLevel.set($any($event.target).value)"
+          step="1" min="0" max="100" value="{{waterLevelSlider()}}" type="range"
+          (input)="waterLevelSlider.set($any($event.target).value)"
         />
         <div class="is-flex is-flex-direction-column is-justify-content-center">
-          <p class="ml-4">{{waterLevel()}} %</p>
+          <p class="ml-4">{{waterLevelSlider()}} %</p>
         </div>
       </div>
     </div>

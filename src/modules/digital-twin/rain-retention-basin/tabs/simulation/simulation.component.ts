@@ -41,11 +41,16 @@ export class SimulationComponent {
         chart.update();
       }
     });
+
+    effect(() => {
+      this.waterLevel.set(this.waterLevelSlider());
+    });
   }
 
   protected chart = viewChild(BaseChartDirective);
   
-  protected waterLevel: WritableSignal<number> = signal(20);
+  protected waterLevelSlider: WritableSignal<number> = signal(20);
+  protected waterLevel: WritableSignal<number> = signal(this.waterLevelSlider());
 
   protected checkedRainForecast: signals.ToggleableSignal = signals.toggleable(false);
   protected rainForecastModalOpen: signals.ToggleableSignal = signals.toggleable(false);
