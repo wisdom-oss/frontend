@@ -81,9 +81,17 @@ de = "Wasserpegel"
 en = "Apply rain forecast"
 de = "Regenvorhersage übernehmen"
 
+[label.catchmentArea]
+en = "Catchment area"
+de = "Einzugsgebiet"
+
 [label.chooseTime]
 en = "Choose time point"
 de = "Zeitpunkt wählen"
+
+[label.city]
+en = "City/Municipality"
+de = "Stadt/Gemeinde"
 
 [label.drainage.yes]
 en = "Draining since"
@@ -97,9 +105,25 @@ de = "Keine Entwässerung"
 en = "Drainage Forerun"
 de = "Entwässerungsvorlauf"
 
+[label.latitude]
+en = "Latitude"
+de = "Breitengrad"
+
 [label.location]
 en = "Location"
 de = "Standort"
+
+[label.longitude]
+en = "Longitude"
+de = "Längengrad"
+
+[label.pavedArea]
+en = "Paved area"
+de = "Befestigte Fläche"
+
+[label.name]
+en = "Name"
+de = "Name"
 
 [label.rainAmount]
 en = "Rain Amount"
@@ -112,6 +136,11 @@ de = "Regendauer"
 [label.rainForecastDate]
 en = "Apply forecast from time"
 de = "Vorhersage übernehmen vom Zeitpunkt"
+
+[label.retentionVolume]
+en = "Retention volume"
+de = "Einstauvolumen"
+
 
 [label.roofSize]
 en = "Roof Size"
@@ -136,6 +165,10 @@ de = "Zeitpunkt"
 [label.title]
 en = "Title"
 de = "Titel"
+
+[label.unpavedArea]
+en = "Unpaved area"
+de = "Unbefestigte Fläche"
 
 
 [tab.control]

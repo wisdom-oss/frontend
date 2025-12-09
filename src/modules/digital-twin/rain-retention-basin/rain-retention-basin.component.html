@@ -37,7 +37,8 @@
   </div>
 
   @if(activeTab() === 'overview') {
-    <rrb-overview/>
+    <rrb-overview [time]="time" [waterLevel]="waterLevel" [name]="name" [city]="city" [lat]="lat" [long]="long"
+                  [volume]="volume" [catchmentArea]="catchmentArea" [pavedArea]="pavedArea" [unpavedArea]="unpavedArea"/>
   }
 
    @if(activeTab() === 'history') {

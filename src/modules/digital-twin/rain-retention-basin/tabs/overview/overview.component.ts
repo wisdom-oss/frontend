@@ -1,4 +1,4 @@
-import { Component, signal, WritableSignal } from '@angular/core';
+import { Component, Input, signal, WritableSignal } from '@angular/core';
 import { CarouselComponent } from "../../../common/carousel/carousel.component";
 import { NgIconComponent, provideIcons } from "@ng-icons/core";
 import { 
@@ -13,7 +13,12 @@ import {
   remixCheckboxMultipleBlankFill, 
   remixMapPin2Fill, 
   remixArrowLeftWideLine,
-  remixArrowRightWideLine
+  remixArrowRightWideLine,
+  remixCommunityLine,
+  remixInfoCardLine,
+  remixTreeLine,
+  remixCollageLine,
+  remixBox2Line
 } from '@ng-icons/remixicon';
 import dayjs, { Dayjs } from 'dayjs';
 import { ChartData } from 'chart.js';
@@ -49,20 +54,33 @@ import { ModelViewComponent } from "../../../common/model-view/model-view.compon
       remixMapPin2Fill,
       remixArrowLeftWideLine,
       remixArrowRightWideLine,
+      remixCommunityLine,
+      remixInfoCardLine,
+      remixTreeLine,
+      remixCollageLine,
+      remixBox2Line
     }),
   ],
 })
 export class OverviewComponent {
-  protected activeView = signal<'model' | 'map' | 'pictures'>('model'); 
+  @Input() time: WritableSignal<Dayjs> = signal(dayjs());
+  @Input() waterLevel: WritableSignal<number> = signal(30);
+  
+  @Input() lat: WritableSignal<number> = signal(52.524639);
+  @Input() long: WritableSignal<number> = signal(8.185833);
+  @Input() city: WritableSignal<string> = signal('Damme');
+  @Input() name: WritableSignal<string> = signal('Zum Griechen');
+  
+  @Input() volume: WritableSignal<number> = signal(100);
+  @Input() catchmentArea: WritableSignal<number> = signal(100);
+  @Input() pavedArea: WritableSignal<number> = signal(50);
+  @Input() unpavedArea: WritableSignal<number> = signal(50); 
+
+  protected activeView: WritableSignal<'model' | 'map' | 'pictures'> = signal('model'); 
 
   setActiveView(view: 'model' | 'map' | 'pictures') {
     this.activeView.set(view);
   }
-
-  time : WritableSignal<Dayjs> = signal(dayjs());
-  waterLevel : WritableSignal<number> = signal(30);
-  lat : WritableSignal<number> = signal(52.524639);
-  long : WritableSignal<number> = signal(8.185833);
 
   dataCurrentForecast: ChartData<'bar', {x: string, y: number}[]> = {
       datasets: [{
