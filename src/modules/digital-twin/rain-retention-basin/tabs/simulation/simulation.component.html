@@ -23,48 +23,20 @@
         </div>
       </div>
     </div>
-   </div>
+  </div>
    
-   <drainage-rules [rules]="rules"></drainage-rules>
+  <drainage-rules [rules]="rules"></drainage-rules>
 
-    <div class="card my-4">
+  <div class="card my-4">
     <div class="card-content">
       <div class="is-fullwidth has-text-centered my-4">
         <p class="is-size-3 my-4" translate>digitalTwin.header.rainForecast</p>
       </div>
-
-      <div class="is-flex is-flex-direction-row is-fullwidth my-4 is-justify-content-space-between">
-        <div class="is-flex is-flex-direction-row">
-          <ng-icon name="remixRainyLine" size="2.5rem"/>
-          <div class="is-flex is-flex-direction-column is-justify-content-center">
-            <p class="mx-4"><span translate>digitalTwin.label.rainForecast</span>: </p>
-          </div>
-          <input id="checkedRainForecast" type="checkbox" class="switch is-rounded" [checked]="checkedRainForecast()" 
-                 (click)="onToogleClick($event, checkedRainForecast)"/>
-          <label for="checkedRainForecast"></label>
-        </div>
-        
-        <div>
-          @if(!checkedRainForecast()) {
-            <button class="button is-primary is-rounded" 
-                    (click)="copyForecast(rainForecastModal, rainForecast); rainForecastModalOpen.set(true)">
-              <p translate>digitalTwin.button.adjustRainForecast</p>
-            </button>
-          }
-
-          @if(checkedRainForecast()) {
-            <div class="is-flex is-flex-direction-row">
-              <span class="is-flex is-flex-direction-row">
-                <p translate>digitalTwin.label.rainForecastDate</p>
-                <p>: </p>
-              </span>
-              <div class="is-flex is-flex-direction-column is-justify-content-center mx-4">
-                <input type="date" style="height: 2rem;"/>
-              </div>
-            </div>
-          }
-        </div>
-      </div>
+      
+      <button class="button is-primary is-rounded my-4" 
+              (click)="copyForecast(rainForecastModal, rainForecast); rainForecastModalOpen.set(true)">
+        <p translate>digitalTwin.button.adjustRainForecast</p>
+      </button>
 
       <div class="modal" [class.is-active]="rainForecastModalOpen()">
         <div class="modal-background"></div>
@@ -82,11 +54,39 @@
               </div>
               <div class="column"></div>
               <div class="column is-one-third">
-                <input class="input is-rounded" type="number" min="0" max="100" [value]="durationForecast()"
+                <input class="input is-rounded" type="number" min="6" max="48" [value]="durationForecast()"
                       (input)="durationForecast.set($any($event.target).valueAsNumber)"/>
               </div>
               <div class="column is-1"></div>
             </div>
+
+            <div class="columns mt-4">
+              <div class="column is-1"></div>
+              <div class="column is-narrow"> 
+                <p><span translate>digitalTwin.label.applyRainForecast</span>: </p>
+              </div>
+              <div class="column"></div>
+              <div class="column is-narrow">
+                <input id="checkedRainForecast" type="checkbox" class="switch is-rounded" [checked]="checkedRainForecast()" 
+                       (click)="onToogleClick($event, checkedRainForecast)"/>
+                <label for="checkedRainForecast"></label>
+              </div>
+              <div class="column is-1"></div>
+            </div>
+
+            @if(checkedRainForecast()) {
+              <div class="columns mt-4">
+                <div class="column is-1"></div>
+                <div class="column is-narrow"> 
+                  <p><span translate>digitalTwin.label.chooseTime</span>: </p>
+                </div>
+                <div class="column"></div>
+                <div class="column is-narrow">
+                  <input type="date" style="height: 2rem;" (input)="setForecastModalFromTime($any($event.target).value)"/>
+                </div>
+                <div class="column is-1"></div>
+              </div>
+            }
 
             <div class="columns mt-4">
               <div class="column is-1"></div>
@@ -114,7 +114,7 @@
                 </div>
                 <div class="column"></div>
                 <div class="column is-one-third">
-                  <input class="input is-rounded" type="number" min="0" max="100" [value]="forecast.rainAmount"
+                  <input class="input is-rounded" type="number" min="0" max="50" [value]="forecast.rainAmount"
                         (input)="updateForecastModal($index, $any($event.target).valueAsNumber)"/>
                 </div>
                 <div class="column is-1"></div>

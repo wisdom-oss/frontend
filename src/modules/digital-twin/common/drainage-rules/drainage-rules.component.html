@@ -4,6 +4,11 @@
         <p class="is-size-3 my-4" translate>digitalTwin.header.drainage</p>
       </div>
 
+      <button class="button is-primary is-rounded my-4" 
+              (click)="drainageRuleModal.set(newDrainageRule); drainageRulesModalOpen.set(true)">
+        <p translate>digitalTwin.button.addRule</p>
+      </button>
+
       <div class="is-flex is-flex-direction-column is-fullwidth my-4">
         @for (rule of drainageRules(); track rule) {
           <div class="card my-2">
@@ -70,13 +75,6 @@
             }
           </div>
         }
-      </div>
-
-      <div class="is-flex is-flex-direction-row is-fullwidth my-4 is-justify-content-center">
-        <button class="button is-primary is-rounded mx-4" 
-                (click)="drainageRuleModal.set(newDrainageRule); drainageRulesModalOpen.set(true)">
-          <p translate>digitalTwin.button.addRule</p>
-        </button>
       </div>
 
       <div class="modal" [class.is-active]="drainageRulesModalOpen()">

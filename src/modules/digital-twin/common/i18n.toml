@@ -77,6 +77,14 @@ en = "Water Level"
 de = "Wasserpegel"
 
 
+[label.applyRainForecast]
+en = "Apply rain forecast"
+de = "Regenvorhersage übernehmen"
+
+[label.chooseTime]
+en = "Choose time point"
+de = "Zeitpunkt wählen"
+
 [label.drainage.yes]
 en = "Draining since"
 de = "Entwässern seit"
@@ -100,10 +108,6 @@ de = "Regenmenge"
 [label.rainDuration]
 en = "Rain Duration"
 de = "Regendauer"
-
-[label.rainForecast]
-en = "Apply rain forecast"
-de = "Regenvorhersage übernehmen"
 
 [label.rainForecastDate]
 en = "Apply forecast from time"

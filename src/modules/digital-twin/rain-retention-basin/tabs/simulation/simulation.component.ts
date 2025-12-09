@@ -11,6 +11,7 @@ import {
 import { TranslateDirective } from '@ngx-translate/core';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartData } from 'chart.js';
+import { randInt } from 'three/src/math/MathUtils.js';
 
 export type SimulationParameter = {
   time: string,
@@ -100,15 +101,11 @@ export class SimulationComponent {
     const length = this.rainForecastModal().length;
 
     if (length < duration) {
-      console.log("Length: " + length + ", Duration: " + this.durationForecast());
-
       const newArray = Array.from({length: duration - length}, (_, i) => ({time: (i+1+length).toString(), rainAmount: 0, waterLevel: 0}));
       this.rainForecastModal.set(this.rainForecastModal().concat(newArray));
     }
 
     if (length > duration) {
-      console.log("Length: " + length + ", Duration: " + this.durationForecast());
-
       const newArray = this.rainForecastModal().filter((_, i) => i < duration);
       this.rainForecastModal.set(newArray);
     }
@@ -117,4 +114,12 @@ export class SimulationComponent {
   copyForecast(copy: WritableSignal<SimulationParameter[]>, copied: WritableSignal<SimulationParameter[]>) {
     copy.set(copied().map(item => ({ ...item })));
   };
+
+  setForecastModalFromTime(time : string) {
+    const newArray = this.rainForecastModal().map((item) => {
+      item.rainAmount = randInt(0, 10);
+      return item;
+    });
+    this.rainForecastModal.set(newArray);
+  }
 }
