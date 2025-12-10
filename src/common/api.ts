@@ -770,7 +770,7 @@ export namespace api {
           let validRaw = validateRaw(raw);
           if (!validRaw.success) {
             console.error({
-              errors: validRaw.errors, 
+              errors: validRaw.errors,
               raw: result,
               url: isSignal(url) ? url() : url,
             });

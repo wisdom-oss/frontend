@@ -8,6 +8,11 @@
  * without having to import them in multiple places.
  */
 
+import {Chart, CategoryScale, LinearScale} from "chart.js";
+import {
+  BarWithErrorBar,
+  BarWithErrorBarsController,
+} from "chartjs-chart-error-bars";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import customParseFormat from "dayjs/plugin/customParseFormat";
@@ -34,3 +39,10 @@ dayjs.extend(durationExt);
 dayjs.extend(isoWeek);
 dayjs.extend(localizedFormat);
 dayjs.extend(relativeTime);
+
+Chart.register(
+  BarWithErrorBarsController,
+  BarWithErrorBar,
+  LinearScale,
+  CategoryScale,
+);

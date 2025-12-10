@@ -32,6 +32,16 @@ type ChartDataset = ChartJsDataset<
   {x: string & tags.Format<"date-time">; y: number}[]
 >;
 
+type ChartDatasetWithError = ChartJsDataset<
+  "bar",
+  {
+    x: string & tags.Format<"date-time">;
+    y: number;
+    yMin: number;
+    yMax: number;
+  }[]
+>;
+
 @Directive({selector: "ng-template[modelTable]"})
 export class ModelTableNgTemplate {
   static ngTemplateContextGuard(
@@ -99,6 +109,7 @@ export class WaterDemandPrediction2Component {
 
   protected recordedUsages = this.service.fetchRecordedUsages(
     computed(() => this.model()?.meter),
+    {bucketSize: dayjs.duration(1, "month")},
   );
 
   protected historicDatasetMap = signals.map();
@@ -139,11 +150,13 @@ export class WaterDemandPrediction2Component {
     let prediction = this.prediction();
     if (!prediction) return;
     this.predictionDatasetMap.set(prediction.madeWithModel, {
-      data: prediction.datapoints.map(({time, value}) => ({
+      data: prediction.datapoints.map(({time, value, confidenceInterval}) => ({
         x: time.toISOString(),
         y: value,
+        yMin: confidenceInterval[0],
+        yMax: confidenceInterval[1],
       })),
-    } satisfies ChartDataset);
+    } satisfies ChartDatasetWithError);
   });
   protected predictionLabels = computed(() => {
     let set = new Set();

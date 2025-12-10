@@ -49,6 +49,7 @@
     "bulma-switch": "github:deather/bulma-switch",
     "bulma-v1-tooltip": "^1.0.2",
     "chart.js": "^4.5.0",
+    "chartjs-chart-error-bars": "^4.4.5",
     "dayjs": "^1.11.18",
     "dexie": "^4.2.0",
     "gravatar-gen": "^1.0.2",

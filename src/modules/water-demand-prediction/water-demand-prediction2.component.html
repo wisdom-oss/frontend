@@ -52,8 +52,14 @@
           ],
           ["data ends at", ctx.model?.dataEndsAt?.locale(lang)?.format("LLL")],
           ["weather capability", ctx.model?.weatherCapability],
-          ["training duration", ctx.model?.trainingDuration?.locale(lang)?.humanize()],
-          ["training start", ctx.model?.trainingStart?.locale(lang)?.format("LLL")],
+          [
+            "training duration",
+            ctx.model?.trainingDuration?.locale(lang)?.humanize(),
+          ],
+          [
+            "training start",
+            ctx.model?.trainingStart?.locale(lang)?.format("LLL"),
+          ],
         ];
         track entry[0]
       ) {
@@ -216,7 +222,7 @@
       <div [style.grid-area]="'chart-prediction'">
         <canvas
           baseChart
-          type="bar"
+          [type]="$any('barWithErrorBars')"
           class="is-fullheight is-fullwidth"
           [labels]="predictionLabels()"
           [options]="chartOptions"
