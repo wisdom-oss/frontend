@@ -102,6 +102,10 @@ html {
   }
 }
 
+.button > .icon > * {
+  display: flex;
+}
+
 // Border-only color for messages
 @each $name, $components in bulma.$message-colors {
   .#{iv.$class-prefix}message.#{iv.$class-prefix}border-is-#{$name} {
