@@ -56,6 +56,19 @@ export class WaterDemandPrediction2Component {
 
   protected lang = signals.lang();
 
+  protected modelIds = this.queryParams.signal("model", {
+    ...ModelId.queryParamOpts(),
+    multi: true,
+  });
+  protected models = this.service.models(this.modelIds);
+
+  protected meterIds = computed(
+    () => new Set(Array.from(this.models().values()).map(model => model.meter)),
+  );
+  protected meters = this.service.meters(this.meterIds);
+
+  // TODO: continue here to use multiple model ids in the query, so that having multiple is stateless
+
   protected modelId = this.queryParams.signal(
     "modelId",
     ModelId.queryParamOpts(),

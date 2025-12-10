@@ -19,11 +19,15 @@ interface Options<T> {
 type MultiOpts<T> = Pick<Options<T>, "multi" | "default"> & {
   multi: true;
   default?: T[];
+  parse?: never;
+  serialize?: never;
 };
 
 type DefaultOpts<T> = Pick<Options<T>, "multi" | "default"> & {
   multi?: false;
   default: T;
+  parse?: never;
+  serialize?: never;
 };
 
 type MinimalOpts = Pick<Options<void>, "multi"> & {multi?: false};
@@ -85,15 +89,15 @@ export class QueryParamService {
    */
   signal(param: string): QueryParamSignal<string | undefined>;
 
-  // string
-  signal(param: string, options: MultiOpts<string>): QueryParamSignal<string[]>;
-  signal(param: string, options: DefaultOpts<string>): QueryParamSignal<string>;
-  signal(param: string, options: MinimalOpts): QueryParamSignal<string | undefined>;
-
   // generic parsed types
   signal<T>(param: string, options: ComplexOpts<T>): QueryParamSignal<T | undefined>;
   signal<T>(param: string, options: MultiComplexOpts<T>): QueryParamSignal<T[]>;
   signal<T>(param: string, options: DefaultComplexOpts<T>): QueryParamSignal<T>;
+
+  // string
+  signal(param: string, options: MultiOpts<string>): QueryParamSignal<string[]>;
+  signal(param: string, options: DefaultOpts<string>): QueryParamSignal<string>;
+  signal(param: string, options: MinimalOpts): QueryParamSignal<string | undefined>;
 
   // general catch-all, must be supertype of all above
   signal<T>(

@@ -31,8 +31,8 @@
     </div>
   </div>
   <div class="grid is-col-min-20">
-    @for (model of service.models()?.values(); track model.id) {
-      @let meter = service.meters()?.get(model.meter);
+    @for (model of service.availableModels()?.values(); track model.id) {
+      @let meter = service.availableMeters()?.get(model.meter);
       <div class="cell">
         <div class="card">
           <div class="card-content">

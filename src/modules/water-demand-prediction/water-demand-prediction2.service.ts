@@ -8,6 +8,7 @@ import {RgbaColor} from "../../common/utils/rgba-color";
 
 import ModelId = PmdArimaPredictionService.ModelId;
 import MeterId = PmdArimaPredictionService.SmartMeterId;
+import {compute} from "three/src/nodes/TSL.js";
 
 type DateTimeString = string & tags.Format<"date-time">;
 
@@ -17,14 +18,33 @@ type DateTimeString = string & tags.Format<"date-time">;
 export class WaterDemandPrediction2Service {
   private service = inject(PmdArimaPredictionService);
 
-  readonly models = makeMap(this.service.fetchModels(), m => m.id);
-  readonly meters = makeMap(this.service.fetchMeters(), m => m.id);
+  readonly availableModels = makeMap(this.service.fetchModels(), m => m.id);
+  readonly availableMeters = makeMap(this.service.fetchMeters(), m => m.id);
+
+  models(
+    modelIds: Signal<Iterable<ModelId>>,
+  ): Signal<Map<ModelId, PmdArimaPredictionService.ModelMetaData>> {
+    return computed(() => {
+      let models = this.availableModels();
+      if (!models) return new Map();
+      let ids = modelIds();
+
+      let selected = new Map();
+      for (let id of ids) {
+        let model = models.get(id);
+        if (!model) continue;
+        selected.set(id, model);
+      }
+
+      return selected;
+    });
+  }
 
   model(
     modelId: Signal<ModelId | undefined>,
   ): Signal<PmdArimaPredictionService.ModelMetaData | undefined> {
     return computed(() => {
-      let models = this.models();
+      let models = this.availableModels();
       let id = modelId();
       if (!models || !id) return;
       let model = models.get(id);
@@ -38,10 +58,29 @@ export class WaterDemandPrediction2Service {
     meterId: Signal<MeterId | undefined>,
   ): Signal<PmdArimaPredictionService.SmartMeter | undefined> {
     return computed(() => {
-      let meters = this.meters();
+      let meters = this.availableMeters();
       let id = meterId();
       if (!meters || !id) return;
       return meters.get(id);
+    });
+  }
+
+  meters(
+    meterIds: Signal<Iterable<MeterId>>,
+  ): Signal<Map<MeterId, PmdArimaPredictionService.SmartMeter>> {
+    return computed(() => {
+      let meters = this.availableMeters();
+      if (!meters) return new Map();
+      let ids = meterIds();
+
+      let selected = new Map();
+      for (let id of ids) {
+        let meter = meters.get(id);
+        if (!meter) continue;
+        selected.set(id, meter);
+      }
+
+      return selected;
     });
   }
 
