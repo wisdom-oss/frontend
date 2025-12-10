@@ -39,6 +39,7 @@ import TrainingId = PmdArimaPredictionService.TrainingId;
 
 import DataPoint = PmdArimaPredictionService.DataPoint;
 import Prediction = PmdArimaPredictionService.Prediction;
+import {fromEntries} from "../../common/utils/from-entries";
 
 type Group = "historic" | "prediction";
 
@@ -73,15 +74,12 @@ export class WaterDemandPrediction2Component {
   );
   protected model = this.service.model(this.modelId);
 
-  _modelId = effect(() => console.log(this.modelId()));
-  _model = effect(() => console.log(this.model()));
-
   protected meterId = computed(() => this.model()?.meter);
   protected meter = this.service.meter(this.meterId);
 
   protected usages = {
     historic: this.predictionService.fetchRecordedUsages(this.meterId, {
-      bucketSize: dayjs.duration(1, "month"),
+      // bucketSize: dayjs.duration(1, "month"),
     }),
     prediction: this.predictionService.fetchPrediction(this.modelId),
   } as const satisfies Record<Group, any>;
@@ -117,23 +115,14 @@ export class WaterDemandPrediction2Component {
     }),
   } as const;
 
-  protected labels = {
-    historic: this.service.labels(
-      computed(() => this.datapoints.historic().values()),
-    ),
-    prediction: this.service.labels(
-      computed(() => this.datapoints.prediction().values()),
-    ),
-  } as const;
+  protected labels = Object.map(this.datapoints, datapoints =>
+    this.service.labels(computed(() => datapoints().values())),
+  );
 
-  protected datasets = {
-    historic: this.service.datasets(
-      this.labels.historic,
-      computed(() => Object.fromEntries(this.datapoints.historic())),
+  protected datasets = Object.map(this.datapoints, (datapoints, key) =>
+    this.service.datasets(
+      this.labels[key],
+      computed(() => Object.fromEntries(datapoints())),
     ),
-    prediction: this.service.datasets(
-      this.labels.prediction,
-      computed(() => Object.fromEntries(this.datapoints.prediction())),
-    ),
-  } as const;
+  );
 }

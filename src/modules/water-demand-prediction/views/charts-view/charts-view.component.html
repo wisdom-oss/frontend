@@ -10,6 +10,8 @@
     },
     scales: {
       y: {
+        min: scaleMin(),
+        max: scaleMax(),
         stacked: false,
         title: {
           display: true,
@@ -39,8 +41,14 @@
       style="grid-area: sidebar; border-left: 0.1rem solid rgba(0, 0, 0, 0.25)"
     >
       <div class="is-flex is-fullwidth is-justify-content-flex-end">
-        <button class="button is-primary" (click)="changeModel.emit()">
-          Change Model
+        <button
+          class="button is-primary has-tooltip-arrow has-tooltip-left"
+          [translate-attr]="{attr: 'data-tooltip', key: 'add model'}"
+          (click)="changeModel.emit()"
+        >
+          <span class="icon">
+            <ng-icon name="remixAddLargeFill"></ng-icon>
+          </span>
         </button>
       </div>
       <div class="m-2">
