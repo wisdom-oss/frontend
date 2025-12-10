@@ -38,18 +38,30 @@
 <div class="box is-fullheight main-layout">
   <div class="inner-layout is-fullheight">
     <div
+      class="pl-4"
       style="grid-area: sidebar; border-left: 0.1rem solid rgba(0, 0, 0, 0.25)"
     >
       <div class="is-flex is-fullwidth is-justify-content-flex-end">
+        <div class="is-flex is-flex-direction-column">
         <button
-          class="button is-primary has-tooltip-arrow has-tooltip-left"
-          [translate-attr]="{attr: 'data-tooltip', key: 'add model'}"
+          class="button mb-4 is-primary has-tooltip-arrow has-tooltip-left"
+          [translate-attr]="{attr: 'data-tooltip', key: 'add prediction'}"
           (click)="changeModel.emit()"
         >
           <span class="icon">
             <ng-icon name="remixAddLargeFill"></ng-icon>
           </span>
         </button>
+        <button
+          class="button mb-4 is-danger has-tooltip-arrow has-tooltip-left"
+          [translate-attr]="{attr: 'data-tooltip', key: 'clear chart'}"
+          (click)="changeModel.emit()"
+        >
+          <span class="icon">
+            <ng-icon name="remixCloseLargeFill"></ng-icon>
+          </span>
+        </button>
+        </div>
       </div>
       <div class="m-2">
         <!-- <ng-container

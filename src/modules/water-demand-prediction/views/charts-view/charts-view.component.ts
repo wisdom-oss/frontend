@@ -6,7 +6,7 @@ import {typeUtils} from "../../../../common/utils/type-utils";
 import Signaled = typeUtils.Signaled;
 import {BaseChartDirective} from "ng2-charts";
 import {NgIconComponent, provideIcons} from "@ng-icons/core";
-import {remixAddLargeFill} from "@ng-icons/remixicon";
+import {remixAddLargeFill, remixCloseLargeFill} from "@ng-icons/remixicon";
 import {TranslateAttrDirective} from "../../../../common/directives/translate-attr.directive";
 import {chain} from "../../../../common/utils/chain";
 
@@ -21,6 +21,7 @@ type Datasets = Signaled<ReturnType<Service["datasets"]>>;
   providers: [
     provideIcons({
       remixAddLargeFill,
+      remixCloseLargeFill,
     }),
   ],
 })
