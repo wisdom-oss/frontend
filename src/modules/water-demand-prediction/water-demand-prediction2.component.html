@@ -44,7 +44,7 @@
     <tbody>
       @for (
         entry of [
-          ["ID", ctx.model?.modelId],
+          ["ID", ctx.model?.id],
           ["Meter", ctx.meter?.name],
           [
             "data starts at",
@@ -52,8 +52,8 @@
           ],
           ["data ends at", ctx.model?.dataEndsAt?.locale(lang)?.format("LLL")],
           ["weather capability", ctx.model?.weatherCapability],
-          ["training time", ctx.model?.trainingTime?.locale(lang)?.humanize()],
-          ["trained at", ctx.model?.trainedAt?.locale(lang)?.format("LLL")],
+          ["training duration", ctx.model?.trainingDuration?.locale(lang)?.humanize()],
+          ["training start", ctx.model?.trainingStart?.locale(lang)?.format("LLL")],
         ];
         track entry[0]
       ) {
@@ -119,8 +119,8 @@
         </div>
       </div>
       <div class="grid is-col-min-20">
-        @for (model of models.values(); track model.modelId) {
-          @let meter = meters?.get(model.meterId);
+        @for (model of models.values(); track model.id) {
+          @let meter = meters?.get(model.meter);
           <div class="cell">
             <div class="card">
               <div class="card-content">
@@ -136,7 +136,7 @@
                   #button
                   (mouseover)="button.classList.add('has-text-primary')"
                   (mouseout)="button.classList.remove('has-text-primary')"
-                  (click)="modelId.set(model.modelId)"
+                  (click)="modelId.set(model.id)"
                   class="card-footer-item"
                 >
                   <span class="has-text-weight-bold">Select</span>

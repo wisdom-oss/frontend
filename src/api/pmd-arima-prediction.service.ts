@@ -81,16 +81,17 @@ export class PmdArimaPredictionService extends api.service(URL) {
         list.map(
           item =>
             ({
-              modelId: ModelId.of(item.modelId),
-              meterId: SmartMeterId.of(item.meterId),
+              id: ModelId.of(item.id),
+              meter: SmartMeterId.of(item.meter),
+              hash: item.hash,
               dataStartsAt: dayjs(item.dataStartsAt),
               dataEndsAt: dayjs(item.dataEndsAt),
               weatherCapability: item.weatherCapability ?? undefined,
               capabilityColumn: item.capabilityColumn ?? undefined,
-              trainingTime: item.trainingTime
-                ? dayjs.duration(item.trainingTime)
+              trainingDuration: item.trainingDuration
+                ? dayjs.duration(item.trainingDuration)
                 : undefined,
-              trainedAt: dayjs(item.trainedAt),
+              trainingStart: dayjs(item.trainingStart),
               comment: item.comment ?? undefined,
             }) satisfies Self.ModelMetaData,
         ),
@@ -258,14 +259,15 @@ export namespace PmdArimaPredictionService {
   };
 
   export type ModelMetaData = {
-    modelId: ModelId;
-    meterId: SmartMeterId;
+    id: ModelId;
+    meter: SmartMeterId;
+    hash: string;
     dataStartsAt?: Dayjs;
     dataEndsAt?: Dayjs;
     weatherCapability?: SupportedCapability;
     capabilityColumn?: string;
-    trainingTime?: Duration;
-    trainedAt?: Dayjs;
+    trainingDuration?: Duration;
+    trainingStart?: Dayjs;
     comment?: string;
   };
 

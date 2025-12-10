@@ -67,7 +67,7 @@ export class WaterDemandPrediction2Component {
 
   protected lang = signals.lang();
 
-  protected models = makeMap(this.service.fetchModels(), m => m.modelId);
+  protected models = makeMap(this.service.fetchModels(), m => m.id);
   protected meters = makeMap(this.service.fetchMeters(), m => m.id);
 
   protected modelId = this.queryParams.signal("modelId", {
@@ -91,14 +91,14 @@ export class WaterDemandPrediction2Component {
   });
 
   protected meter = computed(() => {
-    let meterId = this.model()?.meterId;
+    let meterId = this.model()?.meter;
     let meters = this.meters();
     if (!meters || !meterId) return undefined;
     return meters.get(meterId);
   });
 
   protected recordedUsages = this.service.fetchRecordedUsages(
-    computed(() => this.model()?.meterId),
+    computed(() => this.model()?.meter),
   );
 
   protected historicDatasetMap = signals.map();
@@ -107,7 +107,7 @@ export class WaterDemandPrediction2Component {
     Array.from,
   ) as Signal<ChartDataset[]>;
   private loadHistoricDatasets = effect(() => {
-    let meterId = this.model()?.meterId;
+    let meterId = this.model()?.meter;
     let recordedUsages = this.recordedUsages();
     if (!meterId || !recordedUsages) return;
     this.historicDatasetMap.set(meterId, {

@@ -761,6 +761,7 @@ export namespace api {
     validateRaw,
     parse,
     validate,
+    url,
   }: ResourceOptions<TResult, TRaw, TDefault>): (raw: TRaw) => TResult {
     return raw => {
       let result = raw as unknown as TResult;
@@ -768,7 +769,11 @@ export namespace api {
         if (validateRaw) {
           let validRaw = validateRaw(raw);
           if (!validRaw.success) {
-            console.error(validRaw.errors);
+            console.error({
+              errors: validRaw.errors, 
+              raw: result,
+              url: isSignal(url) ? url() : url,
+            });
             throw new Error("Invalid type on raw response");
           }
         }
