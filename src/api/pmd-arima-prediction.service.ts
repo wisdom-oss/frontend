@@ -61,6 +61,7 @@ export class PmdArimaPredictionService extends api.service(URL) {
         })),
       }),
       params: api.QueryParams.from(params ?? {}),
+      cache: dayjs.duration(7, "days"),
     });
   }
 
@@ -111,6 +112,7 @@ export class PmdArimaPredictionService extends api.service(URL) {
       validateRaw: typia.createValidate<Raw.DataPoint[]>(),
       parse: dts => dts.map(dt => ({...dt, time: dayjs(dt.time)})),
       params: api.QueryParams.from(params ?? {}),
+      cache: dayjs.duration(1, "day"),
     });
   }
 
