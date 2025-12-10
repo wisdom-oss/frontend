@@ -3,13 +3,8 @@ import {
   computed,
   effect,
   inject,
-  input,
-  signal,
   untracked,
-  ViewChild,
   Component,
-  Directive,
-  TemplateRef,
   Signal,
 } from "@angular/core";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
@@ -18,10 +13,7 @@ import {
   remixLoader4Fill,
   remixResetRightLine,
 } from "@ng-icons/remixicon";
-import {ChartData, ChartDataset as ChartJsDataset} from "chart.js";
-import dayjs from "dayjs";
 import {BaseChartDirective} from "ng2-charts";
-import {tags} from "typia";
 
 import {WdpChartsViewComponent} from "./views/charts-view/charts-view.component";
 import {WdpNewModelViewComponent} from "./views/new-model-view/new-model-view.component";
@@ -29,17 +21,13 @@ import {WdpSelectModelViewComponent} from "./views/select-model-view/select-mode
 import {WaterDemandPrediction2Service as Service} from "./water-demand-prediction2.service";
 import {PmdArimaPredictionService} from "../../api/pmd-arima-prediction.service";
 import {signals} from "../../common/signals";
-import {api} from "../../common/api";
 import {QueryParamService} from "../../common/services/query-param.service";
-import {RgbaColor} from "../../common/utils/rgba-color";
 
 import ModelId = PmdArimaPredictionService.ModelId;
 import MeterId = PmdArimaPredictionService.SmartMeterId;
-import TrainingId = PmdArimaPredictionService.TrainingId;
 
 import DataPoint = PmdArimaPredictionService.DataPoint;
 import Prediction = PmdArimaPredictionService.Prediction;
-import {fromEntries} from "../../common/utils/from-entries";
 
 type Group = "historic" | "prediction";
 

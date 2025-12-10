@@ -3,7 +3,6 @@ import {
   effect,
   inject,
   signal,
-  ValueEqualityFn,
   CreateComputedOptions,
   CreateSignalOptions,
   Signal,

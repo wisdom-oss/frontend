@@ -1,17 +1,14 @@
-import {input, output, Component, computed} from "@angular/core";
+import {computed, input, output, Component} from "@angular/core";
 
-import {
-  WaterDemandPrediction2Service as Service,
-  WaterDemandPrediction2Service,
-} from "../../water-demand-prediction2.service";
+import {WaterDemandPrediction2Service as Service} from "../../water-demand-prediction2.service";
 import {typeUtils} from "../../../../common/utils/type-utils";
 
 import Signaled = typeUtils.Signaled;
 import {BaseChartDirective} from "ng2-charts";
 import {NgIconComponent, provideIcons} from "@ng-icons/core";
-import {remixAddLargeFill, remixArrowLeftRightFill} from "@ng-icons/remixicon";
+import {remixAddLargeFill} from "@ng-icons/remixicon";
 import {TranslateAttrDirective} from "../../../../common/directives/translate-attr.directive";
-import { chain } from "../../../../common/utils/chain";
+import {chain} from "../../../../common/utils/chain";
 
 type Labels = Signaled<ReturnType<Service["labels"]>>;
 type Datasets = Signaled<ReturnType<Service["datasets"]>>;
@@ -48,7 +45,7 @@ export class WdpChartsViewComponent {
         if (yMin) min = Math.min(yMin, min);
       }
     }
-    
+
     return Math.floor(min);
   });
 
@@ -64,7 +61,7 @@ export class WdpChartsViewComponent {
         if (yMax) max = Math.max(yMax, max);
       }
     }
-    
+
     return Math.ceil(max);
   });
 }

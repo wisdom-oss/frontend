@@ -1,16 +1,13 @@
 import {computed, inject, Injectable, Signal} from "@angular/core";
+import {ChartDataset} from "chart.js";
+import {tags} from "typia";
 
 import {PmdArimaPredictionService} from "../../api/pmd-arima-prediction.service";
 import {api} from "../../common/api";
-import {signals} from "../../common/signals";
+import {RgbaColor} from "../../common/utils/rgba-color";
 
 import ModelId = PmdArimaPredictionService.ModelId;
 import MeterId = PmdArimaPredictionService.SmartMeterId;
-import TrainingId = PmdArimaPredictionService.TrainingId;
-import {tags} from "typia";
-import {Id} from "../../common/id";
-import {ChartDataset} from "chart.js";
-import {RgbaColor} from "../../common/utils/rgba-color";
 
 type DateTimeString = string & tags.Format<"date-time">;
 
