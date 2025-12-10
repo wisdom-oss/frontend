@@ -106,6 +106,14 @@ export abstract class Id<V extends string | number, Branding extends symbol> {
   [Symbol.toPrimitive](): V {
     return this.get();
   }
+
+  static queryParamOpts<P extends IdConstructor>(this: P) {
+    return {
+      // @ts-ignore dunno how to fix this yet
+      parse: (raw: ConstructorParameters<P>[0]) => this.of(raw),
+      serialize: (id: InstanceType<P>) => id.toString(),
+    };
+  }
 }
 
 export namespace Id {

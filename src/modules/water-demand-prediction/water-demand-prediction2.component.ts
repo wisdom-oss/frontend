@@ -5,6 +5,7 @@ import {
   inject,
   input,
   signal,
+  untracked,
   ViewChild,
   Component,
   Directive,
@@ -22,48 +23,35 @@ import dayjs from "dayjs";
 import {BaseChartDirective} from "ng2-charts";
 import {tags} from "typia";
 
-import {PmdArimaPredictionService as Service} from "../../api/pmd-arima-prediction.service";
+import {WdpChartsViewComponent} from "./views/charts-view/charts-view.component";
+import {WdpNewModelViewComponent} from "./views/new-model-view/new-model-view.component";
+import {WdpSelectModelViewComponent} from "./views/select-model-view/select-model-view.component";
+import {WaterDemandPrediction2Service as Service} from "./water-demand-prediction2.service";
+import {PmdArimaPredictionService} from "../../api/pmd-arima-prediction.service";
 import {signals} from "../../common/signals";
 import {api} from "../../common/api";
 import {QueryParamService} from "../../common/services/query-param.service";
 import {RgbaColor} from "../../common/utils/rgba-color";
 
-type ChartDataset = ChartJsDataset<
-  "bar",
-  {x: string & tags.Format<"date-time">; y: number}[]
->;
+import ModelId = PmdArimaPredictionService.ModelId;
+import MeterId = PmdArimaPredictionService.SmartMeterId;
+import TrainingId = PmdArimaPredictionService.TrainingId;
 
-type ChartDatasetWithError = ChartJsDataset<
-  "bar",
-  {
-    x: string & tags.Format<"date-time">;
-    y: number;
-    yMin: number;
-    yMax: number;
-  }[]
->;
+import DataPoint = PmdArimaPredictionService.DataPoint;
+import Prediction = PmdArimaPredictionService.Prediction;
 
-@Directive({selector: "ng-template[modelTable]"})
-export class ModelTableNgTemplate {
-  static ngTemplateContextGuard(
-    directive: ModelTableNgTemplate,
-    context: unknown,
-  ): context is {
-    $implicit: {model?: Service.ModelMetaData; meter?: Service.SmartMeter};
-  } {
-    return true;
-  }
-}
+type Group = "historic" | "prediction";
 
 @Component({
   imports: [
     NgIconComponent,
     BaseChartDirective,
     CommonModule,
-    ModelTableNgTemplate,
+    WdpChartsViewComponent,
+    WdpNewModelViewComponent,
+    WdpSelectModelViewComponent,
   ],
   templateUrl: "./water-demand-prediction2.component.html",
-  styleUrl: "./water-demand-prediction2.component.scss",
   providers: [
     provideIcons({
       remixResetRightLine,
@@ -74,145 +62,78 @@ export class ModelTableNgTemplate {
 })
 export class WaterDemandPrediction2Component {
   private service = inject(Service);
+  private predictionService = inject(PmdArimaPredictionService);
   private queryParams = inject(QueryParamService);
 
   protected lang = signals.lang();
 
-  protected models = makeMap(this.service.fetchModels(), m => m.id);
-  protected meters = makeMap(this.service.fetchMeters(), m => m.id);
-
-  protected modelId = this.queryParams.signal("modelId", {
-    parse: raw => Service.ModelId.of(raw),
-    serialize: id => id.toString(),
-  });
-
-  protected model = computed(() => {
-    let models = this.models();
-    let modelId = this.modelId();
-    if (!models || !modelId) return undefined;
-    return models.get(modelId);
-  });
-
-  protected modelsLoading = signal(true);
-  private modelsDelayed = signals.delay(this.models, dayjs.duration(0.8, "s"));
-  private modelsLoaded = effect(() => {
-    let models = this.modelsDelayed();
-    if (!models) return;
-    this.modelsLoading.set(false);
-  });
-
-  protected meter = computed(() => {
-    let meterId = this.model()?.meter;
-    let meters = this.meters();
-    if (!meters || !meterId) return undefined;
-    return meters.get(meterId);
-  });
-
-  protected recordedUsages = this.service.fetchRecordedUsages(
-    computed(() => this.model()?.meter),
-    {bucketSize: dayjs.duration(1, "month")},
+  protected modelId = this.queryParams.signal(
+    "modelId",
+    ModelId.queryParamOpts(),
   );
+  protected model = this.service.model(this.modelId);
 
-  protected historicDatasetMap = signals.map();
-  protected historicDatasets = signals.mapTo(
-    this.historicDatasetMap.values(),
-    Array.from,
-  ) as Signal<ChartDataset[]>;
-  private loadHistoricDatasets = effect(() => {
-    let meterId = this.model()?.meter;
-    let recordedUsages = this.recordedUsages();
-    if (!meterId || !recordedUsages) return;
-    this.historicDatasetMap.set(meterId, {
-      data: recordedUsages.map(({time, value}) => ({
-        x: time.toISOString(),
-        y: value,
-      })),
-    } satisfies ChartDataset);
-  });
-  protected historicLabels = computed(() => {
-    let set = new Set();
-    let datasets = this.historicDatasets();
-    for (let dataset of datasets) {
-      for (let {x} of dataset.data) {
-        set.add(x);
-      }
-    }
-    return Array.from(set).sort();
-  });
+  _modelId = effect(() => console.log(this.modelId()));
+  _model = effect(() => console.log(this.model()));
 
-  protected prediction = this.service.fetchPrediction(this.modelId);
+  protected meterId = computed(() => this.model()?.meter);
+  protected meter = this.service.meter(this.meterId);
 
-  protected predictionDatasetMap = signals.map<
-    Service.ModelId,
-    ChartDatasetWithError
-  >();
-  private loadPredictionDatasets = effect(() => {
-    let prediction = this.prediction();
-    if (!prediction) return;
-    this.predictionDatasetMap.set(prediction.madeWithModel, {
-      backgroundColor: RgbaColor.fromString(
-        prediction.madeWithModel.get(),
-      ).toHex(),
-      data: prediction.datapoints.map(({time, value, confidenceInterval}) => ({
-        x: time.toISOString(),
-        y: value,
-        yMin: confidenceInterval[0],
-        yMax: confidenceInterval[1],
-      })),
-    } satisfies ChartDatasetWithError);
-  });
-  protected predictionLabels = computed(() => {
-    let set = new Set();
-    for (let dataset of this.predictionDatasetMap().values()) {
-      for (let {x} of dataset.data) {
-        set.add(x);
-      }
-    }
-    return Array.from(set).sort();
-  }) as Signal<ChartDataset["data"][0]["x"][]>;
-  // calculate datasets with null values to ensure that the bar chart can deal
-  // with them properly
-  protected predictionDatasets = computed(() => {
-    let datasets = [];
-    let labels = this.predictionLabels();
-    for (let dataset of this.predictionDatasetMap().values()) {
-      let data = new Map(
-        dataset.data.map(({x, y, yMin, yMax}) => [x, {y, yMin, yMax}]),
-      );
-      datasets.push({
-        ...dataset,
-        data: labels.map(label => {
-          let x = label;
-          let value = data.get(label);
-          return {x, y: value?.y, yMin: value?.yMin, yMax: value?.yMax};
-        }),
+  protected usages = {
+    historic: this.predictionService.fetchRecordedUsages(this.meterId, {
+      bucketSize: dayjs.duration(1, "month"),
+    }),
+    prediction: this.predictionService.fetchPrediction(this.modelId),
+  } as const satisfies Record<Group, any>;
+
+  protected data = {
+    historic: signals.map<MeterId, DataPoint[]>(),
+    prediction: signals.map<ModelId, Prediction>(),
+  } as const satisfies Record<Group, any>;
+
+  protected datapoints = {
+    historic: this.data.historic satisfies Signal<Map<MeterId, DataPoint[]>>,
+    prediction: (() => {
+      let entries = this.data.prediction.entries();
+      return computed(() => {
+        let entriesIter = entries();
+        return new Map(
+          Array.from(entriesIter).map(([key, val]) => [key, val.datapoints]),
+        );
       });
-    }
-    return datasets;
-  });
+    })() satisfies Signal<Map<ModelId, DataPoint[]>>,
+  } as const;
 
-  // _models = effect(() => console.log(this.models()));
-  // _meters = effect(() => console.log(this.meters()));
-  // _recordedUsages = effect(() => console.log(this.recordedUsages()));
-  // _prediction = effect(() => console.log(this.prediction()));
-  // _historicDatasets = effect(() => console.log(this.historicDatasetMap()));
-  // _predictionDatasets = effect(() => console.log(this.predictionDatasets()));
-}
+  private loadData = {
+    historic: effect(() => {
+      let id = untracked(this.meterId);
+      let data = this.usages.historic();
+      if (id && data) this.data.historic.set(id, data);
+    }),
+    prediction: effect(() => {
+      let id = untracked(this.modelId);
+      let data = this.usages.prediction();
+      if (id && data) this.data.prediction.set(id, data);
+    }),
+  } as const;
 
-function makeMap<K, V>(
-  signal: api.Signal<V[]>,
-  key: (value: V) => K,
-): Signal<Map<K, V> | undefined> & {reload(): boolean} {
-  let map = new Map();
-  let s = computed(
-    () => {
-      let values = signal();
-      map.clear();
-      if (!values) return;
-      for (let value of values) map.set(key(value), value);
-      return map;
-    },
-    {equal: () => false},
-  );
-  return Object.assign(s, {reload: () => signal.reload()});
+  protected labels = {
+    historic: this.service.labels(
+      computed(() => this.datapoints.historic().values()),
+    ),
+    prediction: this.service.labels(
+      computed(() => this.datapoints.prediction().values()),
+    ),
+  } as const;
+
+  protected datasets = {
+    historic: this.service.datasets(
+      this.labels.historic,
+      computed(() => Object.fromEntries(this.datapoints.historic())),
+    ),
+    prediction: this.service.datasets(
+      this.labels.prediction,
+      computed(() => Object.fromEntries(this.datapoints.prediction())),
+    ),
+  } as const;
 }

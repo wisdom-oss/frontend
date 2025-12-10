@@ -1,0 +1,99 @@
+@let lang = this.lang();
+
+<div class="box is-fullheight is-fullwidth">
+  <div class="level mb-4">
+    <div class="level-left">
+      <div class="level-item">
+        <p class="title is-4 mb-0">Select Model</p>
+      </div>
+    </div>
+    <div class="level-right">
+      <!-- <div class="level-item">
+        <button
+          class="button"
+          (click)="modelsLoading.set(true); this.models.reload()"
+        >
+          <span class="icon" [class.is-spinning]="modelsLoading()">
+            <div>
+              <ng-icon name="remixResetRightLine"></ng-icon>
+            </div>
+          </span>
+        </button>
+      </div> -->
+      <div class="level-item">
+        <button class="button is-primary">
+          <span>New Model</span>
+          <span class="icon">
+            <!-- <div><ng-icon name="remixArrowRightFill"></ng-icon></div> -->
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="grid is-col-min-20">
+    @for (model of service.models()?.values(); track model.id) {
+      @let meter = service.meters()?.get(model.meter);
+      <div class="cell">
+        <div class="card">
+          <div class="card-content">
+            <table>
+              <tbody>
+                @for (
+                  entry of [
+                    ["ID", model?.id],
+                    ["Meter", meter?.name],
+                    [
+                      "data starts at",
+                      model?.dataStartsAt?.locale(lang)?.format("LLL"),
+                    ],
+                    [
+                      "data ends at",
+                      model?.dataEndsAt?.locale(lang)?.format("LLL"),
+                    ],
+                    ["weather capability", model?.weatherCapability],
+                    [
+                      "training duration",
+                      model?.trainingDuration?.locale(lang)?.humanize(),
+                    ],
+                    [
+                      "training start",
+                      model?.trainingStart?.locale(lang)?.format("LLL"),
+                    ],
+                  ];
+                  track entry[0]
+                ) {
+                  @let key = entry[0];
+                  @let value = entry[1];
+                  @if (value) {
+                    <tr>
+                      <th>{{ key }}</th>
+                      <td style="padding-left: 1rem">{{ value }}</td>
+                    </tr>
+                  }
+                }
+              </tbody>
+              @if (model?.comment) {
+                <tfoot>
+                  {{
+                    model?.comment
+                  }}
+                </tfoot>
+              }
+            </table>
+          </div>
+          <div class="card-footer">
+            <button
+              #button
+              (mouseover)="button.classList.add('has-text-primary')"
+              (mouseout)="button.classList.remove('has-text-primary')"
+              (click)="modelId.emit(model.id)"
+              class="card-footer-item"
+            >
+              <span class="has-text-weight-bold">Select</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>
