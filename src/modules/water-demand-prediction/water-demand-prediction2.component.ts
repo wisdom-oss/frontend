@@ -17,7 +17,7 @@ import {
   remixLoader4Fill,
   remixResetRightLine,
 } from "@ng-icons/remixicon";
-import {ChartDataset as ChartJsDataset} from "chart.js";
+import {ChartData, ChartDataset as ChartJsDataset} from "chart.js";
 import dayjs from "dayjs";
 import {BaseChartDirective} from "ng2-charts";
 import {tags} from "typia";
@@ -26,6 +26,7 @@ import {PmdArimaPredictionService as Service} from "../../api/pmd-arima-predicti
 import {signals} from "../../common/signals";
 import {api} from "../../common/api";
 import {QueryParamService} from "../../common/services/query-param.service";
+import {RgbaColor} from "../../common/utils/rgba-color";
 
 type ChartDataset = ChartJsDataset<
   "bar",
@@ -141,15 +142,17 @@ export class WaterDemandPrediction2Component {
 
   protected prediction = this.service.fetchPrediction(this.modelId);
 
-  protected predictionDatasetMap = signals.map();
-  protected predictionDatasets = signals.mapTo(
-    this.predictionDatasetMap.values(),
-    Array.from,
-  ) as Signal<ChartDataset[]>;
+  protected predictionDatasetMap = signals.map<
+    Service.ModelId,
+    ChartDatasetWithError
+  >();
   private loadPredictionDatasets = effect(() => {
     let prediction = this.prediction();
     if (!prediction) return;
     this.predictionDatasetMap.set(prediction.madeWithModel, {
+      backgroundColor: RgbaColor.fromString(
+        prediction.madeWithModel.get(),
+      ).toHex(),
       data: prediction.datapoints.map(({time, value, confidenceInterval}) => ({
         x: time.toISOString(),
         y: value,
@@ -160,20 +163,40 @@ export class WaterDemandPrediction2Component {
   });
   protected predictionLabels = computed(() => {
     let set = new Set();
-    let datasets = this.predictionDatasets();
-    for (let dataset of datasets) {
+    for (let dataset of this.predictionDatasetMap().values()) {
       for (let {x} of dataset.data) {
         set.add(x);
       }
     }
     return Array.from(set).sort();
+  }) as Signal<ChartDataset["data"][0]["x"][]>;
+  // calculate datasets with null values to ensure that the bar chart can deal
+  // with them properly
+  protected predictionDatasets = computed(() => {
+    let datasets = [];
+    let labels = this.predictionLabels();
+    for (let dataset of this.predictionDatasetMap().values()) {
+      let data = new Map(
+        dataset.data.map(({x, y, yMin, yMax}) => [x, {y, yMin, yMax}]),
+      );
+      datasets.push({
+        ...dataset,
+        data: labels.map(label => {
+          let x = label;
+          let value = data.get(label);
+          return {x, y: value?.y, yMin: value?.yMin, yMax: value?.yMax};
+        }),
+      });
+    }
+    return datasets;
   });
 
-  _models = effect(() => console.log(this.models()));
-  _meters = effect(() => console.log(this.meters()));
-  _recordedUsages = effect(() => console.log(this.recordedUsages()));
-  _prediction = effect(() => console.log(this.prediction()));
-  _historicDatasets = effect(() => console.log(this.historicDatasetMap()));
+  // _models = effect(() => console.log(this.models()));
+  // _meters = effect(() => console.log(this.meters()));
+  // _recordedUsages = effect(() => console.log(this.recordedUsages()));
+  // _prediction = effect(() => console.log(this.prediction()));
+  // _historicDatasets = effect(() => console.log(this.historicDatasetMap()));
+  // _predictionDatasets = effect(() => console.log(this.predictionDatasets()));
 }
 
 function makeMap<K, V>(
