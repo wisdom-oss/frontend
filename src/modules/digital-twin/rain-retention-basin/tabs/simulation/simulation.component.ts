@@ -4,6 +4,7 @@ import { signals } from '../../../../../common/signals';
 import { ModelViewComponent } from "../../../common/model-view/model-view.component";
 import { NgIconComponent, provideIcons } from "@ng-icons/core";
 import { 
+  remixArrowDownSLine,
   remixContrastDrop2Line,
   remixRainyLine,
   remixTimeLine,
@@ -18,6 +19,8 @@ export type SimulationParameter = {
   rainAmount: number, 
   waterLevel: number
 }
+
+export type SimulationIntervalOption= '5 min' | '15 min' | '30 min' | '1 h';
 
 @Component({
   selector: "rrb-simulation",
@@ -34,6 +37,7 @@ export type SimulationParameter = {
       remixContrastDrop2Line,
       remixRainyLine,
       remixTimeLine,
+      remixArrowDownSLine
     }),
   ],
 })
@@ -48,14 +52,6 @@ export class SimulationComponent {
         chart.update();
       }
     });
-
-    effect(() => {
-      this.waterLevel.set(this.waterLevelSlider());
-    });
-
-    effect(() => {
-      this.updateLengthForecastModal(this.durationForecast());
-    });
   }
 
   protected chart = viewChild(BaseChartDirective);
@@ -65,9 +61,10 @@ export class SimulationComponent {
 
   protected checkedRainForecast: signals.ToggleableSignal = signals.toggleable(false);
   protected rainForecastModalOpen: signals.ToggleableSignal = signals.toggleable(false);
-  
+ 
+  protected intervalForecast: WritableSignal<SimulationIntervalOption> = signal('5 min');
   protected durationForecast: WritableSignal<number> = signal(12);
-  protected rainForecast: WritableSignal<SimulationParameter[]> = signal(Array.from({length: 12}, (_, i) => ({time: (i+1).toString(), rainAmount: 2, waterLevel: (i+1)*5})));
+  protected rainForecast: WritableSignal<SimulationParameter[]> = signal(Array.from({length: 12}, (_, i) => ({time: ((i+1)*5).toString(), rainAmount: 2, waterLevel: (i+1)*5})));
   protected rainForecastModal: WritableSignal<SimulationParameter[]> = signal(this.rainForecast());
 
   dataRainForecast: ChartData<'bar', SimulationParameter[]> = {
@@ -97,11 +94,13 @@ export class SimulationComponent {
     this.rainForecastModal.set(updated);
   };
 
-  updateLengthForecastModal(duration: number) {
+  updateLengthForecastModal() {
     const length = this.rainForecastModal().length;
+    const duration = this.durationForecast();
 
     if (length < duration) {
-      const newArray = Array.from({length: duration - length}, (_, i) => ({time: (i+1+length).toString(), rainAmount: 0, waterLevel: 0}));
+      const factor = parseInt(this.intervalForecast().split(' ')[0]);
+      const newArray = Array.from({length: duration - length}, (_, i) => ({time: ((i+1+length)*factor).toString(), rainAmount: 0, waterLevel: 0}));
       this.rainForecastModal.set(this.rainForecastModal().concat(newArray));
     }
 
@@ -109,7 +108,16 @@ export class SimulationComponent {
       const newArray = this.rainForecastModal().filter((_, i) => i < duration);
       this.rainForecastModal.set(newArray);
     }
-  }
+  };
+
+  updateIntervalForecastModal() {
+    const factor = parseInt(this.intervalForecast().split(' ')[0]);
+    const newArray = this.rainForecastModal().map((item, i) => {
+      item.time = ((i+1)*factor).toString();
+      return item;
+    });
+    this.rainForecastModal.set(newArray);
+  };
 
   copyForecast(copy: WritableSignal<SimulationParameter[]>, copied: WritableSignal<SimulationParameter[]>) {
     copy.set(copied().map(item => ({ ...item })));
@@ -121,5 +129,5 @@ export class SimulationComponent {
       return item;
     });
     this.rainForecastModal.set(newArray);
-  }
+  };
 }

@@ -16,7 +16,7 @@
         <input
           class="slider is-primary m-0 mx-4" style="width: 20rem;"
           step="1" min="0" max="100" value="{{waterLevelSlider()}}" type="range"
-          (input)="waterLevelSlider.set($any($event.target).value)"
+          (input)="waterLevelSlider.set($any($event.target).value); waterLevel.set($any($event.target).value)"
         />
         <div class="is-flex is-flex-direction-column is-justify-content-center">
           <p class="ml-4">{{waterLevelSlider()}} %</p>
@@ -50,12 +50,39 @@
             <div class="columns mt-4">
               <div class="column is-1"></div>
               <div class="column is-narrow">
+                <p><span translate>digitalTwin.label.simulationInterval</span>: </p>
+              </div>
+              <div class="column"></div>
+              <div class="column is-one-third">
+                <div class="dropdown is-hoverable">
+                  <div class="dropdown-trigger">
+                    <button class="button is-flex is-flex-direction-row is-justify-content-space-between" aria-haspopup="true" aria-controls="dropdown-menu" style="width: 8rem">
+                        <p>{{intervalForecast()}}</p>
+                        <ng-icon name="remixArrowDownSLine" size="1.5em"/>
+                    </button>
+                  </div>
+                  <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                    <div class="dropdown-content">
+                      <a class="dropdown-item" [class.is-active]="intervalForecast() === '5 min'" (click)="intervalForecast.set('5 min'); updateIntervalForecastModal()">5 min</a>
+                      <a class="dropdown-item" [class.is-active]="intervalForecast() === '15 min'" (click)="intervalForecast.set('15 min'); updateIntervalForecastModal()">15 min</a>
+                      <a class="dropdown-item" [class.is-active]="intervalForecast() === '30 min'" (click)="intervalForecast.set('30 min'); updateIntervalForecastModal()">30 min</a>
+                      <a class="dropdown-item" [class.is-active]="intervalForecast() === '1 h'" (click)="intervalForecast.set('1 h'); updateIntervalForecastModal()">1 h</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="column is-1"></div>
+            </div>
+
+            <div class="columns mt-4">
+              <div class="column is-1"></div>
+              <div class="column is-narrow">
                 <p><span translate>digitalTwin.label.simulationDuration</span>: </p>
               </div>
               <div class="column"></div>
               <div class="column is-one-third">
                 <input class="input is-rounded" type="number" min="6" max="48" [value]="durationForecast()"
-                      (input)="durationForecast.set($any($event.target).valueAsNumber)"/>
+                      (input)="durationForecast.set($any($event.target).valueAsNumber); updateLengthForecastModal()"/>
               </div>
               <div class="column is-1"></div>
             </div>
@@ -94,7 +121,7 @@
                 <ng-icon name="remixTimeLine" size="1.5em"/>
               </div>
               <div class="column is-narrow">
-                <p translate>digitalTwin.label.time</p>
+                <p><span translate>digitalTwin.label.time</span> ({{intervalForecast() === '1 h' ? 'h' : 'min'}}) </p>
               </div>
               <div class="column"></div>
               <div class="column is-narrow">
@@ -143,6 +170,10 @@
               x: {
                 grid: {
                   display: false,
+                },
+                title: {
+                  display: true,
+                  text: intervalForecast() === '1 h' ? 'h' : 'min',
                 },
               },
               y: {

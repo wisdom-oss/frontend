@@ -141,7 +141,6 @@ de = "Vorhersage übernehmen vom Zeitpunkt"
 en = "Retention volume"
 de = "Einstauvolumen"
 
-
 [label.roofSize]
 en = "Roof Size"
 de = "Dachgröße"
@@ -151,8 +150,12 @@ en = "Set starting water level"
 de = "Startwasserpegel einstellen"
 
 [label.simulationDuration]
-en = "Simulation duration in hours"
-de = "Simualtionsdauer in Stunden"
+en = "Simulation duration"
+de = "Simualtionsdauer"
+
+[label.simulationInterval]
+en = "Simulation interval"
+de = "Simualtionsintervall"
 
 [label.targetLevel]
 en = "Target Level"
