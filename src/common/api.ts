@@ -340,7 +340,7 @@ export namespace api {
     }
 
     toJSON(): Record<string, QueryParams.Value> {
-      return Object.fromEntries(Object.entries(this.map));
+      return Object.fromEntries(this.map.entries());
     }
   }
 
