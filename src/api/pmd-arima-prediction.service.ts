@@ -64,6 +64,7 @@ export class PmdArimaPredictionService extends api.service(URL) {
         time: dayjs(dt.time),
       })),
     });
+    let cache = dayjs.duration(7, "days");
     return Object.assign(
       (
         modelId: api.RequestSignal<ModelId>,
@@ -77,7 +78,7 @@ export class PmdArimaPredictionService extends api.service(URL) {
           validateRaw,
           parse,
           params: api.QueryParams.from(params ?? {}),
-          cache: dayjs.duration(7, "days"),
+          cache,
         }),
       {
         get: (
@@ -131,6 +132,24 @@ export class PmdArimaPredictionService extends api.service(URL) {
         ),
     });
   }
+
+  _fetchRecordedUsages = api.endpoint(
+    this.http,
+    (
+      meterId: api.RequestSignal<SmartMeterId>,
+      params?: api.RequestSignal<{
+        bucketSize?: Duration;
+        start?: Dayjs;
+        end?: Dayjs;
+      }>,
+    ) => ({
+      url: api.url`${URL}/meters/${meterId}/recorded-usages`,
+      validateRaw: typia.createValidate<Raw.DataPoint[]>(),
+      parse: dts => dts.map(dt => ({...dt, time: dayjs(dt.time)})),
+      params: api.QueryParams.from(params ?? {}),
+      cache: dayjs.duration(1, "day"),
+    }),
+  );
 
   fetchRecordedUsages(
     meterId: api.RequestSignal<SmartMeterId>,
@@ -332,5 +351,6 @@ export namespace PmdArimaPredictionService {
 
 import Self = PmdArimaPredictionService;
 import {typeUtils} from "../common/utils/type-utils";
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpContext} from "@angular/common/http";
 import {firstValueFrom} from "rxjs";
+import {httpContexts} from "../common/http-contexts";

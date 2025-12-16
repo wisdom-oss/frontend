@@ -1,5 +1,6 @@
 import {
   httpResource,
+  HttpClient,
   HttpStatusCode,
   HttpContext,
   HttpResourceOptions,
@@ -164,6 +165,10 @@ export namespace api {
    * It also enables the request to auto-update when the signal changes.
    */
   export type RequestSignal<T> = T | CoreSignal<T | undefined>;
+
+  function hasNoSignals<T>(components: RequestSignal<T>[]): components is T[] {
+    return components.every(component => !isSignal(component));
+  }
 
   /**
    * Ensures a {@link RequestSignal} is a signal.
@@ -1117,7 +1122,27 @@ export namespace api {
   > = ((...args: A) => Signal<T, D>) & RequestMethods<M, UnwrapArgs<A>, T>;
 
   // TODO: implement this as a proper function
-  // function endpoint() {}
+  export function endpoint<
+    TArgs extends RequestSignal<unknown>[],
+    TResult,
+    TRaw,
+    TDefault extends TResult | undefined = undefined,
+    // TMethod extends HttpMethod = "GET",
+  >(
+    http: HttpClient,
+    options: (...args: TArgs) => ResourceOptions<TResult, TRaw, TDefault>,
+  ): Endpoint<TArgs, TResult, TDefault, "GET"> {
+    let buildResource = (...args: TArgs) => resource(options(...args));
+    let get = (...args: UnwrapArgs<TArgs>) => {
+      let reqOptions = options(...(args as TArgs));
+      let url = isSignal(reqOptions.url) ? reqOptions.url() : reqOptions.url;
+      url = typia.assert<string>(url);
+      http.get(url);
+    };
+    return null as any;
+  }
+
+  type UrlParts = string | number | boolean | Id<string | number, any>;
 
   /**
    * Template literal tagging function for building URLs.

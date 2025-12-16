@@ -67,6 +67,11 @@ export class WaterDemandPrediction2Component {
   );
   protected meters = this.service.meters(this.meterIds);
 
+  protected _usages = {
+    historic: signals.map<MeterId, DataPoint[]>(),
+    prediction: signals.map<ModelId, Prediction>(),
+  } as const satisfies Record<Group, any>;
+
   // TODO: continue here to use multiple model ids in the query, so that having multiple is stateless
 
   protected modelId = this.queryParams.signal(
@@ -79,7 +84,7 @@ export class WaterDemandPrediction2Component {
   protected meter = this.service.meter(this.meterId);
 
   protected usages = {
-    historic: this.predictionService.fetchRecordedUsages(this.meterId, {
+    historic: this.predictionService._fetchRecordedUsages(this.meterId, {
       // bucketSize: dayjs.duration(1, "month"),
     }),
     prediction: this.predictionService.fetchPrediction(this.modelId),
