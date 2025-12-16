@@ -1,6 +1,6 @@
 // cspell:ignore pmdarima rmse
 
-import {Injectable} from "@angular/core";
+import {inject, Injectable} from "@angular/core";
 import dayjs, {Dayjs} from "dayjs";
 import {Duration} from "dayjs/plugin/duration";
 import typia, {tags} from "typia";
@@ -42,28 +42,61 @@ export class PmdArimaPredictionService extends api.service(URL) {
     startOfYear22: dayjs("2022-01-01"),
   } as const;
 
-  fetchPrediction(
-    modelId: api.RequestSignal<ModelId>,
-    params?: api.RequestSignal<{
-      forecastLength?: Duration;
-      interval?: Duration;
-    }>,
-  ): api.Signal<Self.Prediction> {
-    return api.resource({
-      url: api.url`${URL}/predict/${modelId}`,
-      validateRaw: typia.createValidate<Raw.Prediction>(),
-      parse: raw => ({
-        ...raw,
-        madeWithModel: ModelId.of(raw.madeWithModel),
-        datapoints: raw.datapoints.map(dt => ({
-          ...dt,
-          time: dayjs(dt.time),
-        })),
-      }),
-      params: api.QueryParams.from(params ?? {}),
-      cache: dayjs.duration(7, "days"),
+  private http = inject(HttpClient);
+
+  // TODO: implement this nicer using api.endpoint, when done
+  fetchPrediction: api.Endpoint<
+    [
+      api.RequestSignal<ModelId>,
+      api.RequestSignal<{
+        forecastLength?: Duration;
+        interval?: Duration;
+      }>?,
+    ],
+    Self.Prediction
+  > = (() => {
+    let validateRaw = typia.createValidate<Raw.Prediction>();
+    let parse = (raw: Raw.Prediction) => ({
+      ...raw,
+      madeWithModel: ModelId.of(raw.madeWithModel),
+      datapoints: raw.datapoints.map(dt => ({
+        ...dt,
+        time: dayjs(dt.time),
+      })),
     });
-  }
+    return Object.assign(
+      (
+        modelId: api.RequestSignal<ModelId>,
+        params?: api.RequestSignal<{
+          forecastLength?: Duration;
+          interval?: Duration;
+        }>,
+      ): api.Signal<Self.Prediction> =>
+        api.resource({
+          url: api.url`${URL}/predict/${modelId}`,
+          validateRaw,
+          parse,
+          params: api.QueryParams.from(params ?? {}),
+          cache: dayjs.duration(7, "days"),
+        }),
+      {
+        get: (
+          modelId: ModelId,
+          params?: {forecastLength?: Duration; interval?: Duration},
+        ): Promise<Self.Prediction> => {
+          let url = `${URL}/predict/${modelId}`;
+          let res = firstValueFrom(
+            this.http.get<unknown>(url, {
+              params: api.QueryParams.from(params ?? {}).toHttpParams(),
+            }),
+          );
+          return res
+            .then(res => typia.assert<Raw.Prediction>(res))
+            .then(raw => parse(raw));
+        },
+      },
+    );
+  })();
 
   fetchMeters(): api.Signal<Self.SmartMeter[]> {
     return api.resource({
@@ -299,3 +332,5 @@ export namespace PmdArimaPredictionService {
 
 import Self = PmdArimaPredictionService;
 import {typeUtils} from "../common/utils/type-utils";
+import {HttpClient} from "@angular/common/http";
+import {firstValueFrom} from "rxjs";
