@@ -229,6 +229,11 @@ export namespace api {
       | Id<string | number, any>;
   }
 
+  type FromQueryParams = Record<
+    string,
+    QueryParams.Value | QueryParams.Value[]
+  >;
+
   /**
    * Container type to hold query parameters.
    *
@@ -264,11 +269,15 @@ export namespace api {
      * @param params Raw query parameters or a signal maybe containing them.
      * @returns Query parameters or a signal maybe containing them.
      */
+    static from(params: FromQueryParams): QueryParams;
     static from(
-      params: RequestSignal<
-        Record<string, QueryParams.Value | QueryParams.Value[]>
-      >,
+      params: RequestSignal<FromQueryParams>,
+    ): RequestSignal<QueryParams>;
+    static from(
+      params: RequestSignal<FromQueryParams>,
     ): RequestSignal<QueryParams> {
+      // duplicate signature is necessary to expose broad signature as well as
+      // use it
       return map(params, params => new QueryParams(params));
     }
 
@@ -1081,6 +1090,34 @@ export namespace api {
 
     return socket;
   }
+
+  type UnwrapRequestSignal<T> = T extends RequestSignal<infer U> ? U : T;
+  type UnwrapArgs<Args extends readonly unknown[]> = {
+    [K in keyof Args]: UnwrapRequestSignal<Args[K]>;
+  };
+
+  type HttpMethod = Exclude<
+    ResourceOptions<unknown, unknown, unknown>["method"],
+    undefined
+  >;
+
+  type RequestMethods<
+    M extends HttpMethod,
+    A extends readonly unknown[],
+    T,
+  > = (M extends "GET" ? {get: (...args: A) => Promise<T>} : {}) &
+    (M extends "POST" ? {post: (...args: A) => Promise<T>} : {}) &
+    (M extends "PUT" ? {put: (...args: A) => Promise<T>} : {});
+
+  export type Endpoint<
+    A extends unknown[],
+    T,
+    D = undefined,
+    M extends HttpMethod = "GET",
+  > = ((...args: A) => Signal<T, D>) & RequestMethods<M, UnwrapArgs<A>, T>;
+
+  // TODO: implement this as a proper function
+  // function endpoint() {}
 
   /**
    * Template literal tagging function for building URLs.
