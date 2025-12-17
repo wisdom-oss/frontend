@@ -180,9 +180,12 @@ class EndpointBuilder<
       let url = isSignal(makeUrl) ? makeUrl() : makeUrl;
       url = typia.assert<string>(url);
 
+      let queryParams = this.options.params?.(...args as Args);
+      let params = queryParams?.toHttpParams();
+
       let method = this.options.method ?? "GET";
 
-      let res = http.request<unknown>(method, url);
+      let res = http.request<unknown>(method, url, {params});
       let first = await firstValueFrom(res);
 
       if (this.options.validateRaw && this.options.parse) {
@@ -211,5 +214,5 @@ type Endpoint<Args extends unknown[], Result, Raw> = ((
 let instance = endpoint()
   .url((string: string) => "abc")
   .validateRaw(typia.createValidate<string>())
-  // .parse(abc => abc)
+  .parse(abc => abc)
   .build();
