@@ -1,6 +1,7 @@
 <div>
   <model-view filename="RRB_Damme.glb" [cam]="{x: 0, y: 10, z: 50}" [isSimulation]="true" 
-              [waterLevel]="waterLevel" [simulationParameter]="rainForecast"/>
+              [waterLevel]="waterLevel" [simulationParameter]="rainForecast"
+              [volume]="volume" [catchmentArea]="catchmentArea" [pavedArea]="pavedArea" [unpavedArea]="unpavedArea"/>
   
   <div class="card my-4">
     <div class="card-content">
@@ -16,7 +17,7 @@
         <input
           class="slider is-primary m-0 mx-4" style="width: 20rem;"
           step="1" min="0" max="100" value="{{waterLevelSlider()}}" type="range"
-          (input)="waterLevelSlider.set($any($event.target).value); waterLevel.set($any($event.target).value)"
+          (input)="waterLevelSlider.set($any($event.target).value); waterLevel.set($any($event.target).valueAsNumber)"
         />
         <div class="is-flex is-flex-direction-column is-justify-content-center">
           <p class="ml-4">{{waterLevelSlider()}} %</p>
@@ -128,7 +129,7 @@
                 <ng-icon name="remixRainyLine" size="1.5em"/>
               </div>
               <div class="column is-narrow">
-                <p><span translate>digitalTwin.label.rainAmount</span> (mm) </p>
+                <p><span translate>digitalTwin.label.rainAmount</span> (mm/h) </p>
               </div>
               <div class="column is-1"></div>
             </div>
@@ -182,7 +183,7 @@
                 },
                 title: {
                   display: true,
-                  text: 'mm',
+                  text: 'mm/h',
                 },
                 beginAtZero: true,
                 suggestedMax: 25,

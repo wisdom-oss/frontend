@@ -18,7 +18,7 @@
               <ng-icon name="remixTimeLine" size="1.5em"/>
             </div>
             <div class="column">
-              <p><span translate>digitalTwin.label.time</span>: {{time()}} h</p>
+              <p><span translate>digitalTwin.label.time</span>: {{time()}} {{intervalForecast() === '1 h' ? 'h' : 'min'}}</p>
             </div>
           </div>
 
@@ -36,7 +36,7 @@
               <ng-icon name="remixContrastDrop2Line" size="1.5em"/>
             </div>
             <div class="column">
-              <p><span translate>digitalTwin.header.waterLevel</span>: {{waterLevel()}} %</p>
+              <p><span translate>digitalTwin.header.waterLevel</span>: {{waterLevel().toFixed(2)}} %</p>
             </div>
           </div>
 

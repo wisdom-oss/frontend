@@ -1,4 +1,4 @@
-import { Component, effect, signal, viewChild, WritableSignal } from '@angular/core';
+import { Component, effect, Input, signal, viewChild, WritableSignal } from '@angular/core';
 import { DrainageRule, DrainageRulesComponent } from "../../../common/drainage-rules/drainage-rules.component";
 import { signals } from '../../../../../common/signals';
 import { ModelViewComponent } from "../../../common/model-view/model-view.component";
@@ -42,6 +42,11 @@ export type SimulationIntervalOption= '5 min' | '15 min' | '30 min' | '1 h';
   ],
 })
 export class SimulationComponent {
+  @Input() volume: WritableSignal<number> = signal(100);
+  @Input() catchmentArea: WritableSignal<number> = signal(100);
+  @Input() pavedArea: WritableSignal<number> = signal(50);
+  @Input() unpavedArea: WritableSignal<number> = signal(50); 
+
   constructor() {
     effect(() => {
       const data = this.rainForecast();

@@ -5,7 +5,8 @@ import { gsap } from 'gsap';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import { TranslateDirective } from '@ngx-translate/core';
 import { remixCalendar2Line, remixContrastDrop2Line, remixRainyLine, remixTimeLine } from '@ng-icons/remixicon';
-import { SimulationParameter } from '../../rain-retention-basin/tabs/simulation/simulation.component';
+import { SimulationIntervalOption, SimulationParameter } from '../../rain-retention-basin/tabs/simulation/simulation.component';
+import { randInt } from 'three/src/math/MathUtils.js';
 
 @Component({
   selector: 'model-view',
@@ -27,8 +28,15 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() filename: string = '';
   @Input() cam: {x: number, y: number, z: number} = {x: 0, y: 0, z: 0};
   @Input() isSimulation: boolean = false;
+
   @Input() waterLevel: WritableSignal<number> = signal(20);
-  @Input() simulationParameter: Signal<SimulationParameter[]>  = signal([]);
+  @Input() simulationParameter: WritableSignal<SimulationParameter[]>  = signal([]);
+  @Input() intervalForecast: WritableSignal<SimulationIntervalOption> = signal('5 min');
+
+  @Input() volume: WritableSignal<number> = signal(100);
+  @Input() catchmentArea: WritableSignal<number> = signal(100);
+  @Input() pavedArea: WritableSignal<number> = signal(50);
+  @Input() unpavedArea: WritableSignal<number> = signal(50); 
 
   rendererContainer = viewChild<ElementRef<HTMLDivElement>>('rendererContainer');
   
@@ -168,6 +176,8 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   protected startWaterSimulation() {
+    this.computeSimulationParameter();
+
     let index = 0;
     
     const runStep = () => {
@@ -184,5 +194,19 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
     };
 
     runStep();
+  };
+
+  protected computeSimulationParameter() {
+    let currentLevel = this.waterLevel();
+    const timeFactor = this.intervalForecast() === '5 min' ? 1/12 :
+                       this.intervalForecast() === '15 min' ? 1/4 :
+                       this.intervalForecast() === '30 min' ? 1/2 : 1;
+
+    this.simulationParameter.set(this.simulationParameter().map(param => {
+      const waterAmount: number = (this.pavedArea() * 0.85 + this.pavedArea() * 0.05) * param.rainAmount * timeFactor * 10; // ("* 10000": ha => m²; "/ 1000": l => m³)
+      param.waterLevel = currentLevel + waterAmount / this.volume() * 100; 
+      currentLevel = param.waterLevel;
+      return param;
+    }));
   };
 }

@@ -38,10 +38,10 @@ export class RainRetentionBasinComponent {
   protected city: WritableSignal<string> = signal('Damme');
   protected name: WritableSignal<string> = signal('Zum Griechen');
 
-  protected volume: WritableSignal<number> = signal(100);
-  protected catchmentArea: WritableSignal<number> = signal(100);
-  protected pavedArea: WritableSignal<number> = signal(50);
-  protected unpavedArea: WritableSignal<number> = signal(50);  
+  protected volume: WritableSignal<number> = signal(14325);
+  protected catchmentArea: WritableSignal<number> = signal(92.29);
+  protected pavedArea: WritableSignal<number> = signal(38.34);
+  protected unpavedArea: WritableSignal<number> = signal(53.95);  
 
   setActiveTab(tab: 'overview' | 'history' | 'simulation'| 'control') {
     this.activeTab.set(tab);

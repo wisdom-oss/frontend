@@ -46,7 +46,7 @@
   }
 
   @if(activeTab() === 'simulation') {
-    <rrb-simulation/>
+    <rrb-simulation [volume]="volume" [catchmentArea]="catchmentArea" [pavedArea]="pavedArea" [unpavedArea]="unpavedArea"/>
   }
 
   @if(activeTab() === 'control') {
