@@ -6,7 +6,6 @@ import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import { TranslateDirective } from '@ngx-translate/core';
 import { remixCalendar2Line, remixContrastDrop2Line, remixRainyLine, remixTimeLine } from '@ng-icons/remixicon';
 import { SimulationIntervalOption, SimulationParameter } from '../../rain-retention-basin/tabs/simulation/simulation.component';
-import { randInt } from 'three/src/math/MathUtils.js';
 
 @Component({
   selector: 'model-view',
@@ -203,10 +202,24 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
                        this.intervalForecast() === '30 min' ? 1/2 : 1;
 
     this.simulationParameter.set(this.simulationParameter().map(param => {
-      const waterAmount: number = (this.pavedArea() * 0.85 + this.pavedArea() * 0.05) * param.rainAmount * timeFactor * 10; // ("* 10000": ha => m²; "/ 1000": l => m³)
-      param.waterLevel = currentLevel + waterAmount / this.volume() * 100; 
-      currentLevel = param.waterLevel;
+      const waterAmount: number = (this.pavedArea() * 0.85 + this.unpavedArea() * 0.05) * param.rainAmount * timeFactor * 10; // ("* 10000": ha => m²; "/ 1000": l => m³)
+
+      let outflow: number = 0;
+      outflow = this.computeOutflow(currentLevel);
+
+      currentLevel = currentLevel + (waterAmount - outflow) / this.volume() * 100; 
+      param.waterLevel = currentLevel > 0 ? currentLevel : 0;
       return param;
     }));
+  };
+
+  private computeOutflow(waterLevel: number): number {
+    if (waterLevel < 10) return 0;
+
+    const timeFactor = this.intervalForecast() === '5 min' ? 300 :
+                       this.intervalForecast() === '15 min' ? 900 :
+                       this.intervalForecast() === '30 min' ? 1800 : 3600;
+    
+    return 0.14 * timeFactor ; // (140  m³/s * time in s)
   };
 }
