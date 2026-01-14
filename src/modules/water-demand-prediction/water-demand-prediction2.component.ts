@@ -1,20 +1,12 @@
 import {CommonModule} from "@angular/common";
-import {
-  computed,
-  effect,
-  inject,
-  model,
-  untracked,
-  Component,
-  Signal,
-} from "@angular/core";
-import {provideIcons, NgIconComponent} from "@ng-icons/core";
+import {computed, effect, inject, Component, Signal} from "@angular/core";
+import {provideIcons} from "@ng-icons/core";
 import {
   remixArrowRightFill,
   remixLoader4Fill,
   remixResetRightLine,
 } from "@ng-icons/remixicon";
-import {BaseChartDirective} from "ng2-charts";
+import typia from "typia";
 
 import {WdpChartsViewComponent} from "./views/charts-view/charts-view.component";
 import {WdpNewModelViewComponent} from "./views/new-model-view/new-model-view.component";
@@ -29,14 +21,11 @@ import MeterId = PmdArimaPredictionService.SmartMeterId;
 
 import DataPoint = PmdArimaPredictionService.DataPoint;
 import Prediction = PmdArimaPredictionService.Prediction;
-import typia from "typia";
 
 type Group = "historic" | "prediction";
 
 @Component({
   imports: [
-    NgIconComponent,
-    BaseChartDirective,
     CommonModule,
     WdpChartsViewComponent,
     WdpNewModelViewComponent,
