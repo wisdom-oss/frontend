@@ -109,6 +109,7 @@ export class PmdArimaPredictionService extends api.service(URL) {
       validateRaw: typia.createValidate<Raw.SmartMeter[]>(),
       parse: meters =>
         meters.map(({name, id}) => ({name, id: SmartMeterId.of(id)})),
+      cache: dayjs.duration(4, "hours"),
     });
   }
 

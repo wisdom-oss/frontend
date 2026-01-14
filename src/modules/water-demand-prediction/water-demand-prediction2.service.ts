@@ -8,7 +8,6 @@ import {RgbaColor} from "../../common/utils/rgba-color";
 
 import ModelId = PmdArimaPredictionService.ModelId;
 import MeterId = PmdArimaPredictionService.SmartMeterId;
-import {compute} from "three/src/nodes/TSL.js";
 
 type DateTimeString = string & tags.Format<"date-time">;
 

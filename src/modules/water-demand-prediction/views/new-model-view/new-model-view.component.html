@@ -1,1 +1,72 @@
-<p>new-model-view works!</p>
+@let meters = this.meters();
+@let meterUsages = this.meterUsages();
+@let selectedMeter = this.selectedMeter();
+@let lang = this.lang();
+
+<div class="is-fullheight is-fullwidth box" style="overflow-y: auto">
+  @if (!selectedMeter) {
+    @let chartOptions =
+      {
+        plugins: {
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            callbacks: {
+              title: tooltipTitle(lang),
+              label: tooltipLabel,
+            },
+          },
+        },
+        scales: {
+          x: {
+            ticks: {
+              callback: xTicks(lang),
+            },
+          },
+          y: {
+            ticks: {
+              callback: yTicks,
+            },
+          },
+        },
+      };
+    <p class="title is-4">Create New Model: Select Smartmeter</p>
+    <div class="grid is-col-min-14">
+      @for (meter of meters; track meter.id; let last = $last) {
+        <div class="card is-flex is-flex-direction-column mb-0">
+          <div class="card-content">
+            <div class="content">
+              <p class="title is-4">{{ meter.name }}</p>
+              <p class="subtitle is-6">{{ meter.id }}</p>
+              @if (!(meter.description | empty)) {
+                <p>{{ meter.description }}</p>
+              }
+            </div>
+          </div>
+          <div class="card-image m-2">
+            @let usages = meterUsages.get(meter.id)! | async;
+            <canvas
+              baseChart
+              type="bar"
+              class="is-fullheight is-fullwidth"
+              [options]="chartOptions"
+              [datasets]="usages ? [usages] : []"
+            ></canvas>
+          </div>
+          <div class="is-flex-grow-1"></div>
+          <div class="card-content">
+            <div>
+              <button
+                class="button is-fullwidth"
+                (click)="this.selectedMeter.set(meter.id)"
+              >
+                Select
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

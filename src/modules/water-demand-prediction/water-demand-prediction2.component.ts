@@ -56,7 +56,8 @@ export class WaterDemandPrediction2Component {
   private queryParams = inject(QueryParamService);
 
   protected lang = signals.lang();
-  protected view = model(undefined as "charts" | "new" | "select" | undefined);
+  // TODO: set to `undefined` again, when new editor is done
+  protected view = model("new" as "charts" | "new" | "select" | undefined);
 
   protected modelIds = this.queryParams.signal("model", {
     ...ModelId.queryParamOpts(),
