@@ -69,7 +69,7 @@ export class WaterDemandPrediction2Component {
   );
   protected meters = this.service.meters(this.meterIds);
 
-  protected _usages = {
+  protected usages = {
     historic: signals.map<MeterId, DataPoint[]>(),
     prediction: signals.map<ModelId, Prediction>(),
   } as const satisfies Record<Group, any>;
@@ -77,31 +77,41 @@ export class WaterDemandPrediction2Component {
   private loadHistoricUsages = effect(() => {
     let meterIds = this.meterIds();
     for (let meterId of meterIds) {
-      if (this._usages.historic().has(meterId)) continue;
+      if (this.usages.historic().has(meterId)) continue;
       this.predictionService.fetchRecordedUsages
         .get(meterId)
-        .then(data => this._usages.historic.set(meterId, data));
+        .then(data => this.usages.historic.set(meterId, data));
     }
   });
 
   private loadPredictionUsages = effect(() => {
     let modelIds = this.modelIds();
     for (let modelId of modelIds) {
-      if (this._usages.prediction().has(modelId)) continue;
+      if (this.usages.prediction().has(modelId)) continue;
       this.predictionService.fetchPrediction
         .get(modelId)
-        .then(data => this._usages.prediction.set(modelId, data));
+        .then(data => this.usages.prediction.set(modelId, data));
     }
   });
 
   protected datapoints = {
-    historic: this._usages.historic satisfies Signal<Map<MeterId, DataPoint[]>>,
-    prediction: (() => {
-      let entries = this._usages.prediction.entries();
+    historic: (() => {
+      let entriesIter = this.usages.historic.entries();
+      let entriesArray = computed(() => Array.from(entriesIter()));
       return computed(() => {
-        let entriesIter = entries();
+        let meterIds = this.meterIds();
+        return new Map(entriesArray().filter(([key]) => meterIds.has(key)));
+      });
+    })() satisfies Signal<Map<MeterId, DataPoint[]>>,
+    prediction: (() => {
+      let entriesIter = this.usages.prediction.entries();
+      let entriesArray = computed(() => Array.from(entriesIter()));
+      return computed(() => {
+        let modelIds = this.modelIds();
         return new Map(
-          Array.from(entriesIter).map(([key, val]) => [key, val.datapoints]),
+          entriesArray()
+            .filter(([key]) => modelIds.includes(key))
+            .map(([key, val]) => [key, val.datapoints]),
         );
       });
     })() satisfies Signal<Map<ModelId, DataPoint[]>>,
@@ -126,5 +136,6 @@ export class WaterDemandPrediction2Component {
 
   protected clearChart() {
     this.modelIds.set([]);
+    this.view.set("select");
   }
 }
