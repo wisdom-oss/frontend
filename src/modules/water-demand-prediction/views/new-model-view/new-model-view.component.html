@@ -1,36 +1,41 @@
 @let meters = this.meters();
 @let meterUsages = this.meterUsages();
 @let selectedMeter = this.selectedMeter();
+@let selectedMeterId = this.selectedMeterId();
+@let selectedMeterData = this.selectedMeterData();
 @let lang = this.lang();
 
+@let chartOptions =
+  {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        callbacks: {
+          title: tooltipTitle(lang),
+          label: tooltipLabel,
+        },
+      },
+    },
+    scales: {
+      x: {
+        ticks: {
+          callback: xTicks(lang),
+        },
+      },
+      y: {
+        ticks: {
+          callback: yTicks,
+        },
+      },
+    },
+  };
+
 <div class="is-fullheight is-fullwidth box" style="overflow-y: auto">
-  @if (!selectedMeter) {
-    @let chartOptions =
-      {
-        plugins: {
-          legend: {
-            display: false,
-          },
-          tooltip: {
-            callbacks: {
-              title: tooltipTitle(lang),
-              label: tooltipLabel,
-            },
-          },
-        },
-        scales: {
-          x: {
-            ticks: {
-              callback: xTicks(lang),
-            },
-          },
-          y: {
-            ticks: {
-              callback: yTicks,
-            },
-          },
-        },
-      };
+  @if (!selectedMeterId) {
     <p class="title is-4">Create New Model: Select Smartmeter</p>
     <div class="grid is-col-min-14">
       @for (meter of meters; track meter.id; let last = $last) {
@@ -55,18 +60,91 @@
             ></canvas>
           </div>
           <div class="is-flex-grow-1"></div>
-          <div class="card-content">
-            <div>
-              <button
-                class="button is-fullwidth"
-                (click)="this.selectedMeter.set(meter.id)"
-              >
-                Select
-              </button>
-            </div>
+          <div class="card-footer">
+            <button
+              #button
+              (mouseover)="button.classList.add('has-text-primary')"
+              (mouseout)="button.classList.remove('has-text-primary')"
+              (click)="this.selectedMeterId.set(meter.id)"
+              class="card-footer-item"
+            >
+              <span class="has-text-weight-bold">Select</span>
+            </button>
           </div>
         </div>
       }
+    </div>
+  } @else {
+    <p class="title is-4">Create New Model: Select Options</p>
+    <div class="columns is-fullheight is-fullwidth">
+      <div class="column is-fullheight">
+        <div class="is-fullheight is-flex is-flex-direction-column">
+          <div class="is-flex is-justify-content-space-between">
+            <div>
+              <p class="title is-6">{{ selectedMeter?.name }}</p>
+              <p class="subtitle is-7">{{ selectedMeter?.id }}</p>
+            </div>
+            <div>
+              <button
+                class="button"
+                (click)="this.selectedMeterId.set(undefined)"
+              >
+                Change Smartmeter
+              </button>
+            </div>
+          </div>
+          <div class="is-flex-grow-1 m-5">
+            <div class="is-fullheight">
+              @let usages = meterUsages.get(selectedMeterId)! | async;
+              <canvas
+                baseChart
+                type="bar"
+                class="is-fullheight is-fullwidth"
+                [options]="chartOptions"
+                [datasets]="usages ? [usages] : []"
+              ></canvas>
+            </div>
+          </div>
+          @if (selectedMeter?.description) {
+            <div>
+              <p>{{ selectedMeter!.description }}</p>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="column">
+        <div>
+          <input
+            type="date"
+            #startPointInput
+            [min]="selectedMeterData?.[0]?.time?.format('YYYY-MM-DD')"
+            [max]="
+              selectedMeterData?.[selectedMeterData!.length - 1]?.time?.format(
+                'YYYY-MM-DD'
+              )
+            "
+            (input)="startPointChoice.set(dayjs(startPointInput.value))"
+          />
+        </div>
+
+        <div class="dropdown is-hoverable">
+          <div class="dropdown-trigger">
+            <button class="button">timeSpan</button>
+          </div>
+          <div class="dropdown-menu">
+            <div class="dropdown-content">
+              @for (option of timeSpanOptions; track option) {
+                <a class="dropdown-item" (click)="timeSpanChoice.set(option)">{{
+                  option.locale(lang).humanize()
+                }}</a>
+              }
+            </div>
+          </div>
+        </div>
+
+        <textarea #comment (input)="this.comment.set(comment.value)"></textarea>
+      </div>
     </div>
   }
 </div>
