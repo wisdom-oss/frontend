@@ -29,6 +29,7 @@ import MeterId = PmdArimaPredictionService.SmartMeterId;
 
 import DataPoint = PmdArimaPredictionService.DataPoint;
 import Prediction = PmdArimaPredictionService.Prediction;
+import typia from "typia";
 
 type Group = "historic" | "prediction";
 
@@ -56,8 +57,13 @@ export class WaterDemandPrediction2Component {
   private queryParams = inject(QueryParamService);
 
   protected lang = signals.lang();
-  // TODO: set to `undefined` again, when new editor is done
-  protected view = model("new" as "charts" | "new" | "select" | undefined);
+  protected view = this.queryParams.signal<"charts" | "select" | "new">(
+    "view",
+    {
+      serialize: view => view,
+      parse: raw => typia.assert<"charts" | "select" | "new">(raw),
+    },
+  );
 
   protected modelIds = this.queryParams.signal("model", {
     ...ModelId.queryParamOpts(),
