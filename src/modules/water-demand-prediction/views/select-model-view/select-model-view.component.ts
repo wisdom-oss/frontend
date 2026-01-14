@@ -23,4 +23,5 @@ export class WdpSelectModelViewComponent {
   protected lang = signals.lang();
 
   readonly modelId = output<ModelId>();
+  readonly newModel = output<void>();
 }
