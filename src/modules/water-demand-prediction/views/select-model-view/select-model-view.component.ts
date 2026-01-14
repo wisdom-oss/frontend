@@ -5,11 +5,18 @@ import {PmdArimaPredictionService} from "../../../../api/pmd-arima-prediction.se
 import {signals} from "../../../../common/signals";
 
 import ModelId = PmdArimaPredictionService.ModelId;
+import {NgIconComponent, provideIcons} from "@ng-icons/core";
+import {remixAddBoxFill} from "@ng-icons/remixicon";
 
 @Component({
   selector: "wdp-select-model-view",
-  imports: [],
+  imports: [NgIconComponent],
   templateUrl: "./select-model-view.component.html",
+  providers: [
+    provideIcons({
+      remixAddBoxFill,
+    }),
+  ],
 })
 export class WdpSelectModelViewComponent {
   protected service = inject(Service);

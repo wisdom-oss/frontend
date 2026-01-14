@@ -8,23 +8,11 @@
       </div>
     </div>
     <div class="level-right">
-      <!-- <div class="level-item">
-        <button
-          class="button"
-          (click)="modelsLoading.set(true); this.models.reload()"
-        >
-          <span class="icon" [class.is-spinning]="modelsLoading()">
-            <div>
-              <ng-icon name="remixResetRightLine"></ng-icon>
-            </div>
-          </span>
-        </button>
-      </div> -->
       <div class="level-item">
         <button class="button is-primary">
           <span>New Model</span>
           <span class="icon">
-            <!-- <div><ng-icon name="remixArrowRightFill"></ng-icon></div> -->
+            <ng-icon name="remixAddBoxFill"></ng-icon>
           </span>
         </button>
       </div>
@@ -74,9 +62,11 @@
               </tbody>
               @if (model?.comment) {
                 <tfoot>
-                  {{
-                    model?.comment
-                  }}
+                  <tr>
+                    <td colspan="2">
+                      {{ model?.comment }}
+                    </td>
+                  </tr>
                 </tfoot>
               }
             </table>
