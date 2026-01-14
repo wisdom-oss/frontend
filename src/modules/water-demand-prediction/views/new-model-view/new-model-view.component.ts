@@ -1,17 +1,15 @@
 import {AsyncPipe} from "@angular/common";
-import {computed, effect, inject, signal, Component} from "@angular/core";
+import {computed, effect, inject, Component} from "@angular/core";
 import {ChartDataset, TooltipItem, Scale} from "chart.js";
 import dayjs, {Dayjs} from "dayjs";
 import {Duration} from "dayjs/plugin/duration";
 import {BaseChartDirective} from "ng2-charts";
 
 import {PmdArimaPredictionService} from "../../../../api/pmd-arima-prediction.service";
-import {DropdownComponent} from "../../../../common/components/dropdown/dropdown.component";
 import {EmptyPipe} from "../../../../common/pipes/empty.pipe";
 import {QueryParamService} from "../../../../common/services/query-param.service";
 import {signals} from "../../../../common/signals";
 
-import ModelId = PmdArimaPredictionService.ModelId;
 import MeterId = PmdArimaPredictionService.SmartMeterId;
 import WeatherCapability = PmdArimaPredictionService.WeatherCapability;
 import {typeUtils} from "../../../../common/utils/type-utils";

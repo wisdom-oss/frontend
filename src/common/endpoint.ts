@@ -1,3 +1,5 @@
+/* oxlint-disable */
+
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {
   inject,

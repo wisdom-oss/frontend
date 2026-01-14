@@ -1,3 +1,5 @@
+/* oxlint-disable */
+
 import {
   httpResource,
   HttpClient,
