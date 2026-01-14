@@ -22,7 +22,12 @@
     @for (model of service.availableModels()?.values(); track model.id) {
       @let meter = service.availableMeters()?.get(model.meter);
       <div class="cell">
-        <div class="card">
+        <div
+          class="card"
+          [style.border]="
+            selectedModels().includes(model.id) ? '#0088AA solid 1px' : ''
+          "
+        >
           <div class="card-content">
             <table>
               <tbody>

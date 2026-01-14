@@ -138,11 +138,10 @@ export class WaterDemandPrediction2Component {
   protected addModelId(modelId: ModelId) {
     let modelIds = new Set(this.modelIds());
     modelIds.add(modelId);
-    this.modelIds.set(Array.from(modelIds));
+    this.modelIds.set(Array.from(modelIds)).then(() => this.view.set("charts"));
   }
 
   protected clearChart() {
-    this.modelIds.set([]);
-    this.view.set("select");
+    this.modelIds.set([]).then(() => this.view.set("select"));
   }
 }

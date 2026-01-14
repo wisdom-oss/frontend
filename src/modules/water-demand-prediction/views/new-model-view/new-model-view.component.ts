@@ -18,8 +18,9 @@ import MeterId = PmdArimaPredictionService.SmartMeterId;
 })
 export class WdpNewModelViewComponent {
   private predictionService = inject(PmdArimaPredictionService);
-
   protected lang = signals.lang();
+
+  // Select Meters View
 
   protected meters = this.predictionService.fetchMeters();
   protected meterUsages = computed(() => {
@@ -71,4 +72,8 @@ export class WdpNewModelViewComponent {
     let raw = item.raw as {x: string; y: number};
     return `~${Math.round(raw.y)} m³`;
   }
+
+  // Training Status View
+
+  // protected trainingStatus = this.predictionService.training.status();
 }

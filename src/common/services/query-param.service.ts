@@ -152,6 +152,9 @@ type QueryParamSignal<T> = Signal<T> & {
    *
    * This triggers a router navigation, so the signal value is not updated instantly.
    *
+   * @danger When using multiple query parameter signals, chain them together
+   * using `then` callbacks to avoid race conditions.
+   *
    * @param value New value to write to the query parameter.
    * @returns Promise that resolves to the result of the navigation.
    */

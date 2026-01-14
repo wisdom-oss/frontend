@@ -1,12 +1,12 @@
-import {inject, output, Component} from "@angular/core";
+import {inject, input, output, Component} from "@angular/core";
+import {provideIcons, NgIconComponent} from "@ng-icons/core";
+import {remixAddBoxFill} from "@ng-icons/remixicon";
 
 import {WaterDemandPrediction2Service as Service} from "../../water-demand-prediction2.service";
 import {PmdArimaPredictionService} from "../../../../api/pmd-arima-prediction.service";
 import {signals} from "../../../../common/signals";
 
 import ModelId = PmdArimaPredictionService.ModelId;
-import {NgIconComponent, provideIcons} from "@ng-icons/core";
-import {remixAddBoxFill} from "@ng-icons/remixicon";
 
 @Component({
   selector: "wdp-select-model-view",
@@ -21,6 +21,8 @@ import {remixAddBoxFill} from "@ng-icons/remixicon";
 export class WdpSelectModelViewComponent {
   protected service = inject(Service);
   protected lang = signals.lang();
+
+  readonly selectedModels = input<ModelId[]>([]);
 
   readonly modelId = output<ModelId>();
   readonly newModel = output<void>();

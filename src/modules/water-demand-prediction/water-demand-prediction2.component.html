@@ -3,8 +3,8 @@
 
 @if (view == "select" || (!view && !modelIds.length)) {
   <wdp-select-model-view
+    [selectedModels]="modelIds"
     (modelId)="addModelId($event)"
-    (modelId)="this.view.set('charts')"
     (newModel)="this.view.set('new')"
   ></wdp-select-model-view>
 }
