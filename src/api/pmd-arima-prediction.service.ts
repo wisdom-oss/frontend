@@ -89,6 +89,10 @@ export class PmdArimaPredictionService extends api.service(URL) {
           let res = firstValueFrom(
             this.http.get<unknown>(url, {
               params: api.QueryParams.from(params ?? {}).toHttpParams(),
+              context: new HttpContext().set(httpContexts.cache, [
+                JSON.stringify({url, params}),
+                cache,
+              ]),
             }),
           );
           return res
@@ -178,6 +182,10 @@ export class PmdArimaPredictionService extends api.service(URL) {
           let res = firstValueFrom(
             this.http.get<unknown>(url, {
               params: api.QueryParams.from(params ?? {}).toHttpParams(),
+              context: new HttpContext().set(httpContexts.cache, [
+                JSON.stringify({url, params}),
+                cache,
+              ]),
             }),
           );
           return res
