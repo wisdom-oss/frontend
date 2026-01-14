@@ -1122,6 +1122,7 @@ export namespace api {
   > = ((...args: A) => Signal<T, D>) & RequestMethods<M, UnwrapArgs<A>, T>;
 
   // TODO: implement this as a proper function
+  /** @deprecated in this current state */
   export function endpoint<
     TArgs extends RequestSignal<unknown>[],
     TResult,

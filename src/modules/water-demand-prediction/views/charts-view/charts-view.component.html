@@ -46,7 +46,7 @@
           <button
             class="button mb-4 is-primary has-tooltip-arrow has-tooltip-left"
             [translate-attr]="{attr: 'data-tooltip', key: 'add prediction'}"
-            (click)="changeModel.emit()"
+            (click)="addModel.emit()"
           >
             <span class="icon">
               <ng-icon name="remixAddLargeFill"></ng-icon>
@@ -55,7 +55,7 @@
           <button
             class="button mb-4 is-danger has-tooltip-arrow has-tooltip-left"
             [translate-attr]="{attr: 'data-tooltip', key: 'clear chart'}"
-            (click)="changeModel.emit()"
+            (click)="clearChart.emit()"
           >
             <span class="icon">
               <ng-icon name="remixCloseLargeFill"></ng-icon>

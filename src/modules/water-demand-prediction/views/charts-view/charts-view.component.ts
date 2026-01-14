@@ -32,7 +32,8 @@ export class WdpChartsViewComponent {
   readonly predictionLabels = input<Labels>();
   readonly predictionDatasets = input<Datasets>();
 
-  readonly changeModel = output();
+  readonly addModel = output();
+  readonly clearChart = output();
 
   protected scaleMin = computed(() => {
     let historic = this.historicDatasets();

@@ -3,6 +3,7 @@ import {
   computed,
   effect,
   inject,
+  model,
   untracked,
   Component,
   Signal,
@@ -55,6 +56,7 @@ export class WaterDemandPrediction2Component {
   private queryParams = inject(QueryParamService);
 
   protected lang = signals.lang();
+  protected view = model(undefined as "charts" | "new" | "select" | undefined);
 
   protected modelIds = this.queryParams.signal("model", {
     ...ModelId.queryParamOpts(),
@@ -72,33 +74,30 @@ export class WaterDemandPrediction2Component {
     prediction: signals.map<ModelId, Prediction>(),
   } as const satisfies Record<Group, any>;
 
-  // TODO: continue here to use multiple model ids in the query, so that having multiple is stateless
+  private loadHistoricUsages = effect(() => {
+    let meterIds = this.meterIds();
+    for (let meterId of meterIds) {
+      if (this._usages.historic().has(meterId)) continue;
+      this.predictionService.fetchRecordedUsages
+        .get(meterId)
+        .then(data => this._usages.historic.set(meterId, data));
+    }
+  });
 
-  protected modelId = this.queryParams.signal(
-    "modelId",
-    ModelId.queryParamOpts(),
-  );
-  protected model = this.service.model(this.modelId);
-
-  protected meterId = computed(() => this.model()?.meter);
-  protected meter = this.service.meter(this.meterId);
-
-  protected usages = {
-    historic: this.predictionService._fetchRecordedUsages(this.meterId, {
-      // bucketSize: dayjs.duration(1, "month"),
-    }),
-    prediction: this.predictionService.fetchPrediction(this.modelId),
-  } as const satisfies Record<Group, any>;
-
-  protected data = {
-    historic: signals.map<MeterId, DataPoint[]>(),
-    prediction: signals.map<ModelId, Prediction>(),
-  } as const satisfies Record<Group, any>;
+  private loadPredictionUsages = effect(() => {
+    let modelIds = this.modelIds();
+    for (let modelId of modelIds) {
+      if (this._usages.prediction().has(modelId)) continue;
+      this.predictionService.fetchPrediction
+        .get(modelId)
+        .then(data => this._usages.prediction.set(modelId, data));
+    }
+  });
 
   protected datapoints = {
-    historic: this.data.historic satisfies Signal<Map<MeterId, DataPoint[]>>,
+    historic: this._usages.historic satisfies Signal<Map<MeterId, DataPoint[]>>,
     prediction: (() => {
-      let entries = this.data.prediction.entries();
+      let entries = this._usages.prediction.entries();
       return computed(() => {
         let entriesIter = entries();
         return new Map(
@@ -106,20 +105,7 @@ export class WaterDemandPrediction2Component {
         );
       });
     })() satisfies Signal<Map<ModelId, DataPoint[]>>,
-  } as const;
-
-  private loadData = {
-    historic: effect(() => {
-      let id = untracked(this.meterId);
-      let data = this.usages.historic();
-      if (id && data) this.data.historic.set(id, data);
-    }),
-    prediction: effect(() => {
-      let id = untracked(this.modelId);
-      let data = this.usages.prediction();
-      if (id && data) this.data.prediction.set(id, data);
-    }),
-  } as const;
+  };
 
   protected labels = Object.map(this.datapoints, datapoints =>
     this.service.labels(computed(() => datapoints().values())),
@@ -131,4 +117,14 @@ export class WaterDemandPrediction2Component {
       computed(() => Object.fromEntries(datapoints())),
     ),
   );
+
+  protected addModelId(modelId: ModelId) {
+    let modelIds = new Set(this.modelIds());
+    modelIds.add(modelId);
+    this.modelIds.set(Array.from(modelIds));
+  }
+
+  protected clearChart() {
+    this.modelIds.set([]);
+  }
 }

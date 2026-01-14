@@ -133,40 +133,60 @@ export class PmdArimaPredictionService extends api.service(URL) {
     });
   }
 
-  _fetchRecordedUsages = api.endpoint(
-    this.http,
-    (
-      meterId: api.RequestSignal<SmartMeterId>,
-      params?: api.RequestSignal<{
+  // update here similarly
+  fetchRecordedUsages: api.Endpoint<
+    [
+      api.RequestSignal<SmartMeterId>,
+      api.RequestSignal<{
         bucketSize?: Duration;
         start?: Dayjs;
         end?: Dayjs;
-      }>,
-    ) => ({
-      url: api.url`${URL}/meters/${meterId}/recorded-usages`,
-      validateRaw: typia.createValidate<Raw.DataPoint[]>(),
-      parse: dts => dts.map(dt => ({...dt, time: dayjs(dt.time)})),
-      params: api.QueryParams.from(params ?? {}),
-      cache: dayjs.duration(1, "day"),
-    }),
-  );
-
-  fetchRecordedUsages(
-    meterId: api.RequestSignal<SmartMeterId>,
-    params?: api.RequestSignal<{
-      bucketSize?: Duration;
-      start?: Dayjs;
-      end?: Dayjs;
-    }>,
-  ): api.Signal<Self.DataPoint[]> {
-    return api.resource({
-      url: api.url`${URL}/meters/${meterId}/recorded-usages`,
-      validateRaw: typia.createValidate<Raw.DataPoint[]>(),
-      parse: dts => dts.map(dt => ({...dt, time: dayjs(dt.time)})),
-      params: api.QueryParams.from(params ?? {}),
-      cache: dayjs.duration(1, "day"),
-    });
-  }
+      }>?,
+    ],
+    Self.DataPoint[]
+  > = (() => {
+    let validateRaw = typia.createValidate<Raw.DataPoint[]>();
+    let parse = (dts: Raw.DataPoint[]) =>
+      dts.map(dt => ({...dt, time: dayjs(dt.time)}));
+    let cache = dayjs.duration(1, "day");
+    return Object.assign(
+      (
+        meterId: api.RequestSignal<SmartMeterId>,
+        params?: api.RequestSignal<{
+          bucketSize?: Duration;
+          start?: Dayjs;
+          end?: Dayjs;
+        }>,
+      ): api.Signal<Self.DataPoint[]> =>
+        api.resource({
+          url: api.url`${URL}/meters/${meterId}/recorded-usages`,
+          validateRaw,
+          parse,
+          params: api.QueryParams.from(params ?? {}),
+          cache,
+        }),
+      {
+        get: (
+          meterId: SmartMeterId,
+          params?: {
+            bucketSize?: Duration;
+            start?: Dayjs;
+            end?: Dayjs;
+          },
+        ): Promise<Self.DataPoint[]> => {
+          let url = `${URL}/meters/${meterId}/recorded-usages`;
+          let res = firstValueFrom(
+            this.http.get<unknown>(url, {
+              params: api.QueryParams.from(params ?? {}).toHttpParams(),
+            }),
+          );
+          return res
+            .then(res => typia.assert<Raw.DataPoint[]>(res))
+            .then(raw => parse(raw));
+        },
+      },
+    );
+  })();
 
   readonly training = {
     start: (

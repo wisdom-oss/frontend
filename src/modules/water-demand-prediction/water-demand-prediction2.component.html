@@ -1,16 +1,24 @@
-@let model = this.model();
-@if (!model) {
+@let view = this.view();
+@let modelIds = this.modelIds();
+
+@if (view == "select" || (!view && !modelIds.length)) {
   <wdp-select-model-view
-    (modelId)="this.modelId.set($event)"
+    (modelId)="addModelId($event)"
+    (modelId)="this.view.set('charts')"
   ></wdp-select-model-view>
-} @else {
+}
+
+@if (view == "new") {
+  <wdp-new-model-view></wdp-new-model-view>
+}
+
+@if (view == "charts" || (!view && modelIds.length)) {
   <wdp-charts-view
     [historicLabels]="labels.historic()"
     [historicDatasets]="datasets.historic()"
     [predictionLabels]="labels.prediction()"
     [predictionDatasets]="datasets.prediction()"
-    (changeModel)="this.modelId.set(undefined)"
+    (addModel)="this.view.set('select')"
+    (clearChart)="clearChart()"
   ></wdp-charts-view>
 }
-
-<!-- <wdp-new-model-view></wdp-new-model-view> -->

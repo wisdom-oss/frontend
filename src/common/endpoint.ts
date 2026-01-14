@@ -1,10 +1,16 @@
 import {HttpClient, HttpHeaders} from "@angular/common/http";
-import {isSignal, ValueEqualityFn, Injector, Signal, inject} from "@angular/core";
+import {
+  inject,
+  isSignal,
+  ValueEqualityFn,
+  Injector,
+  Signal,
+} from "@angular/core";
 import {Duration} from "dayjs/plugin/duration";
+import {firstValueFrom} from "rxjs";
 import typia from "typia";
 
 import {api} from "./api";
-import { firstValueFrom } from "rxjs";
 
 export type HttpMethod =
   | "GET"
