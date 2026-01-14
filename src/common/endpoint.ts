@@ -18,11 +18,6 @@ export type HttpMethod =
   | "CONNECT";
 
 export type RequestSignal<T> = T | Signal<T | undefined>;
-export type RequestSignals<T> = T extends readonly (infer U)[]
-  ? RequestSignal<U>[]
-  : T extends Record<PropertyKey, infer V>
-    ? {[K in keyof T]: RequestSignal<T[K]>}
-    : never;
 
 type UnwrapRequestSignal<T> = T extends RequestSignal<infer U> ? U : T;
 type UnwrapArgs<Args extends readonly unknown[]> = {
@@ -32,48 +27,11 @@ type UnwrapArgs<Args extends readonly unknown[]> = {
 export const NONE = Symbol("api.NONE");
 export type NONE = typeof NONE;
 
-export type EndpointSignal<T, D = undefined> = Signal<T | D>;
-
-// export type Endpoint<A extends unknown[], T, D> = (
-//   ...args: RequestSignals<A>
-// ) => EndpointSignal<T, D> & {send: (...args: A) => Promise<T>};
-
-type EndpointNecessaryOptions<TResult, TRaw = TResult> = {
-  url: string;
-} & (
-  | {
-      validateRaw: typia.IValidation<TRaw>;
-      parse: (value: TRaw) => TResult;
-    }
-  | {
-      validate: typia.IValidation<TResult>;
-    }
-);
-
-type EndpointCommonOptions = Partial<{
-  body: unknown;
-  params: api.QueryParams;
-  headers: HttpHeaders;
-}>;
-
-type EndpointStaticOptions = Partial<{
-  method: HttpMethod;
-  injector: Injector;
-  cache: Duration;
-}>;
-
 type EndpointStaticResourceOptions<TResult> = Partial<{
   defaultValue: NoInfer<TResult>;
   equal: ValueEqualityFn<NoInfer<TResult>>;
   debugName: string;
 }>;
-
-type MakeEndpointOptionsFn<A extends unknown[], TResult, TRaw> = (
-  ...args: RequestSignals<A>
-) => RequestSignals<EndpointNecessaryOptions<TResult, TRaw>> &
-  RequestSignals<EndpointCommonOptions> &
-  EndpointStaticOptions &
-  EndpointStaticResourceOptions<TResult>;
 
 export function endpoint(): EndpointBuilder<
   unknown[],
@@ -109,17 +67,26 @@ class EndpointBuilder<
     cache?: Duration;
 
     // optional data to send
-    params?: (...args: Args) => api.QueryParams;
+    body?: (...args: Args) => unknown;
+    params?: (...args: Args) => RequestSignal<api.QueryParams>;
+    headers?: (...args: Args) => RequestSignal<HttpHeaders>;
   }) {}
 
-  url<Args extends unknown[]>(this: EndpointBuilder<unknown[], Result, Raw, "needs url", ValidateState>, url: RequestSignal<string> | ((...args: Args) => RequestSignal<string>)): EndpointBuilder<Args, Result, Raw, "has url", ValidateState> {
+  url<Args extends unknown[]>(
+    this: EndpointBuilder<unknown[], Result, Raw, "needs url", ValidateState>, 
+    url: RequestSignal<string> | ((...args: Args) => RequestSignal<string>)
+  ): EndpointBuilder<Args, Result, Raw, "has url", ValidateState> {
+    this.assertNotASignal(url);
     let options = this.options as any;
     if (typeof url == "function" && !isSignal(url)) options.url = url;
     else options.url = () => url;
     return new EndpointBuilder(options);
   }
 
-  validate<Result>(this: EndpointBuilder<Args, unknown, unknown, UrlState, "needs validation">, validator: (result: unknown) => typia.IValidation<Result>): EndpointBuilder<Args, Result, Result, UrlState, "has validation"> {
+  validate<Result>(
+    this: EndpointBuilder<Args, unknown, unknown, UrlState, "needs validation">, 
+    validator: (result: unknown) => typia.IValidation<Result>
+  ): EndpointBuilder<Args, Result, Result, UrlState, "has validation"> {
     return new EndpointBuilder({
       ...this.options as any,
       validate: validator
@@ -128,7 +95,9 @@ class EndpointBuilder<
 
   validateRaw<Raw>(this: EndpointBuilder<Args, unknown, unknown, UrlState, "needs validation">, validator: (raw: unknown) => typia.IValidation<Raw>): EndpointBuilder<Args, unknown, Raw, UrlState, "validates raw">;
   validateRaw(this: EndpointBuilder<Args, Result, Raw, UrlState, "parses raw">, validator: (raw: unknown) => typia.IValidation<Raw>): EndpointBuilder<Args, Result, Raw, UrlState, "has validation">;
-  validateRaw(validator: (raw: unknown) => typia.IValidation<Raw>): EndpointBuilder<Args, any, Raw, UrlState, any> {
+  validateRaw(
+    validator: (raw: unknown) => typia.IValidation<Raw>
+  ): EndpointBuilder<Args, any, Raw, UrlState, any> {
     return new EndpointBuilder({
       ...this.options as any,
       validateRaw: validator
@@ -137,7 +106,9 @@ class EndpointBuilder<
 
   parse<Raw, Result>(this: EndpointBuilder<Args, unknown, unknown, UrlState, "needs validation">, parser: (raw: Raw) => Result): EndpointBuilder<Args, Result, Raw, UrlState, "parses raw">;
   parse<Raw, Result>(this: EndpointBuilder<Args, unknown, Raw, UrlState, "validates raw">, parser: (raw: Raw) => Result): EndpointBuilder<Args, Result, Raw, UrlState, "has validation">;
-  parse<Raw, Result>(parser: (raw: Raw) => Result): EndpointBuilder<Args, Result, Raw, UrlState, any> {
+  parse<Raw, Result>(
+    parser: (raw: Raw) => Result
+  ): EndpointBuilder<Args, Result, Raw, UrlState, any> {
     return new EndpointBuilder({
       ...this.options as any,
       parse: parser,
@@ -159,18 +130,34 @@ class EndpointBuilder<
     return this;
   }
 
-  params(params: api.QueryParams | ((...args: Args) => api.QueryParams)): this {
+  body(body: (...args: Args) => unknown): this {
+    this.assertNotASignal(body);
+    this.options.body = body;
+    return this;
+  }
+
+  params(params: api.QueryParams | ((...args: Args) => RequestSignal<api.QueryParams>)): this {
+    this.assertNotASignal(params);
     if (typeof params == "function") this.options.params = params;
     else this.options.params = () => params;
     return this;
   }
 
-  build(this: EndpointBuilder<Args, Result, Raw, "has url", "has validation">) {
-    // TODO: return built
+  headers(headers: HttpHeaders | ((...args: Args) => RequestSignal<HttpHeaders>)): this {
+    this.assertNotASignal(headers);
+    if (typeof headers == "function") this.options.headers = headers;
+    else this.options.headers = () => headers;
+    return this;
   }
 
-  private buildResource(): (...args: Args) => Signal<unknown> {
-    return null as any;
+  build(
+    this: EndpointBuilder<Args, Result, Raw, "has url", "has validation">
+  ): Endpoint<Args, Result, Raw> {
+    return Object.assign(this.buildResource(), {send: this.buildSender()})
+  }
+
+  private buildResource(): (...args: Args) => Signal<Result> {
+    throw new Error("not yet implemented");
   }
 
   private buildSender(): (...args: UnwrapArgs<Args>) => Promise<Result> {
@@ -180,12 +167,20 @@ class EndpointBuilder<
       let url = isSignal(makeUrl) ? makeUrl() : makeUrl;
       url = typia.assert<string>(url);
 
-      let queryParams = this.options.params?.(...args as Args);
+      let body = this.options.body?.(...args as Args);
+
+      let makeQueryParams = this.options.params?.(...args as Args);
+      let queryParams = makeQueryParams && 
+        isSignal(makeQueryParams) ? makeQueryParams() : makeQueryParams;
       let params = queryParams?.toHttpParams();
+
+      let makeHeaders = this.options.headers?.(...args as Args);
+      let headers = makeHeaders && 
+        isSignal(makeHeaders) ? makeHeaders() : makeHeaders;
 
       let method = this.options.method ?? "GET";
 
-      let res = http.request<unknown>(method, url, {params});
+      let res = http.request<unknown>(method, url, {body, params, headers});
       let first = await firstValueFrom(res);
 
       if (this.options.validateRaw && this.options.parse) {
@@ -205,11 +200,22 @@ class EndpointBuilder<
       throw new Error("invalid state");
     }
   }
+
+  assertNotASignal(value: unknown) {
+    if (isSignal(value)) throw new Error(
+      [
+        "Invalid usage: signal passed directly.",
+        "",
+        "Pass a function that returns a signal.",
+        "Functions are executed in a reactive context for resources."
+      ].join("\n")
+    );
+  }
 }
 
 type Endpoint<Args extends unknown[], Result, Raw> = ((
   ...args: Args
-) => Signal<Result>) & {send: (...args: Args) => Promise<Result>};
+) => Signal<Result>) & {send: (...args: UnwrapArgs<Args>) => Promise<Result>};
 
 let instance = endpoint()
   .url((string: string) => "abc")
