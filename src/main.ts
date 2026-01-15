@@ -8,8 +8,10 @@ import {bootstrapApplication} from "@angular/platform-browser";
 import {RouterOutlet} from "@angular/router";
 import {TranslateService} from "@ngx-translate/core";
 import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+import relativeTime from "dayjs/plugin/relativeTime";
 
-import {StorageService} from "./common/storage.service";
+import {StorageService} from "./common/services/storage.service";
 import durationExt from "./core/dayjs/duration-ext.plugin";
 import {wisdomAppConfig} from "./config";
 import {configureTranslations} from "./i18n";

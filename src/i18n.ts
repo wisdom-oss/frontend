@@ -1,7 +1,7 @@
 import {TranslationObject, TranslateService} from "@ngx-translate/core";
 
 import {asserts} from "./common/asserts";
-import {StorageService} from "./common/storage.service";
+import {StorageService} from "./common/services/storage.service";
 import core from "./core/i18n.toml";
 import beWaterSmart from "./modules/be-water-smart/i18n.toml";
 import growl from "./modules/growl/i18n.toml";
