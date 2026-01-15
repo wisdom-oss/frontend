@@ -15,6 +15,7 @@ import {
   LayerComponent,
   MapComponent,
   GeoJSONSourceComponent,
+  AttributionControlDirective,
   NavigationControlDirective,
 } from "@maplibre/ngx-maplibre-gl";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
@@ -40,6 +41,7 @@ import {WaterRightsService} from "../../../../api/water-rights.service";
 import colorful from "../../../../assets/map/styles/colorful.json";
 import {signals} from "../../../../common/signals";
 import {MapCursorDirective} from "../../../../common/directives/map-cursor.directive";
+import {RecreateOnDirective} from "../../../../common/directives/recreate-on.directive";
 import {SomePipe} from "../../../../common/pipes/some.pipe";
 
 type UsageLocations = FeatureCollection<
@@ -100,9 +102,11 @@ export class LandRecordPipe implements PipeTransform {
 
 @Component({
   imports: [
+    AttributionControlDirective,
     ControlComponent,
     GeoJSONSourceComponent,
     KeyValueFormatPipe,
+    LandRecordPipe,
     LayerComponent,
     MapComponent,
     MapCursorDirective,
@@ -110,10 +114,10 @@ export class LandRecordPipe implements PipeTransform {
     NgIconComponent,
     NgIf,
     RateFormatPipe,
+    RecreateOnDirective,
     SomePipe,
     TranslateDirective,
     TranslatePipe,
-    LandRecordPipe,
   ],
   templateUrl: "./detail-view.component.html",
   providers: [
@@ -141,6 +145,14 @@ export class DetailViewComponent {
     hover: WritableSignal<undefined | number>,
   };
 
+  protected attribution = computed(() => {
+    let usageLocations = this.mapData.usageLocations();
+    if (!usageLocations) return;
+    let {attribution, attributionURL} = usageLocations;
+    if (!attributionURL) return attribution;
+    return `<a href="${attributionURL}" target="_blank">${attribution}</a>`;
+  });
+
   // prettier-ignore
   private asT<T>(value: T): T { return value }
   protected asTable = this.asT<[string, undefined | null | string][]>;
@@ -165,7 +177,9 @@ export class DetailViewComponent {
     this.mapData = {
       style: colorful as any as StyleSpecification,
       usageLocations,
-      fitBounds: DetailViewComponent.buildFitBounds(usageLocations),
+      fitBounds: DetailViewComponent.buildFitBounds(
+        computed(() => usageLocations()?.data),
+      ),
       hover: signal(undefined),
     };
   }
@@ -173,25 +187,34 @@ export class DetailViewComponent {
   private static buildUsageLocations(
     geo: GeoDataService,
     dataSignal: DetailViewComponent["data"],
-  ): Signal<undefined | UsageLocations> {
+  ): Signal<
+    | undefined
+    | {attribution?: string; attributionURL?: string; data: UsageLocations}
+  > {
     let allUsageLocations = signals.mapTo(
       geo.fetchLayerContents(
         "water_right_usage_locations",
         undefined,
         dayjs.duration(1, "day"),
       ),
-      locations => ({
-        type: "FeatureCollection",
-        features: (locations?.data ?? []).map(location => ({
-          type: "Feature" as const,
-          id: location.id,
-          geometry: location.geometry as Point,
-          properties: {
+      contents => ({
+        attribution: contents?.attribution,
+        attributionURL: contents?.attributionURL,
+        data: {
+          type: "FeatureCollection",
+          features: (contents?.data ?? []).map(location => ({
+            type: "Feature" as const,
             id: location.id,
-            name: location.name as string,
-            waterRight: location.additionalProperties!["waterRight"]! as number,
-          },
-        })),
+            geometry: location.geometry as Point,
+            properties: {
+              id: location.id,
+              name: location.name as string,
+              waterRight: location.additionalProperties![
+                "waterRight"
+              ]! as number,
+            },
+          })),
+        },
       }),
     );
 
@@ -203,10 +226,14 @@ export class DetailViewComponent {
       let usageLocationIds = data.usageLocations.map(({id}) => id);
 
       return {
-        type: "FeatureCollection",
-        features: usageLocations.features.filter(({properties: {id}}) =>
-          usageLocationIds.includes(id),
-        ),
+        attribution: usageLocations.attribution ?? undefined,
+        attributionURL: usageLocations.attributionURL ?? undefined,
+        data: {
+          type: "FeatureCollection",
+          features: usageLocations.data.features.filter(({properties: {id}}) =>
+            usageLocationIds.includes(id),
+          ),
+        },
       };
     });
   }

@@ -47,11 +47,13 @@
           [showCompass]="false"
           position="top-left"
         ></mgl-control>
+        @let attribution = this.attribution();
         <mgl-control
+          *recreateOn="attribution"
           mglAttribution
           position="bottom-right"
           [compact]="true"
-          [customAttribution]="[attribution()]"
+          [customAttribution]="attribution"
         ></mgl-control>
         <!-- using ng-containers we can ensure this ordering -->
         <ng-container>
@@ -113,9 +115,12 @@
       <ng-container sources>
         <mgl-geojson-source
           id="groundwater-bodies-source"
-          [data]="groundwaterBodies"
+          [data]="groundwaterBodies.data"
         ></mgl-geojson-source>
-        <mgl-geojson-source id="nds-municipals-source" [data]="ndsMunicipals">
+        <mgl-geojson-source
+          id="nds-municipals-source"
+          [data]="ndsMunicipals.data"
+        >
         </mgl-geojson-source>
         <mgl-geojson-source
           id="groundwater-measurement-stations-source"
@@ -123,7 +128,7 @@
         ></mgl-geojson-source>
         <mgl-geojson-source
           id="water-right-usage-locations-source"
-          [data]="waterRightUsageLocations"
+          [data]="waterRightUsageLocations.data"
           [cluster]="true"
           [clusterMinPoints]="10"
           [clusterRadius]="60"
@@ -132,7 +137,7 @@
         </mgl-geojson-source>
         <mgl-geojson-source
           id="old-water-right-usage-locations-source"
-          [data]="oldWaterRightUsageLocations"
+          [data]="oldWaterRightUsageLocations.data"
           [cluster]="true"
           [clusterMinPoints]="10"
           [clusterRadius]="60"
@@ -152,7 +157,7 @@
       <ng-container layers *ngIf="selectedLayersUpdate()">
         <ng-container groundwater-bodies>
           @if (
-            groundwaterBodies.features.length &&
+            groundwaterBodies.data.features.length &&
             selectedLayers.groundwaterBodies()
           ) {
             <mgl-layer
@@ -191,7 +196,7 @@
         </ng-container>
         <ng-container nds-municipals>
           @if (
-            ndsMunicipals.features.length && selectedLayers.ndsMunicipals()
+            ndsMunicipals.data.features.length && selectedLayers.ndsMunicipals()
           ) {
             <mgl-layer
               id="nds-municipals-layer-fill"
@@ -278,7 +283,7 @@
                 : selectedLayers.oldWaterRightUsageLocations;
             @let prefix = current ? "" : "old-";
             <ng-container water-right-usage-locations>
-              @if (locations.features.length && selected()) {
+              @if (locations.data.features.length && selected()) {
                 <mgl-layer
                   [id]="prefix + 'water-right-usage-locations-layer-symbol'"
                   type="symbol"

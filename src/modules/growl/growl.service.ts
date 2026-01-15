@@ -46,6 +46,8 @@ type MeasurementClassifications = GrowlService.MeasurementClassifications;
 type MeasurementClassificationCount =
   GrowlService.MeasurementClassificationCount;
 
+type Attributed<T> = {attribution?: string; attributionURL?: string; data: T};
+
 @Injectable({
   providedIn: "root",
 })
@@ -54,11 +56,11 @@ export class GrowlService {
 
   // prettier-ignore
   readonly data = {
-    groundwaterBodies: computed(() => this.geo.groundwaterBodies())                           as Signal<GroundwaterBodies>,
+    groundwaterBodies: computed(() => this.geo.groundwaterBodies())                           as Signal<Attributed<GroundwaterBodies>>,
     groundwaterMeasurementStations: computed(() => this.applyMeasurementDataToStations())     as Signal<GroundwaterMeasurementStations>,
-    ndsMunicipals: computed(() => this.geo.ndsMunicipals())                                   as Signal<NdsMunicipals>,
-    waterRightUsageLocations: computed(() => this.geo.waterRightUsageLocations())             as Signal<WaterRightUsageLocations>,
-    oldWaterRightUsageLocations: computed(() => this.geo.oldWaterRightUsageLocations())       as Signal<WaterRightUsageLocations>,
+    ndsMunicipals: computed(() => this.geo.ndsMunicipals())                                   as Signal<Attributed<NdsMunicipals>>,
+    waterRightUsageLocations: computed(() => this.geo.waterRightUsageLocations())             as Signal<Attributed<WaterRightUsageLocations>>,
+    oldWaterRightUsageLocations: computed(() => this.geo.oldWaterRightUsageLocations())       as Signal<Attributed<WaterRightUsageLocations>>,
 
     measurementClassificationCount: computed(() => this.calcMeasurementClassificationCount()) as Signal<MeasurementClassificationCount>,
     measurementsDate: computed(() => this.gl.lastWeek[this.selectMeasurementsDay()][0])       as Signal<Dayjs>,
@@ -66,11 +68,11 @@ export class GrowlService {
 
   private geo: {
     service: GeoDataService;
-    groundwaterMeasurementStations: Signal<Points>;
-    groundwaterBodies: Signal<MultiPolygons>;
-    ndsMunicipals: Signal<MultiPolygons>;
-    waterRightUsageLocations: Signal<Points>;
-    oldWaterRightUsageLocations: Signal<Points>;
+    groundwaterMeasurementStations: Signal<Attributed<Points>>;
+    groundwaterBodies: Signal<Attributed<MultiPolygons>>;
+    ndsMunicipals: Signal<Attributed<MultiPolygons>>;
+    waterRightUsageLocations: Signal<Attributed<Points>>;
+    oldWaterRightUsageLocations: Signal<Attributed<Points>>;
   };
 
   private gl: {
@@ -142,24 +144,28 @@ export class GrowlService {
     layerName: string,
     type: G["type"],
     cacheTtl: Duration,
-  ): Signal<FeatureCollection<G, GeoProperties>> {
+  ): Signal<Attributed<FeatureCollection<G, GeoProperties>>> {
     return signals.mapTo(
       service.fetchLayerContents(layerName, undefined, cacheTtl),
       contents => ({
-        type: "FeatureCollection",
-        features: (contents?.data ?? [])
-          .filter(({geometry, ...content}) => {
-            let isExpectedType = geometry.type === type;
-            let msg = `expected "${type}, got "${geometry.type}"`;
-            if (!isExpectedType) console.warn(msg, content);
-            return isExpectedType;
-          })
-          .map(({geometry, id, name, key, additionalProperties}) => ({
-            type: "Feature",
-            geometry: geometry as G,
-            id,
-            properties: {name, key, ...additionalProperties},
-          })),
+        attribution: contents?.attribution ?? undefined,
+        attributionURL: contents?.attributionURL ?? undefined,
+        data: {
+          type: "FeatureCollection",
+          features: (contents?.data ?? [])
+            .filter(({geometry, ...content}) => {
+              let isExpectedType = geometry.type === type;
+              let msg = `expected "${type}, got "${geometry.type}"`;
+              if (!isExpectedType) console.warn(msg, content);
+              return isExpectedType;
+            })
+            .map(({geometry, id, name, key, additionalProperties}) => ({
+              type: "Feature",
+              geometry: geometry as G,
+              id,
+              properties: {name, key, ...additionalProperties},
+            })),
+        },
       }),
     );
   }
@@ -220,7 +226,7 @@ export class GrowlService {
 
     return {
       type: "FeatureCollection",
-      features: stations.features.map(station => {
+      features: stations.data.features.map(station => {
         let measurement = measurements[station.properties.key] ?? {};
         return {
           type: "Feature" as const,

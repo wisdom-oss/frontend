@@ -1,6 +1,7 @@
 import {TranslationObject, TranslateService} from "@ngx-translate/core";
 
 import {asserts} from "./common/asserts";
+import {StorageService} from "./common/storage.service";
 import core from "./core/i18n.toml";
 import beWaterSmart from "./modules/be-water-smart/i18n.toml";
 import growl from "./modules/growl/i18n.toml";
@@ -24,8 +25,13 @@ const modules: NestedStringRecord = {
   "weather-data": weatherData,
 };
 
-export function configureTranslations(service: TranslateService) {
-  let fallbackLanguage = service.getBrowserLang() ?? "en";
+export function configureTranslations(
+  service: TranslateService,
+  storage: StorageService,
+) {
+  let storages = storage.instance(TranslateService);
+  let fallbackLanguage =
+    storages.local.get("lang") ?? service.getBrowserLang() ?? "en";
   const transformed: NestedStringRecord = {};
 
   function traverse(record: object, path: string[] = []) {
@@ -55,6 +61,7 @@ export function configureTranslations(service: TranslateService) {
 
   service.setFallbackLang(fallbackLanguage);
   service.use(fallbackLanguage);
+  service.onLangChange.subscribe(({lang}) => storages.local.set("lang", lang));
 }
 
 type NestedStringRecord = Record<

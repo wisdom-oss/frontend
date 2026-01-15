@@ -11,6 +11,7 @@
       [center]="{lat: 52.8, lon: 9.2}"
       [cursor]="clusterHoverId() || hover()?.waterRight ? 'pointer' : 'grab'"
       [fitBounds]="$any(fitBounds())"
+      [attributionControl]="false"
       (click)="clusterHoverId() && fitBounds.set(outlineSource.polygon().bbox)"
       (click)="hover()?.waterRight && openDetails(hover()!.waterRight!)"
     >
@@ -23,12 +24,20 @@
             translatePrefix="water-rights.legal-department."
           ></map-layer-selection-control>
         </mgl-control>
+        @let attribution = this.attribution();
+        <mgl-control
+          *recreateOn="attribution"
+          mglAttribution
+          position="bottom-right"
+          [compact]="true"
+          [customAttribution]="attribution"
+        ></mgl-control>
       </ng-container>
       <ng-container sources>
         <mgl-geojson-source
           id="water-rights-source"
           [data]="
-            filteredUsageLocations() ?? {
+            filteredUsageLocations()?.data ?? {
               type: 'FeatureCollection',
               features: [],
             }

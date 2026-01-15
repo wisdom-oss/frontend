@@ -1,5 +1,5 @@
 import {HttpParams} from "@angular/common/http";
-import {computed, Injectable} from "@angular/core";
+import {Injectable} from "@angular/core";
 import dayjs, {Dayjs} from "dayjs";
 import {FeatureCollection, Point} from "geojson";
 import typia from "typia";
@@ -40,20 +40,18 @@ export class DwdService extends api.service(URL) {
         cache: this.cacheTtl,
       }),
 
-    fetchData: (parameters: {
-      stationId: api.RequestSignal<string>;
-      dataType: api.RequestSignal<string>;
-      granularity: api.RequestSignal<string>;
-      from?: api.RequestSignal<Dayjs | undefined>;
-      until?: api.RequestSignal<Dayjs | undefined>;
-    }): api.Signal<Self.V1.Data> => {
-      let {stationId, dataType, granularity} = parameters;
-      let url = api.url`${URL}/v1/${stationId}/${dataType}/${granularity}`;
-      let params = computed(() => {
+    fetchData: (
+      parameters: api.RequestSignal<Self.Params.V1.Data>,
+    ): api.Signal<Self.V1.Data> => {
+      let url = api.map(
+        parameters,
+        ({stationId, dataType, granularity}) =>
+          `${URL}/v1/${stationId}/${dataType}/${granularity}`,
+      );
+
+      let params = api.map(parameters, ({from, until}) => {
         let params = new HttpParams();
-        let from = api.toSignal(parameters.from)();
         if (from) params = params.set("from", from.unix());
-        let until = api.toSignal(parameters.until)();
         if (until) params = params.set("until", until.unix());
         return params;
       });
@@ -69,6 +67,18 @@ export class DwdService extends api.service(URL) {
 }
 
 export namespace DwdService {
+  export namespace Params {
+    export namespace V1 {
+      export type Data = {
+        stationId: string;
+        dataType: string;
+        granularity: string;
+        from?: Dayjs;
+        until?: Dayjs;
+      };
+    }
+  }
+
   export namespace V1 {
     export type Station = {
       id: string;

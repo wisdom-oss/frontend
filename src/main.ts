@@ -9,6 +9,8 @@ import {RouterOutlet} from "@angular/router";
 import {TranslateService} from "@ngx-translate/core";
 import dayjs from "dayjs";
 
+import {StorageService} from "./common/storage.service";
+import durationExt from "./core/dayjs/duration-ext.plugin";
 import {wisdomAppConfig} from "./config";
 import {configureTranslations} from "./i18n";
 
@@ -20,8 +22,11 @@ import "dayjs/locale/de";
   template: "<router-outlet></router-outlet>",
 })
 export class AppComponent {
-  constructor(translate: TranslateService) {
-    configureTranslations(translate);
+  constructor(translate: TranslateService, storage: StorageService) {
+    dayjs.extend(duration);
+    dayjs.extend(relativeTime);
+    dayjs.extend(durationExt);
+    configureTranslations(translate, storage);
     translate.onLangChange.subscribe(({lang}) => dayjs.locale(lang));
     registerLocaleData(localeDe, "de", localeDeExtra);
   }

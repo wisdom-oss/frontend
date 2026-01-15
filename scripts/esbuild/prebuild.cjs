@@ -4,6 +4,8 @@ const {readFile, writeFile, mkdir} = require("fs/promises");
 const toml = require("smol-toml");
 const xml = require("fast-xml-parser");
 const sharp = require("sharp");
+const {exec} = require("child_process");
+const {promisify} = require("util");
 
 /**
  * An esbuild plugin that executes prebuild operations.
@@ -24,12 +26,18 @@ function prebuildPlugin(_options = {}) {
       await Promise.all([
         buildNlwknMeasurementClassificationColorSvgs(),
         extractRemixicons().then(buildSpritesheets),
+        storeGitCommitSHA(),
       ]);
     },
   };
 }
 
-module.exports = prebuildPlugin;
+module.exports = Object.assign(prebuildPlugin, {
+  buildNlwknMeasurementClassificationColorSvgs,
+  extractRemixicons,
+  buildSpritesheets,
+  storeGitCommitSHA,
+});
 
 // ------------------------------------
 // Prebuild Subroutines
@@ -129,6 +137,17 @@ async function buildSpritesheets() {
     console.error(e);
     throw e;
   }
+}
+
+/** Stores the current git commit sha in `src/assets/generated/revision.txt`. */
+async function storeGitCommitSHA() {
+  let sha = process.env.GIT_COMMIT_SHA?.trim();
+  if (!sha) {
+    const execAsync = promisify(exec);
+    await execAsync("git rev-parse HEAD").then(({stdout}) => (sha = stdout));
+  }
+
+  await writeFile("src/assets/generated/revision.txt", sha.trim());
 }
 
 // ------------------------------------
