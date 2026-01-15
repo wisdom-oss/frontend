@@ -20,7 +20,6 @@ import {GeoDataService} from "./api/geo-data.service";
 import {WaterRightsService} from "./api/water-rights.service";
 import {UsageForecastsService} from "./api/usage-forecasts.service";
 import {BeWaterSmartService} from "./api/be-water-smart.service";
-import {WaterDemandPredictionService} from "./api/water-demand-prediction.service";
 import {PmdArimaPredictionService} from "./api/pmd-arima-prediction.service";
 import {extraTags} from "./common/utils/extra-tags";
 import {api} from "./common/api";
