@@ -189,12 +189,6 @@ export function sidebar(): readonly SidebarEntry[] {
         },
         {
           module: "core.sidebar.category.water-demand-prediction",
-          icon: {remixBookLine},
-          link: "/oowv/water-demand-prediction",
-          services: {WaterDemandPredictionService},
-        },
-        {
-          module: "core.sidebar.category.water-demand-prediction",
           icon: {remixNumbersFill},
           link: "/oowv/water-demand-prediction2",
           services: {PmdArimaPredictionService},
