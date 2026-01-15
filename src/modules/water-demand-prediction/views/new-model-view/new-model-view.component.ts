@@ -135,12 +135,11 @@ export class WdpNewModelViewComponent {
 
   protected commentPlaceholder = computed(() => {
     let template =
-      "Model trained on ${name} (${id}) starting at ${startPoint} for ${timeSpan}";
+      "Model trained on ${name} (${id}) starting at ${startPoint} for ${timeSpan}.";
 
     let meter = this.selectedMeter();
     let startPoint = this.startPointChoice();
     let timeSpan = this.timeSpanChoice();
-    console.log({meter, startPoint, timeSpan});
     if (!meter || !startPoint || !timeSpan) return undefined;
     return template
       .replace("${name}", meter.name)
@@ -150,6 +149,22 @@ export class WdpNewModelViewComponent {
   });
   protected comment = signals.maybe<string>();
   _comment = effect(() => console.log(this.comment()));
+
+  protected trainingParams = computed(() => {
+    let startPoint = this.startPointChoice();
+    let timeSpan = this.timeSpanChoice();
+    let comment = this.comment() || this.commentPlaceholder();
+    console.log({startPoint, timeSpan, comment});
+    if (!startPoint || !timeSpan || !comment) return undefined;
+    return {startPoint, timeSpan, comment};
+  });
+  _trainingParams = effect(() => console.log(!this.trainingParams()));
+
+  protected startTrainingTrigger = signals.trigger();
+  _startTrainingTrigger = effect(() => {
+    this.startTrainingTrigger();
+    console.log("they clicked");
+  });
 
   // protected trainingStatus = this.predictionService.training.status();
 }

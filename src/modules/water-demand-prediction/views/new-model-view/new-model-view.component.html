@@ -154,15 +154,21 @@
             <label class="label">Comment</label>
             <div class="control">
               <textarea
+                #comment
                 class="textarea"
                 [placeholder]="commentPlaceholder() ?? ''"
+                (input)="this.comment.set(comment.value)"
               ></textarea>
             </div>
           </div>
 
           <div class="field">
             <div class="control">
-              <button class="button is-fullwidth is-primary">
+              <button
+                class="button is-fullwidth is-primary"
+                [disabled]="!selectedMeterId || !this.trainingParams()"
+                (click)="startTrainingTrigger.trigger()"
+              >
                 Start Training
               </button>
             </div>
