@@ -1,5 +1,5 @@
 import {AsyncPipe} from "@angular/common";
-import {computed, effect, inject, Component} from "@angular/core";
+import {computed, effect, inject, untracked, Component} from "@angular/core";
 import {ChartDataset, TooltipItem, Scale} from "chart.js";
 import dayjs, {Dayjs} from "dayjs";
 import {Duration} from "dayjs/plugin/duration";
@@ -13,10 +13,11 @@ import {signals} from "../../../../common/signals";
 import MeterId = PmdArimaPredictionService.SmartMeterId;
 import WeatherCapability = PmdArimaPredictionService.WeatherCapability;
 import {typeUtils} from "../../../../common/utils/type-utils";
+import {FormControlDirective, ReactiveFormsModule} from "@angular/forms";
 
 @Component({
   selector: "wdp-new-model-view",
-  imports: [BaseChartDirective, EmptyPipe, AsyncPipe],
+  imports: [BaseChartDirective, EmptyPipe, AsyncPipe, ReactiveFormsModule],
   templateUrl: "./new-model-view.component.html",
 })
 export class WdpNewModelViewComponent {
@@ -71,10 +72,6 @@ export class WdpNewModelViewComponent {
     };
   }
 
-  protected yTicks(this: Scale, value: any): string {
-    return `${value} m³`;
-  }
-
   protected tooltipTitle(
     lang: "en" | "de",
   ): (items: TooltipItem<"bar">[]) => string {
@@ -91,6 +88,14 @@ export class WdpNewModelViewComponent {
 
   // Select Options View
 
+  protected startPointRange = computed(() => {
+    let meterData = this.selectedMeterData();
+    if (!meterData || !meterData.length) return undefined;
+    let first = meterData[0];
+    let last = meterData[meterData.length - 1];
+    return [first.time, last.time] as const;
+  });
+  _startPointRange = effect(() => console.log(this.startPointRange()));
   protected startPointChoice = signals.maybe<Dayjs>();
 
   protected timeSpanOptions = [
@@ -100,24 +105,49 @@ export class WdpNewModelViewComponent {
     dayjs.duration(3, "months"),
     dayjs.duration(6, "months"),
   ];
-  protected timeSpanChoice = signals.maybe<Duration>();
-  _timeSpanChoice = effect(() => console.log(this.timeSpanChoice()));
-
-  protected weatherCapabilityOptions =
-    this.predictionService.fetchWeatherCapabilities(
-      computed(() => {
-        let startPoint = this.startPointChoice();
-        let timeSpan = this.timeSpanChoice();
-        let options: typeUtils.Signaled<
-          Parameters<PmdArimaPredictionService["fetchWeatherCapabilities"]>[0]
-        > = {};
-        if (startPoint) options.start = startPoint;
-        if (startPoint && timeSpan) options.end = startPoint.add(timeSpan);
-        return options;
-      }),
+  protected timeSpanOptionsConstrained = computed(() => {
+    let range = this.startPointRange();
+    let choice = this.startPointChoice();
+    if (!range || !choice) return [];
+    let [_, end] = range;
+    return this.timeSpanOptions.filter(duration =>
+      choice.add(duration).isBefore(end),
     );
-  protected weatherCapabilityChoice = signals.maybe<WeatherCapability>();
+  });
+  private enableTimeSpanSelector = effect(() => {
+    let options = this.timeSpanOptionsConstrained();
+    if (!options.length) this.timeSpanChoice.formControl.disable();
+    else this.timeSpanChoice.formControl.enable();
+  });
+  _timeSpanOptionsConstrained = effect(() =>
+    console.log(this.timeSpanOptionsConstrained()),
+  );
+  protected timeSpanChoice = signals.formControl<Duration | undefined>(
+    undefined,
+  );
+  _timeSpanChoice = effect(() => console.log(this.timeSpanChoice()));
+  private keepTimeSpanChoiceValid = effect(() => {
+    let options = this.timeSpanOptionsConstrained();
+    let choice = untracked(this.timeSpanChoice);
+    if (!choice) return;
+    if (!options.includes(choice)) this.timeSpanChoice.set(undefined);
+  });
 
+  protected commentPlaceholder = computed(() => {
+    let template =
+      "Model trained on ${name} (${id}) starting at ${startPoint} for ${timeSpan}";
+
+    let meter = this.selectedMeter();
+    let startPoint = this.startPointChoice();
+    let timeSpan = this.timeSpanChoice();
+    console.log({meter, startPoint, timeSpan});
+    if (!meter || !startPoint || !timeSpan) return undefined;
+    return template
+      .replace("${name}", meter.name)
+      .replace("${id}", meter.id.get())
+      .replace("${startPoint}", startPoint.format("LL"))
+      .replace("${timeSpan}", timeSpan.humanize());
+  });
   protected comment = signals.maybe<string>();
   _comment = effect(() => console.log(this.comment()));
 

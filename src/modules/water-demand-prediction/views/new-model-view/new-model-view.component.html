@@ -2,7 +2,7 @@
 @let meterUsages = this.meterUsages();
 @let selectedMeter = this.selectedMeter();
 @let selectedMeterId = this.selectedMeterId();
-@let selectedMeterData = this.selectedMeterData();
+@let startPointRange = this.startPointRange();
 @let lang = this.lang();
 
 @let chartOptions =
@@ -27,8 +27,9 @@
         },
       },
       y: {
-        ticks: {
-          callback: yTicks,
+        title: {
+          display: true,
+          text: "water demand [m³]",
         },
       },
     },
@@ -75,75 +76,98 @@
       }
     </div>
   } @else {
-    <p class="title is-4">Create New Model: Select Options</p>
-    <div class="columns is-fullheight is-fullwidth">
-      <div class="column is-fullheight">
-        <div class="is-fullheight is-flex is-flex-direction-column">
-          <div class="is-flex is-justify-content-space-between">
-            <div>
-              <p class="title is-6">{{ selectedMeter?.name }}</p>
-              <p class="subtitle is-7">{{ selectedMeter?.id }}</p>
+    <div class="is-fullheight is-flex is-flex-direction-column">
+      <p class="title is-4">Create New Model: Select Options</p>
+      <div class="columns is-fullwidth is-flex-grow-1">
+        <div class="column is-fullheight">
+          <div class="is-fullheight is-flex is-flex-direction-column">
+            <div class="is-flex is-justify-content-space-between">
+              <div>
+                <p class="title is-6">{{ selectedMeter?.name }}</p>
+                <p class="subtitle is-7">{{ selectedMeter?.id }}</p>
+              </div>
+              <div>
+                <button
+                  class="button"
+                  (click)="this.selectedMeterId.set(undefined)"
+                >
+                  Change Smartmeter
+                </button>
+              </div>
             </div>
-            <div>
-              <button
-                class="button"
-                (click)="this.selectedMeterId.set(undefined)"
-              >
-                Change Smartmeter
+            <div class="is-flex-grow-1 m-5">
+              <div class="is-fullheight">
+                @let usages = meterUsages.get(selectedMeterId)! | async;
+                <canvas
+                  baseChart
+                  type="bar"
+                  class="is-fullheight is-fullwidth"
+                  [options]="chartOptions"
+                  [datasets]="usages ? [usages] : []"
+                ></canvas>
+              </div>
+            </div>
+            @if (selectedMeter?.description) {
+              <div>
+                <p>{{ selectedMeter!.description }}</p>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="column">
+          <div class="field">
+            <label class="label">Start Point</label>
+            <div class="control">
+              <input
+                type="date"
+                #startPointInput
+                [min]="startPointRange?.[0]?.format('YYYY-MM-DD')"
+                [max]="startPointRange?.[1]?.format('YYYY-MM-DD')"
+                (input)="
+                  startPointChoice.set(
+                    startPointInput.value.length
+                      ? dayjs(startPointInput.value)
+                      : undefined
+                  )
+                "
+              />
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">Time Span</label>
+            <div class="control">
+              <div class="select">
+                <select [formControl]="timeSpanChoice.formControl">
+                  @for (option of timeSpanOptionsConstrained(); track option) {
+                    <option [ngValue]="option">
+                      {{ option.locale(lang).humanize() }}
+                    </option>
+                  }
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">Comment</label>
+            <div class="control">
+              <textarea
+                class="textarea"
+                [placeholder]="commentPlaceholder() ?? ''"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="control">
+              <button class="button is-fullwidth is-primary">
+                Start Training
               </button>
             </div>
           </div>
-          <div class="is-flex-grow-1 m-5">
-            <div class="is-fullheight">
-              @let usages = meterUsages.get(selectedMeterId)! | async;
-              <canvas
-                baseChart
-                type="bar"
-                class="is-fullheight is-fullwidth"
-                [options]="chartOptions"
-                [datasets]="usages ? [usages] : []"
-              ></canvas>
-            </div>
-          </div>
-          @if (selectedMeter?.description) {
-            <div>
-              <p>{{ selectedMeter!.description }}</p>
-            </div>
-          }
         </div>
-      </div>
-
-      <div class="column">
-        <div>
-          <input
-            type="date"
-            #startPointInput
-            [min]="selectedMeterData?.[0]?.time?.format('YYYY-MM-DD')"
-            [max]="
-              selectedMeterData?.[selectedMeterData!.length - 1]?.time?.format(
-                'YYYY-MM-DD'
-              )
-            "
-            (input)="startPointChoice.set(dayjs(startPointInput.value))"
-          />
-        </div>
-
-        <div class="dropdown is-hoverable">
-          <div class="dropdown-trigger">
-            <button class="button">timeSpan</button>
-          </div>
-          <div class="dropdown-menu">
-            <div class="dropdown-content">
-              @for (option of timeSpanOptions; track option) {
-                <a class="dropdown-item" (click)="timeSpanChoice.set(option)">{{
-                  option.locale(lang).humanize()
-                }}</a>
-              }
-            </div>
-          </div>
-        </div>
-
-        <textarea #comment (input)="this.comment.set(comment.value)"></textarea>
       </div>
     </div>
   }
