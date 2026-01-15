@@ -7,10 +7,11 @@ import {PmdArimaPredictionService} from "../../../../api/pmd-arima-prediction.se
 import {signals} from "../../../../common/signals";
 
 import ModelId = PmdArimaPredictionService.ModelId;
+import {TranslateDirective} from "@ngx-translate/core";
 
 @Component({
   selector: "wdp-select-model-view",
-  imports: [NgIconComponent],
+  imports: [NgIconComponent, TranslateDirective],
   templateUrl: "./select-model-view.component.html",
   providers: [
     provideIcons({

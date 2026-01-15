@@ -30,7 +30,9 @@
       y: {
         title: {
           display: true,
-          text: "water demand [m³]",
+          text:
+            ("water-demand-prediction.legend.water-demand" | translate) +
+            " [m³]",
         },
       },
     },
@@ -39,7 +41,10 @@
 <div class="is-fullheight is-fullwidth box" style="overflow-y: auto">
   @if (!trainingId) {
     @if (!selectedMeterId) {
-      <p class="title is-4">Create New Model: Select Smartmeter</p>
+      <p
+        class="title is-4"
+        translate="water-demand-prediction.title.create-new-model.select-smartmeter"
+      ></p>
       <div class="grid is-col-min-14">
         @for (meter of meters; track meter.id; let last = $last) {
           <div class="card is-flex is-flex-direction-column mb-0">
@@ -71,7 +76,10 @@
                 (click)="this.selectedMeterId.set(meter.id)"
                 class="card-footer-item"
               >
-                <span class="has-text-weight-bold">Select</span>
+                <span
+                  class="has-text-weight-bold"
+                  translate="water-demand-prediction.buttons.select"
+                ></span>
               </button>
             </div>
           </div>
@@ -79,7 +87,10 @@
       </div>
     } @else {
       <div class="is-fullheight is-flex is-flex-direction-column">
-        <p class="title is-4">Create New Model: Select Options</p>
+        <p
+          class="title is-4"
+          translate="water-demand-prediction.title.create-new-model.select-options"
+        ></p>
         <div class="columns is-fullwidth is-flex-grow-1">
           <div class="column is-fullheight is-two-thirds">
             <div class="is-fullheight is-flex is-flex-direction-column">
@@ -92,9 +103,8 @@
                   <button
                     class="button"
                     (click)="this.selectedMeterId.set(undefined)"
-                  >
-                    Change Smartmeter
-                  </button>
+                    translate="water-demand-prediction.buttons.change-smartmeter"
+                  ></button>
                 </div>
               </div>
               <div class="is-flex-grow-1 m-5">
@@ -119,7 +129,10 @@
 
           <div class="column is-one-third">
             <div class="field">
-              <label class="label">Start Point</label>
+              <label
+                class="label"
+                translate="water-demand-prediction.choice.start-point"
+              ></label>
               <div class="control">
                 <input
                   type="date"
@@ -138,7 +151,10 @@
             </div>
 
             <div class="field">
-              <label class="label">Time Span</label>
+              <label
+                class="label"
+                translate="water-demand-prediction.choice.time-span"
+              ></label>
               <div class="control">
                 <div class="select">
                   <select [formControl]="timeSpanChoice.formControl">
@@ -188,10 +204,15 @@
   } @else {
     <div class="is-fullheight is-flex is-flex-direction-column">
       <div class="is-flex is-justify-content-space-between mb-2">
-        <p class="title is-4 mb-0">Training New Model</p>
-        <button class="button" (click)="return.emit()">
-          Return to Selecting Models
-        </button>
+        <p
+          class="title is-4 mb-0"
+          translate="water-demand-prediction.title.training-new-model"
+        ></p>
+        <button
+          class="button"
+          (click)="returnToSelectingModels()"
+          translate="water-demand-prediction.buttons.return-to-selecting-models"
+        ></button>
       </div>
       <div class="is-fullwidth is-flex-grow-1">
         @let isTraining = this.isTraining();

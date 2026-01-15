@@ -6,6 +6,26 @@ de = "Historisch"
 en = "Prediction"
 de = "Vorhersage"
 
+[title.select-model]
+en = "Select Model"
+de = "Modellauswahl"
+
+[title.create-new-model.select-smartmeter]
+en = "Create New Model: Select Smartmeter"
+de = "Modellerstellung: Smartmeter-Auswahl"
+
+[title.create-new-model.select-options]
+en = "Create New Model: Select Options"
+de = "Modellerstellung: Weitere Optionen"
+
+[title.training-new-model]
+en = "Training New Model"
+de = "Modelltraining"
+
+[legend.water-demand]
+en = "water demand"
+de = "Wasserbedarf"
+
 [timeframe.all]
 en = "whole period"
 de = "gesamter Zeitraum"
@@ -38,9 +58,37 @@ de = "Ruhestandshaushalt"
 en = "single household"
 de = "Single Haushalt"
 
-[buttons.delete-charts]
-en = "Delete Charts"
+[model-meta.data-starts-at]
+en = "data starts at"
+de = "Datenstart"
+
+[model-meta.data-ends-at]
+en = "data ends at"
+de = "Datenend"
+
+[model-meta.training-duration]
+en = "training duration"
+de = "Trainingsdauer"
+
+[model-meta.training-start]
+en = "training start"
+de = "Trainingsstart"
+
+[buttons.add-prediction]
+en = "Add Prediction"
+de = "Vorhersage hinzufügen"
+
+[buttons.clear-charts]
+en = "Clear Charts"
 de = "Lösche Graphen"
+
+[buttons.change-smartmeter]
+en = "Change Smartmeter"
+de = "Anderes Smartmeter"
+
+[buttons.new-model]
+en = "New Model"
+de = "Neues Modell"
 
 [buttons.train-model]
 en = "Train Selected Model"
@@ -53,6 +101,14 @@ de = "Am Trainieren"
 [buttons.add-charts]
 en = "Add to Charts"
 de = "Zum Graphen hinzufügen"
+
+[buttons.select]
+en = "Select"
+de = "auswählen"
+
+[buttons.return-to-selecting-models]
+en = "Return to selecting models"
+de = "Zurück zur Modellauswahl"
 
 [choice.smartmeter]
 en = "Select Smartmeter"
@@ -77,6 +133,18 @@ de = "Wähle Spalte"
 [choice.start-point]
 en = "Start Point"
 de = "Startpunkt"
+
+[choice.time-span]
+en = "Time Span"
+de = "Zeitspanne"
+
+[choice.comment]
+en = "Comment"
+de = "Kommentar"
+
+[choice.comment-placeholder-template]
+en = "Model trained on ${name} (${id}) starting at ${startPoint} for ${timeSpan}."
+de = "Modell trainiert auf ${name} (${id}) beginnend am ${startPoint} für ${timeSpan}."
 
 [graph.legend.time]
 en = "Time"

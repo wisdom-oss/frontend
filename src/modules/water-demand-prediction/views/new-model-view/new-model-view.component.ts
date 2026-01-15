@@ -23,6 +23,11 @@ import {typeUtils} from "../../../../common/utils/type-utils";
 import MeterId = PmdArimaPredictionService.SmartMeterId;
 import TrainingId = PmdArimaPredictionService.TrainingId;
 import WeatherCapability = PmdArimaPredictionService.WeatherCapability;
+import {
+  TranslateDirective,
+  TranslatePipe,
+  TranslateService,
+} from "@ngx-translate/core";
 
 @Component({
   selector: "wdp-new-model-view",
@@ -32,6 +37,8 @@ import WeatherCapability = PmdArimaPredictionService.WeatherCapability;
     AsyncPipe,
     ReactiveFormsModule,
     NgClass,
+    TranslateDirective,
+    TranslatePipe,
   ],
   templateUrl: "./new-model-view.component.html",
 })
@@ -39,6 +46,7 @@ export class WdpNewModelViewComponent {
   private predictionService = inject(PmdArimaPredictionService);
   private queryParams = inject(QueryParamService);
   protected lang = signals.lang();
+  protected translateService = inject(TranslateService);
   protected dayjs = dayjs; // dayjs re-export
 
   readonly return = output();
@@ -151,8 +159,10 @@ export class WdpNewModelViewComponent {
   });
 
   protected commentPlaceholder = computed(() => {
-    let template =
-      "Model trained on ${name} (${id}) starting at ${startPoint} for ${timeSpan}.";
+    let lang = this.lang();
+    let template = this.translateService.instant(
+      "water-demand-prediction.choice.comment-placeholder-template",
+    );
 
     let meter = this.selectedMeter();
     let startPoint = this.startPointChoice();
@@ -161,8 +171,8 @@ export class WdpNewModelViewComponent {
     return template
       .replace("${name}", meter.name)
       .replace("${id}", meter.id.get())
-      .replace("${startPoint}", startPoint.format("LL"))
-      .replace("${timeSpan}", timeSpan.humanize());
+      .replace("${startPoint}", startPoint.locale(lang).format("LL"))
+      .replace("${timeSpan}", timeSpan.locale(lang).humanize());
   });
   protected comment = signals.maybe<string>();
   _comment = effect(() => console.log(this.comment()));
@@ -228,4 +238,8 @@ export class WdpNewModelViewComponent {
     let message = this.trainingStatus()?.();
     if (message) this.trainingLog.push(message);
   });
+
+  protected returnToSelectingModels() {
+    this.trainingId.set(undefined).then(() => this.return.emit());
+  }
 }

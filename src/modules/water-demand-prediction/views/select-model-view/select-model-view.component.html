@@ -4,13 +4,16 @@
   <div class="level mb-4">
     <div class="level-left">
       <div class="level-item">
-        <p class="title is-4 mb-0">Select Model</p>
+        <p
+          class="title is-4 mb-0"
+          translate="water-demand-prediction.title.select-model"
+        ></p>
       </div>
     </div>
     <div class="level-right">
       <div class="level-item">
         <button class="button is-primary" (click)="newModel.emit()">
-          <span>New Model</span>
+          <span translate="water-demand-prediction.buttons.new-model"></span>
           <span class="icon">
             <ng-icon name="remixAddBoxFill"></ng-icon>
           </span>
@@ -36,20 +39,20 @@
                     ["ID", model?.id],
                     ["Meter", meter?.name],
                     [
-                      "data starts at",
+                      "water-demand-prediction.model-meta.data-starts-at",
                       model?.dataStartsAt?.locale(lang)?.format("LLL"),
                     ],
                     [
-                      "data ends at",
+                      "water-demand-prediction.model-meta.data-ends-at",
                       model?.dataEndsAt?.locale(lang)?.format("LLL"),
                     ],
                     ["weather capability", model?.weatherCapability],
                     [
-                      "training duration",
+                      "water-demand-prediction.model-meta.training-duration",
                       model?.trainingDuration?.locale(lang)?.humanize(),
                     ],
                     [
-                      "training start",
+                      "water-demand-prediction.model-meta.training-start",
                       model?.trainingStart?.locale(lang)?.format("LLL"),
                     ],
                   ];
@@ -59,7 +62,7 @@
                   @let value = entry[1];
                   @if (value) {
                     <tr>
-                      <th>{{ key }}</th>
+                      <th [translate]="$any(key)"></th>
                       <td style="padding-left: 1rem">{{ value }}</td>
                     </tr>
                   }
@@ -84,7 +87,10 @@
               (click)="modelId.emit(model.id)"
               class="card-footer-item"
             >
-              <span class="has-text-weight-bold">Select</span>
+              <span
+                class="has-text-weight-bold"
+                translate="water-demand-prediction.buttons.select"
+              ></span>
             </button>
           </div>
         </div>
