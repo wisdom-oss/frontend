@@ -1,6 +1,6 @@
 import {computed, input, output, Component} from "@angular/core";
 
-import {WaterDemandPrediction2Service as Service} from "../../water-demand-prediction2.service";
+import {WaterDemandPrediction2Service as Service} from "../../water-demand-prediction.service";
 import {typeUtils} from "../../../../common/utils/type-utils";
 
 import Signaled = typeUtils.Signaled;

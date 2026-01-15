@@ -11,7 +11,7 @@ import typia from "typia";
 import {WdpChartsViewComponent} from "./views/charts-view/charts-view.component";
 import {WdpNewModelViewComponent} from "./views/new-model-view/new-model-view.component";
 import {WdpSelectModelViewComponent} from "./views/select-model-view/select-model-view.component";
-import {WaterDemandPrediction2Service as Service} from "./water-demand-prediction2.service";
+import {WaterDemandPrediction2Service as Service} from "./water-demand-prediction.service";
 import {PmdArimaPredictionService} from "../../api/pmd-arima-prediction.service";
 import {signals} from "../../common/signals";
 import {QueryParamService} from "../../common/services/query-param.service";
@@ -31,7 +31,7 @@ type Group = "historic" | "prediction";
     WdpNewModelViewComponent,
     WdpSelectModelViewComponent,
   ],
-  templateUrl: "./water-demand-prediction2.component.html",
+  templateUrl: "./water-demand-prediction.component.html",
   providers: [
     provideIcons({
       remixResetRightLine,

@@ -2,7 +2,7 @@ import {inject, input, output, Component} from "@angular/core";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {remixAddBoxFill} from "@ng-icons/remixicon";
 
-import {WaterDemandPrediction2Service as Service} from "../../water-demand-prediction2.service";
+import {WaterDemandPrediction2Service as Service} from "../../water-demand-prediction.service";
 import {PmdArimaPredictionService} from "../../../../api/pmd-arima-prediction.service";
 import {signals} from "../../../../common/signals";
 
