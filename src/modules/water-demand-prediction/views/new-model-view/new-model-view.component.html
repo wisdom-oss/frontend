@@ -4,6 +4,7 @@
 @let selectedMeterId = this.selectedMeterId();
 @let startPointRange = this.startPointRange();
 @let lang = this.lang();
+@let trainingId = this.trainingId();
 
 @let chartOptions =
   {
@@ -36,143 +37,176 @@
   };
 
 <div class="is-fullheight is-fullwidth box" style="overflow-y: auto">
-  @if (!selectedMeterId) {
-    <p class="title is-4">Create New Model: Select Smartmeter</p>
-    <div class="grid is-col-min-14">
-      @for (meter of meters; track meter.id; let last = $last) {
-        <div class="card is-flex is-flex-direction-column mb-0">
-          <div class="card-content">
-            <div class="content">
-              <p class="title is-4">{{ meter.name }}</p>
-              <p class="subtitle is-6">{{ meter.id }}</p>
-              @if (!(meter.description | empty)) {
-                <p>{{ meter.description }}</p>
-              }
-            </div>
-          </div>
-          <div class="card-image m-2">
-            @let usages = meterUsages.get(meter.id)! | async;
-            <canvas
-              baseChart
-              type="bar"
-              class="is-fullheight is-fullwidth"
-              [options]="chartOptions"
-              [datasets]="usages ? [usages] : []"
-            ></canvas>
-          </div>
-          <div class="is-flex-grow-1"></div>
-          <div class="card-footer">
-            <button
-              #button
-              (mouseover)="button.classList.add('has-text-primary')"
-              (mouseout)="button.classList.remove('has-text-primary')"
-              (click)="this.selectedMeterId.set(meter.id)"
-              class="card-footer-item"
-            >
-              <span class="has-text-weight-bold">Select</span>
-            </button>
-          </div>
-        </div>
-      }
-    </div>
-  } @else {
-    <div class="is-fullheight is-flex is-flex-direction-column">
-      <p class="title is-4">Create New Model: Select Options</p>
-      <div class="columns is-fullwidth is-flex-grow-1">
-        <div class="column is-fullheight">
-          <div class="is-fullheight is-flex is-flex-direction-column">
-            <div class="is-flex is-justify-content-space-between">
-              <div>
-                <p class="title is-6">{{ selectedMeter?.name }}</p>
-                <p class="subtitle is-7">{{ selectedMeter?.id }}</p>
-              </div>
-              <div>
-                <button
-                  class="button"
-                  (click)="this.selectedMeterId.set(undefined)"
-                >
-                  Change Smartmeter
-                </button>
+  @if (!trainingId) {
+    @if (!selectedMeterId) {
+      <p class="title is-4">Create New Model: Select Smartmeter</p>
+      <div class="grid is-col-min-14">
+        @for (meter of meters; track meter.id; let last = $last) {
+          <div class="card is-flex is-flex-direction-column mb-0">
+            <div class="card-content">
+              <div class="content">
+                <p class="title is-4">{{ meter.name }}</p>
+                <p class="subtitle is-6">{{ meter.id }}</p>
+                @if (!(meter.description | empty)) {
+                  <p>{{ meter.description }}</p>
+                }
               </div>
             </div>
-            <div class="is-flex-grow-1 m-5">
-              <div class="is-fullheight">
-                @let usages = meterUsages.get(selectedMeterId)! | async;
-                <canvas
-                  baseChart
-                  type="bar"
-                  class="is-fullheight is-fullwidth"
-                  [options]="chartOptions"
-                  [datasets]="usages ? [usages] : []"
-                ></canvas>
-              </div>
+            <div class="card-image m-2">
+              @let usages = meterUsages.get(meter.id)! | async;
+              <canvas
+                baseChart
+                type="bar"
+                class="is-fullheight is-fullwidth"
+                [options]="chartOptions"
+                [datasets]="usages ? [usages] : []"
+              ></canvas>
             </div>
-            @if (selectedMeter?.description) {
-              <div>
-                <p>{{ selectedMeter!.description }}</p>
-              </div>
-            }
-          </div>
-        </div>
-
-        <div class="column">
-          <div class="field">
-            <label class="label">Start Point</label>
-            <div class="control">
-              <input
-                type="date"
-                #startPointInput
-                [min]="startPointRange?.[0]?.format('YYYY-MM-DD')"
-                [max]="startPointRange?.[1]?.format('YYYY-MM-DD')"
-                (input)="
-                  startPointChoice.set(
-                    startPointInput.value.length
-                      ? dayjs(startPointInput.value)
-                      : undefined
-                  )
-                "
-              />
-            </div>
-          </div>
-
-          <div class="field">
-            <label class="label">Time Span</label>
-            <div class="control">
-              <div class="select">
-                <select [formControl]="timeSpanChoice.formControl">
-                  @for (option of timeSpanOptionsConstrained(); track option) {
-                    <option [ngValue]="option">
-                      {{ option.locale(lang).humanize() }}
-                    </option>
-                  }
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div class="field">
-            <label class="label">Comment</label>
-            <div class="control">
-              <textarea
-                #comment
-                class="textarea"
-                [placeholder]="commentPlaceholder() ?? ''"
-                (input)="this.comment.set(comment.value)"
-              ></textarea>
-            </div>
-          </div>
-
-          <div class="field">
-            <div class="control">
+            <div class="is-flex-grow-1"></div>
+            <div class="card-footer">
               <button
-                class="button is-fullwidth is-primary"
-                [disabled]="!selectedMeterId || !this.trainingParams()"
-                (click)="startTrainingTrigger.trigger()"
+                #button
+                (mouseover)="button.classList.add('has-text-primary')"
+                (mouseout)="button.classList.remove('has-text-primary')"
+                (click)="this.selectedMeterId.set(meter.id)"
+                class="card-footer-item"
               >
-                Start Training
+                <span class="has-text-weight-bold">Select</span>
               </button>
             </div>
           </div>
+        }
+      </div>
+    } @else {
+      <div class="is-fullheight is-flex is-flex-direction-column">
+        <p class="title is-4">Create New Model: Select Options</p>
+        <div class="columns is-fullwidth is-flex-grow-1">
+          <div class="column is-fullheight is-two-thirds">
+            <div class="is-fullheight is-flex is-flex-direction-column">
+              <div class="is-flex is-justify-content-space-between">
+                <div>
+                  <p class="title is-6">{{ selectedMeter?.name }}</p>
+                  <p class="subtitle is-7">{{ selectedMeter?.id }}</p>
+                </div>
+                <div>
+                  <button
+                    class="button"
+                    (click)="this.selectedMeterId.set(undefined)"
+                  >
+                    Change Smartmeter
+                  </button>
+                </div>
+              </div>
+              <div class="is-flex-grow-1 m-5">
+                <div class="is-fullheight">
+                  @let usages = meterUsages.get(selectedMeterId)! | async;
+                  <canvas
+                    baseChart
+                    type="bar"
+                    class="is-fullheight is-fullwidth"
+                    [options]="chartOptions"
+                    [datasets]="usages ? [usages] : []"
+                  ></canvas>
+                </div>
+              </div>
+              @if (selectedMeter?.description) {
+                <div>
+                  <p>{{ selectedMeter!.description }}</p>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="column is-one-third">
+            <div class="field">
+              <label class="label">Start Point</label>
+              <div class="control">
+                <input
+                  type="date"
+                  #startPointInput
+                  [min]="startPointRange?.[0]?.format('YYYY-MM-DD')"
+                  [max]="startPointRange?.[1]?.format('YYYY-MM-DD')"
+                  (input)="
+                    startPointChoice.set(
+                      startPointInput.value.length
+                        ? dayjs(startPointInput.value)
+                        : undefined
+                    )
+                  "
+                />
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="label">Time Span</label>
+              <div class="control">
+                <div class="select">
+                  <select [formControl]="timeSpanChoice.formControl">
+                    @for (
+                      option of timeSpanOptionsConstrained();
+                      track option
+                    ) {
+                      <option [ngValue]="option">
+                        {{ option.locale(lang).humanize() }}
+                      </option>
+                    }
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="label">Comment</label>
+              <div class="control">
+                <textarea
+                  #comment
+                  class="textarea"
+                  [placeholder]="commentPlaceholder() ?? ''"
+                  (input)="this.comment.set(comment.value)"
+                ></textarea>
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="control">
+                <button
+                  class="button is-fullwidth is-primary"
+                  [disabled]="!selectedMeterId || !this.trainingParams()"
+                  (click)="startTrainingTrigger.trigger()"
+                >
+                  Start Training
+                </button>
+                <p class="has-text-danger">
+                  {{ $any(startTrainingError())?.error.detail }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  } @else {
+    <div class="is-fullheight is-flex is-flex-direction-column">
+      <div class="is-flex is-justify-content-space-between mb-2">
+        <p class="title is-4 mb-0">Training New Model</p>
+        <button class="button" (click)="return.emit()">
+          Return to Selecting Models
+        </button>
+      </div>
+      <div class="is-fullwidth is-flex-grow-1">
+        @let isTraining = this.isTraining();
+        <progress
+          [attr.value]="isTraining ? null : 1"
+          max="1"
+          class="progress mb-0"
+          [ngClass]="isTraining ? 'is-primary' : 'is-success'"
+          style="border-bottom-left-radius: 0; border-bottom-right-radius: 0"
+        ></progress>
+        <div class="content">
+          <pre
+            class="mb-5"
+            style="border-radius: 0 0 0.5rem 0.5rem"
+          >@for (entry of trainingLog(); track entry) {{{entry + "\n"}}}</pre>
         </div>
       </div>
     </div>

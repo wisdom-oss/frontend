@@ -10,7 +10,7 @@
 }
 
 @if (view == "new") {
-  <wdp-new-model-view></wdp-new-model-view>
+  <wdp-new-model-view (return)="this.view.set('select')"></wdp-new-model-view>
 }
 
 @if (view == "charts" || (!view && modelIds.length)) {

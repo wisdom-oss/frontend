@@ -949,6 +949,12 @@ export namespace api {
     validateRaw?: (input: unknown) => typia.IValidation<TRaw>;
 
     /**
+     * Assume that incoming strings are JSON.
+     * @default true
+     */
+    assumeJson?: boolean;
+
+    /**
      * Parse the raw messages into a message format to be used in the public API.
      * @param input Raw incoming message, validated via {@link validateRaw}.
      */
@@ -1022,6 +1028,7 @@ export namespace api {
     url,
     validate,
     validateRaw,
+    assumeJson,
     parse,
     serialize,
     protocols,
@@ -1036,8 +1043,8 @@ export namespace api {
     TSend,
     TDefault
   > {
-    let webSocket = new WebSocket(url, protocols);
-    if (binaryType) webSocket.binaryType = binaryType;
+    let ws = new WebSocket(url, protocols);
+    if (binaryType) ws.binaryType = binaryType;
 
     let waitUntilOpen = new Once();
     let send = (message: TSend) => {
@@ -1050,30 +1057,30 @@ export namespace api {
           isTypedArray(payload) ||
           payload instanceof DataView
         )
-          webSocket.send(payload as ArrayBuffer | Blob | ArrayBufferLike);
-        else if (typeof payload === "string") webSocket.send(payload);
-        else webSocket.send(JSON.stringify(payload));
+          ws.send(payload as ArrayBuffer | Blob | ArrayBufferLike);
+        else if (typeof payload === "string") ws.send(payload);
+        else ws.send(JSON.stringify(payload));
       });
     };
 
     let writeSignal = signal<TMessage | TDefault>(defaultValue as TDefault);
     let socket = Object.assign(writeSignal, {
-      close: webSocket.close,
+      close: ws.close,
       send,
     });
 
-    let addEventListener = webSocket.addEventListener;
-    if (onClose) addEventListener("close", ev => onClose(socket, ev));
-    if (onError) addEventListener("error", ev => onError(socket, ev));
-    if (onOpen) addEventListener("open", ev => onOpen(socket, ev));
-    if (onMessage) addEventListener("message", ev => onMessage(socket, ev));
+    if (onClose) ws.addEventListener("close", ev => onClose(socket, ev));
+    if (onError) ws.addEventListener("error", ev => onError(socket, ev));
+    if (onOpen) ws.addEventListener("open", ev => onOpen(socket, ev));
+    if (onMessage) ws.addEventListener("message", ev => onMessage(socket, ev));
 
-    webSocket.addEventListener("open", () => waitUntilOpen.set());
-    webSocket.addEventListener("message", ev => {
+    ws.addEventListener("open", () => waitUntilOpen.set());
+    ws.addEventListener("message", ev => {
       let message;
-      if (typeof ev.data === "string") message = JSON.parse(ev.data);
-      else if (webSocket.binaryType === "blob") message = new Blob(ev.data);
-      else if (webSocket.binaryType === "arraybuffer")
+      if (!(assumeJson ?? true)) message = ev.data;
+      else if (typeof ev.data === "string") message = JSON.parse(ev.data);
+      else if (ws.binaryType === "blob") message = new Blob(ev.data);
+      else if (ws.binaryType === "arraybuffer")
         message = new ArrayBuffer(ev.data);
 
       if (validateRaw) {

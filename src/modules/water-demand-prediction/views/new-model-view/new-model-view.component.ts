@@ -1,5 +1,14 @@
-import {AsyncPipe} from "@angular/common";
-import {computed, effect, inject, untracked, Component} from "@angular/core";
+import {NgClass, AsyncPipe} from "@angular/common";
+import {
+  computed,
+  effect,
+  inject,
+  output,
+  signal,
+  untracked,
+  Component,
+} from "@angular/core";
+import {FormControlDirective, ReactiveFormsModule} from "@angular/forms";
 import {ChartDataset, TooltipItem, Scale} from "chart.js";
 import dayjs, {Dayjs} from "dayjs";
 import {Duration} from "dayjs/plugin/duration";
@@ -9,15 +18,21 @@ import {PmdArimaPredictionService} from "../../../../api/pmd-arima-prediction.se
 import {EmptyPipe} from "../../../../common/pipes/empty.pipe";
 import {QueryParamService} from "../../../../common/services/query-param.service";
 import {signals} from "../../../../common/signals";
+import {typeUtils} from "../../../../common/utils/type-utils";
 
 import MeterId = PmdArimaPredictionService.SmartMeterId;
+import TrainingId = PmdArimaPredictionService.TrainingId;
 import WeatherCapability = PmdArimaPredictionService.WeatherCapability;
-import {typeUtils} from "../../../../common/utils/type-utils";
-import {FormControlDirective, ReactiveFormsModule} from "@angular/forms";
 
 @Component({
   selector: "wdp-new-model-view",
-  imports: [BaseChartDirective, EmptyPipe, AsyncPipe, ReactiveFormsModule],
+  imports: [
+    BaseChartDirective,
+    EmptyPipe,
+    AsyncPipe,
+    ReactiveFormsModule,
+    NgClass,
+  ],
   templateUrl: "./new-model-view.component.html",
 })
 export class WdpNewModelViewComponent {
@@ -25,6 +40,8 @@ export class WdpNewModelViewComponent {
   private queryParams = inject(QueryParamService);
   protected lang = signals.lang();
   protected dayjs = dayjs; // dayjs re-export
+
+  readonly return = output();
 
   // Select Meters View
 
@@ -166,5 +183,49 @@ export class WdpNewModelViewComponent {
     console.log("they clicked");
   });
 
-  // protected trainingStatus = this.predictionService.training.status();
+  protected triggerTrainingParams = computed(() => {
+    let params = untracked(this.trainingParams);
+    this.startTrainingTrigger();
+    return params;
+  });
+  _triggerTrainingParams = effect(() =>
+    console.log(this.triggerTrainingParams()),
+  );
+
+  protected startTraining = this.predictionService.training.start(
+    this.selectedMeterId,
+    this.triggerTrainingParams,
+  );
+  protected startTrainingError = this.startTraining.resource.error;
+  _startTrainingError = effect(() => console.log(this.startTrainingError()));
+
+  // Training Status View
+
+  protected trainingId = this.queryParams.signal(
+    "training",
+    TrainingId.queryParamOpts(),
+  );
+  _trainingId = effect(() => console.log(this.trainingId()));
+  private loadTrainingId = effect(() => {
+    let startTraining = this.startTraining();
+    if (!startTraining) return;
+    this.trainingId.set(startTraining.trainingId);
+  });
+
+  protected trainingStatus = computed(() => {
+    let id = this.trainingId();
+    if (!id) return undefined;
+    return this.predictionService.training.status(id, {
+      onOpen: () => this.isTraining.set(true),
+      onClose: () => this.isTraining.set(false),
+    });
+  });
+  protected isTraining = signal(false);
+  _trainingStatus = effect(() => console.log(this.trainingStatus()?.()));
+
+  protected trainingLog = signals.array<string>();
+  private appendTrainingLog = effect(() => {
+    let message = this.trainingStatus()?.();
+    if (message) this.trainingLog.push(message);
+  });
 }

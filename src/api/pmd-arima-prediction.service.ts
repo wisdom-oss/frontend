@@ -213,17 +213,25 @@ export class PmdArimaPredictionService extends api.service(URL) {
         method: "PUT",
         params: api.QueryParams.from(params),
         validateRaw: typia.createValidate<Raw.TrainingInitiation>(),
-        parse: ({modelId, trainingId}) => ({
-          modelId: ModelId.of(modelId),
-          trainingId: TrainingId.of(trainingId),
+        parse: ({training_id}) => ({
+          trainingId: TrainingId.of(training_id),
         }),
       });
     },
 
-    status: (trainingId: TrainingId): api.Socket<string, never> => {
+    status: (
+      trainingId: TrainingId,
+      options?: {
+        onOpen?: (event: Event) => void;
+        onClose?: (event: CloseEvent) => void;
+      },
+    ): api.Socket<string, never> => {
       return api.socket({
         url: `${URL}/training/status/${trainingId}`,
         validate: typia.createValidate<string>(),
+        assumeJson: false,
+        onOpen: (_, event) => options?.onOpen?.(event),
+        onClose: (_, event) => options?.onClose?.(event),
       });
     },
   } as const;
@@ -306,7 +314,9 @@ namespace Raw {
     "columns"
   > & {columns: WeatherColumn[]};
 
-  export type TrainingInitiation = api.RawRecord<Self.TrainingInitiation>;
+  export type TrainingInitiation = {
+    training_id: string;
+  };
 }
 
 export namespace PmdArimaPredictionService {
@@ -373,7 +383,6 @@ export namespace PmdArimaPredictionService {
   };
 
   export type TrainingInitiation = {
-    modelId: ModelId;
     trainingId: TrainingId;
   };
 }
