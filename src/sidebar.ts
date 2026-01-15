@@ -1,7 +1,6 @@
 import {computed, inject, Component, Signal} from "@angular/core";
 import {
   remixBarChartFill,
-  remixBookLine,
   remixBuilding3Fill,
   remixDatabase2Fill,
   remixDrizzleFill,

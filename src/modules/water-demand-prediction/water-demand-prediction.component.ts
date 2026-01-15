@@ -34,9 +34,9 @@ type Group = "historic" | "prediction";
   templateUrl: "./water-demand-prediction.component.html",
   providers: [
     provideIcons({
-      remixResetRightLine,
       remixArrowRightFill,
       remixLoader4Fill,
+      remixResetRightLine,
     }),
   ],
 })

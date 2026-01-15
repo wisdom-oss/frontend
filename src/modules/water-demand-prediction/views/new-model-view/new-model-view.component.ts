@@ -8,7 +8,12 @@ import {
   untracked,
   Component,
 } from "@angular/core";
-import {FormControlDirective, ReactiveFormsModule} from "@angular/forms";
+import {ReactiveFormsModule} from "@angular/forms";
+import {
+  TranslateDirective,
+  TranslatePipe,
+  TranslateService,
+} from "@ngx-translate/core";
 import {ChartDataset, TooltipItem, Scale} from "chart.js";
 import dayjs, {Dayjs} from "dayjs";
 import {Duration} from "dayjs/plugin/duration";
@@ -18,25 +23,18 @@ import {PmdArimaPredictionService} from "../../../../api/pmd-arima-prediction.se
 import {EmptyPipe} from "../../../../common/pipes/empty.pipe";
 import {QueryParamService} from "../../../../common/services/query-param.service";
 import {signals} from "../../../../common/signals";
-import {typeUtils} from "../../../../common/utils/type-utils";
 
 import MeterId = PmdArimaPredictionService.SmartMeterId;
 import TrainingId = PmdArimaPredictionService.TrainingId;
-import WeatherCapability = PmdArimaPredictionService.WeatherCapability;
-import {
-  TranslateDirective,
-  TranslatePipe,
-  TranslateService,
-} from "@ngx-translate/core";
 
 @Component({
   selector: "wdp-new-model-view",
   imports: [
+    AsyncPipe,
     BaseChartDirective,
     EmptyPipe,
-    AsyncPipe,
-    ReactiveFormsModule,
     NgClass,
+    ReactiveFormsModule,
     TranslateDirective,
     TranslatePipe,
   ],
