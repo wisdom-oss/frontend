@@ -9,6 +9,7 @@ import {GrowlComponent} from "./modules/growl/growl.component";
 import {longTermForecastRoutes} from "./modules/long-term-forecast/routes";
 import {OowvActionMapComponent} from "./modules/oowv/action-map/action-map.component";
 import {PumpModelsComponent} from "./modules/pump-models/pump-models.component";
+import {WaterDemandPrediction2Component} from "./modules/water-demand-prediction/water-demand-prediction.component";
 import {WaterRightsComponent} from "./modules/water-rights/water-rights.component";
 import {waterRightsRoutes} from "./modules/water-rights/routes";
 import {WeatherDataComponent} from "./modules/weather-data/weather-data.component";
@@ -41,6 +42,10 @@ export const routes: Routes = [
         path: "oowv/action-map",
         component: OowvActionMapComponent,
         canActivate: [permissionsGuard(...OowvActionMapComponent.SCOPES)],
+      },
+      {
+        path: "oowv/water-demand-prediction2",
+        component: WaterDemandPrediction2Component,
       },
     ],
   },

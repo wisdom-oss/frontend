@@ -7,6 +7,7 @@ import {
   remixFilePaper2Fill,
   remixInstanceLine,
   remixMap2Fill,
+  remixNumbersFill,
   remixRfidLine,
   remixSunCloudyFill,
   remixWaterPercentFill,
@@ -18,6 +19,7 @@ import {GeoDataService} from "./api/geo-data.service";
 import {WaterRightsService} from "./api/water-rights.service";
 import {UsageForecastsService} from "./api/usage-forecasts.service";
 import {BeWaterSmartService} from "./api/be-water-smart.service";
+import {PmdArimaPredictionService} from "./api/pmd-arima-prediction.service";
 import {extraTags} from "./common/utils/extra-tags";
 import {api} from "./common/api";
 import {AuthService} from "./core/auth/auth.service";
@@ -182,6 +184,12 @@ export function sidebar(): readonly SidebarEntry[] {
           link: "/oowv/action-map",
           services: {GeoDataService},
           scopes: OowvActionMapComponent.SCOPES,
+        },
+        {
+          module: "core.sidebar.category.water-demand-prediction",
+          icon: {remixNumbersFill},
+          link: "/oowv/water-demand-prediction2",
+          services: {PmdArimaPredictionService},
         },
       ],
     },

@@ -1,0 +1,100 @@
+@let lang = this.lang();
+
+<div class="box is-fullheight is-fullwidth" style="overflow-y: auto">
+  <div class="level mb-4">
+    <div class="level-left">
+      <div class="level-item">
+        <p
+          class="title is-4 mb-0"
+          translate="water-demand-prediction.title.select-model"
+        ></p>
+      </div>
+    </div>
+    <div class="level-right">
+      <div class="level-item">
+        <button class="button is-primary" (click)="newModel.emit()">
+          <span translate="water-demand-prediction.buttons.new-model"></span>
+          <span class="icon">
+            <ng-icon name="remixAddBoxFill"></ng-icon>
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="grid is-col-min-20">
+    @for (model of service.availableModels()?.values(); track model.id) {
+      @let meter = service.availableMeters()?.get(model.meter);
+      <div class="cell">
+        <div
+          class="card"
+          [style.border]="
+            selectedModels().includes(model.id) ? '#0088AA solid 1px' : ''
+          "
+        >
+          <div class="card-content">
+            <table>
+              <tbody>
+                @for (
+                  entry of [
+                    ["ID", model?.id],
+                    ["Meter", meter?.name],
+                    [
+                      "water-demand-prediction.model-meta.data-starts-at",
+                      model?.dataStartsAt?.locale(lang)?.format("LLL"),
+                    ],
+                    [
+                      "water-demand-prediction.model-meta.data-ends-at",
+                      model?.dataEndsAt?.locale(lang)?.format("LLL"),
+                    ],
+                    ["weather capability", model?.weatherCapability],
+                    [
+                      "water-demand-prediction.model-meta.training-duration",
+                      model?.trainingDuration?.locale(lang)?.humanize(),
+                    ],
+                    [
+                      "water-demand-prediction.model-meta.training-start",
+                      model?.trainingStart?.locale(lang)?.format("LLL"),
+                    ],
+                  ];
+                  track entry[0]
+                ) {
+                  @let key = entry[0];
+                  @let value = entry[1];
+                  @if (value) {
+                    <tr>
+                      <th [translate]="$any(key)"></th>
+                      <td style="padding-left: 1rem">{{ value }}</td>
+                    </tr>
+                  }
+                }
+              </tbody>
+              @if (model?.comment) {
+                <tfoot>
+                  <tr>
+                    <td colspan="2">
+                      {{ model?.comment }}
+                    </td>
+                  </tr>
+                </tfoot>
+              }
+            </table>
+          </div>
+          <div class="card-footer">
+            <button
+              #button
+              (mouseover)="button.classList.add('has-text-primary')"
+              (mouseout)="button.classList.remove('has-text-primary')"
+              (click)="modelId.emit(model.id)"
+              class="card-footer-item"
+            >
+              <span
+                class="has-text-weight-bold"
+                translate="water-demand-prediction.buttons.select"
+              ></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

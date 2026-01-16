@@ -14,14 +14,16 @@ import {SidebarEntry} from "../../sidebar";
   selector: "sidebar-icon",
   imports: [NgIcon, KeyValuePipe, NgComponentOutlet],
   template: `
-    @let iconVal = icon();
-    @if (isURL(iconVal)) {
-      <ng-icon [name]="iconVal.toString()"></ng-icon>
-    } @else if (isRecord(iconVal)) {
-      <ng-icon [name]="(iconVal | keyvalue)[0].key"></ng-icon>
-    } @else {
-      <ng-container *ngComponentOutlet="iconVal"></ng-container>
-    }
+    <div class="is-grid">
+      @let iconVal = icon();
+      @if (isURL(iconVal)) {
+        <ng-icon [name]="iconVal.toString()"></ng-icon>
+      } @else if (isRecord(iconVal)) {
+        <ng-icon [name]="(iconVal | keyvalue)[0].key"></ng-icon>
+      } @else {
+        <ng-container *ngComponentOutlet="iconVal"></ng-container>
+      }
+    </div>
   `,
 })
 export class SidebarIconComponent {

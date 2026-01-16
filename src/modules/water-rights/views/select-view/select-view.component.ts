@@ -116,7 +116,7 @@ export class SelectViewComponent {
     private router: Router,
     private route: ActivatedRoute,
   ) {
-    this.usageLocations = signals.map(
+    this.usageLocations = signals.mapTo(
       geo.fetchLayerContents(
         "water_right_usage_locations",
         undefined,

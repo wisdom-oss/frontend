@@ -191,7 +191,7 @@ export class DetailViewComponent {
     | undefined
     | {attribution?: string; attributionURL?: string; data: UsageLocations}
   > {
-    let allUsageLocations = signals.map(
+    let allUsageLocations = signals.mapTo(
       geo.fetchLayerContents(
         "water_right_usage_locations",
         undefined,

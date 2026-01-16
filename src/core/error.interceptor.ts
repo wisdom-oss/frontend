@@ -8,7 +8,7 @@ import {TagUri} from "@cptpiepmatz/tag-uri";
 import {catchError, throwError} from "rxjs";
 
 import {AuthService} from "./auth/auth.service";
-import {ServiceError} from "../common/service-error";
+import {api} from "../common/api";
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   let authService = inject(AuthService);
@@ -18,7 +18,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       if (err instanceof HttpErrorResponse) {
         if (err.status == HttpStatusCode.Unauthorized) authService.logout();
 
-        let errorTag = err.error as Partial<ServiceError>;
+        let errorTag = err.error as Partial<api.Error>;
         if (errorTag.instance) {
           let tag = TagUri.parse(errorTag.instance);
           if (tag.specific.split(":").includes("JsonWebTokenMalformed")) {

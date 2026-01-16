@@ -20,6 +20,9 @@
     "bbox",
     "greenable",
     "oowv",
+    "smartmeter",
+    "timeframe",
+    "timeframes",
     "typia"
   ],
   "files.watcherExclude": {

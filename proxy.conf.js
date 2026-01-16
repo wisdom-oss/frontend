@@ -46,6 +46,15 @@ const OPTIONAL_PROXY_CONFIGS = {
       rewrite: path => path.replace(/^\/api\/bws/, ""),
     },
   ],
+  pmdarima: [
+    "/api/pmdarima-predictions/**",
+    {
+      target: "http://localhost:8000",
+      secure: false,
+      changeOrigin: true,
+      rewrite: path => path.replace(/^\/api\/pmdarima-predictions/, ""),
+    },
+  ],
 };
 
 /**

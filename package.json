@@ -18,7 +18,8 @@
     "docker:build": "bash -c 'docker build -t wisdom-oss/frontend --build-arg GIT_COMMIT_SHA=$(git rev-parse HEAD) .'",
     "docker:start": "npm run docker:run",
     "docker:run": "docker run --rm -p 5000:5000 wisdom-oss/frontend",
-    "git-hooks": "husky"
+    "git-hooks": "husky",
+    "postinstall": "patch-package"
   },
   "private": true,
   "dependencies": {
@@ -34,8 +35,8 @@
     "@cptpiepmatz/tag-uri": "npm:@jsr/cptpiepmatz__tag-uri@^0.1.2",
     "@maplibre/ngx-maplibre-gl": "^20.0.0",
     "@mjackson/multipart-parser": "npm:@jsr/mjackson__multipart-parser@^0.10.1",
-    "@ng-icons/core": "^32.2.0",
-    "@ng-icons/remixicon": "^32.2.0",
+    "@ng-icons/core": "^32.4.0",
+    "@ng-icons/remixicon": "^32.4.0",
     "@ngx-translate/core": "^17.0.0",
     "@thatopen/components": "^2.4.11",
     "@thatopen/components-front": "~2.4.12",
@@ -48,12 +49,14 @@
     "bulma-switch": "github:deather/bulma-switch",
     "bulma-v1-tooltip": "^1.0.2",
     "chart.js": "^4.5.1",
+    "chartjs-chart-error-bars": "^4.4.5",
     "dayjs": "^1.11.18",
     "dexie": "^4.2.1",
     "gravatar-gen": "^1.0.2",
     "jwt-decode": "^4.0.0",
     "maplibre-gl": "^5.7.3",
     "ng2-charts": "^8.0.0",
+    "patch-package": "^8.0.1",
     "rollup": "^4.52.4",
     "rxjs": "~7.8.2",
     "three": "~0.178.0",
@@ -94,6 +97,6 @@
   },
   "volta": {
     "node": "22.18.0",
-    "npm": "11.5.2"
+    "npm": "11.6.0"
   }
 }

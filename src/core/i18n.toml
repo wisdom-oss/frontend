@@ -69,3 +69,7 @@ de = "Wasserverbrauch"
 [sidebar.category.waterworks]
 en = "Waterworks"
 de = "Wasserwerke"
+
+[sidebar.category.water-demand-prediction]
+en = "Water Demand Prediction"
+de = "Wasserbedarfsvorhersage"

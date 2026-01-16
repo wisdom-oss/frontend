@@ -1,5 +1,8 @@
+/* oxlint-disable */
+
 import {
   httpResource,
+  HttpClient,
   HttpStatusCode,
   HttpContext,
   HttpResourceOptions,
@@ -9,12 +12,14 @@ import {
   HttpErrorResponse,
 } from "@angular/common/http";
 import {computed, isSignal, signal, Signal as CoreSignal} from "@angular/core";
+import dayjs, {Dayjs} from "dayjs";
 import {Duration} from "dayjs/plugin/duration";
 import {isTypedArray} from "three/src/animation/AnimationUtils.js";
-import typia from "typia";
+import typia, {tags} from "typia";
 
 import {httpContexts} from "./http-contexts";
 import {Once} from "./utils/once";
+import {Id} from "./id";
 
 /**
  * Toolkit to build API services.
@@ -43,6 +48,74 @@ export namespace api {
    * export class SomeService extends api.service("/api/something") {}
    */
   export type Service = typeof ApiService;
+
+  /**
+   * Represents a typical error returned by backend services, following [RFC 9457].
+   *
+   * This interface is used to convey standardized error information.
+   * It includes fields for general error details, optional extended information,
+   * and server-specific metadata.
+   *
+   * ### Notes:
+   * - When interacting with an erroring service, ensure you handle it as
+   *   `Partial<api.Error>`.
+   *   Services may respond with incomplete or unexpected data, so all fields
+   *   should be treated as potentially missing.
+   * - The `host` field is automatically populated by the backend during response
+   *   generation.
+   *
+   * [RFC 9457]: https://datatracker.ietf.org/doc/html/rfc9457
+   */
+  export interface Error {
+    /**
+     * A URI reference identifying the problem type.
+     * This can serve as a primary identifier and may link to external
+     * documentation.
+     */
+    type: string;
+
+    /**
+     * The HTTP status code associated with the error response.
+     * Follows [RFC 9110] standards.
+     *
+     * [RFC 9110]: https://www.rfc-editor.org/rfc/rfc9110#section-15
+     */
+    status: number;
+
+    /**
+     * A short, human-readable summary of the problem
+     * (e.g., "Missing Authorization Information").
+     */
+    title: string;
+
+    /**
+     * A human-readable description of the problem with a focus on guidance for
+     * resolution.
+     */
+    detail: string;
+
+    /**
+     * A URI identifying the specific occurrence of the error.
+     * This may be dereferenceable for further investigation.
+     *
+     * Usually includes a `tag:` URI by the [RFC 4151] standard.
+     *
+     * [RFC 4151]: https://datatracker.ietf.org/doc/html/rfc4151
+     */
+    instance?: string;
+
+    /**
+     * Extended error details, often containing a list of related errors
+     * represented as plain strings.
+     */
+    errors?: string[];
+
+    /**
+     * The hostname of the server where the error occurred.
+     * Automatically set by the backend during response generation.
+     */
+    host: string;
+  }
 
   /**
    * Base class for all API services.
@@ -95,6 +168,10 @@ export namespace api {
    */
   export type RequestSignal<T> = T | CoreSignal<T | undefined>;
 
+  function hasNoSignals<T>(components: RequestSignal<T>[]): components is T[] {
+    return components.every(component => !isSignal(component));
+  }
+
   /**
    * Ensures a {@link RequestSignal} is a signal.
    *
@@ -123,6 +200,13 @@ export namespace api {
     // The `value` is not *really* omitted in the output but avoids accidentally
     // calling `.value()`.
     resource: Omit<HttpResourceRef<T | D>, "value">;
+
+    /**
+     * Reloads the signal.
+     *
+     * Shorthand to `.resource.reload()`.
+     */
+    reload(): boolean;
   };
 
   /**
@@ -140,6 +224,142 @@ export namespace api {
   export const NONE = Symbol("api.NONE");
   export type NONE = typeof NONE;
 
+  export namespace QueryParams {
+    /** Value compatible with query params. */
+    export type Value =
+      | undefined
+      | string
+      | number
+      | boolean
+      | Dayjs
+      | Duration
+      | Id<string | number, any>;
+  }
+
+  type FromQueryParams = Record<
+    string,
+    QueryParams.Value | QueryParams.Value[]
+  >;
+
+  /**
+   * Container type to hold query parameters.
+   *
+   * This replaces the {@link HttpParams} class used by Angular regularly and adds behavior for more data types than just primitives.
+   * For additional supported types, check {@link QueryParams.Value}.
+   *
+   * This container type is designed to work hand in hand with the `api` namespace.
+   * It provides a static `from` method that converts a {@link RequestSignal} of parameters into a `RequestSignal<QueryParams>`, allowing easy usage when sending query parameters.
+   *
+   * All methods that modify the container also return the container itself, this allows the usage of the builder pattern but also regular modifying the query params.
+   * Different to the {@link HttpParams}, this container is **not** immutable and will change.
+   * But in most code the immutability of `HttpParams` were surprising as everything else isn't immutable.
+   */
+  export class QueryParams {
+    private map = new Map();
+
+    /**
+     * Construct a query params container from a record holding compatible values.
+     * @param params A record with values to be sent.
+     */
+    constructor(
+      params: Record<string, QueryParams.Value | QueryParams.Value[]> = {},
+    ) {
+      for (let [key, val] of Object.entries(params)) {
+        if (!this.map.has(key)) this.map.set(key, []);
+        if (Array.isArray(val)) val.forEach(val => this.map.get(key).push(val));
+        else this.map.get(key).push(val);
+      }
+    }
+
+    /**
+     * Alternative constructor useful for {@link resource} usage.
+     * @param params Raw query parameters or a signal maybe containing them.
+     * @returns Query parameters or a signal maybe containing them.
+     */
+    static from(params: FromQueryParams): QueryParams;
+    static from(
+      params: RequestSignal<FromQueryParams>,
+    ): RequestSignal<QueryParams>;
+    static from(
+      params: RequestSignal<FromQueryParams>,
+    ): RequestSignal<QueryParams> {
+      // duplicate signature is necessary to expose broad signature as well as
+      // use it
+      return map(params, params => new QueryParams(params));
+    }
+
+    private static serialize(
+      value: QueryParams.Value,
+    ): undefined | string | boolean | number {
+      if (dayjs.isDayjs(value)) return value.toISOString();
+      if (dayjs.isDuration(value)) return value.toISOString();
+      if (value instanceof Id) return value.get();
+      return value;
+    }
+
+    has(param: string): boolean {
+      return this.map.get(param)?.length > 0;
+    }
+
+    get(param: string): QueryParams.Value | null {
+      return this.map.get(param)?.[0] ?? null;
+    }
+
+    getAll(param: string): QueryParams.Value[] | null {
+      return this.map.get(param) ?? null;
+    }
+
+    keys(): string[] {
+      return Array.from(this.map.keys());
+    }
+
+    append(param: string, value: QueryParams.Value): QueryParams {
+      if (!this.map.has(param)) this.map.set(param, [value]);
+      else this.map.get(param).push(value);
+      return this;
+    }
+
+    appendAll(params: {
+      [param: string]: QueryParams.Value | QueryParams.Value[];
+    }): QueryParams {
+      for (let [key, val] of Object.entries(params)) {
+        if (!this.map.has(key)) this.map.set(key, []);
+        if (Array.isArray(val)) val.forEach(val => this.map.get(key).push(val));
+        this.map.get(key).push(val);
+      }
+      return this;
+    }
+
+    set(param: string, value: QueryParams.Value): QueryParams {
+      this.map.set(param, [value]);
+      return this;
+    }
+
+    delete(param: string): QueryParams {
+      this.map.delete(param);
+      return this;
+    }
+
+    toString(): string {
+      return this.toHttpParams().toString();
+    }
+
+    toHttpParams(): HttpParams {
+      return new HttpParams().appendAll(
+        Object.fromEntries(
+          Array.from(this.map.entries()).map(([key, val]) => [
+            key,
+            val.map(QueryParams.serialize),
+          ]),
+        ),
+      );
+    }
+
+    toJSON(): Record<string, QueryParams.Value> {
+      return Object.fromEntries(this.map.entries());
+    }
+  }
+
   type Request = {
     [K in keyof Omit<
       HttpResourceRequest,
@@ -149,6 +369,7 @@ export namespace api {
       | "withCredentials"
       | "transferCache"
       | "cache"
+      | "params"
     >]: RequestSignal<HttpResourceRequest[K]>;
   };
 
@@ -191,7 +412,7 @@ export namespace api {
     TResult,
     TRaw,
     TDefault extends TResult | undefined,
-  > = Request &
+  > = (Request &
     Options<TResult, TRaw> & {
       /**
        * URL for the request.
@@ -213,17 +434,45 @@ export namespace api {
        *
        * If the requested service returns a structure that doesn't directly
        * match `TResult`, use the `parse` option to transform from `TRaw` to
-       * `TResult`.
-       * This `validate` function will always run on the result of `parse`.
+       * `TResult`. This `validate` function will always run on the result
+       * of `parse`.
+       *
+       * Optional, but either this or the pair (`validateRaw` + `parse`)
+       * must be provided.
        */
-      validate: (input: unknown) => typia.IValidation<TResult>;
+      validate?: (input: unknown) => typia.IValidation<TResult>;
+
+      /**
+       * Validator for the raw response type (`TRaw`), before parsing.
+       *
+       * Just like `validate`, this is also a {@link typia}-generated validator,
+       * but it runs on the raw response, before the `parse` function is applied.
+       *
+       * This is useful when you're working with custom response formats and
+       * want to make sure that what you feed into `parse` is safe.
+       *
+       * Optional, but if you don't provide `validate`, then both this and
+       * `parse` must be provided.
+       */
+      validateRaw?: (input: unknown) => typia.IValidation<TRaw>;
+
+      /**
+       * Convert the raw response (`TRaw`) into the final shape (`TResult`).
+       *
+       * Runs before `validate` on the final result.
+       * If the server already gives you a `TResult`, you can skip this.
+       *
+       * Optional, but if you don't provide `validate`, then both this and
+       * `validateRaw` must be provided.
+       */
+      parse?: (raw: TRaw) => TResult;
 
       /**
        * HTTP method to use.
        *
        * Defaults to "GET".
        */
-      method?: "GET" | "POST";
+      method?: "GET" | "POST" | "PUT";
 
       /**
        * Controls the raw response type returned by the server.
@@ -243,17 +492,6 @@ export namespace api {
        * By using `parse`, you can convert these raw values into a `TResult`.
        */
       responseType?: "arrayBuffer" | "blob" | "text";
-
-      /**
-       * Validator for the raw response type (`TRaw`), before parsing.
-       *
-       * Just like `validate`, this is also a {@link typia}-generated validator,
-       * but it runs on the raw response, before the `parse` function is applied.
-       *
-       * This is optional, but highly recommended when you're parsing structured
-       * data manually, to make sure your `parse` input is safe and expected.
-       */
-      validateRaw?: (input: unknown) => typia.IValidation<TRaw>;
 
       /**
        * The default value returned before a response is available.
@@ -281,7 +519,7 @@ export namespace api {
        * authentication if the user is logged in.
        *
        * You can override this by explicitly setting this to:
-       * - `true` - force-authenticate, even if the URL doesn’t start with `/api/`
+       * - `true` - force-authenticate, even if the URL doesn't start with `/api/`
        * - `false` - explicitly skip authentication
        */
       authenticate?: boolean;
@@ -307,6 +545,8 @@ export namespace api {
        */
       cache?: Duration;
 
+      params?: RequestSignal<QueryParams>;
+
       /**
        * Custom error handler for specific HTTP status codes.
        *
@@ -330,7 +570,20 @@ export namespace api {
       onError?: Partial<
         Record<HttpStatusCode, (err: HttpErrorResponse) => TResult>
       >;
-    };
+    }) &
+    // Enforce that either `validate` is present,
+    // or `validateRaw` and `parse` are both present.
+    (| {
+          validate: (input: unknown) => typia.IValidation<TResult>;
+          validateRaw?: (input: unknown) => typia.IValidation<TRaw>;
+          parse?: (raw: TRaw) => TResult;
+        }
+      | {
+          validate?: (input: unknown) => typia.IValidation<TResult>;
+          validateRaw: (input: unknown) => typia.IValidation<TRaw>;
+          parse: (raw: TRaw) => TResult;
+        }
+    );
 
   /**
    * Our custom wrapper around Angular's {@link httpResource}.
@@ -383,7 +636,10 @@ export namespace api {
       equal,
     }) as HttpResourceRef<TResult | TDefault>;
     let value = buildResourceErrorHandler(options, resourceRef);
-    return Object.assign(value, {resource: resourceRef});
+    return Object.assign(value, {
+      resource: resourceRef,
+      reload: () => resourceRef.reload(),
+    });
   }
 
   /**
@@ -475,7 +731,6 @@ export namespace api {
       for (let key of [
         "method",
         "body",
-        "params",
         "headers",
         "reportProgress",
       ] as const) {
@@ -489,6 +744,14 @@ export namespace api {
 
         // @ts-ignore here too
         request[key] = options[key];
+      }
+
+      if (options.params) {
+        if (isSignal(options.params)) {
+          let params = options.params();
+          if (params === undefined) return undefined;
+          request.params = params.toHttpParams();
+        } else request.params = options.params.toHttpParams();
       }
 
       return {context, ...request};
@@ -514,6 +777,7 @@ export namespace api {
     validateRaw,
     parse,
     validate,
+    url,
   }: ResourceOptions<TResult, TRaw, TDefault>): (raw: TRaw) => TResult {
     return raw => {
       let result = raw as unknown as TResult;
@@ -521,7 +785,11 @@ export namespace api {
         if (validateRaw) {
           let validRaw = validateRaw(raw);
           if (!validRaw.success) {
-            console.error(validRaw.errors);
+            console.error({
+              errors: validRaw.errors,
+              raw: result,
+              url: isSignal(url) ? url() : url,
+            });
             throw new Error("Invalid type on raw response");
           }
         }
@@ -529,10 +797,12 @@ export namespace api {
         result = parse(raw);
       }
 
-      let validResult = validate(result);
-      if (!validResult.success) {
-        console.error(validResult.errors);
-        throw new Error("Invalid type on response");
+      if (validate) {
+        let validResult = validate(result);
+        if (!validResult.success) {
+          console.error(validResult.errors);
+          throw new Error("Invalid type on response");
+        }
       }
 
       return result;
@@ -679,6 +949,12 @@ export namespace api {
     validateRaw?: (input: unknown) => typia.IValidation<TRaw>;
 
     /**
+     * Assume that incoming strings are JSON.
+     * @default true
+     */
+    assumeJson?: boolean;
+
+    /**
      * Parse the raw messages into a message format to be used in the public API.
      * @param input Raw incoming message, validated via {@link validateRaw}.
      */
@@ -752,6 +1028,7 @@ export namespace api {
     url,
     validate,
     validateRaw,
+    assumeJson,
     parse,
     serialize,
     protocols,
@@ -766,8 +1043,8 @@ export namespace api {
     TSend,
     TDefault
   > {
-    let webSocket = new WebSocket(url, protocols);
-    if (binaryType) webSocket.binaryType = binaryType;
+    let ws = new WebSocket(url, protocols);
+    if (binaryType) ws.binaryType = binaryType;
 
     let waitUntilOpen = new Once();
     let send = (message: TSend) => {
@@ -780,30 +1057,30 @@ export namespace api {
           isTypedArray(payload) ||
           payload instanceof DataView
         )
-          webSocket.send(payload as ArrayBuffer | Blob | ArrayBufferLike);
-        else if (typeof payload === "string") webSocket.send(payload);
-        else webSocket.send(JSON.stringify(payload));
+          ws.send(payload as ArrayBuffer | Blob | ArrayBufferLike);
+        else if (typeof payload === "string") ws.send(payload);
+        else ws.send(JSON.stringify(payload));
       });
     };
 
     let writeSignal = signal<TMessage | TDefault>(defaultValue as TDefault);
     let socket = Object.assign(writeSignal, {
-      close: webSocket.close,
+      close: ws.close,
       send,
     });
 
-    let addEventListener = webSocket.addEventListener;
-    if (onClose) addEventListener("close", ev => onClose(socket, ev));
-    if (onError) addEventListener("error", ev => onError(socket, ev));
-    if (onOpen) addEventListener("open", ev => onOpen(socket, ev));
-    if (onMessage) addEventListener("message", ev => onMessage(socket, ev));
+    if (onClose) ws.addEventListener("close", ev => onClose(socket, ev));
+    if (onError) ws.addEventListener("error", ev => onError(socket, ev));
+    if (onOpen) ws.addEventListener("open", ev => onOpen(socket, ev));
+    if (onMessage) ws.addEventListener("message", ev => onMessage(socket, ev));
 
-    webSocket.addEventListener("open", () => waitUntilOpen.set());
-    webSocket.addEventListener("message", ev => {
+    ws.addEventListener("open", () => waitUntilOpen.set());
+    ws.addEventListener("message", ev => {
       let message;
-      if (typeof ev.data === "string") message = JSON.parse(ev.data);
-      else if (webSocket.binaryType === "blob") message = new Blob(ev.data);
-      else if (webSocket.binaryType === "arraybuffer")
+      if (!(assumeJson ?? true)) message = ev.data;
+      else if (typeof ev.data === "string") message = JSON.parse(ev.data);
+      else if (ws.binaryType === "blob") message = new Blob(ev.data);
+      else if (ws.binaryType === "arraybuffer")
         message = new ArrayBuffer(ev.data);
 
       if (validateRaw) {
@@ -827,6 +1104,55 @@ export namespace api {
 
     return socket;
   }
+
+  type UnwrapRequestSignal<T> = T extends RequestSignal<infer U> ? U : T;
+  type UnwrapArgs<Args extends readonly unknown[]> = {
+    [K in keyof Args]: UnwrapRequestSignal<Args[K]>;
+  };
+
+  type HttpMethod = Exclude<
+    ResourceOptions<unknown, unknown, unknown>["method"],
+    undefined
+  >;
+
+  type RequestMethods<
+    M extends HttpMethod,
+    A extends readonly unknown[],
+    T,
+  > = (M extends "GET" ? {get: (...args: A) => Promise<T>} : {}) &
+    (M extends "POST" ? {post: (...args: A) => Promise<T>} : {}) &
+    (M extends "PUT" ? {put: (...args: A) => Promise<T>} : {});
+
+  export type Endpoint<
+    A extends unknown[],
+    T,
+    D = undefined,
+    M extends HttpMethod = "GET",
+  > = ((...args: A) => Signal<T, D>) & RequestMethods<M, UnwrapArgs<A>, T>;
+
+  // TODO: implement this as a proper function
+  /** @deprecated in this current state */
+  export function endpoint<
+    TArgs extends RequestSignal<unknown>[],
+    TResult,
+    TRaw,
+    TDefault extends TResult | undefined = undefined,
+    // TMethod extends HttpMethod = "GET",
+  >(
+    http: HttpClient,
+    options: (...args: TArgs) => ResourceOptions<TResult, TRaw, TDefault>,
+  ): Endpoint<TArgs, TResult, TDefault, "GET"> {
+    let buildResource = (...args: TArgs) => resource(options(...args));
+    let get = (...args: UnwrapArgs<TArgs>) => {
+      let reqOptions = options(...(args as TArgs));
+      let url = isSignal(reqOptions.url) ? reqOptions.url() : reqOptions.url;
+      url = typia.assert<string>(url);
+      http.get(url);
+    };
+    return null as any;
+  }
+
+  type UrlParts = string | number | boolean | Id<string | number, any>;
 
   /**
    * Template literal tagging function for building URLs.
@@ -857,7 +1183,9 @@ export namespace api {
    */
   export function url(
     template: TemplateStringsArray,
-    ...args: RequestSignal<string | number | boolean>[]
+    ...args: RequestSignal<
+      string | number | boolean | Id<string | number, any>
+    >[]
   ): CoreSignal<string | undefined> {
     return computed(() => {
       let url = template[0];
@@ -904,4 +1232,23 @@ export namespace api {
       return f(value);
     });
   }
+
+  /** @deprecated */
+  export type DeserializedRecord<T> = {
+    [K in keyof T]: T[K] extends string & tags.Format<"date-time">
+      ? Dayjs
+      : T[K] extends string & tags.Format<"duration">
+        ? Duration
+        : T[K];
+  };
+
+  export type RawRecord<T> = {
+    [K in keyof T]: T[K] extends Id<any, any>
+      ? Id.Value<T[K]>
+      : T[K] extends Dayjs | undefined
+        ? (string & tags.Format<"date-time">) | Extract<T[K], undefined>
+        : T[K] extends Duration | undefined
+          ? (string & tags.Format<"duration">) | Extract<T[K], undefined>
+          : T[K];
+  };
 }
