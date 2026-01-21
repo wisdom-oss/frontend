@@ -26,6 +26,8 @@ RUN volta run npm --version
 # install dependencies
 COPY --link package-lock.json .
 COPY --link .npmrc .
+# also include patches for install
+COPY --link patches .
 RUN volta run npm ci
 
 # build the app
