@@ -109,7 +109,11 @@
             ],
             "stylePreprocessorOptions": {
               "sass": {
-                "silenceDeprecations": ["global-builtin", "import"]
+                "silenceDeprecations": [
+                  "global-builtin",
+                  "import",
+                  "if-function"
+                ]
               }
             }
           },
@@ -156,7 +160,7 @@
         "test": {
           "builder": "@angular-builders/jest:run",
           "options": {
-            "configPath": "jest.config.ts"
+            "config": "jest.config.ts"
           }
         }
       }

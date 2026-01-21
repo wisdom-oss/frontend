@@ -26,10 +26,10 @@
       <ng-container images>
         @for (color of measurementColors | keyvalue; track color.key) {
           <mgl-image
-            [id]="'measurement-classification-' + color.key + '-image'"
+            [id]="'measurement-classification-' + $any(color.key) + '-image'"
             [url]="
               '/public/generated/groundwater-level-station-marker/' +
-              color.key +
+              $any(color.key) +
               '.png'
             "
           ></mgl-image>
@@ -227,17 +227,17 @@
             @for (color of measurementColors | keyvalue; track color.key) {
               <!-- prettier-ignore -->
               <mgl-layer
-                [id]="'groundwater-measurement-stations-layer-' + color.key + '-symbol'"
+                [id]="'groundwater-measurement-stations-layer-' + $any(color.key) + '-symbol'"
                 type="symbol"
                 source="groundwater-measurement-stations-source"
                 [layout]="{
-                  'icon-image': 'measurement-classification-' + color.key + '-image',
+                  'icon-image': 'measurement-classification-' + $any(color.key) + '-image',
                   'icon-size': ['interpolate', ['linear'], ['zoom'], 5, 0.1, 12, 1],
                   'icon-ignore-placement': true,
                   'symbol-z-order': 'source',
                   'icon-overlap': 'always',
                 }"
-                [filter]="['==', ['get', 'classification'], '' + color.key]"
+                [filter]="['==', ['get', 'classification'], '' + $any(color.key)]"
                 (layerMouseMove)="
                   hoveredFeatures.groundwaterMeasurementStation.set(
                     $any($event.features![0]!)

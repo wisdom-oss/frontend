@@ -61,7 +61,7 @@ type CssCursor =
 @Directive({
   selector: "mgl-map",
   host: {
-    "(mapLoad)": "onLoad($event)",
+    "(mapLoad)": "onLoad($any($event))",
   },
 })
 export class MapCursorDirective {
