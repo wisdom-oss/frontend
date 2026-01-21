@@ -50,7 +50,7 @@
     "bulma-v1-tooltip": "^1.0.2",
     "chart.js": "^4.5.1",
     "chartjs-chart-error-bars": "^4.4.5",
-    "dayjs": "^1.11.18",
+    "dayjs": "^1.11.19",
     "dexie": "^4.2.1",
     "gravatar-gen": "^1.0.2",
     "jwt-decode": "^4.0.0",
