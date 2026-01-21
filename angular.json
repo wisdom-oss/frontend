@@ -109,7 +109,11 @@
             ],
             "stylePreprocessorOptions": {
               "sass": {
-                "silenceDeprecations": ["global-builtin", "import", "if-function"]
+                "silenceDeprecations": [
+                  "global-builtin",
+                  "import",
+                  "if-function"
+                ]
               }
             }
           },
