@@ -1,6 +1,6 @@
 <div>
   @if(activeView() === 'model') {
-    <model-view filename="IBC.glb" [cam]="{x: 0, y: 0.25, z: 2}"/>
+    <model-view-braintank filename="IBC.glb" [cam]="{x: 0, y: 0.25, z: 2}"/>
   }
   @if(activeView() === 'map') {
     <div class="is-fullwidth" style="height: 40rem">
@@ -44,7 +44,7 @@
           <div class="is-flex is-flex-direction-row">
             <ng-icon name="remixTimeLine" size="2.5rem" class="mx-4"/>
             <div class="is-flex is-flex-direction-column is-justify-content-center">
-              <p><span translate>digitalTwin.label.time</span>: {{time().format('DD.MM.YYYY, HH:mm:ss')}}</p>
+              <p><span translate>digitalTwin.label.time</span>: {{time().format('DD.MM.YYYY, HH:mm')}}</p>
             </div>
           </div>
         </div>
@@ -64,7 +64,7 @@
           <div class="is-flex is-flex-direction-row">
             <ng-icon name="remixWaterPercentLine" size="2.5rem" class="mx-4"/>
             <div class="is-flex is-flex-direction-column is-justify-content-center">
-              @if(draining()){<p><span translate>digitalTwin.label.drainage.yes</span>: {{drainingTime().format('HH:mm:ss')}}</p>}
+              @if(draining()){<p><span translate>digitalTwin.label.drainage.yes</span>: {{drainingTime().format('HH:mm')}}</p>}
               @if(!draining()){<p translate>digitalTwin.label.drainage.no</p>}
             </div>
           </div>

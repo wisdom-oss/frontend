@@ -1,12 +1,10 @@
 <div>
   @if(activeView() === 'model') {
-    <model-view filename="RRB_Damme.glb" [cam]="{x: 0, y: 10, z: 50}"/>
+    <model-view-rrb filename="RRB_Damme_Water.glb" [cam]="{x: -96, y: 40, z: 4}" [waterLevel]="waterLevel"/>
   }
   @if(activeView() === 'map') {
-    <div map class="is-fullwidth" style="height: 40rem">
-      <div class="is-fullwidth" style="height: 40rem">
+    <div class="is-fullwidth" style="height: 40rem">
         <map-view [locations]="locations" [center]="{lon: long(), lat: lat()}"></map-view>
-      </div>
     </div>
   }
   @if(activeView() === 'pictures') {

@@ -45,12 +45,8 @@ export type DrainageRule = {
   ],
 })
 export class DrainageRulesComponent {
-  @Input() rules: DrainageRule[] = [
-      {title: "Mittelstarker Regenfall", rainAmount: 5, rainDuration: 15, targetLevel: 40, drainageForerun: 10, open: signals.toggleable(true)},
-      {title: "Starkregen", rainAmount: 15, rainDuration: 30, targetLevel: 20, drainageForerun: 30, open: signals.toggleable(false)},
-  ];
+  @Input() drainageRules: WritableSignal<DrainageRule[]> = signal([]);
 
-  protected drainageRules: WritableSignal<DrainageRule[]>= signal(this.rules);
   protected newDrainageRule: DrainageRule = {title: "", rainAmount: 0, rainDuration: 0, targetLevel: 0, drainageForerun: 0, open: signals.toggleable(true)}
   protected drainageRuleModal: WritableSignal<DrainageRule>= signal(this.newDrainageRule);
   protected drainageRuleModalIndex: WritableSignal<number|undefined> = signal(undefined);
@@ -71,7 +67,8 @@ export class DrainageRulesComponent {
 
   updateDrainageRules() {
     if (this.drainageRuleModalIndex() === undefined) {
-      this.drainageRules().push(this.drainageRuleModal());
+      const rules = this.drainageRules().concat(this.drainageRuleModal());
+      this.drainageRules.set(rules);
     } else {
       this.drainageRules.set(this.drainageRules().map((item, i) => 
         i === this.drainageRuleModalIndex() ? this.drainageRuleModal() : item

@@ -1,0 +1,174 @@
+<div class="card my-4">
+    <div class="card-content">
+      <div class="is-fullwidth has-text-centered my-4">
+        <p class="is-size-3 my-4" translate>digitalTwin.header.rainForecast</p>
+      </div>
+      
+      <button class="button is-primary is-rounded my-4" 
+              (click)="copyForecast(rainForecastModal, rainForecast); rainForecastModalOpen.set(true)">
+        <p translate>digitalTwin.button.adjustRainForecast</p>
+      </button>
+  
+      <div class="modal" [class.is-active]="rainForecastModalOpen()">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+          <header class="modal-card-head">
+            <p class="modal-card-title" translate>digitalTwin.button.adjustRainForecast</p>
+            <button class="delete" aria-label="close" 
+                    (click)="copyForecast(rainForecastModal, rainForecast); rainForecastModalOpen.set(false)"></button>
+          </header>
+          <section class="modal-card-body">
+            <div class="columns mt-4">
+              <div class="column is-1"></div>
+              <div class="column is-narrow">
+                <p><span translate>digitalTwin.label.simulationInterval</span>: </p>
+              </div>
+              <div class="column"></div>
+              <div class="column is-one-third">
+                <div class="dropdown is-hoverable">
+                  <div class="dropdown-trigger">
+                    <button class="button is-flex is-flex-direction-row is-justify-content-space-between" aria-haspopup="true" aria-controls="dropdown-menu" style="width: 8rem">
+                        <p>{{intervalForecast()}}</p>
+                        <ng-icon name="remixArrowDownSLine" size="1.5em"/>
+                    </button>
+                  </div>
+                  <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                    <div class="dropdown-content">
+                      <a class="dropdown-item" [class.is-active]="intervalForecast() === '5 min'" (click)="intervalForecast.set('5 min'); updateIntervalForecastModal()">5 min</a>
+                      <a class="dropdown-item" [class.is-active]="intervalForecast() === '10 min'" (click)="intervalForecast.set('10 min'); updateIntervalForecastModal()">10 min</a>
+                      <a class="dropdown-item" [class.is-active]="intervalForecast() === '15 min'" (click)="intervalForecast.set('15 min'); updateIntervalForecastModal()">15 min</a>
+                      <a class="dropdown-item" [class.is-active]="intervalForecast() === '30 min'" (click)="intervalForecast.set('30 min'); updateIntervalForecastModal()">30 min</a>
+                      <a class="dropdown-item" [class.is-active]="intervalForecast() === '1 h'" (click)="intervalForecast.set('1 h'); updateIntervalForecastModal()">1 h</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="column is-1"></div>
+            </div>
+
+            <div class="columns mt-4">
+              <div class="column is-1"></div>
+              <div class="column is-narrow">
+                <p><span translate>digitalTwin.label.simulationDuration</span>: </p>
+              </div>
+              <div class="column"></div>
+              <div class="column is-one-third">
+                <input class="input is-rounded" type="number" min="6" max="48" [value]="durationForecast()"
+                      (input)="durationForecast.set($any($event.target).valueAsNumber); updateLengthForecastModal()"/>
+              </div>
+              <div class="column is-1"></div>
+            </div>
+
+            <div class="columns mt-4">
+              <div class="column is-1"></div>
+              <div class="column is-narrow"> 
+                <p><span translate>digitalTwin.label.applyRainForecast</span>: </p>
+              </div>
+              <div class="column"></div>
+              <div class="column is-narrow">
+                <input id="checkedRainForecast" type="checkbox" class="switch is-rounded" [checked]="checkedRainForecast()" 
+                       (click)="onToogleClick($event, checkedRainForecast)"/>
+                <label for="checkedRainForecast"></label>
+              </div>
+              <div class="column is-1"></div>
+            </div>
+
+            @if(checkedRainForecast()) {
+              <div class="columns mt-4">
+                <div class="column is-1"></div>
+                <div class="column is-narrow"> 
+                  <p><span translate>digitalTwin.label.chooseTime</span>: </p>
+                </div>
+                <div class="column"></div>
+                <div class="column is-narrow">
+                  <input type="date" style="height: 2rem;" (input)="setForecastModalFromTime($any($event.target).value)"/>
+                </div>
+                <div class="column is-1"></div>
+              </div>
+            }
+
+            <div class="columns mt-4">
+              <div class="column is-1"></div>
+              <div class="column is-narrow">
+                <ng-icon name="remixTimeLine" size="1.5em"/>
+              </div>
+              <div class="column is-narrow">
+                <p><span translate>digitalTwin.label.time</span> ({{intervalForecast() === '1 h' ? 'h' : 'min'}}) </p>
+              </div>
+              <div class="column"></div>
+              <div class="column is-narrow">
+                <ng-icon name="remixRainyLine" size="1.5em"/>
+              </div>
+              <div class="column is-narrow">
+                <p><span translate>digitalTwin.label.rainAmount</span> (mm) </p>
+              </div>
+              <div class="column is-1"></div>
+            </div>
+
+            @for (forecast of rainForecastModal(); track forecast.time) {
+              <div class="columns">
+                <div class="column is-1"></div>
+                <div class="column is-one-third has-text-centered">
+                  <p>{{forecast.time}}</p>
+                </div>
+                <div class="column"></div>
+                <div class="column is-one-third">
+                  <input class="input is-rounded" type="number" min="0" max="50" [value]="forecast.rainAmount"
+                        (input)="updateForecastModal($index, $any($event.target).valueAsNumber)"/>
+                </div>
+                <div class="column is-1"></div>
+              </div>
+            }
+          </section>
+          <footer class="modal-card-foot">
+            <div class="buttons">
+              <button class="button is-success" 
+                     (click)="copyForecast(rainForecast, rainForecastModal); rainForecastModalOpen.set(false)" 
+                     translate>digitalTwin.button.confirm</button>
+              <button class="button" 
+                      (click)="copyForecast(rainForecastModal, rainForecast); rainForecastModalOpen.set(false)" 
+                      translate>digitalTwin.button.cancel</button>
+            </div>
+          </footer>
+        </div>
+      </div>
+
+      <div class="is-fullwidth" style="height: 16rem;">
+        <ng-container chart>
+          @let optionsRainForecast = {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                grid: {
+                  display: false,
+                },
+                title: {
+                  display: true,
+                  text: intervalForecast() === '1 h' ? 'h' : 'min',
+                },
+              },
+              y: {
+                grid: {
+                  display: false,
+                },
+                title: {
+                  display: true,
+                  text: 'mm',
+                },
+                beginAtZero: true,
+                suggestedMax: 25,
+              },
+            },
+            plugins: {
+              legend: {
+                display: false,
+              },
+            },
+          };
+          <canvas baseChart class="is-fullheight is-fullwidth" [data]="dataRainForecast" [options]="optionsRainForecast" [type]="'bar'">
+          </canvas>
+        </ng-container>
+      </div>
+    </div>
+</div>

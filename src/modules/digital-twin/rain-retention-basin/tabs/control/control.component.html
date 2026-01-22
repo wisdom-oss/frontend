@@ -1,5 +1,5 @@
 <div>
-   <model-view filename="RRB_Damme.glb" [cam]="{x: 0, y: 10, z: 50}"/>
+   <model-view-rrb filename="RRB_Damme_Water.glb" [cam]="{x: -96, y: 40, z: 4}" [waterLevel]="waterLevel"/>
 
    <div class="card my-4">
       <div class="card-content">
@@ -27,5 +27,5 @@
       </div>
    </div>
    
-   <drainage-rules [rules]="rules"></drainage-rules>
+   <drainage-rules [drainageRules]="drainageRules"></drainage-rules>
 </div>

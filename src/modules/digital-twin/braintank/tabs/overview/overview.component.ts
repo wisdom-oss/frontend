@@ -1,4 +1,4 @@
-import { Component, signal, WritableSignal } from '@angular/core';
+import { Component, Input, signal, WritableSignal } from '@angular/core';
 import { NgIconComponent, provideIcons } from "@ng-icons/core";
 import { 
   remixContrastDrop2Line, 
@@ -15,7 +15,7 @@ import {
   remixArrowRightWideLine
 } from '@ng-icons/remixicon';
 import { TranslateDirective } from '@ngx-translate/core';
-import { ModelViewComponent } from "../../../common/model-view/model-view.component";
+import { ModelViewComponent } from "../../model-view/model-view.component";
 import dayjs, { Dayjs } from 'dayjs';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartData } from 'chart.js';
@@ -54,19 +54,19 @@ import { MapViewComponent } from "../../../common/map-view/map-view.component";
   ],
 })
 export class OverviewComponent {
+  protected waterLevel: WritableSignal<number> = signal(20);
+  protected time : WritableSignal<Dayjs> = signal(dayjs());
+  protected roofSize : WritableSignal<number> = signal(160);
+  protected lat : WritableSignal<number> = signal(53.146170);
+  protected long : WritableSignal<number> = signal(8.185751);
+  protected draining : WritableSignal<boolean> = signal(false);
+  protected drainingTime: WritableSignal<Dayjs> = signal(dayjs().subtract(10, 'minutes'));
+
   protected activeView = signal<'model' | 'map' | 'pictures'>('model'); 
 
   setActiveView(view: 'model' | 'map' | 'pictures') {
     this.activeView.set(view);
   }
-
-  waterLevel : WritableSignal<number> = signal(30);
-  time : WritableSignal<Dayjs> = signal(dayjs());
-  roofSize : WritableSignal<number> = signal(160);
-  lat : WritableSignal<number> = signal(53.146170);
-  long : WritableSignal<number> = signal(8.185751);
-  draining : WritableSignal<boolean> = signal(true);
-  drainingTime: WritableSignal<Dayjs> = signal(dayjs().subtract(30, 'minutes'));
 
   dataCurrentForecast: ChartData<'bar', {x: string, y: number}[]> = {
     datasets: [{

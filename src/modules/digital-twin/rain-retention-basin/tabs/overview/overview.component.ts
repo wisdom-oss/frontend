@@ -1,4 +1,4 @@
-import { Component, Input, signal, WritableSignal } from '@angular/core';
+import { Component, signal, WritableSignal } from '@angular/core';
 import { CarouselComponent } from "../../../common/carousel/carousel.component";
 import { NgIconComponent, provideIcons } from "@ng-icons/core";
 import { 
@@ -27,7 +27,7 @@ import colorful from "../../../../../assets/map/styles/colorful.json";
 import { TranslateDirective } from '@ngx-translate/core';
 import { BaseChartDirective } from 'ng2-charts';
 import { MapViewComponent } from "../../../common/map-view/map-view.component";
-import { ModelViewComponent } from "../../../common/model-view/model-view.component";
+import { ModelViewComponent } from "../../model-view/model-view.component";
 
 @Component({
   selector: "rrb-overview",
@@ -63,18 +63,18 @@ import { ModelViewComponent } from "../../../common/model-view/model-view.compon
   ],
 })
 export class OverviewComponent {
-  @Input() time: WritableSignal<Dayjs> = signal(dayjs());
-  @Input() waterLevel: WritableSignal<number> = signal(30);
+  protected time: WritableSignal<Dayjs> = signal(dayjs());
+  protected waterLevel: WritableSignal<number> = signal(10);
   
-  @Input() lat: WritableSignal<number> = signal(52.524639);
-  @Input() long: WritableSignal<number> = signal(8.185833);
-  @Input() city: WritableSignal<string> = signal('Damme');
-  @Input() name: WritableSignal<string> = signal('Zum Griechen');
+  protected lat: WritableSignal<number> = signal(52.524639);
+  protected long: WritableSignal<number> = signal(8.185833);
+  protected city: WritableSignal<string> = signal('Damme');
+  protected name: WritableSignal<string> = signal('Zum Griechen');
   
-  @Input() volume: WritableSignal<number> = signal(100);
-  @Input() catchmentArea: WritableSignal<number> = signal(100);
-  @Input() pavedArea: WritableSignal<number> = signal(50);
-  @Input() unpavedArea: WritableSignal<number> = signal(50); 
+  protected volume: WritableSignal<number> = signal(14325);
+  protected catchmentArea: WritableSignal<number> = signal(92.29);
+  protected pavedArea: WritableSignal<number> = signal(38.34);
+  protected unpavedArea: WritableSignal<number> = signal(53.95); 
 
   protected activeView: WritableSignal<'model' | 'map' | 'pictures'> = signal('model'); 
 

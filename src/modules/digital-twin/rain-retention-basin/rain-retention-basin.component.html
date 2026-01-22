@@ -37,8 +37,7 @@
   </div>
 
   @if(activeTab() === 'overview') {
-    <rrb-overview [time]="time" [waterLevel]="waterLevel" [name]="name" [city]="city" [lat]="lat" [long]="long"
-                  [volume]="volume" [catchmentArea]="catchmentArea" [pavedArea]="pavedArea" [unpavedArea]="unpavedArea"/>
+    <rrb-overview/>
   }
 
    @if(activeTab() === 'history') {
@@ -46,7 +45,7 @@
   }
 
   @if(activeTab() === 'simulation') {
-    <rrb-simulation [volume]="volume" [catchmentArea]="catchmentArea" [pavedArea]="pavedArea" [unpavedArea]="unpavedArea"/>
+    <rrb-simulation/>
   }
 
   @if(activeTab() === 'control') {

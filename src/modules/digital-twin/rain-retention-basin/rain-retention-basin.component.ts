@@ -6,7 +6,6 @@ import { OverviewComponent } from './tabs/overview/overview.component';
 import { SimulationComponent } from './tabs/simulation/simulation.component';
 import { HistoryComponent } from './tabs/history/history.component';
 import { ControlComponent } from "./tabs/control/control.component";
-import dayjs, { Dayjs } from 'dayjs';
 
 @Component({
   imports: [
@@ -28,20 +27,7 @@ import dayjs, { Dayjs } from 'dayjs';
   ],
 })
 export class RainRetentionBasinComponent {
-  protected activeTab: WritableSignal<'overview' | 'history' | 'simulation' | 'control'> = signal('overview'); 
-
-  protected time: WritableSignal<Dayjs> = signal(dayjs());
-  protected waterLevel: WritableSignal<number> = signal(30);
-
-  protected lat: WritableSignal<number> = signal(52.524639);
-  protected long: WritableSignal<number> = signal(8.185833);
-  protected city: WritableSignal<string> = signal('Damme');
-  protected name: WritableSignal<string> = signal('Zum Griechen');
-
-  protected volume: WritableSignal<number> = signal(14325);
-  protected catchmentArea: WritableSignal<number> = signal(92.29);
-  protected pavedArea: WritableSignal<number> = signal(38.34);
-  protected unpavedArea: WritableSignal<number> = signal(53.95);  
+  protected activeTab: WritableSignal<'overview' | 'history' | 'simulation' | 'control'> = signal('overview');  
 
   setActiveTab(tab: 'overview' | 'history' | 'simulation'| 'control') {
     this.activeTab.set(tab);

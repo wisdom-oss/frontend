@@ -1,14 +1,14 @@
-import { Component, ElementRef, OnDestroy, OnInit, AfterViewInit, viewChild, Input, signal, WritableSignal, effect, Signal } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, AfterViewInit, viewChild, Input, signal, WritableSignal, effect } from '@angular/core';
 import * as THREE from 'three';
 import { GLTFLoader, OrbitControls } from 'three-stdlib';
 import { gsap } from 'gsap';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import { TranslateDirective } from '@ngx-translate/core';
 import { remixCalendar2Line, remixContrastDrop2Line, remixRainyLine, remixTimeLine } from '@ng-icons/remixicon';
-import { SimulationIntervalOption, SimulationParameter } from '../../rain-retention-basin/tabs/simulation/simulation.component';
+import { SimulationIntervalOption, SimulationParameter } from '../../common/types/SimulationTypes';
 
 @Component({
-  selector: 'model-view',
+  selector: 'model-view-braintank',
   imports: [
     NgIconComponent,
     TranslateDirective
@@ -32,11 +32,6 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() simulationParameter: WritableSignal<SimulationParameter[]>  = signal([]);
   @Input() intervalForecast: WritableSignal<SimulationIntervalOption> = signal('5 min');
 
-  @Input() volume: WritableSignal<number> = signal(100);
-  @Input() catchmentArea: WritableSignal<number> = signal(100);
-  @Input() pavedArea: WritableSignal<number> = signal(50);
-  @Input() unpavedArea: WritableSignal<number> = signal(50); 
-
   rendererContainer = viewChild<ElementRef<HTMLDivElement>>('rendererContainer');
   
   private scene!: THREE.Scene;
@@ -50,6 +45,7 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
   private originalY: number = 1;
   protected time: WritableSignal<string> = signal('0');
   protected rainAmount: WritableSignal<number> = signal(0);
+
   
   constructor() {
     effect(() => {
@@ -65,7 +61,7 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
     this.camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
     this.camera.position.set(this.cam.x, this.cam.y, this.cam.z); 
   
-    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.5);
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 2);
     hemiLight.position.set(0, 20, 0);
     this.scene.add(hemiLight);
   }
@@ -76,6 +72,7 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
   
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setSize(container.nativeElement.clientWidth, container.nativeElement.clientHeight);
+    this.renderer.localClippingEnabled = true;
     container.nativeElement.appendChild(this.renderer.domElement);
   
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
@@ -89,7 +86,7 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
       this.setScaleYWater(model, this.waterLevel());
       model.rotation.y = - Math.PI / 4;
     });
-  
+
     this.animate();
     this.resizeObserver = new ResizeObserver(() => this.scheduleResize());
     this.resizeObserver.observe(container.nativeElement);
@@ -197,29 +194,10 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
   protected computeSimulationParameter() {
     let currentLevel = this.waterLevel();
-    const timeFactor = this.intervalForecast() === '5 min' ? 1/12 :
-                       this.intervalForecast() === '15 min' ? 1/4 :
-                       this.intervalForecast() === '30 min' ? 1/2 : 1;
 
     this.simulationParameter.set(this.simulationParameter().map(param => {
-      const waterAmount: number = (this.pavedArea() * 0.85 + this.unpavedArea() * 0.05) * param.rainAmount * timeFactor * 10; // ("* 10000": ha => m²; "/ 1000": l => m³)
-
-      let outflow: number = 0;
-      outflow = this.computeOutflow(currentLevel);
-
-      currentLevel = currentLevel + (waterAmount - outflow) / this.volume() * 100; 
-      param.waterLevel = currentLevel > 0 ? currentLevel : 0;
+      //TODO: Compute simulation
       return param;
     }));
-  };
-
-  private computeOutflow(waterLevel: number): number {
-    if (waterLevel < 10) return 0;
-
-    const timeFactor = this.intervalForecast() === '5 min' ? 300 :
-                       this.intervalForecast() === '15 min' ? 900 :
-                       this.intervalForecast() === '30 min' ? 1800 : 3600;
-    
-    return 0.14 * timeFactor ; // (140  m³/s * time in s)
   };
 }
