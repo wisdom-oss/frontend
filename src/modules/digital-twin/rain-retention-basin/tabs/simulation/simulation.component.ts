@@ -25,7 +25,7 @@ export class SimulationComponent {
  
   protected intervalForecast: WritableSignal<SimulationIntervalOption> = signal('5 min');
   protected durationForecast: WritableSignal<number> = signal(12);
-  protected rainForecast: WritableSignal<SimulationParameter[]> = signal(Array.from({length: 12}, (_, i) => ({time: ((i+1)*5).toString(), rainAmount: 2, waterLevel: (i+1)*5})));
+  protected rainForecast: WritableSignal<SimulationParameter[]> = signal(Array.from({length: 12}, (_, i) => ({time: ((i+1)*5).toString(), rainAmount: 2, waterLevel: 0})));
   protected rainForecastModal: WritableSignal<SimulationParameter[]> = signal(this.rainForecast());
 
   protected drainageRules: WritableSignal<DrainageRule[]> = signal([

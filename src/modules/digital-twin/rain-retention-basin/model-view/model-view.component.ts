@@ -1,18 +1,20 @@
 import { Component, ElementRef, OnDestroy, OnInit, AfterViewInit, viewChild, Input, signal, WritableSignal, effect } from '@angular/core';
 import * as THREE from 'three';
 import { GLTFLoader, OrbitControls } from 'three-stdlib';
-import { gsap } from 'gsap';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import { TranslateDirective } from '@ngx-translate/core';
 import { remixCalendar2Line, remixContrastDrop2Line, remixRainyLine, remixTimeLine } from '@ng-icons/remixicon';
 import { SimulationIntervalOption, SimulationParameter } from '../../common/types/SimulationTypes';
+import { ChartData } from 'chart.js';
+import { BaseChartDirective } from 'ng2-charts';
 
 @Component({
   selector: 'model-view-rrb',
   imports: [
     NgIconComponent,
-    TranslateDirective
-  ],
+    TranslateDirective,
+    BaseChartDirective
+],
   templateUrl: './model-view.component.html',
   providers: [
     provideIcons({
@@ -53,11 +55,33 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private minBound: number = 0;
   private maxBound: number = 0;
+
+  protected chart = viewChild(BaseChartDirective);
+
+  protected simulationChart: ChartData<'line', SimulationParameter[]> = {
+      datasets: [{
+        data: this.simulationParameter(),
+        parsing: {
+          xAxisKey: 'time',
+          yAxisKey: 'waterLevel'
+        },
+      }],
+    };
   
   constructor() {
     effect(() => {
       const newLevel = this.waterLevel();
       this.animateWaterToLevel(newLevel);
+    });
+
+    effect(() => {
+      const data = this.simulationParameter();
+      const chart = this.chart()?.chart;
+      
+      if (chart) {
+        chart.data.datasets[0].data = data;
+        chart.update();
+      }
     });
   };
   

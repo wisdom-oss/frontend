@@ -72,6 +72,10 @@ de = "Regenvorhersage"
 en = "Simulation Values"
 de = "Simulationswerte"
 
+[header.simulationCourse]
+en = "Simulation Course"
+de = "Simulationsverlauf"
+
 [header.waterLevel]
 en = "Water Level"
 de = "Wasserpegel"
