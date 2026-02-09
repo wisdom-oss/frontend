@@ -157,7 +157,7 @@
                   text: 'mm',
                 },
                 beginAtZero: true,
-                suggestedMax: 25,
+                suggestedMax: intervalForecast() === '1 h' ||  intervalForecast() === '30 min' ? 30 : intervalForecast() === '15 min' || intervalForecast() === '10 min' ? 20 : 10,
               },
             },
             plugins: {

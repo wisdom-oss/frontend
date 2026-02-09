@@ -1,13 +1,11 @@
 <div>
   <model-view-rrb filename="RRB_Damme_Water.glb" [cam]="{x: -96, y: 40, z: 4}" [isSimulation]="true" 
-              [waterLevel]="waterLevel" [simulationParameter]="rainForecast"
+              [waterLevel]="waterLevel" [simulationParameter]="rainForecast" [intervalForecast]="intervalForecast"
               [volume]="volume" [catchmentArea]="catchmentArea" [pavedArea]="pavedArea" [unpavedArea]="unpavedArea"/>
   
   <water-level [waterLevelSlider]="waterLevelSlider" [waterLevel]="waterLevel"/>
    
   <drainage-rules [drainageRules]="drainageRules"></drainage-rules>
   
-  <rain-forecast [checkedRainForecast]="checkedRainForecast" [rainForecastModalOpen]="rainForecastModalOpen"
-                 [intervalForecast]="intervalForecast"[durationForecast]="durationForecast"
-                 [rainForecast]="rainForecast" [rainForecastModal]="rainForecastModal"/>
+  <rain-forecast [intervalForecast]="intervalForecast" [rainForecast]="rainForecast"/>
 </div>

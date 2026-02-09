@@ -17,16 +17,12 @@ import { RainForecastComponent } from "../../../common/rain-forecast/rain-foreca
   templateUrl: './simulation.component.html'
 })
 export class SimulationComponent {
-  protected waterLevelSlider: WritableSignal<number> = signal(20);
+  protected waterLevelSlider: WritableSignal<number> = signal(0);
   protected waterLevel: WritableSignal<number> = signal(this.waterLevelSlider());
-
-  protected checkedRainForecast: signals.ToggleableSignal = signals.toggleable(false);
-  protected rainForecastModalOpen: signals.ToggleableSignal = signals.toggleable(false);
  
   protected intervalForecast: WritableSignal<SimulationIntervalOption> = signal('5 min');
-  protected durationForecast: WritableSignal<number> = signal(12);
-  protected rainForecast: WritableSignal<SimulationParameter[]> = signal(Array.from({length: 12}, (_, i) => ({time: ((i+1)*5).toString(), rainAmount: 2, waterLevel: 0})));
-  protected rainForecastModal: WritableSignal<SimulationParameter[]> = signal(this.rainForecast());
+  private rainAmounts: number[] = [1.2, 1.4, 1.6, 1.9, 2.5, 3.2, 4.6, 8.9, 1.2, 1.1, 0.9, 0.8, 0.4, 0.4, 0.4, 0.4, 0.3, 0.3, 0.3, 0.3, 0.2, 0.2, 0.2, 0.2];
+  protected rainForecast: WritableSignal<SimulationParameter[]> = signal(Array.from({length: this.rainAmounts.length}, (_, i) => ({time: ((i+1)*5).toString(), rainAmount: this.rainAmounts[i], waterLevel: 0})));
 
   protected drainageRules: WritableSignal<DrainageRule[]> = signal([
       {title: "Mittelstarker Regenfall", rainAmount: 5, rainDuration: 15, targetLevel: 40, drainageForerun: 180, open: signals.toggleable(true)},

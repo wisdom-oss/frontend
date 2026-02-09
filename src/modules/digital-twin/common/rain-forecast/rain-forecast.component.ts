@@ -1,4 +1,4 @@
-import { Component, effect, Input, signal, viewChild, WritableSignal } from '@angular/core';
+import { AfterViewInit, Component, effect, Input, signal, viewChild, WritableSignal } from '@angular/core';
 import { signals } from '../../../../common/signals';
 import { SimulationIntervalOption, SimulationParameter } from '../types/SimulationTypes';
 import { randInt } from 'three/src/math/MathUtils.js';
@@ -25,26 +25,25 @@ import { remixArrowDownSLine, remixContrastDrop2Line, remixRainyLine, remixTimeL
     }),
   ],
 })
-export class RainForecastComponent {
-  @Input() checkedRainForecast: signals.ToggleableSignal = signals.toggleable(false);
-  @Input() rainForecastModalOpen: signals.ToggleableSignal = signals.toggleable(false);
-   
-  @Input() intervalForecast: WritableSignal<SimulationIntervalOption> = signal('5 min');
-  @Input() durationForecast: WritableSignal<number> = signal(12);
-  @Input() rainForecast: WritableSignal<SimulationParameter[]> = signal(Array.from({length: 12}, (_, i) => ({time: ((i+1)*5).toString(), rainAmount: 2, waterLevel: (i+1)*5})));
-  @Input() rainForecastModal: WritableSignal<SimulationParameter[]> = signal(this.rainForecast());
+export class RainForecastComponent implements AfterViewInit {
+  @Input() intervalForecast!: WritableSignal<SimulationIntervalOption>;
+  @Input() rainForecast: WritableSignal<SimulationParameter[]> = signal([]);
+
+  protected checkedRainForecast: signals.ToggleableSignal = signals.toggleable(false);
+  protected rainForecastModalOpen: signals.ToggleableSignal = signals.toggleable(false);
+  
+  protected rainForecastModal: WritableSignal<SimulationParameter[]> = signal(this.rainForecast());
+  protected durationForecast: WritableSignal<number> = signal(this.rainForecast().length);
 
   constructor() {
     effect(() => {
-      const data = this.rainForecast();
-      const chart = this.chart()?.chart;
-      
-      if (chart) {
-        chart.data.datasets[0].data = data;
-        chart.update();
-      }
+      this.updateChart(this.rainForecast());
     });
-  }
+  };
+
+  ngAfterViewInit(): void {
+    this.updateChart(this.rainForecast());
+  };
 
   protected chart = viewChild(BaseChartDirective);
 
@@ -61,6 +60,16 @@ export class RainForecastComponent {
   onToogleClick(event: MouseEvent, signal: signals.ToggleableSignal) {
     event.preventDefault();
     signal.toggle(); 
+  };
+
+  updateChart(data: SimulationParameter[]) {
+    this.durationForecast.set(data.length);
+    const chart = this.chart()?.chart;
+      
+    if (chart) {
+      chart.data.datasets[0].data = data;
+      chart.update();
+    }
   };
 
   updateForecastModal(index: number, newRainAmount: number) {

@@ -20,13 +20,8 @@ export class SimulationComponent {
   protected waterLevelSlider: WritableSignal<number> = signal(20);
   protected waterLevel: WritableSignal<number> = signal(this.waterLevelSlider());
   
-  protected checkedRainForecast: signals.ToggleableSignal = signals.toggleable(false);
-  protected rainForecastModalOpen: signals.ToggleableSignal = signals.toggleable(false);
-   
   protected intervalForecast: WritableSignal<SimulationIntervalOption> = signal('5 min');
-  protected durationForecast: WritableSignal<number> = signal(12);
-  protected rainForecast: WritableSignal<SimulationParameter[]> = signal(Array.from({length: 12}, (_, i) => ({time: ((i+1)*5).toString(), rainAmount: 2, waterLevel: (i+1)*5})));
-  protected rainForecastModal: WritableSignal<SimulationParameter[]> = signal(this.rainForecast());
+  protected rainForecast: WritableSignal<SimulationParameter[]> = signal([]);
 
   protected drainageRules: WritableSignal<DrainageRule[]> = signal([
     {title: "Mittelstarker Regenfall", rainAmount: 5, rainDuration: 15, targetLevel: 40, drainageForerun: 180, open: signals.toggleable(true)},

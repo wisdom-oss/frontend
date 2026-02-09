@@ -45,7 +45,7 @@ export type DrainageRule = {
   ],
 })
 export class DrainageRulesComponent {
-  @Input() drainageRules: WritableSignal<DrainageRule[]> = signal([]);
+  @Input() drainageRules!: WritableSignal<DrainageRule[]>;
 
   protected newDrainageRule: DrainageRule = {title: "", rainAmount: 0, rainDuration: 0, targetLevel: 0, drainageForerun: 0, open: signals.toggleable(true)}
   protected drainageRuleModal: WritableSignal<DrainageRule>= signal(this.newDrainageRule);

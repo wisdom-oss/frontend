@@ -32,7 +32,7 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Input() waterLevel: WritableSignal<number> = signal(20);
   @Input() simulationParameter: WritableSignal<SimulationParameter[]>  = signal([]);
-  @Input() intervalForecast: WritableSignal<SimulationIntervalOption> = signal('5 min');
+  @Input() intervalForecast!: WritableSignal<SimulationIntervalOption>;
 
   @Input() volume: WritableSignal<number> = signal(100);
   @Input() catchmentArea: WritableSignal<number> = signal(100);
@@ -95,7 +95,7 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 2);
     hemiLight.position.set(0, 20, 0);
     this.scene.add(hemiLight);
-  }
+  };
   
   ngAfterViewInit(): void {
     const container = this.rendererContainer();
@@ -120,19 +120,19 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
     this.animate();
     this.resizeObserver = new ResizeObserver(() => this.scheduleResize());
     this.resizeObserver.observe(container.nativeElement);
-  }
+  };
   
   ngOnDestroy(): void {
     cancelAnimationFrame(this.animationFrameId);
     if (this.renderer) this.renderer.dispose();
     if (this.resizeObserver) this.resizeObserver.disconnect();
     if (this.resizeRaf) cancelAnimationFrame(this.resizeRaf);
-  }
+  };
 
   private scheduleResize() {
     if (this.resizeRaf) cancelAnimationFrame(this.resizeRaf);
     this.resizeRaf = requestAnimationFrame(() => this.onContainerResize());
-  }
+  };
   
   private onContainerResize = () => {
     const container = this.rendererContainer();
