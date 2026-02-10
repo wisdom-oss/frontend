@@ -177,6 +177,10 @@ de = "Titel"
 en = "Unpaved area"
 de = "Unbefestigte Fläche"
 
+[notification.success]
+en = "No drainage is currently necessary or planned!"
+de = "Derzeit keine Entwässerung notwendig und geplant!"
+
 
 [tab.control]
 en = "Control"
