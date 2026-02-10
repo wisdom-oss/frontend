@@ -25,19 +25,19 @@ import { ChartData } from 'chart.js';
 import { StyleSpecification } from 'maplibre-gl';
 import colorful from "../../../../../assets/map/styles/colorful.json";
 import { TranslateDirective } from '@ngx-translate/core';
-import { BaseChartDirective } from 'ng2-charts';
 import { MapViewComponent } from "../../../common/map-view/map-view.component";
 import { ModelViewComponent } from "../../model-view/model-view.component";
+import { ChartComponent } from "../../../common/chart/chart.component";
 
 @Component({
   selector: "rrb-overview",
   imports: [
     TranslateDirective,
     NgIconComponent,
-    BaseChartDirective,
     CarouselComponent,
     MapViewComponent,
-    ModelViewComponent
+    ModelViewComponent,
+    ChartComponent
 ],
   templateUrl: './overview.component.html',
   providers: [
@@ -83,14 +83,14 @@ export class OverviewComponent {
   }
 
   dataCurrentForecast: ChartData<'bar', {x: string, y: number}[]> = {
-      datasets: [{
-        data: [{x: '16:00', y: 0}, {x: '16:15', y: 0}, {x: '16:30', y: 3}, {x: '16:45', y: 2}, {x: '17:00', y: 0}, {x: '17:15', y: 0}, {x: '17:30', y: 6}, {x: '17:45', y: 8}],
-        parsing: {
-          xAxisKey: 'x',
-          yAxisKey: 'y'
-        },
-      }],
-    };
+    datasets: [{
+      data: [{x: '16:00', y: 0}, {x: '16:15', y: 0}, {x: '16:30', y: 3}, {x: '16:45', y: 2}, {x: '17:00', y: 0}, {x: '17:15', y: 0}, {x: '17:30', y: 6}, {x: '17:45', y: 8}],
+      parsing: {
+        xAxisKey: 'x',
+        yAxisKey: 'y'
+      },
+    }],
+  };
   
   protected style = colorful as any as StyleSpecification;
   
