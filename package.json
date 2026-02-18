@@ -69,7 +69,7 @@
     "@angular-builders/custom-esbuild": "^21.0.3",
     "@angular-builders/jest": "^21.0.3",
     "@angular/build": "^21.1.0",
-    "@angular/cli": "^21.1.1",
+    "@angular/cli": "^21.1.4",
     "@angular/compiler-cli": "^21.1.1",
     "@compodoc/compodoc": "^1.2.1",
     "@kennethwkz/unplugin-typia": "2.6.7",
