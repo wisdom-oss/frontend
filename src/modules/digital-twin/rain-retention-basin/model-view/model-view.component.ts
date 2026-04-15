@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, OnInit, AfterViewInit, viewChild, Input, signal, WritableSignal, effect } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, AfterViewInit, viewChild, Input, signal, WritableSignal, effect, computed } from '@angular/core';
 import * as THREE from 'three';
 import { GLTFLoader, OrbitControls } from 'three-stdlib';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
@@ -8,8 +8,10 @@ import { SimulationIntervalOption, SimulationParameter } from '../../common/type
 import { ChartData } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { firstValueFrom } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { Scopes } from '../../../../core/auth/scopes';
+import { httpContexts } from '../../../../common/http-contexts';
+import dayjs from 'dayjs';
 
 @Component({
   selector: 'model-view-rrb',
@@ -43,8 +45,8 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() catchmentArea: WritableSignal<number> = signal(100);
   @Input() pavedArea: WritableSignal<number> = signal(50);
   @Input() unpavedArea: WritableSignal<number> = signal(50);
-  @Input() city: WritableSignal<string> = signal('Damme');
-  @Input() name: WritableSignal<string> = signal('Nordhofe');
+  @Input() city: WritableSignal<string> = signal('');
+  @Input() name: WritableSignal<string> = signal('');
 
   rendererContainer = viewChild<ElementRef<HTMLDivElement>>('rendererContainer');
   
@@ -57,7 +59,7 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
   private resizeRaf!: number | null;
   private waterPlane: THREE.Plane | null = null;
   
-  private model_url = `/api/files/v1/rrb-digital-twin/model/${this.city()}/${this.name()}.glb`;
+  private model_url = computed(() => `/api/files/v1/rrb-digital-twin/model/${this.city()}/${this.name()}.glb`);
   
   protected time: WritableSignal<string> = signal('0');
   protected rainAmount: WritableSignal<number> = signal(0);
@@ -106,8 +108,6 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 2);
     hemiLight.position.set(0, 20, 0);
     this.scene.add(hemiLight);
-
-    console.log(this.model_url);
   };
   
   ngAfterViewInit(): void {
@@ -144,12 +144,17 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private async loadGltfModel(): Promise<THREE.Group> {
     const loader = new GLTFLoader();
-    const data = await firstValueFrom(this.http.get(this.model_url, {responseType: 'arraybuffer'}));
+    let context = (url: string) =>
+        new HttpContext().set(httpContexts.cache, [
+          url,
+          dayjs.duration(1, "week"),
+        ]);
+    const data = await firstValueFrom(this.http.get(this.model_url(), {responseType: 'arraybuffer', context: context(this.model_url())}));
 
     return new Promise((resolve, reject) => {
       loader.parse(data, '', (gltf) => resolve(gltf.scene), reject);
     });
-  }
+  };
 
   private scheduleResize() {
     if (this.resizeRaf) cancelAnimationFrame(this.resizeRaf);
