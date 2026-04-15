@@ -5,6 +5,8 @@ import {CoreComponent} from "./core/core.component";
 import {permissionsGuard} from "./core/auth/permissions.guard";
 import {GreeterComponent} from "./core/greeter/greeter.component";
 import {BeWaterSmartComponent} from "./modules/be-water-smart/be-water-smart.component";
+import {BraintankComponent} from "./modules/digital-twin/braintank/braintank.component";
+import {RainRetentionBasinComponent} from "./modules/digital-twin/rain-retention-basin/rain-retention-basin.component";
 import {GrowlComponent} from "./modules/growl/growl.component";
 import {longTermForecastRoutes} from "./modules/long-term-forecast/routes";
 import {OowvActionMapComponent} from "./modules/oowv/action-map/action-map.component";
@@ -46,6 +48,16 @@ export const routes: Routes = [
       {
         path: "oowv/water-demand-prediction2",
         component: WaterDemandPrediction2Component,
+      },
+      {
+        path: "digital-twin/braintank",
+        component: BraintankComponent,
+        canActivate: [permissionsGuard(...RainRetentionBasinComponent.SCOPES)],
+      },
+      {
+        path: "digital-twin/rain-retention-basin",
+        component: RainRetentionBasinComponent,
+        canActivate: [permissionsGuard(...RainRetentionBasinComponent.SCOPES)],
       },
     ],
   },

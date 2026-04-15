@@ -1,0 +1,57 @@
+<div class="card my-4">
+  <div class="card-content">
+    <div class="is-fullwidth has-text-centered my-4">
+      <p class="is-size-3 my-4" translate>digitalTwin.header.drainThrottle</p>
+    </div>
+
+    <div class="is-flex is-flex-direction-row is-fullwidth my-4">
+      <ng-icon name="remixCustomSize" size="2.5rem" />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        <p class="mx-4">
+          <span translate>digitalTwin.label.setThrottleSize</span>:
+        </p>
+      </div>
+      <input
+        class="slider is-primary m-0 mx-4"
+        style="width: 20rem"
+        step="100"
+        min="0"
+        max="10000"
+        value="{{ throttleSize() }}"
+        type="range"
+        (input)="
+          throttleSize.set($any($event.target).value);
+          throttleSize.set($any($event.target).valueAsNumber)
+        "
+      />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        <p class="ml-4">{{ throttleSize() }} l/s (max)</p>
+      </div>
+    </div>
+
+    <div class="is-flex is-flex-direction-row is-fullwidth my-4">
+      <ng-icon name="remixExpandHeightLine" size="2.5rem" />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        <p class="mx-4">
+          <span translate>digitalTwin.label.setThrottleHeight</span>:
+        </p>
+      </div>
+      <input
+        class="slider is-primary m-0 mx-4"
+        style="width: 20rem"
+        step="0.1"
+        min="0"
+        max="10"
+        value="{{ throttleHeight() }}"
+        type="range"
+        (input)="
+          throttleHeight.set($any($event.target).value);
+          throttleHeight.set($any($event.target).valueAsNumber)
+        "
+      />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        <p class="ml-4">{{ throttleHeight() }} m</p>
+      </div>
+    </div>
+  </div>
+</div>
