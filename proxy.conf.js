@@ -46,6 +46,15 @@ const OPTIONAL_PROXY_CONFIGS = {
       rewrite: path => path.replace(/^\/api\/bws/, ""),
     },
   ],
+  pmdarima: [
+    "/api/pmdarima-predictions/**",
+    {
+      target: "http://localhost:8000",
+      secure: false,
+      changeOrigin: true,
+      rewrite: path => path.replace(/^\/api\/pmdarima-predictions/, ""),
+    },
+  ],
 };
 
 /**
@@ -61,6 +70,8 @@ const PROXY_CONFIG = {
     target: "https://wisdom-demo.uol.de/api",
     secure: false,
     changeOrigin: true,
+    ws: true,
+    rewriteWsOrigin: true,
     rewrite: path => path.replace(/^\/api/, ""),
   },
 };

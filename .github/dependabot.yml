@@ -1,14 +1,12 @@
 version: 2
 updates:
   - package-ecosystem: npm
-    assignees:
-      - cptpiepmatz
     labels: []
     directory: "/"
     schedule:
       interval: weekly
-      day: thursday
-      time: "12:00"
+      day: wednesday
+      time: "09:00"
       timezone: "Europe/Berlin"
     allow:
       - dependency-type: direct

@@ -1,0 +1,18 @@
+.main-layout {
+  container-type: inline-size;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.inner-layout {
+  display: grid;
+  grid-template:
+    "title-historic title-prediction sidebar" auto
+    "legend-historic legend-prediction sidebar" auto
+    "chart-historic chart-prediction sidebar" minmax(20em, 1fr) / 1fr 1fr auto;
+  gap: 0.5rem;
+
+  // * {
+  //   background-color: cadetblue;
+  // }
+}

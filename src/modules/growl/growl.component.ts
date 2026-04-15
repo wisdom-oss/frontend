@@ -35,6 +35,9 @@ import colorful from "../../assets/map/styles/colorful.json";
 import {LayerSelectionControlComponent} from "../../common/components/map/layer-selection-control/layer-selection-control.component";
 import {ResizeMapOnLoadDirective} from "../../common/directives/resize-map-on-load.directive";
 import {signals} from "../../common/signals";
+import {RecreateOnDirective} from "../../common/directives/recreate-on.directive";
+import {keys} from "../../common/utils/keys";
+import {omit} from "../../common/utils/omit";
 
 @Component({
   imports: [
@@ -51,6 +54,7 @@ import {signals} from "../../common/signals";
     MapComponent,
     NavigationControlDirective,
     NgIf,
+    RecreateOnDirective,
     ResizeMapOnLoadDirective,
     WithdrawalInfoControlComponent,
   ],
@@ -62,12 +66,6 @@ export class GrowlComponent {
 
   protected style = colorful as any as StyleSpecification;
   protected measurementColors = nlwknMeasurementClassificationColors;
-
-  readonly attribution = signal(`
-    <a href="https://www.nlwkn.niedersachsen.de/opendata" target="_blank">
-      2024 Niedersächsischer Landesbetrieb für Wasserwirtschaft, Küsten- und Naturschutz (NLWKN)
-    </a>
-  `);
 
   // prettier-ignore
   protected hoveredFeatures = {
@@ -88,6 +86,21 @@ export class GrowlComponent {
   } as const;
   protected selectedLayersUpdate = signal(false);
 
+  protected attribution = computed(() => {
+    return keys(omit(this.selectedLayers, "groundwaterLevelStations"))
+      .filter(key => this.selectedLayers[key]())
+      .map(key => this.service.data[key]())
+      .filter(({attribution}) => !!attribution)
+      .map(({attribution, attributionURL}) => {
+        if (!attributionURL) return attribution;
+        return `<a href="${attributionURL}" target="_blank">${attribution}</a>`;
+      })
+      .reduce((attributions, value) => {
+        if (!attributions?.includes(value!)) attributions.push(value!);
+        return attributions;
+      }, [] as string[]);
+  });
+
   protected fitBounds = signal<BBox | undefined>(undefined);
 
   protected waterRightUsageLocationsSource: Signal<GeoJSONSourceComponent> =
@@ -105,7 +118,7 @@ export class GrowlComponent {
     let groundwaterBody = this.groundwaterBodyRequest();
     if (this.hoverClusterPolygon.hasValue()) return;
 
-    for (let body of this.service.data.groundwaterBodies().features) {
+    for (let body of this.service.data.groundwaterBodies().data.features) {
       if (groundwaterBody?.id == body.id) {
         return body;
       }
@@ -138,7 +151,7 @@ export class GrowlComponent {
   private initialLoad = computed(() => {
     return (
       !!this.service.data.groundwaterMeasurementStations().features.length &&
-      !!this.service.data.groundwaterBodies().features.length
+      !!this.service.data.groundwaterBodies().data.features.length
     );
   });
 

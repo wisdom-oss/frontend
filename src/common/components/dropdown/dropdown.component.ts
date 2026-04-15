@@ -3,6 +3,7 @@ import {
   computed,
   effect,
   input,
+  model,
   output,
   signal,
   Component,
@@ -40,8 +41,18 @@ export class DropdownComponent {
    */
   readonly changeMenuName = input(true);
 
+  /**
+   * Flag, if the trigger should take the size of the maximum size value.
+   * @default false
+   */
+  readonly maxWidth = input(false);
+  protected readonly possibleDisplays = computed(() => [
+    this.menuName(),
+    ...this.optionsIter().map(([_, display]) => display),
+  ]);
+
   /** Selected choice. */
-  readonly choice = signal<string | undefined>(undefined);
+  readonly choice = model<string | undefined>(undefined);
   protected choiceOutput = output<string>({alias: "choice"});
   protected choiceName = computed(() => {
     let choice = this.choice();
@@ -52,7 +63,21 @@ export class DropdownComponent {
   /** Define the kind of dropdown menu. */
   readonly kind = input.required<"hover" | "click">();
 
+  /** Mark the dropdown as disabled. */
+  readonly disabled = input<boolean>(false);
+
+  /** Make it dropup instead. */
+  readonly isUp = input<boolean>(false, {alias: "is-up"});
+
   protected readonly isActive = signal(false);
+
+  protected arrowUp = computed(() => {
+    let up = this.isUp();
+    let active = this.isActive();
+    let disabled = this.disabled();
+    if (disabled) return !up;
+    return up ? active : !active;
+  });
 
   constructor(private translate: TranslateService) {
     effect(() => {

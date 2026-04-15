@@ -11,7 +11,7 @@ const URL = "/api/groundwater-levels" as const;
 @Injectable({
   providedIn: "root",
 })
-export class GroundwaterLevelsService {
+export class GroundwaterLevelsService extends api.service(URL) {
   fetchRecorderLocation(
     stationId: api.RequestSignal<string>,
   ): api.Signal<Self.RecorderLocation> {
@@ -31,7 +31,9 @@ export class GroundwaterLevelsService {
   fetchMeasurementClassifications(
     date: api.RequestSignal<Dayjs> = dayjs(),
   ): api.Signal<Record<string, Self.Measurement>> {
-    let dateIso = signals.map(api.toSignal(date), date => date?.toISOString());
+    let dateIso = signals.mapTo(api.toSignal(date), date =>
+      date?.toISOString(),
+    );
     let query = api.url`{
       measurements(
         from: "${dateIso}"

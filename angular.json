@@ -59,6 +59,10 @@
                 "path": "scripts/esbuild/prebuild.cjs",
                 "options": {}
               },
+              {
+                "path": "scripts/esbuild/load-txt.cjs",
+                "options": {}
+              },
               "scripts/esbuild/unplugin.cjs"
             ],
             "outputPath": "dist/wisdom-oss/frontend",
@@ -105,7 +109,11 @@
             ],
             "stylePreprocessorOptions": {
               "sass": {
-                "silenceDeprecations": ["global-builtin", "import"]
+                "silenceDeprecations": [
+                  "global-builtin",
+                  "import",
+                  "if-function"
+                ]
               }
             }
           },
@@ -152,7 +160,7 @@
         "test": {
           "builder": "@angular-builders/jest:run",
           "options": {
-            "configPath": "jest.config.ts"
+            "config": "jest.config.ts"
           }
         }
       }

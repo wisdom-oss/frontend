@@ -11,7 +11,7 @@ const URL = "/api/geodata" as const;
 @Injectable({
   providedIn: "root",
 })
-export class GeoDataService {
+export class GeoDataService extends api.service(URL) {
   fetchAvailableLayers(): api.Signal<GeoDataService.AvailableLayers> {
     return api.resource({
       url: `${URL}/v2/`,

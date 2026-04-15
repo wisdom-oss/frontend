@@ -1,9 +1,7 @@
 {
   "recommendations": [
     "angular.ng-template",
-    "YoavBls.pretty-ts-errors",
-    "rangav.vscode-thunder-client",
     "Gruntfuggly.todo-tree",
-    "rhalaly.scope-to-this"
+    "YoavBls.pretty-ts-errors"
   ]
 }

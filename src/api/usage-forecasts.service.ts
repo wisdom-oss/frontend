@@ -10,7 +10,7 @@ const URL = "/api/water-usage-forecasts" as const;
 @Injectable({
   providedIn: "root",
 })
-export class UsageForecastsService {
+export class UsageForecastsService extends api.service(URL) {
   fetchAvailableAlgorithms(): api.Signal<Self.AvailableAlgorithms> {
     return api.resource({
       url: `${URL}/`,
@@ -61,7 +61,7 @@ export class UsageForecastsService {
       url: api.url`${URL}/${scriptIdentifier}`,
       validate: typia.createValidate<Self.Result>(),
       cache: dayjs.duration(1, "day"),
-      params,
+      params: params as any,
       body: formData,
     });
   }

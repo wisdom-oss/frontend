@@ -1,0 +1,266 @@
+[data-group.historic]
+en = "Historic"
+de = "Historisch"
+
+[data-group.prediction]
+en = "Prediction"
+de = "Vorhersage"
+
+[title.select-model]
+en = "Select Model"
+de = "Modellauswahl"
+
+[title.create-new-model.select-smartmeter]
+en = "Create New Model: Select Smartmeter"
+de = "Modellerstellung: Smartmeter-Auswahl"
+
+[title.create-new-model.select-options]
+en = "Create New Model: Select Options"
+de = "Modellerstellung: Weitere Optionen"
+
+[title.training-new-model]
+en = "Training New Model"
+de = "Modelltraining"
+
+[legend.water-demand]
+en = "water demand"
+de = "Wasserbedarf"
+
+[timeframe.all]
+en = "whole period"
+de = "gesamter Zeitraum"
+
+[resolution.hourly]
+en = "hourly"
+de = "stündlich"
+
+[resolution.daily]
+en = "daily"
+de = "täglich"
+
+[resolution.weekly]
+en = "weekly"
+de = "wöchentlich"
+
+[smartmeter.atypical-household]
+en = "atypical household"
+de = "atypischer Haushalt"
+
+[smartmeter.family-household]
+en = "family household"
+de = "Familienhaushalt"
+
+[smartmeter.retired-household]
+en = "retired household"
+de = "Ruhestandshaushalt"
+
+[smartmeter.single-household]
+en = "single household"
+de = "Single Haushalt"
+
+[model-meta.data-starts-at]
+en = "data starts at"
+de = "Datenstart"
+
+[model-meta.data-ends-at]
+en = "data ends at"
+de = "Datenend"
+
+[model-meta.training-duration]
+en = "training duration"
+de = "Trainingsdauer"
+
+[model-meta.training-start]
+en = "training start"
+de = "Trainingsstart"
+
+[buttons.add-prediction]
+en = "Add Prediction"
+de = "Vorhersage hinzufügen"
+
+[buttons.clear-charts]
+en = "Clear Charts"
+de = "Lösche Graphen"
+
+[buttons.change-smartmeter]
+en = "Change Smartmeter"
+de = "Anderes Smartmeter"
+
+[buttons.new-model]
+en = "New Model"
+de = "Neues Modell"
+
+[buttons.train-model]
+en = "Train Selected Model"
+de = "Starte Modelltraining"
+
+[buttons.training]
+en = "Training"
+de = "Am Trainieren"
+
+[buttons.add-charts]
+en = "Add to Charts"
+de = "Zum Graphen hinzufügen"
+
+[buttons.select]
+en = "Select"
+de = "auswählen"
+
+[buttons.return-to-selecting-models]
+en = "Return to selecting models"
+de = "Zurück zur Modellauswahl"
+
+[choice.smartmeter]
+en = "Select Smartmeter"
+de = "Wähle Smartmeter"
+
+[choice.timeframe]
+en = "Select Timeframe"
+de = "Wähle Zeitrahmen"
+
+[choice.resolution]
+en = "Select Resolution"
+de = "Wähle Auflösung"
+
+[choice.weather]
+en = "Select Weather"
+de = "Wähle Wetter"
+
+[choice.weatherColumn]
+en = "Select Column"
+de = "Wähle Spalte"
+
+[choice.start-point]
+en = "Start Point"
+de = "Startpunkt"
+
+[choice.time-span]
+en = "Time Span"
+de = "Zeitspanne"
+
+[choice.comment]
+en = "Comment"
+de = "Kommentar"
+
+[choice.comment-placeholder-template]
+en = "Model trained on ${name} (${id}) starting at ${startPoint} for ${timeSpan}."
+de = "Modell trainiert auf ${name} (${id}) beginnend am ${startPoint} für ${timeSpan}."
+
+[graph.legend.time]
+en = "Time"
+de = "Zeit"
+
+[start-point.startOfData]
+en = "Start of Timeseries"
+de = "Start der Zeitreihe"
+
+[start-point.startOfJune21]
+en = "Start of June 2021"
+de = "Anfang Juni 2021"
+
+[start-point.startOfYear22]
+en = "Start of 2022"
+de = "Anfang 2022"
+
+[weather.air_temperature]
+en = "Temperature"
+de = "Temperatur"
+
+[weather.precipitation]
+en = "Precipitation"
+de = "Niederschlag"
+
+[weather.moisture]
+en = "Moisture"
+de = "Feuchtigkeit"
+
+[weather.plain]
+en = "No Weather"
+de = "Kein Wetter"
+
+[metrics.mae]
+en = "Mean Absolute Error"
+de = "Mittlerer abs. Fehler"
+
+[metrics.mse]
+en = "Mean Squared Error"
+de = "Mittlere quadratische Abweichung"
+
+[metrics.rmse]
+en = "Root Mean Squared Error"
+de = "Wurzel des mittl. quadr. Fehlers"
+
+[metrics.r2]
+en = "R2"
+de = "R2"
+
+[explanation.mae]
+en = """
+In the context of machine learning, absolute error refers to the magnitude of 
+difference between the prediction of an observation and the true value of that 
+observation. 
+MAE takes the average of absolute errors for a group of predictions and 
+observations as a measurement of the magnitude of errors for the entire group. 
+MAE can also be referred as L1 loss function.
+"""
+de = """
+Im Kontext des maschinellen Lernens bezieht sich der absolute Fehler auf die 
+Größe der Differenz zwischen der Vorhersage einer Beobachtung und dem wahren 
+Wert dieser Beobachtung. 
+MAE nimmt den Durchschnitt der absoluten Fehler für eine Gruppe von Vorhersagen 
+und Beobachtungen als Maß für das Ausmaß der Fehler für die gesamte Gruppe. 
+MAE kann auch als L1-Verlustfunktion bezeichnet werden.
+"""
+
+[explanation.mse]
+en = """
+In the fields of regression analysis and machine learning, the Mean Square 
+Error (MSE) is a crucial metric for evaluating the performance of predictive 
+models. 
+It measures the average squared difference between the predicted and the actual 
+target values within a dataset. 
+The primary objective of the MSE is to assess the quality of a model's 
+predictions by measuring how closely they align with the ground truth.
+"""
+de = """
+In den Bereichen Regressionsanalyse und maschinelles Lernen ist der mittlere 
+quadratische Fehler (Mean Square Error, MSE) eine wichtige Kennzahl für die 
+Bewertung der Leistung von Vorhersagemodellen. 
+Er misst die durchschnittliche quadratische Differenz zwischen den 
+vorhergesagten und den tatsächlichen Zielwerten innerhalb eines Datensatzes. 
+Das Hauptziel des MSE besteht darin, die Qualität der Vorhersagen eines Modells 
+zu bewerten, indem man misst, wie gut sie mit der Grundwahrheit übereinstimmen.
+"""
+
+[explanation.rmse]
+en = """
+Root mean square error or root mean square deviation is one of the most commonly 
+used measures for evaluating the quality of predictions. 
+It shows how far predictions fall from measured true values using Euclidean 
+distance.
+"""
+de = """
+Der mittlere quadratische Fehler (Root Mean Square Error) oder die mittlere 
+quadratische Abweichung (Root Mean Square Deviation) ist eines der am häufigsten 
+verwendeten Maße zur Bewertung der Qualität von Vorhersagen.
+Es zeigt, wie weit die Vorhersagen von den gemessenen wahren Werten abweichen, 
+wobei der euklidische Abstand verwendet wird.
+"""
+
+[explanation.r2]
+en = """
+The R-squared metric — R², or the coefficient of determination – is used to 
+measure how well a model fits data, and how well it can predict future outcomes. 
+Simply put, it tells you how much of the variation in your data can be explained 
+by your model. 
+The closer the R-squared value is to one, the better your model fits the data.
+"""
+de = """
+Die Metrik R-Quadrat - R² oder das Bestimmtheitsmaß - wird verwendet, um zu 
+messen, wie gut ein Modell zu den Daten passt und wie gut es zukünftige 
+Ergebnisse vorhersagen kann. 
+Einfach ausgedrückt, sagt es aus, wie viel der Variation in Ihren Daten durch 
+Ihr Modell erklärt werden kann. 
+Je näher der R-Quadrat-Wert bei eins liegt, desto besser passt Ihr Modell zu den 
+Daten.
+"""
