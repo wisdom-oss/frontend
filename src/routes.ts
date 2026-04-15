@@ -50,12 +50,12 @@ export const routes: Routes = [
         component: WaterDemandPrediction2Component,
       },
       {
-        path: "braintank",
+        path: "digital-twin/braintank",
         component: BraintankComponent,
         canActivate: [permissionsGuard(...RainRetentionBasinComponent.SCOPES)],
       },
       {
-        path: "rain-retention-basin",
+        path: "digital-twin/rain-retention-basin",
         component: RainRetentionBasinComponent,
         canActivate: [permissionsGuard(...RainRetentionBasinComponent.SCOPES)],
       },
