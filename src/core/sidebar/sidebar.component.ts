@@ -96,6 +96,9 @@ export class SidebarComponent implements AfterViewInit {
     pumpModels: computed(() =>
       this.auth.scopes().has(...PumpModelsComponent.SCOPES),
     ),
+    digitalTwin: computed(() =>
+      this.auth.scopes().has(...PumpModelsComponent.SCOPES),
+    ),
   };
 
   constructor(

@@ -7,6 +7,9 @@ import { remixCalendar2Line, remixContrastDrop2Line, remixRainyLine, remixTimeLi
 import { SimulationIntervalOption, SimulationParameter } from '../../common/types/SimulationTypes';
 import { ChartData } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
+import { firstValueFrom } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Scopes } from '../../../../core/auth/scopes';
 
 @Component({
   selector: 'model-view-rrb',
@@ -26,6 +29,8 @@ import { BaseChartDirective } from 'ng2-charts';
   ],
 })
 export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
+  static readonly SCOPES: Scopes.Scope[] = ["static-files:read"];
+  
   @Input() filename: string = '';
   @Input() cam: {x: number, y: number, z: number} = {x: 0, y: 0, z: 0};
   @Input() isSimulation: boolean = false;
@@ -37,7 +42,9 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() volume: WritableSignal<number> = signal(100);
   @Input() catchmentArea: WritableSignal<number> = signal(100);
   @Input() pavedArea: WritableSignal<number> = signal(50);
-  @Input() unpavedArea: WritableSignal<number> = signal(50); 
+  @Input() unpavedArea: WritableSignal<number> = signal(50);
+  @Input() city: WritableSignal<string> = signal('Damme');
+  @Input() name: WritableSignal<string> = signal('Nordhofe');
 
   rendererContainer = viewChild<ElementRef<HTMLDivElement>>('rendererContainer');
   
@@ -49,6 +56,8 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
   private resizeObserver!: ResizeObserver;
   private resizeRaf!: number | null;
   private waterPlane: THREE.Plane | null = null;
+  
+  private model_url = `/api/files/v1/rrb-digital-twin/model/${this.city()}/${this.name()}.glb`;
   
   protected time: WritableSignal<string> = signal('0');
   protected rainAmount: WritableSignal<number> = signal(0);
@@ -68,7 +77,9 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
       }],
     };
   
-  constructor() {
+  constructor(
+    private http: HttpClient,
+  ) {
     effect(() => {
       const newLevel = this.waterLevel();
       this.animateWaterToLevel(newLevel);
@@ -95,6 +106,8 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 2);
     hemiLight.position.set(0, 20, 0);
     this.scene.add(hemiLight);
+
+    console.log(this.model_url);
   };
   
   ngAfterViewInit(): void {
@@ -107,12 +120,12 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
     container.nativeElement.appendChild(this.renderer.domElement);
   
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-    const loader = new GLTFLoader();
-
-    loader.load('/public/model/' + this.filename, (gltf) => {
-      const model = gltf.scene;
+    
+    this.loadGltfModel().then(model => {
       this.scene.add(model);
-      model.rotation.y = - Math.PI / 4;
+
+      model.rotation.y = -Math.PI / 4;
+
       this.setUpWater(model);
       this.animateWaterToLevel(this.waterLevel());
     });
@@ -128,6 +141,15 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.resizeObserver) this.resizeObserver.disconnect();
     if (this.resizeRaf) cancelAnimationFrame(this.resizeRaf);
   };
+
+  private async loadGltfModel(): Promise<THREE.Group> {
+    const loader = new GLTFLoader();
+    const data = await firstValueFrom(this.http.get(this.model_url, {responseType: 'arraybuffer'}));
+
+    return new Promise((resolve, reject) => {
+      loader.parse(data, '', (gltf) => resolve(gltf.scene), reject);
+    });
+  }
 
   private scheduleResize() {
     if (this.resizeRaf) cancelAnimationFrame(this.resizeRaf);

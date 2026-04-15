@@ -13,7 +13,7 @@ import {WaterRightsComponent} from "./modules/water-rights/water-rights.componen
 import {waterRightsRoutes} from "./modules/water-rights/routes";
 import {WeatherDataComponent} from "./modules/weather-data/weather-data.component";
 import {BraintankComponent} from "./modules/digital-twin/braintank/braintank.component";
-import { RainRetentionBasinComponent } from "./modules/digital-twin/rain-retention-basin/rain-retention-basin.component";
+import {RainRetentionBasinComponent} from "./modules/digital-twin/rain-retention-basin/rain-retention-basin.component";
 
 
 export const routes: Routes = [
@@ -48,10 +48,12 @@ export const routes: Routes = [
       {
         path: "braintank",
         component: BraintankComponent,
+        canActivate: [permissionsGuard(...RainRetentionBasinComponent.SCOPES)],
       },
       {
         path: "rain-retention-basin",
         component: RainRetentionBasinComponent,
+        canActivate: [permissionsGuard(...RainRetentionBasinComponent.SCOPES)],
       },
     ],
   },

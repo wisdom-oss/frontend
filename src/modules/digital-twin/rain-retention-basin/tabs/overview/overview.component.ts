@@ -69,7 +69,7 @@ export class OverviewComponent {
   protected lat: WritableSignal<number> = signal(52.524639);
   protected long: WritableSignal<number> = signal(8.185833);
   protected city: WritableSignal<string> = signal('Damme');
-  protected name: WritableSignal<string> = signal('Zum Griechen');
+  protected name: WritableSignal<string> = signal('Nordhofe');
   
   protected volume: WritableSignal<number> = signal(14325);
   protected catchmentArea: WritableSignal<number> = signal(92.29);

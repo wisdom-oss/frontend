@@ -6,6 +6,7 @@ import { OverviewComponent } from './tabs/overview/overview.component';
 import { SimulationComponent } from './tabs/simulation/simulation.component';
 import { HistoryComponent } from './tabs/history/history.component';
 import { ControlComponent } from "./tabs/control/control.component";
+import { Scopes } from '../../../core/auth/scopes';
 
 @Component({
   imports: [
@@ -27,6 +28,8 @@ import { ControlComponent } from "./tabs/control/control.component";
   ],
 })
 export class RainRetentionBasinComponent {
+  static readonly SCOPES: Scopes.Scope[] = ["digital-twin:read"];
+  
   protected activeTab: WritableSignal<'overview' | 'history' | 'simulation' | 'control'> = signal('overview');  
 
   setActiveTab(tab: 'overview' | 'history' | 'simulation'| 'control') {

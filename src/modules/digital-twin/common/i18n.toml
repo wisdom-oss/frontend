@@ -60,6 +60,10 @@ de = "Tagesverlauf vom"
 en = "Drainage"
 de = "Entwässerung"
 
+[header.drainThrottle]
+en = "Drain Throttle"
+de = "Ablaufdrossel"
+
 [header.features]
 en = "Features"
 de = "Eigenschaften"
@@ -152,6 +156,14 @@ de = "Dachgröße"
 [label.setStartLevel]
 en = "Set starting water level"
 de = "Startwasserpegel einstellen"
+
+[label.setThrottleHeight]
+en = "Set height of drain throttle"
+de = "Höhe der Ablaufdrossel einstellen"
+
+[label.setThrottleSize]
+en = "Set size of drain throttle"
+de = "Größe der Ablaufdrossel einstellen"
 
 [label.simulationDuration]
 en = "Simulation duration"

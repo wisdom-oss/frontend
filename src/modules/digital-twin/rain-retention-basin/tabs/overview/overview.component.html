@@ -1,6 +1,6 @@
 <div>
   @if(activeView() === 'model') {
-    <model-view-rrb filename="RRB_Damme_Water.glb" [cam]="{x: -96, y: 40, z: 4}" [waterLevel]="waterLevel"/>
+    <model-view-rrb filename="RRB_Damme_Water.glb" [cam]="{x: -96, y: 40, z: 4}" [waterLevel]="waterLevel" [name]="name" [city]="city"/>
   }
   @if(activeView() === 'map') {
     <div class="is-fullwidth" style="height: 40rem">

@@ -18,6 +18,9 @@ import { ChartData } from 'chart.js';
 })
 export class ControlComponent {
   protected waterLevel: WritableSignal<number> = signal(10);
+
+  protected city: WritableSignal<string> = signal('Damme');
+  protected name: WritableSignal<string> = signal('Nordhofe');
   
   protected activeControl = signal<'manual' | 'semi-automatic' | 'automatic'>('manual'); 
 
