@@ -1,7 +1,10 @@
 <div class="is-fullwidth is is-fullheight" style="overflow: auto">
   <div class="tabs is-toggle is-medium is-fullwidth">
     <ul>
-      <li [class.is-active]="activeTab() === 'overview'" (click)="setActiveTab('overview')">
+      <li
+        [class.is-active]="activeTab() === 'overview'"
+        (click)="setActiveTab('overview')"
+      >
         <a>
           <span class="icon">
             <ng-icon name="remixProfileLine"></ng-icon>
@@ -9,7 +12,10 @@
           <span translate>digitalTwin.tab.overview</span>
         </a>
       </li>
-      <li [class.is-active]="activeTab() === 'history'" (click)="setActiveTab('history')">
+      <li
+        [class.is-active]="activeTab() === 'history'"
+        (click)="setActiveTab('history')"
+      >
         <a>
           <span class="icon">
             <ng-icon name="remixLineChartLine"></ng-icon>
@@ -17,7 +23,10 @@
           <span translate>digitalTwin.tab.history</span>
         </a>
       </li>
-      <li [class.is-active]="activeTab() === 'simulation'" (click)="setActiveTab('simulation')">
+      <li
+        [class.is-active]="activeTab() === 'simulation'"
+        (click)="setActiveTab('simulation')"
+      >
         <a>
           <span class="icon">
             <ng-icon name="remixMovieLine"></ng-icon>
@@ -25,7 +34,10 @@
           <span translate>digitalTwin.tab.simulation</span>
         </a>
       </li>
-      <li [class.is-active]="activeTab() === 'control'" (click)="setActiveTab('control')">
+      <li
+        [class.is-active]="activeTab() === 'control'"
+        (click)="setActiveTab('control')"
+      >
         <a>
           <span class="icon">
             <ng-icon name="remixGamepadLine"></ng-icon>
@@ -36,19 +48,19 @@
     </ul>
   </div>
 
-  @if(activeTab() === 'overview') {
-    <rrb-overview/>
+  @if (activeTab() === "overview") {
+    <rrb-overview />
   }
 
-   @if(activeTab() === 'history') {
-    <rrb-history/>
+  @if (activeTab() === "history") {
+    <rrb-history />
   }
 
-  @if(activeTab() === 'simulation') {
-    <rrb-simulation/>
+  @if (activeTab() === "simulation") {
+    <rrb-simulation />
   }
 
-  @if(activeTab() === 'control') {
-    <rrb-control/>
+  @if (activeTab() === "control") {
+    <rrb-control />
   }
 </div>

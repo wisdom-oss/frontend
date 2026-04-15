@@ -1,39 +1,61 @@
-import { Component, ElementRef, OnDestroy, OnInit, AfterViewInit, viewChild, Input, signal, WritableSignal, effect } from '@angular/core';
-import * as THREE from 'three';
-import { GLTFLoader, OrbitControls } from 'three-stdlib';
-import { gsap } from 'gsap';
-import { NgIconComponent, provideIcons } from '@ng-icons/core';
-import { TranslateDirective } from '@ngx-translate/core';
-import { remixCalendar2Line, remixContrastDrop2Line, remixRainyLine, remixTimeLine } from '@ng-icons/remixicon';
-import { SimulationIntervalOption, SimulationParameter } from '../../common/types/SimulationTypes';
+import {
+  effect,
+  signal,
+  viewChild,
+  Component,
+  OnDestroy,
+  OnInit,
+  AfterViewInit,
+  Input,
+  ElementRef,
+  WritableSignal,
+} from "@angular/core";
+import {provideIcons, NgIconComponent} from "@ng-icons/core";
+import {
+  remixCalendar2Line,
+  remixContrastDrop2Line,
+  remixRainyLine,
+  remixTimeLine,
+} from "@ng-icons/remixicon";
+import {TranslateDirective} from "@ngx-translate/core";
+import {gsap} from "gsap";
+import {OrbitControls, GLTFLoader} from "three-stdlib";
+
+import * as THREE from "three";
+
+import {
+  SimulationIntervalOption,
+  SimulationParameter,
+} from "../../common/types/SimulationTypes";
 
 @Component({
-  selector: 'model-view-braintank',
-  imports: [
-    NgIconComponent,
-    TranslateDirective
-  ],
-  templateUrl: './model-view.component.html',
+  selector: "model-view-braintank",
+  imports: [NgIconComponent, TranslateDirective],
+  templateUrl: "./model-view.component.html",
   providers: [
     provideIcons({
       remixRainyLine,
       remixTimeLine,
       remixCalendar2Line,
-      remixContrastDrop2Line
+      remixContrastDrop2Line,
     }),
   ],
 })
 export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
-  @Input() filename: string = '';
-  @Input() cam: {x: number, y: number, z: number} = {x: 0, y: 0, z: 0};
+  @Input() filename: string = "";
+  @Input() cam: {x: number; y: number; z: number} = {x: 0, y: 0, z: 0};
   @Input() isSimulation: boolean = false;
 
   @Input() waterLevel: WritableSignal<number> = signal(20);
-  @Input() simulationParameter: WritableSignal<SimulationParameter[]>  = signal([]);
-  @Input() intervalForecast: WritableSignal<SimulationIntervalOption> = signal('5 min');
+  @Input() simulationParameter: WritableSignal<SimulationParameter[]> = signal(
+    [],
+  );
+  @Input() intervalForecast: WritableSignal<SimulationIntervalOption> =
+    signal("5 min");
 
-  rendererContainer = viewChild<ElementRef<HTMLDivElement>>('rendererContainer');
-  
+  rendererContainer =
+    viewChild<ElementRef<HTMLDivElement>>("rendererContainer");
+
   private scene!: THREE.Scene;
   private camera!: THREE.PerspectiveCamera;
   private renderer!: THREE.WebGLRenderer;
@@ -41,57 +63,59 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
   private animationFrameId!: number;
   private resizeObserver!: ResizeObserver;
   private resizeRaf!: number | null;
-  
+
   private originalY: number = 1;
-  protected time: WritableSignal<string> = signal('0');
+  protected time: WritableSignal<string> = signal("0");
   protected rainAmount: WritableSignal<number> = signal(0);
 
-  
   constructor() {
     effect(() => {
       const newLevel = this.waterLevel();
       this.animateWaterToLevel(newLevel);
     });
-  };
-  
+  }
+
   ngOnInit(): void {
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0xeeeeee);
-  
+
     this.camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-    this.camera.position.set(this.cam.x, this.cam.y, this.cam.z); 
-  
+    this.camera.position.set(this.cam.x, this.cam.y, this.cam.z);
+
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 2);
     hemiLight.position.set(0, 20, 0);
     this.scene.add(hemiLight);
   }
-  
+
   ngAfterViewInit(): void {
     const container = this.rendererContainer();
     if (!container) return;
-  
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
-    this.renderer.setSize(container.nativeElement.clientWidth, container.nativeElement.clientHeight);
+
+    this.renderer = new THREE.WebGLRenderer({antialias: true});
+    this.renderer.setSize(
+      container.nativeElement.clientWidth,
+      container.nativeElement.clientHeight,
+    );
     this.renderer.localClippingEnabled = true;
     container.nativeElement.appendChild(this.renderer.domElement);
-  
+
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     const loader = new GLTFLoader();
 
-    loader.load('/public/model/' + this.filename, (gltf) => {
+    loader.load("/public/model/" + this.filename, gltf => {
       const model = gltf.scene;
       this.scene.add(model);
-      this.setColorMesh(model, 'Water', 0x0000ff);
-      this.setColorMesh(model, 'Pool', 0xffffff);
+      this.setColorMesh(model, "Water", 0x0000ff);
+      this.setColorMesh(model, "Pool", 0xffffff);
       this.setScaleYWater(model, this.waterLevel());
-      model.rotation.y = - Math.PI / 4;
+      model.rotation.y = -Math.PI / 4;
     });
 
     this.animate();
     this.resizeObserver = new ResizeObserver(() => this.scheduleResize());
     this.resizeObserver.observe(container.nativeElement);
   }
-  
+
   ngOnDestroy(): void {
     cancelAnimationFrame(this.animationFrameId);
     if (this.renderer) this.renderer.dispose();
@@ -103,14 +127,14 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.resizeRaf) cancelAnimationFrame(this.resizeRaf);
     this.resizeRaf = requestAnimationFrame(() => this.onContainerResize());
   }
-  
+
   private onContainerResize = () => {
     const container = this.rendererContainer();
     if (!container) return;
-  
+
     const width = container.nativeElement.clientWidth;
     const height = container.nativeElement.clientHeight;
-  
+
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
@@ -121,64 +145,75 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
     this.controls.update();
     this.renderer.render(this.scene, this.camera);
   };
-  
-  private setColorMesh = (model: THREE.Group<THREE.Object3DEventMap>, objectName: string, color: string|number) => {
+
+  private setColorMesh = (
+    model: THREE.Group<THREE.Object3DEventMap>,
+    objectName: string,
+    color: string | number,
+  ) => {
     const mesh = model.getObjectByName(objectName) as THREE.Mesh;
-  
+
     if (mesh && mesh.material instanceof THREE.MeshStandardMaterial) {
       mesh.material.color.set(color);
     }
   };
-  
-  private setScaleYWater = (model: THREE.Group<THREE.Object3DEventMap>, scaleY: number) => {
-    const water = model.getObjectByName('Water');
+
+  private setScaleYWater = (
+    model: THREE.Group<THREE.Object3DEventMap>,
+    scaleY: number,
+  ) => {
+    const water = model.getObjectByName("Water");
 
     if (!water) return;
 
     this.originalY = water.scale.y;
     let newY = (scaleY / 100) * this.originalY;
-  
+
     if (newY < 0 || newY > this.originalY) {
       newY = 0;
     }
-  
+
     if (water) {
       water.scale.set(water.scale.x, newY, water.scale.z);
-      water.position.y = this.originalY * this.originalY * (newY - this.originalY);
-    } 
-  
+      water.position.y =
+        this.originalY * this.originalY * (newY - this.originalY);
+    }
+
     water.renderOrder = 1;
   };
 
   private animateWaterToLevel(newScale: number) {
-    const water = this.scene.getObjectByName('Water');
+    const water = this.scene.getObjectByName("Water");
 
     if (!water) return;
 
     gsap.to(water.scale, {
       y: (newScale / 100) * this.originalY,
       duration: 0.5,
-      ease: "power2.out"
+      ease: "power2.out",
     });
 
     // keep bottom anchored
     gsap.to(water.position, {
-      y: this.originalY * this.originalY * (((newScale / 100) * this.originalY) - this.originalY),
+      y:
+        this.originalY *
+        this.originalY *
+        ((newScale / 100) * this.originalY - this.originalY),
       duration: 0.5,
-      ease: "power2.out"
+      ease: "power2.out",
     });
 
     this.waterLevel.set(newScale);
-  };
+  }
 
   protected startWaterSimulation() {
     this.computeSimulationParameter();
 
     let index = 0;
-    
+
     const runStep = () => {
       const nextLevel = this.simulationParameter()[index];
-      
+
       this.animateWaterToLevel(nextLevel.waterLevel);
       this.time.set(nextLevel.time);
       this.rainAmount.set(nextLevel.rainAmount);
@@ -190,14 +225,14 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
     };
 
     runStep();
-  };
+  }
 
   protected computeSimulationParameter() {
-    let currentLevel = this.waterLevel();
-
-    this.simulationParameter.set(this.simulationParameter().map(param => {
-      //TODO: Compute simulation
-      return param;
-    }));
-  };
+    this.simulationParameter.set(
+      this.simulationParameter().map(param => {
+        //TODO: Compute simulation
+        return param;
+      }),
+    );
+  }
 }

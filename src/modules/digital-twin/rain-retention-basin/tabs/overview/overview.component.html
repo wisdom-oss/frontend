@@ -1,33 +1,62 @@
 <div>
-  @if(activeView() === 'model') {
-    <model-view-rrb filename="RRB_Damme_Water.glb" [cam]="{x: -96, y: 40, z: 4}" [waterLevel]="waterLevel" [name]="name" [city]="city"/>
+  @if (activeView() === "model") {
+    <model-view-rrb
+      filename="RRB_Damme_Water.glb"
+      [cam]="{x: -96, y: 40, z: 4}"
+      [waterLevel]="waterLevel"
+      [name]="name"
+      [city]="city"
+    />
   }
-  @if(activeView() === 'map') {
+  @if (activeView() === "map") {
     <div class="is-fullwidth" style="height: 40rem">
-        <map-view [locations]="locations" [center]="{lon: long(), lat: lat()}"></map-view>
+      <map-view
+        [locations]="locations"
+        [center]="{lon: long(), lat: lat()}"
+      ></map-view>
     </div>
   }
-  @if(activeView() === 'pictures') {
+  @if (activeView() === "pictures") {
     <div class="is-fullwidth" style="height: 40rem">
-      <app-carousel 
-        [images]="['../../../../../public/images/GroßerGrieche.JPG', '../../../../../public/images/KleinerGrieche.JPG']"
-        [autoPlay]="false">
+      <app-carousel
+        [images]="[
+          '../../../../../public/images/GroßerGrieche.JPG',
+          '../../../../../public/images/KleinerGrieche.JPG',
+        ]"
+        [autoPlay]="false"
+      >
       </app-carousel>
     </div>
   }
 
   <div class="is-flex is-flex-direction-row is-justify-content-center">
     <div class="buttons has-addons">
-      <button [class.is-active]="activeView() === 'model'" (click)="setActiveView('model')" class="button">
-        <ng-icon name="remixCheckboxMultipleBlankFill" size="1.5rem" class="mr-2"/>
+      <button
+        [class.is-active]="activeView() === 'model'"
+        (click)="setActiveView('model')"
+        class="button"
+      >
+        <ng-icon
+          name="remixCheckboxMultipleBlankFill"
+          size="1.5rem"
+          class="mr-2"
+        />
         <span translate>digitalTwin.button.model</span>
       </button>
-      <button [class.is-active]="activeView() === 'map'" (click)="setActiveView('map')" class="button">
-        <ng-icon name="remixMap2Fill" size="1.5rem" class="mr-2"/>
+      <button
+        [class.is-active]="activeView() === 'map'"
+        (click)="setActiveView('map')"
+        class="button"
+      >
+        <ng-icon name="remixMap2Fill" size="1.5rem" class="mr-2" />
         <span translate>digitalTwin.button.map</span>
       </button>
-      <button [class.is-active]="activeView() === 'pictures'" (click)="setActiveView('pictures')" class="button">
-        <ng-icon name="remixImageFill" size="1.5rem" class="mr-2"/>
+      <button
+        [class.is-active]="activeView() === 'pictures'"
+        (click)="setActiveView('pictures')"
+        class="button"
+      >
+        <ng-icon name="remixImageFill" size="1.5rem" class="mr-2" />
         <span translate>digitalTwin.button.pictures</span>
       </button>
     </div>
@@ -36,24 +65,34 @@
   <div class="card my-4">
     <div class="card-content">
       <div class="is-fullwidth has-text-centered my-4">
-          <p class="is-size-3 my-4" translate>digitalTwin.header.currentValues</p>
+        <p class="is-size-3 my-4" translate>digitalTwin.header.currentValues</p>
       </div>
-      
+
       <div class="columns my-4">
         <div class="column is-half">
           <div class="is-flex is-flex-direction-row">
-            <ng-icon name="remixTimeLine" size="2.5rem" class="mx-4"/>
-            <div class="is-flex is-flex-direction-column is-justify-content-center">
-              <p><span translate>digitalTwin.label.time</span>: {{time().format('DD.MM.YY, HH:mm')}}</p>
+            <ng-icon name="remixTimeLine" size="2.5rem" class="mx-4" />
+            <div
+              class="is-flex is-flex-direction-column is-justify-content-center"
+            >
+              <p>
+                <span translate>digitalTwin.label.time</span>:
+                {{ time().format("DD.MM.YY, HH:mm") }}
+              </p>
             </div>
           </div>
         </div>
 
         <div class="column is-half">
           <div class="is-flex is-flex-direction-row">
-            <ng-icon name="remixContrastDrop2Line" size="2.5rem" class="mx-4"/>
-            <div class="is-flex is-flex-direction-column is-justify-content-center">
-              <p><span translate>digitalTwin.header.waterLevel</span>: {{waterLevel()}} %</p>
+            <ng-icon name="remixContrastDrop2Line" size="2.5rem" class="mx-4" />
+            <div
+              class="is-flex is-flex-direction-column is-justify-content-center"
+            >
+              <p>
+                <span translate>digitalTwin.header.waterLevel</span>:
+                {{ waterLevel() }} %
+              </p>
             </div>
           </div>
         </div>
@@ -70,38 +109,22 @@
       <div class="columns my-4">
         <div class="column is-half">
           <div class="is-flex is-flex-direction-row">
-            <ng-icon name="remixInfoCardLine" size="2.5rem" class="mx-4"/>
-            <div class="is-flex is-flex-direction-column is-justify-content-center">
-              <p><span translate>digitalTwin.label.name</span>: {{name()}}</p>
+            <ng-icon name="remixInfoCardLine" size="2.5rem" class="mx-4" />
+            <div
+              class="is-flex is-flex-direction-column is-justify-content-center"
+            >
+              <p><span translate>digitalTwin.label.name</span>: {{ name() }}</p>
             </div>
           </div>
         </div>
 
         <div class="column is-half">
           <div class="is-flex is-flex-direction-row">
-            <ng-icon name="remixCommunityLine" size="2.5rem" class="mx-4"/>
-            <div class="is-flex is-flex-direction-column is-justify-content-center">
-              <p><span translate>digitalTwin.label.city</span>: {{city()}}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="columns my-4">
-        <div class="column is-half">
-          <div class="is-flex is-flex-direction-row">
-            <ng-icon name="remixMapPin2Line" size="2.5rem" class="mx-4"/>
-            <div class="is-flex is-flex-direction-column is-justify-content-center">
-              <p><span translate>digitalTwin.label.latitude</span>: {{lat()}}</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="column is-half">
-          <div class="is-flex is-flex-direction-row">
-            <ng-icon name="remixMapPin2Line" size="2.5rem" class="mx-4"/>
-            <div class="is-flex is-flex-direction-column is-justify-content-center">
-              <p><span translate>digitalTwin.label.longitude</span>: {{long()}}</p>
+            <ng-icon name="remixCommunityLine" size="2.5rem" class="mx-4" />
+            <div
+              class="is-flex is-flex-direction-column is-justify-content-center"
+            >
+              <p><span translate>digitalTwin.label.city</span>: {{ city() }}</p>
             </div>
           </div>
         </div>
@@ -110,38 +133,86 @@
       <div class="columns my-4">
         <div class="column is-half">
           <div class="is-flex is-flex-direction-row">
-            <ng-icon name="remixBox2Line" size="2.5rem" class="mx-4"/>
-            <div class="is-flex is-flex-direction-column is-justify-content-center">
-              <p><span translate>digitalTwin.label.retentionVolume</span>: {{volume()}} m³</p>
+            <ng-icon name="remixMapPin2Line" size="2.5rem" class="mx-4" />
+            <div
+              class="is-flex is-flex-direction-column is-justify-content-center"
+            >
+              <p>
+                <span translate>digitalTwin.label.latitude</span>: {{ lat() }}
+              </p>
             </div>
           </div>
         </div>
 
         <div class="column is-half">
           <div class="is-flex is-flex-direction-row">
-            <ng-icon name="remixCollageLine" size="2.5rem" class="mx-4"/>
-            <div class="is-flex is-flex-direction-column is-justify-content-center">
-              <p><span translate>digitalTwin.label.catchmentArea</span>: {{catchmentArea()}} ha</p>
+            <ng-icon name="remixMapPin2Line" size="2.5rem" class="mx-4" />
+            <div
+              class="is-flex is-flex-direction-column is-justify-content-center"
+            >
+              <p>
+                <span translate>digitalTwin.label.longitude</span>: {{ long() }}
+              </p>
             </div>
           </div>
         </div>
       </div>
-      
+
       <div class="columns my-4">
         <div class="column is-half">
           <div class="is-flex is-flex-direction-row">
-            <ng-icon name="remixHome8Line" size="2.5rem" class="mx-4"/>
-            <div class="is-flex is-flex-direction-column is-justify-content-center">
-              <p><span translate>digitalTwin.label.pavedArea</span>: {{pavedArea()}} ha</p>
+            <ng-icon name="remixBox2Line" size="2.5rem" class="mx-4" />
+            <div
+              class="is-flex is-flex-direction-column is-justify-content-center"
+            >
+              <p>
+                <span translate>digitalTwin.label.retentionVolume</span>:
+                {{ volume() }} m³
+              </p>
             </div>
           </div>
         </div>
 
         <div class="column is-half">
           <div class="is-flex is-flex-direction-row">
-            <ng-icon name="remixTreeLine" size="2.5rem" class="mx-4"/>
-            <div class="is-flex is-flex-direction-column is-justify-content-center">
-              <p><span translate>digitalTwin.label.unpavedArea</span>: {{unpavedArea()}} ha</p>
+            <ng-icon name="remixCollageLine" size="2.5rem" class="mx-4" />
+            <div
+              class="is-flex is-flex-direction-column is-justify-content-center"
+            >
+              <p>
+                <span translate>digitalTwin.label.catchmentArea</span>:
+                {{ catchmentArea() }} ha
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="columns my-4">
+        <div class="column is-half">
+          <div class="is-flex is-flex-direction-row">
+            <ng-icon name="remixHome8Line" size="2.5rem" class="mx-4" />
+            <div
+              class="is-flex is-flex-direction-column is-justify-content-center"
+            >
+              <p>
+                <span translate>digitalTwin.label.pavedArea</span>:
+                {{ pavedArea() }} ha
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="column is-half">
+          <div class="is-flex is-flex-direction-row">
+            <ng-icon name="remixTreeLine" size="2.5rem" class="mx-4" />
+            <div
+              class="is-flex is-flex-direction-column is-justify-content-center"
+            >
+              <p>
+                <span translate>digitalTwin.label.unpavedArea</span>:
+                {{ unpavedArea() }} ha
+              </p>
             </div>
           </div>
         </div>
@@ -149,5 +220,11 @@
     </div>
   </div>
 
-  <chart header="digitalTwin.header.rainForecast" [chartData]="dataCurrentForecast" text="mm" [suggestedMax]="10" chartType="bar"/>
+  <chart
+    header="digitalTwin.header.rainForecast"
+    [chartData]="dataCurrentForecast"
+    text="mm"
+    [suggestedMax]="10"
+    chartType="bar"
+  />
 </div>

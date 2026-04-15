@@ -1,18 +1,19 @@
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
-import { NgIconComponent, provideIcons } from "@ng-icons/core";
-import { remixArrowLeftWideLine, remixArrowRightWideLine } from '@ng-icons/remixicon';
+import {Component, OnDestroy, OnInit, Input} from "@angular/core";
+import {provideIcons, NgIconComponent} from "@ng-icons/core";
+import {
+  remixArrowLeftWideLine,
+  remixArrowRightWideLine,
+} from "@ng-icons/remixicon";
 
 @Component({
-  selector: 'app-carousel',
-  templateUrl: './carousel.component.html',
-  styleUrls: ['./carousel.component.scss'],
-  imports: [
-    NgIconComponent
-  ],
+  selector: "app-carousel",
+  templateUrl: "./carousel.component.html",
+  styleUrls: ["./carousel.component.scss"],
+  imports: [NgIconComponent],
   providers: [
     provideIcons({
       remixArrowRightWideLine,
-      remixArrowLeftWideLine
+      remixArrowLeftWideLine,
     }),
   ],
 })

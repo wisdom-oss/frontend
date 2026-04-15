@@ -1,33 +1,34 @@
-import { Component, signal, WritableSignal } from '@angular/core';
-import { CarouselComponent } from "../../../common/carousel/carousel.component";
-import { NgIconComponent, provideIcons } from "@ng-icons/core";
-import { 
-  remixContrastDrop2Line, 
-  remixTimeLine, 
-  remixHome8Line, 
-  remixMapPin2Line, 
-  remixWaterPercentLine, 
-  remixRainyLine, 
-  remixMap2Fill, 
-  remixImageFill, 
-  remixCheckboxMultipleBlankFill, 
-  remixMapPin2Fill, 
+import {signal, Component, WritableSignal} from "@angular/core";
+import {provideIcons, NgIconComponent} from "@ng-icons/core";
+import {
   remixArrowLeftWideLine,
   remixArrowRightWideLine,
-  remixCommunityLine,
-  remixInfoCardLine,
-  remixTreeLine,
+  remixBox2Line,
+  remixCheckboxMultipleBlankFill,
   remixCollageLine,
-  remixBox2Line
-} from '@ng-icons/remixicon';
-import dayjs, { Dayjs } from 'dayjs';
-import { ChartData } from 'chart.js';
-import { StyleSpecification } from 'maplibre-gl';
+  remixCommunityLine,
+  remixContrastDrop2Line,
+  remixHome8Line,
+  remixImageFill,
+  remixInfoCardLine,
+  remixMap2Fill,
+  remixMapPin2Fill,
+  remixMapPin2Line,
+  remixRainyLine,
+  remixTimeLine,
+  remixTreeLine,
+  remixWaterPercentLine,
+} from "@ng-icons/remixicon";
+import {TranslateDirective} from "@ngx-translate/core";
+import {ChartData} from "chart.js";
+import dayjs, {Dayjs} from "dayjs";
+import {StyleSpecification} from "maplibre-gl";
+
 import colorful from "../../../../../assets/map/styles/colorful.json";
-import { TranslateDirective } from '@ngx-translate/core';
-import { MapViewComponent } from "../../../common/map-view/map-view.component";
-import { ModelViewComponent } from "../../model-view/model-view.component";
-import { ChartComponent } from "../../../common/chart/chart.component";
+import {CarouselComponent} from "../../../common/carousel/carousel.component";
+import {ChartComponent} from "../../../common/chart/chart.component";
+import {MapViewComponent} from "../../../common/map-view/map-view.component";
+import {ModelViewComponent} from "../../model-view/model-view.component";
 
 @Component({
   selector: "rrb-overview",
@@ -37,9 +38,9 @@ import { ChartComponent } from "../../../common/chart/chart.component";
     CarouselComponent,
     MapViewComponent,
     ModelViewComponent,
-    ChartComponent
-],
-  templateUrl: './overview.component.html',
+    ChartComponent,
+  ],
+  templateUrl: "./overview.component.html",
   providers: [
     provideIcons({
       remixContrastDrop2Line,
@@ -58,55 +59,67 @@ import { ChartComponent } from "../../../common/chart/chart.component";
       remixInfoCardLine,
       remixTreeLine,
       remixCollageLine,
-      remixBox2Line
+      remixBox2Line,
     }),
   ],
 })
 export class OverviewComponent {
   protected time: WritableSignal<Dayjs> = signal(dayjs());
   protected waterLevel: WritableSignal<number> = signal(10);
-  
+
   protected lat: WritableSignal<number> = signal(52.524639);
   protected long: WritableSignal<number> = signal(8.185833);
-  protected city: WritableSignal<string> = signal('Damme');
-  protected name: WritableSignal<string> = signal('Nordhofe');
-  
+  protected city: WritableSignal<string> = signal("Damme");
+  protected name: WritableSignal<string> = signal("Nordhofe");
+
   protected volume: WritableSignal<number> = signal(14325);
   protected catchmentArea: WritableSignal<number> = signal(92.29);
   protected pavedArea: WritableSignal<number> = signal(38.34);
-  protected unpavedArea: WritableSignal<number> = signal(53.95); 
+  protected unpavedArea: WritableSignal<number> = signal(53.95);
 
-  protected activeView: WritableSignal<'model' | 'map' | 'pictures'> = signal('model'); 
+  protected activeView: WritableSignal<"model" | "map" | "pictures"> =
+    signal("model");
 
-  setActiveView(view: 'model' | 'map' | 'pictures') {
+  setActiveView(view: "model" | "map" | "pictures") {
     this.activeView.set(view);
   }
 
-  dataCurrentForecast: ChartData<'bar', {x: string, y: number}[]> = {
-    datasets: [{
-      data: [{x: '16:00', y: 0}, {x: '16:15', y: 0}, {x: '16:30', y: 3}, {x: '16:45', y: 2}, {x: '17:00', y: 0}, {x: '17:15', y: 0}, {x: '17:30', y: 6}, {x: '17:45', y: 8}],
-      parsing: {
-        xAxisKey: 'x',
-        yAxisKey: 'y'
+  dataCurrentForecast: ChartData<"bar", {x: string; y: number}[]> = {
+    datasets: [
+      {
+        data: [
+          {x: "16:00", y: 0},
+          {x: "16:15", y: 0},
+          {x: "16:30", y: 3},
+          {x: "16:45", y: 2},
+          {x: "17:00", y: 0},
+          {x: "17:15", y: 0},
+          {x: "17:30", y: 6},
+          {x: "17:45", y: 8},
+        ],
+        parsing: {
+          xAxisKey: "x",
+          yAxisKey: "y",
+        },
       },
-    }],
+    ],
   };
-  
+
   protected style = colorful as any as StyleSpecification;
-  
-  protected locations : GeoJSON.FeatureCollection = {
-    type: 'FeatureCollection',
+
+  protected locations: GeoJSON.FeatureCollection = {
+    type: "FeatureCollection",
     features: [
       {
-        type: 'Feature',
+        type: "Feature",
         geometry: {
-          type: 'Point',
-          coordinates: [this.long(), this.lat()]
+          type: "Point",
+          coordinates: [this.long(), this.lat()],
         },
         properties: {
-          name: 'Test Point'
-        }
-      }
-    ]
+          name: "Test Point",
+        },
+      },
+    ],
   };
 }

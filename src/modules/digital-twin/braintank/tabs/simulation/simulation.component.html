@@ -1,10 +1,21 @@
 <div>
-  <model-view-braintank filename="IBC.glb" [cam]="{x: 0, y: 0.25, z: 2}" [isSimulation]="true" [waterLevel]="waterLevel"
-                        [simulationParameter]="rainForecast"/>
-  
-  <water-level [waterLevelSlider]="waterLevelSlider" [waterLevel]="waterLevel"/>
+  <model-view-braintank
+    filename="IBC.glb"
+    [cam]="{x: 0, y: 0.25, z: 2}"
+    [isSimulation]="true"
+    [waterLevel]="waterLevel"
+    [simulationParameter]="rainForecast"
+  />
+
+  <water-level
+    [waterLevelSlider]="waterLevelSlider"
+    [waterLevel]="waterLevel"
+  />
 
   <drainage-rules [drainageRules]="drainageRules"></drainage-rules>
 
-  <rain-forecast [intervalForecast]="intervalForecast" [rainForecast]="rainForecast"/>
+  <rain-forecast
+    [intervalForecast]="intervalForecast"
+    [rainForecast]="rainForecast"
+  />
 </div>

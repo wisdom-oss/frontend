@@ -5,6 +5,8 @@ import {CoreComponent} from "./core/core.component";
 import {permissionsGuard} from "./core/auth/permissions.guard";
 import {GreeterComponent} from "./core/greeter/greeter.component";
 import {BeWaterSmartComponent} from "./modules/be-water-smart/be-water-smart.component";
+import {BraintankComponent} from "./modules/digital-twin/braintank/braintank.component";
+import {RainRetentionBasinComponent} from "./modules/digital-twin/rain-retention-basin/rain-retention-basin.component";
 import {GrowlComponent} from "./modules/growl/growl.component";
 import {longTermForecastRoutes} from "./modules/long-term-forecast/routes";
 import {OowvActionMapComponent} from "./modules/oowv/action-map/action-map.component";
@@ -12,9 +14,6 @@ import {PumpModelsComponent} from "./modules/pump-models/pump-models.component";
 import {WaterRightsComponent} from "./modules/water-rights/water-rights.component";
 import {waterRightsRoutes} from "./modules/water-rights/routes";
 import {WeatherDataComponent} from "./modules/weather-data/weather-data.component";
-import {BraintankComponent} from "./modules/digital-twin/braintank/braintank.component";
-import {RainRetentionBasinComponent} from "./modules/digital-twin/rain-retention-basin/rain-retention-basin.component";
-
 
 export const routes: Routes = [
   {path: "callback", component: CallbackComponent},

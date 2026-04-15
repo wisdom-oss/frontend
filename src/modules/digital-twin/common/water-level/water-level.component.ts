@@ -1,15 +1,12 @@
-import { Component, Input, signal, WritableSignal } from '@angular/core';
-import { NgIconComponent, provideIcons } from '@ng-icons/core';
-import { remixContrastDrop2Line } from '@ng-icons/remixicon';
-import { TranslateDirective } from '@ngx-translate/core';
+import {signal, Component, Input, WritableSignal} from "@angular/core";
+import {provideIcons, NgIconComponent} from "@ng-icons/core";
+import {remixContrastDrop2Line} from "@ng-icons/remixicon";
+import {TranslateDirective} from "@ngx-translate/core";
 
 @Component({
-  selector: 'water-level',
-  imports: [
-    TranslateDirective,
-    NgIconComponent
-  ],
-  templateUrl: './water-level.component.html',
+  selector: "water-level",
+  imports: [TranslateDirective, NgIconComponent],
+  templateUrl: "./water-level.component.html",
   providers: [
     provideIcons({
       remixContrastDrop2Line,

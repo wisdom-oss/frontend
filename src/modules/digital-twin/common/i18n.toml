@@ -42,11 +42,9 @@ de = "Halbautomatisch"
 en = "Start Simulation"
 de = "Simulation starten"
 
-
 [display.module.rrb]
 en = "Rain Retention Basin"
 de = "Regenrückhaltebecken"
-
 
 [header.currentValues]
 en = "Current Values"
@@ -83,7 +81,6 @@ de = "Simulationsverlauf"
 [header.waterLevel]
 en = "Water Level"
 de = "Wasserpegel"
-
 
 [label.applyRainForecast]
 en = "Apply rain forecast"
@@ -192,7 +189,6 @@ de = "Unbefestigte Fläche"
 [notification.success]
 en = "No drainage is currently necessary or planned!"
 de = "Derzeit keine Entwässerung notwendig und geplant!"
-
 
 [tab.control]
 en = "Control"

@@ -21,18 +21,18 @@ import {
   remixBookLine,
   remixBookShelfLine,
   remixBuilding3Fill,
-  remixDrizzleFill,
   remixDatabase2Fill,
+  remixDrizzleFill,
   remixFilePaper2Fill,
+  remixHeavyShowersLine,
   remixInstanceLine,
   remixLineChartLine,
-  remixMapLine,
   remixMap2Fill,
+  remixMapLine,
   remixRfidLine,
   remixSunCloudyFill,
   remixSwap2Line,
   remixWaterPercentFill,
-  remixHeavyShowersLine,
 } from "@ng-icons/remixicon";
 import {TranslateDirective} from "@ngx-translate/core";
 import {filter} from "rxjs";

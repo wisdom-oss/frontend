@@ -1,12 +1,18 @@
-import { Component, signal, WritableSignal } from '@angular/core';
-import { NgIconComponent, provideIcons } from "@ng-icons/core";
-import { remixGamepadLine, remixLineChartLine, remixMovieLine, remixProfileLine } from '@ng-icons/remixicon';
-import { TranslateDirective } from '@ngx-translate/core';
-import { OverviewComponent } from './tabs/overview/overview.component';
-import { SimulationComponent } from './tabs/simulation/simulation.component';
-import { HistoryComponent } from './tabs/history/history.component';
-import { ControlComponent } from "./tabs/control/control.component";
-import { Scopes } from '../../../core/auth/scopes';
+import {signal, Component, WritableSignal} from "@angular/core";
+import {provideIcons, NgIconComponent} from "@ng-icons/core";
+import {
+  remixGamepadLine,
+  remixLineChartLine,
+  remixMovieLine,
+  remixProfileLine,
+} from "@ng-icons/remixicon";
+import {TranslateDirective} from "@ngx-translate/core";
+
+import {ControlComponent} from "./tabs/control/control.component";
+import {HistoryComponent} from "./tabs/history/history.component";
+import {OverviewComponent} from "./tabs/overview/overview.component";
+import {SimulationComponent} from "./tabs/simulation/simulation.component";
+import {Scopes} from "../../../core/auth/scopes";
 
 @Component({
   imports: [
@@ -15,24 +21,26 @@ import { Scopes } from '../../../core/auth/scopes';
     OverviewComponent,
     HistoryComponent,
     SimulationComponent,
-    ControlComponent
-],
-  templateUrl: './rain-retention-basin.component.html',
+    ControlComponent,
+  ],
+  templateUrl: "./rain-retention-basin.component.html",
   providers: [
     provideIcons({
       remixLineChartLine,
       remixMovieLine,
       remixProfileLine,
-      remixGamepadLine
+      remixGamepadLine,
     }),
   ],
 })
 export class RainRetentionBasinComponent {
   static readonly SCOPES: Scopes.Scope[] = ["digital-twin:read"];
-  
-  protected activeTab: WritableSignal<'overview' | 'history' | 'simulation' | 'control'> = signal('overview');  
 
-  setActiveTab(tab: 'overview' | 'history' | 'simulation'| 'control') {
+  protected activeTab: WritableSignal<
+    "overview" | "history" | "simulation" | "control"
+  > = signal("overview");
+
+  setActiveTab(tab: "overview" | "history" | "simulation" | "control") {
     this.activeTab.set(tab);
   }
 }

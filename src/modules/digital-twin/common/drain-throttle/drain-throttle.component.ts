@@ -1,19 +1,16 @@
-import { Component, Input, signal, WritableSignal } from '@angular/core';
-import { NgIconComponent, provideIcons } from '@ng-icons/core';
-import { remixCustomSize, remixExpandHeightLine } from '@ng-icons/remixicon';
-import { TranslateDirective } from '@ngx-translate/core';
+import {signal, Component, Input, WritableSignal} from "@angular/core";
+import {provideIcons, NgIconComponent} from "@ng-icons/core";
+import {remixCustomSize, remixExpandHeightLine} from "@ng-icons/remixicon";
+import {TranslateDirective} from "@ngx-translate/core";
 
 @Component({
   selector: "drain-throttle",
-  imports: [
-    TranslateDirective,
-    NgIconComponent
-  ],
-  templateUrl: './drain-throttle.component.html',
+  imports: [TranslateDirective, NgIconComponent],
+  templateUrl: "./drain-throttle.component.html",
   providers: [
     provideIcons({
       remixCustomSize,
-      remixExpandHeightLine
+      remixExpandHeightLine,
     }),
   ],
 })

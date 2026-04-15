@@ -110,17 +110,21 @@
         </a>
       </li>
     </ul>
-    <p class="menu-label icon-text" 
+    <p
+      class="menu-label icon-text"
       [class.unauthorized]="!authorized.digitalTwin()"
-      *ngIf="authorized.digitalTwin()">
+      *ngIf="authorized.digitalTwin()"
+    >
       <span class="icon">
         <ng-icon name="remixSwap2Line"></ng-icon>
       </span>
       <span translate>core.sidebar.category.digital-twin</span>
     </p>
-    <ul class="menu-list"
-        [class.unauthorized]="!authorized.digitalTwin()"
-        *ngIf="authorized.digitalTwin()">
+    <ul
+      class="menu-list"
+      [class.unauthorized]="!authorized.digitalTwin()"
+      *ngIf="authorized.digitalTwin()"
+    >
       <li>
         <a class="icon-text" routerLink="/braintank">
           <span class="icon">
