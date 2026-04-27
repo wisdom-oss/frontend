@@ -2,9 +2,8 @@
   <model-view-rrb
     filename="RRB_Damme_Water.glb"
     [cam]="{x: -96, y: 40, z: 4}"
-    [waterLevel]="waterLevel"
-    [name]="name"
-    [city]="city"
+    [(waterLevel)]="waterLevel"
+    [isSimulation]="false"
   />
 
   <div class="card my-4">
@@ -45,7 +44,7 @@
     </div>
   </div>
 
-  <drainage-rules [drainageRules]="drainageRules"></drainage-rules>
+  <drainage-rules [drainageRules]="drainageRules()"></drainage-rules>
 
   <chart
     header="digitalTwin.header.rainForecast"

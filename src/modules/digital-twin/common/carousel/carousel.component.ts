@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit, Input} from "@angular/core";
+import {input, Component, OnDestroy, OnInit} from "@angular/core";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {
   remixArrowLeftWideLine,
@@ -18,15 +18,15 @@ import {
   ],
 })
 export class CarouselComponent implements OnInit, OnDestroy {
-  @Input() images: string[] = [];
-  @Input() autoPlay = true;
-  @Input() interval = 4000;
+  readonly images = input.required<string[]>();
+  readonly autoPlay = input.required<boolean>();
+  readonly interval = input.required<number>();
 
   currentIndex = 0;
   private timer?: ReturnType<typeof setInterval>;
 
   ngOnInit(): void {
-    if (this.autoPlay) this.startAutoPlay();
+    if (this.autoPlay()) this.startAutoPlay();
   }
 
   ngOnDestroy(): void {
@@ -34,12 +34,12 @@ export class CarouselComponent implements OnInit, OnDestroy {
   }
 
   next(): void {
-    this.currentIndex = (this.currentIndex + 1) % this.images.length;
+    this.currentIndex = (this.currentIndex + 1) % this.images().length;
   }
 
   prev(): void {
     this.currentIndex =
-      (this.currentIndex - 1 + this.images.length) % this.images.length;
+      (this.currentIndex - 1 + this.images().length) % this.images().length;
   }
 
   goTo(index: number): void {
@@ -48,7 +48,7 @@ export class CarouselComponent implements OnInit, OnDestroy {
 
   startAutoPlay(): void {
     this.stopAutoPlay();
-    this.timer = setInterval(() => this.next(), this.interval);
+    this.timer = setInterval(() => this.next(), this.interval());
   }
 
   stopAutoPlay(): void {

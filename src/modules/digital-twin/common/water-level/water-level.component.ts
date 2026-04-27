@@ -1,4 +1,4 @@
-import {signal, Component, Input, WritableSignal} from "@angular/core";
+import {model, Component} from "@angular/core";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {remixContrastDrop2Line} from "@ng-icons/remixicon";
 import {TranslateDirective} from "@ngx-translate/core";
@@ -14,6 +14,6 @@ import {TranslateDirective} from "@ngx-translate/core";
   ],
 })
 export class WaterLevelComponent {
-  @Input() waterLevelSlider: WritableSignal<number> = signal(0);
-  @Input() waterLevel: WritableSignal<number> = signal(this.waterLevelSlider());
+  waterLevelSlider = model.required<number>();
+  waterLevel = model.required<number>();
 }

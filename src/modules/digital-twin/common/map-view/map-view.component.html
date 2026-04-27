@@ -3,13 +3,13 @@
     <mgl-map
       class="is-fullheight"
       [style]="style"
-      [zoom]="[zoom]"
-      [center]="center"
+      [zoom]="[zoom()]"
+      [center]="center()"
     >
       <ng-container sources>
         <mgl-geojson-source
           id="locations-source"
-          [data]="locations"
+          [data]="locations()"
         ></mgl-geojson-source>
       </ng-container>
       <mgl-layer

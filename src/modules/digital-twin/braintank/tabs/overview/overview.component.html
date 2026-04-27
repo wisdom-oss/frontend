@@ -1,11 +1,17 @@
 <div>
   @if (activeView() === "model") {
-    <model-view-braintank filename="IBC.glb" [cam]="{x: 0, y: 0.25, z: 2}" />
+    <model-view-braintank
+      [filename]="'IBC.glb'"
+      [isSimulation]="false"
+      [cam]="{x: 0, y: 0.25, z: 2}"
+      [(waterLevel)]="waterLevel"
+    />
   }
   @if (activeView() === "map") {
     <div class="is-fullwidth" style="height: 40rem">
       <map-view
         [locations]="locations"
+        [zoom]="12"
         [center]="{lon: long(), lat: lat()}"
       ></map-view>
     </div>
@@ -14,6 +20,7 @@
     <div class="is-fullwidth" style="height: 40rem">
       <app-carousel
         [images]="['../../../../../public/images/BrainTankUni.jpg']"
+        [interval]="4000"
         [autoPlay]="false"
       >
       </app-carousel>

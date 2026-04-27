@@ -1,10 +1,10 @@
 import {
   effect,
+  model,
   signal,
   viewChild,
   Component,
   AfterViewInit,
-  Input,
   WritableSignal,
 } from "@angular/core";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
@@ -39,8 +39,8 @@ import {
   ],
 })
 export class RainForecastComponent implements AfterViewInit {
-  @Input() intervalForecast!: WritableSignal<SimulationIntervalOption>;
-  @Input() rainForecast: WritableSignal<SimulationParameter[]> = signal([]);
+  intervalForecast = model.required<SimulationIntervalOption>();
+  rainForecast = model<SimulationParameter[]>([]);
 
   protected checkedRainForecast: signals.ToggleableSignal =
     signals.toggleable(false);

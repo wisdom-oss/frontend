@@ -6,7 +6,7 @@
       style="position: absolute"
     ></div>
 
-    @if (isSimulation) {
+    @if (isSimulation()) {
       <div
         class="card"
         style="
@@ -77,7 +77,7 @@
     }
   </div>
 
-  @if (isSimulation) {
+  @if (isSimulation()) {
     <div class="card my-4">
       <div class="card-content">
         <div class="card-content is-fullwidth has-text-centered">

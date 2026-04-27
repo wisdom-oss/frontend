@@ -3,31 +3,31 @@
     filename="RRB_Damme_Water.glb"
     [cam]="{x: -96, y: 40, z: 4}"
     [isSimulation]="true"
-    [waterLevel]="waterLevel"
-    [simulationParameter]="rainForecast"
-    [intervalForecast]="intervalForecast"
-    [volume]="volume"
-    [catchmentArea]="catchmentArea"
-    [pavedArea]="pavedArea"
-    [unpavedArea]="unpavedArea"
-    [name]="name"
-    [city]="city"
+    [(waterLevel)]="waterLevel"
+    [(simulationParameter)]="rainForecast"
+    [intervalForecast]="intervalForecast()"
+    [volume]="volume()"
+    [catchmentArea]="catchmentArea()"
+    [pavedArea]="pavedArea()"
+    [unpavedArea]="unpavedArea()"
+    [name]="name()"
+    [city]="city()"
   />
 
   <water-level
-    [waterLevelSlider]="waterLevelSlider"
-    [waterLevel]="waterLevel"
+    [(waterLevelSlider)]="waterLevelSlider"
+    [(waterLevel)]="waterLevel"
   />
 
   <drain-throttle
-    [throttleSize]="throttleSize"
-    [throttleHeight]="throttleHeight"
+    [(throttleSize)]="throttleSize"
+    [(throttleHeight)]="throttleHeight"
   ></drain-throttle>
 
-  <drainage-rules [drainageRules]="drainageRules"></drainage-rules>
+  <drainage-rules [(drainageRules)]="drainageRules"></drainage-rules>
 
   <rain-forecast
-    [intervalForecast]="intervalForecast"
-    [rainForecast]="rainForecast"
+    [(intervalForecast)]="intervalForecast"
+    [(rainForecast)]="rainForecast"
   />
 </div>

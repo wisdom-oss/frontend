@@ -27,9 +27,7 @@ import {ModelViewComponent} from "../../model-view/model-view.component";
 })
 export class SimulationComponent {
   protected waterLevelSlider: WritableSignal<number> = signal(0);
-  protected waterLevel: WritableSignal<number> = signal(
-    this.waterLevelSlider(),
-  );
+  protected waterLevel: WritableSignal<number> = signal(0);
 
   protected throttleSize: WritableSignal<number> = signal(0);
   protected throttleHeight: WritableSignal<number> = signal(0);

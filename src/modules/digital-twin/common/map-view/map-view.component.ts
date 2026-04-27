@@ -1,4 +1,4 @@
-import {Component, Input} from "@angular/core";
+import {input, Component} from "@angular/core";
 import {
   LayerComponent,
   MapComponent,
@@ -14,12 +14,9 @@ import colorful from "../../../../assets/map/styles/colorful.json";
   templateUrl: "./map-view.component.html",
 })
 export class MapViewComponent {
-  @Input() locations: GeoJSON.FeatureCollection = {
-    type: "FeatureCollection",
-    features: [],
-  };
-  @Input() zoom: number = 12;
-  @Input() center: {lon: number; lat: number} = {lon: 8.21, lat: 53.14};
+  readonly locations = input.required<GeoJSON.FeatureCollection>();
+  readonly zoom = input.required<number>();
+  readonly center = input.required<{lon: number; lat: number}>();
 
   protected style = colorful as any as StyleSpecification;
 }

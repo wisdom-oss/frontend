@@ -1,4 +1,4 @@
-import {signal, Component, Input, WritableSignal} from "@angular/core";
+import {model, Component} from "@angular/core";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {remixCustomSize, remixExpandHeightLine} from "@ng-icons/remixicon";
 import {TranslateDirective} from "@ngx-translate/core";
@@ -15,6 +15,6 @@ import {TranslateDirective} from "@ngx-translate/core";
   ],
 })
 export class DrainThrottleComponent {
-  @Input() throttleSize: WritableSignal<number> = signal(0);
-  @Input() throttleHeight: WritableSignal<number> = signal(0);
+  throttleSize = model.required<number>();
+  throttleHeight = model.required<number>();
 }

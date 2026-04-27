@@ -1,12 +1,13 @@
 import {
   effect,
+  input,
+  model,
   signal,
   viewChild,
   Component,
   OnDestroy,
   OnInit,
   AfterViewInit,
-  Input,
   ElementRef,
   WritableSignal,
 } from "@angular/core";
@@ -42,16 +43,13 @@ import {
   ],
 })
 export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
-  @Input() filename: string = "";
-  @Input() cam: {x: number; y: number; z: number} = {x: 0, y: 0, z: 0};
-  @Input() isSimulation: boolean = false;
+  readonly filename = input.required<string>();
+  readonly cam = input.required<{x: number; y: number; z: number}>();
+  readonly isSimulation = input.required<boolean>();
 
-  @Input() waterLevel: WritableSignal<number> = signal(20);
-  @Input() simulationParameter: WritableSignal<SimulationParameter[]> = signal(
-    [],
-  );
-  @Input() intervalForecast: WritableSignal<SimulationIntervalOption> =
-    signal("5 min");
+  waterLevel = model.required<number>();
+  simulationParameter = model<SimulationParameter[]>([]);
+  readonly intervalForecast = input<SimulationIntervalOption>("5 min");
 
   rendererContainer =
     viewChild<ElementRef<HTMLDivElement>>("rendererContainer");
@@ -80,7 +78,7 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
     this.scene.background = new THREE.Color(0xeeeeee);
 
     this.camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-    this.camera.position.set(this.cam.x, this.cam.y, this.cam.z);
+    this.camera.position.set(this.cam().x, this.cam().y, this.cam().z);
 
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 2);
     hemiLight.position.set(0, 20, 0);

@@ -1,4 +1,4 @@
-import {signal, Component, Input, WritableSignal} from "@angular/core";
+import {model, signal, Component, WritableSignal} from "@angular/core";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {
   remixArrowDownSLine,
@@ -43,7 +43,7 @@ export type DrainageRule = {
   ],
 })
 export class DrainageRulesComponent {
-  @Input() drainageRules!: WritableSignal<DrainageRule[]>;
+  drainageRules = model.required<DrainageRule[]>();
 
   protected newDrainageRule: DrainageRule = {
     title: "",
