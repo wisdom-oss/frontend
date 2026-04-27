@@ -1,4 +1,5 @@
 import {signal, Component, WritableSignal} from "@angular/core";
+import {RouterLinkActive, RouterLink, RouterOutlet} from "@angular/router";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {
   remixGamepadLine,
@@ -8,22 +9,18 @@ import {
 } from "@ng-icons/remixicon";
 import {TranslateDirective} from "@ngx-translate/core";
 
-import {ControlComponent} from "./tabs/control/control.component";
-import {HistoryComponent} from "./tabs/history/history.component";
-import {OverviewComponent} from "./tabs/overview/overview.component";
-import {SimulationComponent} from "./tabs/simulation/simulation.component";
 import {Scopes} from "../../../core/auth/scopes";
 
 @Component({
   imports: [
     NgIconComponent,
     TranslateDirective,
-    OverviewComponent,
-    HistoryComponent,
-    SimulationComponent,
-    ControlComponent,
+    RouterOutlet,
+    RouterLink,
+    RouterLinkActive,
   ],
   templateUrl: "./rain-retention-basin.component.html",
+  styleUrl: "./rain-retention-basin.component.scss",
   providers: [
     provideIcons({
       remixLineChartLine,
@@ -33,14 +30,4 @@ import {Scopes} from "../../../core/auth/scopes";
     }),
   ],
 })
-export class RainRetentionBasinComponent {
-  static readonly SCOPES: Scopes.Scope[] = ["digital-twin:read"];
-
-  protected activeTab: WritableSignal<
-    "overview" | "history" | "simulation" | "control"
-  > = signal("overview");
-
-  setActiveTab(tab: "overview" | "history" | "simulation" | "control") {
-    this.activeTab.set(tab);
-  }
-}
+export class RainRetentionBasinComponent {}

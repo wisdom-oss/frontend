@@ -8,11 +8,9 @@
     [name]="name()"
   />
 
-  <div class="card my-4">
-    <div class="card-content">
-      <div class="is-fullwidth has-text-centered my-4">
-        <p class="is-size-3 my-4" translate>digitalTwin.tab.control</p>
-      </div>
+  <div class="">
+    <div class="mx-4">
+      <p class="is-size-3 my-4" translate>digitalTwin.tab.control</p>
 
       <div class="is-flex is-flex-direction-row is-justify-content-center my-4">
         <div class="buttons has-addons">
@@ -46,7 +44,11 @@
     </div>
   </div>
 
+  <hr />
+
   <drainage-rules [drainageRules]="drainageRules()"></drainage-rules>
+
+  <hr />
 
   <chart
     header="digitalTwin.header.rainForecast"

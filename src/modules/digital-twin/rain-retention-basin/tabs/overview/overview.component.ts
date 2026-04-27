@@ -1,4 +1,12 @@
-import {signal, Component, WritableSignal} from "@angular/core";
+import {
+  computed,
+  inject,
+  signal,
+  Component,
+  WritableSignal,
+} from "@angular/core";
+import {toSignal} from "@angular/core/rxjs-interop";
+import {RouterLinkActive, RouterLink, ActivatedRoute} from "@angular/router";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {
   remixArrowLeftWideLine,
@@ -39,8 +47,11 @@ import {ModelViewComponent} from "../../model-view/model-view.component";
     MapViewComponent,
     ModelViewComponent,
     ChartComponent,
+    RouterLink,
+    RouterLinkActive,
   ],
   templateUrl: "./overview.component.html",
+  styleUrl: "./overview.component.scss",
   providers: [
     provideIcons({
       remixContrastDrop2Line,
@@ -76,6 +87,12 @@ export class OverviewComponent {
   protected catchmentArea: WritableSignal<number> = signal(92.29);
   protected pavedArea: WritableSignal<number> = signal(38.34);
   protected unpavedArea: WritableSignal<number> = signal(53.95);
+
+  protected route = inject(ActivatedRoute);
+  protected params = toSignal(this.route.params);
+  protected activeView_ = computed<"model" | "map" | "pictures">(
+    () => this.params()?.["view"],
+  );
 
   protected activeView: WritableSignal<"model" | "map" | "pictures"> =
     signal("model");

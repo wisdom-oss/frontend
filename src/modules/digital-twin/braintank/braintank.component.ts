@@ -1,6 +1,10 @@
 import {effect, inject, signal, Component} from "@angular/core";
-import {RouterLink, RouterOutlet, ActivatedRoute} from "@angular/router";
-import {ɵɵRouterLinkActive} from "@angular/router/testing";
+import {
+  RouterLinkActive,
+  RouterLink,
+  RouterOutlet,
+  ActivatedRoute,
+} from "@angular/router";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {
   remixLineChartLine,
@@ -15,7 +19,7 @@ import {TranslateDirective} from "@ngx-translate/core";
     RouterLink,
     RouterOutlet,
     TranslateDirective,
-    ɵɵRouterLinkActive,
+    RouterLinkActive,
   ],
   templateUrl: "./braintank.component.html",
   styleUrl: "./braintank.component.scss",

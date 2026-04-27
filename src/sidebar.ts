@@ -28,7 +28,7 @@ import {api} from "./common/api";
 import {AuthService} from "./core/auth/auth.service";
 import {Scopes} from "./core/auth/scopes";
 import {OowvActionMapIconComponent} from "./core/sidebar/icons/oowv-action-map-icon/oowv-action-map-icon.component";
-import {RainRetentionBasinComponent} from "./modules/digital-twin/rain-retention-basin/rain-retention-basin.component";
+import {DIGITAL_TWIN_SCOPES} from "./modules/digital-twin/scopes";
 import {OowvActionMapComponent} from "./modules/oowv/action-map/action-map.component";
 import {PumpModelsComponent} from "./modules/pump-models/pump-models.component";
 
@@ -206,12 +206,10 @@ export function sidebar(): readonly SidebarEntry[] {
           icon: {remixBnbLine},
           link: "/digital-twin/braintank",
           services: {},
-          scopes: RainRetentionBasinComponent.SCOPES,
+          scopes: DIGITAL_TWIN_SCOPES,
           visible: () => {
             const auth = inject(AuthService);
-            return computed(() =>
-              auth.scopes().has(...RainRetentionBasinComponent.SCOPES),
-            );
+            return computed(() => auth.scopes().has(...DIGITAL_TWIN_SCOPES));
           },
         },
         {
@@ -219,12 +217,10 @@ export function sidebar(): readonly SidebarEntry[] {
           icon: {remixHeavyShowersLine},
           link: "/digital-twin/rain-retention-basin",
           services: {},
-          scopes: RainRetentionBasinComponent.SCOPES,
+          scopes: DIGITAL_TWIN_SCOPES,
           visible: () => {
             const auth = inject(AuthService);
-            return computed(() =>
-              auth.scopes().has(...RainRetentionBasinComponent.SCOPES),
-            );
+            return computed(() => auth.scopes().has(...DIGITAL_TWIN_SCOPES));
           },
         },
       ],

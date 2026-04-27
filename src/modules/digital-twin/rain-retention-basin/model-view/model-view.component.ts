@@ -48,8 +48,16 @@ import {
       remixContrastDrop2Line,
     }),
   ],
+  host: {
+    "(window:keydown.shift)": "controls.enableZoom = true",
+    "(window:keydown.control)": "controls.enableZoom = true",
+    "(window:keyup.shift)": "controls.enableZoom = false",
+    "(window:keyup.control)": "controls.enableZoom = false",
+  },
 })
 export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
+  readonly height = input("40rem");
+
   static readonly SCOPES: Scopes.Scope[] = ["static-files:read"];
 
   readonly filename = input.required<string>();
@@ -69,11 +77,12 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
   rendererContainer =
     viewChild<ElementRef<HTMLDivElement>>("rendererContainer");
+  protected cursor = signal("grab");
 
   private scene!: THREE.Scene;
   private camera!: THREE.PerspectiveCamera;
   private renderer!: THREE.WebGLRenderer;
-  private controls!: OrbitControls;
+  protected controls!: OrbitControls;
   private animationFrameId!: number;
   private resizeObserver!: ResizeObserver;
   private resizeRaf!: number | null;
@@ -146,6 +155,7 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
     container.nativeElement.appendChild(this.renderer.domElement);
 
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+    this.controls.enableZoom = false;
 
     this.loadGltfModel().then(model => {
       this.scene.add(model);
