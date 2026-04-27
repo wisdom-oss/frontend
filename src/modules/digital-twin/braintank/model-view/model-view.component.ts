@@ -100,7 +100,7 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     const loader = new GLTFLoader();
 
-    loader.load("/public/model/" + this.filename, gltf => {
+    loader.load("/public/model/" + this.filename(), gltf => {
       const model = gltf.scene;
       this.scene.add(model);
       this.setColorMesh(model, "Water", 0x0000ff);

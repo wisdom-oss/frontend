@@ -64,8 +64,8 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly catchmentArea = input<number>(0);
   readonly pavedArea = input<number>(0);
   readonly unpavedArea = input<number>(0);
-  readonly city = input<string>("");
-  readonly name = input<string>("");
+  readonly city = input.required<string>();
+  readonly name = input.required<string>();
 
   rendererContainer =
     viewChild<ElementRef<HTMLDivElement>>("rendererContainer");
