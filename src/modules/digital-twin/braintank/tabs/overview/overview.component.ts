@@ -1,4 +1,13 @@
-import {signal, Component, WritableSignal} from "@angular/core";
+import {
+  computed,
+  effect,
+  inject,
+  signal,
+  Component,
+  WritableSignal,
+} from "@angular/core";
+import {toSignal} from "@angular/core/rxjs-interop";
+import {RouterLinkActive, RouterLink, ActivatedRoute} from "@angular/router";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {
   remixArrowLeftWideLine,
@@ -28,14 +37,17 @@ import {ModelViewComponent} from "../../model-view/model-view.component";
 @Component({
   selector: "braintank-overview",
   imports: [
-    ModelViewComponent,
-    TranslateDirective,
-    NgIconComponent,
     BaseChartDirective,
     CarouselComponent,
     MapViewComponent,
+    ModelViewComponent,
+    NgIconComponent,
+    RouterLink,
+    RouterLinkActive,
+    TranslateDirective,
   ],
   templateUrl: "./overview.component.html",
+  styleUrl: "./overview.component.scss",
   providers: [
     provideIcons({
       remixContrastDrop2Line,
@@ -62,6 +74,12 @@ export class OverviewComponent {
   protected draining: WritableSignal<boolean> = signal(false);
   protected drainingTime: WritableSignal<Dayjs> = signal(
     dayjs().subtract(10, "minutes"),
+  );
+
+  protected route = inject(ActivatedRoute);
+  protected params = toSignal(this.route.params);
+  protected activeView_ = computed<"model" | "map" | "pictures">(
+    () => this.params()?.["view"],
   );
 
   protected activeView = signal<"model" | "map" | "pictures">("model");

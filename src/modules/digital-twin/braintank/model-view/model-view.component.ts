@@ -8,9 +8,9 @@ import {
   OnDestroy,
   OnInit,
   AfterViewInit,
+  HostListener,
   ElementRef,
   WritableSignal,
-  HostListener,
 } from "@angular/core";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {
@@ -47,9 +47,11 @@ import {
     "(window:keydown.control)": "controls.enableZoom = true",
     "(window:keyup.shift)": "controls.enableZoom = false",
     "(window:keyup.control)": "controls.enableZoom = false",
-  }
+  },
 })
 export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
+  readonly height = input("40rem");
+
   readonly filename = input.required<string>();
   readonly cam = input.required<{x: number; y: number; z: number}>();
   readonly isSimulation = input.required<boolean>();
@@ -60,6 +62,7 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
   rendererContainer =
     viewChild<ElementRef<HTMLDivElement>>("rendererContainer");
+  protected cursor = signal("grab");
 
   protected scene!: THREE.Scene;
   protected camera!: THREE.PerspectiveCamera;
