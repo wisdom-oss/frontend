@@ -78,15 +78,9 @@ export class OverviewComponent {
 
   protected route = inject(ActivatedRoute);
   protected params = toSignal(this.route.params);
-  protected activeView_ = computed<"model" | "map" | "pictures">(
+  protected activeView = computed<"model" | "map" | "pictures">(
     () => this.params()?.["view"],
   );
-
-  protected activeView = signal<"model" | "map" | "pictures">("model");
-
-  setActiveView(view: "model" | "map" | "pictures") {
-    this.activeView.set(view);
-  }
 
   dataCurrentForecast: ChartData<"bar", {x: string; y: number}[]> = {
     datasets: [
