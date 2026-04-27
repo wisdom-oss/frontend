@@ -10,6 +10,7 @@ import {
   AfterViewInit,
   ElementRef,
   WritableSignal,
+  HostListener,
 } from "@angular/core";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {
@@ -41,6 +42,12 @@ import {
       remixContrastDrop2Line,
     }),
   ],
+  host: {
+    "(window:keydown.shift)": "controls.enableZoom = true",
+    "(window:keydown.control)": "controls.enableZoom = true",
+    "(window:keyup.shift)": "controls.enableZoom = false",
+    "(window:keyup.control)": "controls.enableZoom = false",
+  }
 })
 export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly filename = input.required<string>();
@@ -54,15 +61,15 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
   rendererContainer =
     viewChild<ElementRef<HTMLDivElement>>("rendererContainer");
 
-  private scene!: THREE.Scene;
-  private camera!: THREE.PerspectiveCamera;
-  private renderer!: THREE.WebGLRenderer;
-  private controls!: OrbitControls;
-  private animationFrameId!: number;
-  private resizeObserver!: ResizeObserver;
-  private resizeRaf!: number | null;
+  protected scene!: THREE.Scene;
+  protected camera!: THREE.PerspectiveCamera;
+  protected renderer!: THREE.WebGLRenderer;
+  protected controls!: OrbitControls;
+  protected animationFrameId!: number;
+  protected resizeObserver!: ResizeObserver;
+  protected resizeRaf!: number | null;
 
-  private originalY: number = 1;
+  protected originalY: number = 1;
   protected time: WritableSignal<string> = signal("0");
   protected rainAmount: WritableSignal<number> = signal(0);
 
@@ -98,6 +105,7 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
     container.nativeElement.appendChild(this.renderer.domElement);
 
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+    this.controls.enableZoom = false;
     const loader = new GLTFLoader();
 
     loader.load("/public/model/" + this.filename(), gltf => {
