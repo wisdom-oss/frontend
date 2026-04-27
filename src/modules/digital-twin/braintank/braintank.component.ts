@@ -1,4 +1,6 @@
-import {signal, Component} from "@angular/core";
+import {effect, inject, signal, Component} from "@angular/core";
+import {RouterLink, RouterOutlet, ActivatedRoute} from "@angular/router";
+import {ɵɵRouterLinkActive} from "@angular/router/testing";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {
   remixLineChartLine,
@@ -7,19 +9,16 @@ import {
 } from "@ng-icons/remixicon";
 import {TranslateDirective} from "@ngx-translate/core";
 
-import {HistoryComponent} from "./tabs/history/history.component";
-import {OverviewComponent} from "./tabs/overview/overview.component";
-import {SimulationComponent} from "./tabs/simulation/simulation.component";
-
 @Component({
   imports: [
     NgIconComponent,
+    RouterLink,
+    RouterOutlet,
     TranslateDirective,
-    OverviewComponent,
-    HistoryComponent,
-    SimulationComponent,
+    ɵɵRouterLinkActive,
   ],
   templateUrl: "./braintank.component.html",
+  styleUrl: "./braintank.component.scss",
   providers: [
     provideIcons({
       remixLineChartLine,
@@ -28,12 +27,4 @@ import {SimulationComponent} from "./tabs/simulation/simulation.component";
     }),
   ],
 })
-export class BraintankComponent {
-  protected activeTab = signal<"overview" | "history" | "simulation">(
-    "overview",
-  );
-
-  setActiveTab(tab: "overview" | "history" | "simulation") {
-    this.activeTab.set(tab);
-  }
-}
+export class BraintankComponent {}

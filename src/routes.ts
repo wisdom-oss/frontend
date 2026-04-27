@@ -6,6 +6,7 @@ import {permissionsGuard} from "./core/auth/permissions.guard";
 import {GreeterComponent} from "./core/greeter/greeter.component";
 import {BeWaterSmartComponent} from "./modules/be-water-smart/be-water-smart.component";
 import {BraintankComponent} from "./modules/digital-twin/braintank/braintank.component";
+import {braintankRoutes} from "./modules/digital-twin/braintank/routes";
 import {RainRetentionBasinComponent} from "./modules/digital-twin/rain-retention-basin/rain-retention-basin.component";
 import {GrowlComponent} from "./modules/growl/growl.component";
 import {longTermForecastRoutes} from "./modules/long-term-forecast/routes";
@@ -53,6 +54,7 @@ export const routes: Routes = [
         path: "digital-twin/braintank",
         component: BraintankComponent,
         canActivate: [permissionsGuard(...RainRetentionBasinComponent.SCOPES)],
+        children: braintankRoutes,
       },
       {
         path: "digital-twin/rain-retention-basin",
