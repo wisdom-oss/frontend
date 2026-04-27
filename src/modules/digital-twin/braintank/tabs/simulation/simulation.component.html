@@ -1,5 +1,6 @@
 <div>
   <model-view-braintank
+    height="calc(100vh - 12rem)"
     filename="IBC.glb"
     [cam]="{x: 0, y: 0.25, z: 2}"
     [isSimulation]="true"
@@ -13,7 +14,11 @@
     [(waterLevel)]="waterLevel"
   />
 
+  <hr />
+
   <drainage-rules [(drainageRules)]="drainageRules"></drainage-rules>
+
+  <hr />
 
   <rain-forecast
     [(intervalForecast)]="intervalForecast"

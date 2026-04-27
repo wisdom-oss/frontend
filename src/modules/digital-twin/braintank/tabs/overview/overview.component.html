@@ -59,149 +59,114 @@
   </div>
 </div>
 
+<hr />
+
 <div>
-  <div class="card my-4">
-    <div class="card-content">
-      <div class="is-fullwidth has-text-centered my-4">
-        <p class="is-size-3 my-4" translate>digitalTwin.header.currentValues</p>
+  <p class="is-size-3 m-4" translate>digitalTwin.header.currentValues</p>
+  <div class="grid is-col-min-10">
+    <div class="is-flex is-flex-direction-row">
+      <ng-icon name="remixTimeLine" size="2.5rem" class="mx-4" />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        <p>
+          <span translate>digitalTwin.label.time</span>:
+          {{ time().format("DD.MM.YYYY, HH:mm") }}
+        </p>
       </div>
-
-      <div class="columns my-4">
-        <div class="column is-half">
-          <div class="is-flex is-flex-direction-row">
-            <ng-icon name="remixTimeLine" size="2.5rem" class="mx-4" />
-            <div
-              class="is-flex is-flex-direction-column is-justify-content-center"
-            >
-              <p>
-                <span translate>digitalTwin.label.time</span>:
-                {{ time().format("DD.MM.YYYY, HH:mm") }}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="column is-half">
-          <div class="is-flex is-flex-direction-row">
-            <ng-icon name="remixContrastDrop2Line" size="2.5rem" class="mx-4" />
-            <div
-              class="is-flex is-flex-direction-column is-justify-content-center"
-            >
-              <p>
-                <span translate>digitalTwin.header.waterLevel</span>:
-                {{ waterLevel() }}%
-              </p>
-            </div>
-          </div>
-        </div>
+    </div>
+    <div class="is-flex is-flex-direction-row">
+      <ng-icon name="remixContrastDrop2Line" size="2.5rem" class="mx-4" />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        <p>
+          <span translate>digitalTwin.header.waterLevel</span>:
+          {{ waterLevel() }}%
+        </p>
       </div>
-
-      <div class="columns my-4">
-        <div class="column is-half">
-          <div class="is-flex is-flex-direction-row">
-            <ng-icon name="remixWaterPercentLine" size="2.5rem" class="mx-4" />
-            <div
-              class="is-flex is-flex-direction-column is-justify-content-center"
-            >
-              @if (draining()) {
-                <p>
-                  <span translate>digitalTwin.label.drainage.yes</span>:
-                  {{ drainingTime().format("HH:mm") }}
-                </p>
-              }
-              @if (!draining()) {
-                <p translate>digitalTwin.label.drainage.no</p>
-              }
-            </div>
-          </div>
-        </div>
+    </div>
+    <div class="is-flex is-flex-direction-row">
+      <ng-icon name="remixWaterPercentLine" size="2.5rem" class="mx-4" />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        @if (draining()) {
+          <p>
+            <span translate>digitalTwin.label.drainage.yes</span>:
+            {{ drainingTime().format("HH:mm") }}
+          </p>
+        }
+        @if (!draining()) {
+          <p translate>digitalTwin.label.drainage.no</p>
+        }
       </div>
     </div>
   </div>
+</div>
 
-  <div class="card my-4">
-    <div class="card-content">
-      <div class="is-fullwidth has-text-centered my-4">
-        <p class="is-size-3 my-4" translate>digitalTwin.header.features</p>
+<hr />
+
+<div>
+  <p class="is-size-3 m-4" translate>digitalTwin.header.features</p>
+  <div class="grid is-col-min-10">
+    <div class="is-flex is-flex-direction-row">
+      <ng-icon name="remixHome8Line" size="2.5rem" class="mx-4" />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        <p>
+          <span translate>digitalTwin.label.roofSize</span>: {{ roofSize() }} m²
+        </p>
       </div>
-
-      <div class="columns my-4">
-        <div class="column is-half">
-          <div class="is-flex is-flex-direction-row">
-            <ng-icon name="remixHome8Line" size="2.5rem" class="mx-4" />
-            <div
-              class="is-flex is-flex-direction-column is-justify-content-center"
-            >
-              <p>
-                <span translate>digitalTwin.label.roofSize</span>:
-                {{ roofSize() }} m²
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="column is-half">
-          <div class="is-flex is-flex-direction-row">
-            <ng-icon name="remixMapPin2Line" size="2.5rem" class="mx-4" />
-            <div
-              class="is-flex is-flex-direction-column is-justify-content-center"
-            >
-              <p>
-                <span translate>digitalTwin.label.location</span>: {{ lat() }},
-                {{ long() }}
-              </p>
-            </div>
-          </div>
-        </div>
+    </div>
+    <div class="is-flex is-flex-direction-row">
+      <ng-icon name="remixMapPin2Line" size="2.5rem" class="mx-4" />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        <p>
+          <span translate>digitalTwin.label.location</span>: {{ lat() }},
+          {{ long() }}
+        </p>
       </div>
     </div>
   </div>
+</div>
 
-  <div class="card my-4">
-    <div class="card-content">
-      <div class="is-fullwidth has-text-centered my-4">
-        <p class="is-size-3 my-4" translate>digitalTwin.header.rainForecast</p>
-      </div>
+<hr />
 
-      <ng-container chart>
-        <div class="is-fullwidth" style="height: 22rem">
-          @let optionsCurrentForecast =
-            {
-              responsive: true,
-              maintainAspectRatio: false,
-              scales: {
-                x: {
-                  grid: {
-                    display: false,
-                  },
-                },
-                y: {
-                  grid: {
-                    display: false,
-                  },
-                  title: {
-                    display: true,
-                    text: "mm",
-                  },
-                  beginAtZero: true,
-                  suggestedMax: 10,
-                },
-              },
-              plugins: {
-                legend: {
+<div>
+  <p class="is-size-3 m-4" translate>digitalTwin.header.rainForecast</p>
+  <ng-container chart>
+    <div class="is-fullwidth p-4">
+      <div class="is-fullwidth" style="height: 22rem">
+        @let optionsCurrentForecast =
+          {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                grid: {
                   display: false,
                 },
               },
-            };
-          <canvas
-            baseChart
-            class="is-fullheight is-fullwidth"
-            [data]="dataCurrentForecast"
-            [options]="optionsCurrentForecast"
-            [type]="'bar'"
-          ></canvas>
-        </div>
-      </ng-container>
+              y: {
+                grid: {
+                  display: false,
+                },
+                title: {
+                  display: true,
+                  text: "mm",
+                },
+                beginAtZero: true,
+                suggestedMax: 10,
+              },
+            },
+            plugins: {
+              legend: {
+                display: false,
+              },
+            },
+          };
+        <canvas
+          baseChart
+          class="is-fullheight is-fullwidth"
+          [data]="dataCurrentForecast"
+          [options]="optionsCurrentForecast"
+          [type]="'bar'"
+        ></canvas>
+      </div>
     </div>
-  </div>
+  </ng-container>
 </div>

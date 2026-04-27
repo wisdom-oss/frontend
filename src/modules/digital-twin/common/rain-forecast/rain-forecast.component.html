@@ -1,18 +1,18 @@
-<div class="card my-4">
-  <div class="card-content">
-    <div class="is-fullwidth has-text-centered">
+<div class="">
+  <div class="mx-4">
+    <div class="is-flex is-flex-direction-row is-justify-content-space-between">
       <p class="is-size-3 my-4" translate>digitalTwin.header.rainForecast</p>
-    </div>
 
-    <button
-      class="button is-primary is-rounded my-4"
-      (click)="
-        copyForecast(rainForecastModal, rainForecast);
-        rainForecastModalOpen.set(true)
-      "
-    >
-      <p translate>digitalTwin.button.adjustRainForecast</p>
-    </button>
+      <button
+        class="button is-primary is-rounded my-4"
+        (click)="
+          copyForecast(rainForecastModal, rainForecast);
+          rainForecastModalOpen.set(true)
+        "
+      >
+        <p translate>digitalTwin.button.adjustRainForecast</p>
+      </button>
+    </div>
 
     <div class="modal" [class.is-active]="rainForecastModalOpen()">
       <div class="modal-background"></div>
@@ -242,56 +242,58 @@
       </div>
     </div>
 
-    <div class="is-fullwidth" style="height: 22rem">
-      <ng-container chart>
-        @let optionsRainForecast =
-          {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              x: {
-                grid: {
+    <div class="is-fullwidth p-4">
+      <div class="is-fullwidth" style="height: 22rem">
+        <ng-container chart>
+          @let optionsRainForecast =
+            {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                x: {
+                  grid: {
+                    display: false,
+                  },
+                  title: {
+                    display: true,
+                    text: intervalForecast() === "1 h" ? "h" : "min",
+                  },
+                },
+                y: {
+                  grid: {
+                    display: false,
+                  },
+                  title: {
+                    display: true,
+                    text: "mm",
+                  },
+                  beginAtZero: true,
+                  suggestedMax:
+                    intervalForecast() === "1 h" ||
+                    intervalForecast() === "30 min"
+                      ? 30
+                      : intervalForecast() === "15 min" ||
+                          intervalForecast() === "10 min"
+                        ? 20
+                        : 10,
+                },
+              },
+              plugins: {
+                legend: {
                   display: false,
                 },
-                title: {
-                  display: true,
-                  text: intervalForecast() === "1 h" ? "h" : "min",
-                },
               },
-              y: {
-                grid: {
-                  display: false,
-                },
-                title: {
-                  display: true,
-                  text: "mm",
-                },
-                beginAtZero: true,
-                suggestedMax:
-                  intervalForecast() === "1 h" ||
-                  intervalForecast() === "30 min"
-                    ? 30
-                    : intervalForecast() === "15 min" ||
-                        intervalForecast() === "10 min"
-                      ? 20
-                      : 10,
-              },
-            },
-            plugins: {
-              legend: {
-                display: false,
-              },
-            },
-          };
-        <canvas
-          baseChart
-          class="is-fullheight is-fullwidth"
-          [data]="dataRainForecast"
-          [options]="optionsRainForecast"
-          [type]="'bar'"
-        >
-        </canvas>
-      </ng-container>
+            };
+          <canvas
+            baseChart
+            class="is-fullheight is-fullwidth"
+            [data]="dataRainForecast"
+            [options]="optionsRainForecast"
+            [type]="'bar'"
+          >
+          </canvas>
+        </ng-container>
+      </div>
     </div>
   </div>
 </div>
