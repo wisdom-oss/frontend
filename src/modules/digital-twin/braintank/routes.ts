@@ -1,11 +1,5 @@
 import {inject} from "@angular/core";
-import {
-  RedirectCommand,
-  CanActivateFn,
-  Router,
-  Routes,
-  UrlTree,
-} from "@angular/router";
+import {CanActivateFn, Router, Routes} from "@angular/router";
 
 import {HistoryComponent} from "./tabs/history/history.component";
 import {OverviewComponent} from "./tabs/overview/overview.component";

@@ -79,59 +79,59 @@
       </div>
     </div>
   }
+</div>
 
-  @if (isSimulation()) {
-    <div class="card my-4">
-      <div class="card-content">
-        <div class="card-content is-fullwidth has-text-centered">
-          <p class="is-size-3" translate>digitalTwin.header.simulationCourse</p>
-        </div>
+@if (isSimulation()) {
+  <div class="">
+    <div class="">
+      <p class="is-size-3 m-4" translate>digitalTwin.header.simulationCourse</p>
 
-        <div class="is-fullwidth" style="height: 22rem">
-          <ng-container chart>
-            @let optionsSimulation =
-              {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                  x: {
-                    grid: {
-                      display: false,
-                    },
-                    title: {
-                      display: true,
-                      text: intervalForecast() === "1 h" ? "h" : "min",
-                    },
-                  },
-                  y: {
-                    grid: {
-                      display: false,
-                    },
-                    title: {
-                      display: true,
-                      text: "%",
-                    },
-                    beginAtZero: true,
-                    suggestedMax: 100,
-                  },
-                },
-                plugins: {
-                  legend: {
+      <div class="is-fullwidth" style="height: 22rem">
+        <ng-container chart>
+          @let optionsSimulation =
+            {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                x: {
+                  grid: {
                     display: false,
                   },
+                  title: {
+                    display: true,
+                    text: intervalForecast() === "1 h" ? "h" : "min",
+                  },
                 },
-              };
-            <canvas
-              baseChart
-              class="is-fullheight is-fullwidth"
-              [data]="simulationChart"
-              [options]="optionsSimulation"
-              [type]="'line'"
-            >
-            </canvas>
-          </ng-container>
-        </div>
+                y: {
+                  grid: {
+                    display: false,
+                  },
+                  title: {
+                    display: true,
+                    text: "%",
+                  },
+                  beginAtZero: true,
+                  suggestedMax: 100,
+                },
+              },
+              plugins: {
+                legend: {
+                  display: false,
+                },
+              },
+            };
+          <canvas
+            baseChart
+            class="is-fullheight is-fullwidth"
+            [data]="simulationChart"
+            [options]="optionsSimulation"
+            [type]="'line'"
+          >
+          </canvas>
+        </ng-container>
       </div>
     </div>
-  }
-</div>
+  </div>
+
+  <hr />
+}

@@ -1,6 +1,5 @@
 import {
   computed,
-  effect,
   inject,
   signal,
   Component,

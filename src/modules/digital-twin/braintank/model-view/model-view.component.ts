@@ -8,7 +8,6 @@ import {
   OnDestroy,
   OnInit,
   AfterViewInit,
-  HostListener,
   ElementRef,
   WritableSignal,
 } from "@angular/core";

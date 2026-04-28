@@ -1,10 +1,5 @@
-import {effect, inject, signal, Component} from "@angular/core";
-import {
-  RouterLinkActive,
-  RouterLink,
-  RouterOutlet,
-  ActivatedRoute,
-} from "@angular/router";
+import {Component} from "@angular/core";
+import {RouterLinkActive, RouterLink, RouterOutlet} from "@angular/router";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {
   remixLineChartLine,

@@ -1,4 +1,4 @@
-import {signal, Component, WritableSignal} from "@angular/core";
+import {Component} from "@angular/core";
 import {RouterLinkActive, RouterLink, RouterOutlet} from "@angular/router";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {
@@ -8,8 +8,6 @@ import {
   remixProfileLine,
 } from "@ng-icons/remixicon";
 import {TranslateDirective} from "@ngx-translate/core";
-
-import {Scopes} from "../../../core/auth/scopes";
 
 @Component({
   imports: [
