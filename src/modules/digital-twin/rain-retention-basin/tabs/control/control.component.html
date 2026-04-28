@@ -1,0 +1,60 @@
+<div>
+  <model-view-rrb
+    filename="RRB_Damme_Water.glb"
+    [cam]="{x: -96, y: 40, z: 4}"
+    [(waterLevel)]="waterLevel"
+    [isSimulation]="false"
+    [city]="city()"
+    [name]="name()"
+  />
+
+  <div class="">
+    <div class="mx-4">
+      <p class="is-size-3 my-4" translate>digitalTwin.tab.control</p>
+
+      <div class="is-flex is-flex-direction-row is-justify-content-center my-4">
+        <div class="buttons has-addons">
+          <button
+            [class.is-active]="activeControl() === 'manual'"
+            (click)="setActiveControl('manual')"
+            class="button"
+          >
+            <span translate>digitalTwin.button.manual</span>
+          </button>
+          <button
+            [class.is-active]="activeControl() === 'semi-automatic'"
+            (click)="setActiveControl('semi-automatic')"
+            class="button"
+          >
+            <span translate>digitalTwin.button.semiAutomatic</span>
+          </button>
+          <button
+            [class.is-active]="activeControl() === 'automatic'"
+            (click)="setActiveControl('automatic')"
+            class="button"
+          >
+            <span translate>digitalTwin.button.automatic</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="notification is-success my-4">
+        <p translate>digitalTwin.notification.success</p>
+      </div>
+    </div>
+  </div>
+
+  <hr />
+
+  <drainage-rules [drainageRules]="drainageRules()"></drainage-rules>
+
+  <hr />
+
+  <chart
+    header="digitalTwin.header.rainForecast"
+    [chartData]="dataCurrentForecast"
+    text="mm"
+    [suggestedMax]="10"
+    chartType="bar"
+  />
+</div>

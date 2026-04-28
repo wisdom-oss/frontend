@@ -1,15 +1,18 @@
 import {computed, inject, Component, Signal} from "@angular/core";
 import {
   remixBarChartFill,
+  remixBnbLine,
   remixBuilding3Fill,
   remixDatabase2Fill,
   remixDrizzleFill,
   remixFilePaper2Fill,
+  remixHeavyShowersLine,
   remixInstanceLine,
   remixMap2Fill,
   remixNumbersFill,
   remixRfidLine,
   remixSunCloudyFill,
+  remixSwap2Line,
   remixWaterPercentFill,
 } from "@ng-icons/remixicon";
 
@@ -25,6 +28,7 @@ import {api} from "./common/api";
 import {AuthService} from "./core/auth/auth.service";
 import {Scopes} from "./core/auth/scopes";
 import {OowvActionMapIconComponent} from "./core/sidebar/icons/oowv-action-map-icon/oowv-action-map-icon.component";
+import {DIGITAL_TWIN_SCOPES} from "./modules/digital-twin/scopes";
 import {OowvActionMapComponent} from "./modules/oowv/action-map/action-map.component";
 import {PumpModelsComponent} from "./modules/pump-models/pump-models.component";
 
@@ -190,6 +194,34 @@ export function sidebar(): readonly SidebarEntry[] {
           icon: {remixNumbersFill},
           link: "/oowv/water-demand-prediction2",
           services: {PmdArimaPredictionService},
+        },
+      ],
+    },
+    {
+      category: "core.sidebar.category.digital-twin",
+      icon: {remixSwap2Line},
+      modules: [
+        {
+          module: "b:rainTank",
+          icon: {remixBnbLine},
+          link: "/digital-twin/braintank",
+          services: {},
+          scopes: DIGITAL_TWIN_SCOPES,
+          visible: () => {
+            const auth = inject(AuthService);
+            return computed(() => auth.scopes().has(...DIGITAL_TWIN_SCOPES));
+          },
+        },
+        {
+          module: "digitalTwin.display.module.rrb",
+          icon: {remixHeavyShowersLine},
+          link: "/digital-twin/rain-retention-basin",
+          services: {},
+          scopes: DIGITAL_TWIN_SCOPES,
+          visible: () => {
+            const auth = inject(AuthService);
+            return computed(() => auth.scopes().has(...DIGITAL_TWIN_SCOPES));
+          },
         },
       ],
     },

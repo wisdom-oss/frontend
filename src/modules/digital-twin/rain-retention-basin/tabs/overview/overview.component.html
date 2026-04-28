@@ -1,0 +1,171 @@
+<div>
+  @let height = "calc(100vh - 12rem)";
+  @switch (activeView()) {
+    @case ("model") {
+      <model-view-rrb
+        [height]="height"
+        filename="RRB_Damme_Water.glb"
+        [cam]="{x: -96, y: 40, z: 4}"
+        [isSimulation]="false"
+        [(waterLevel)]="waterLevel"
+        [city]="city()"
+        [name]="name()"
+      />
+    }
+    @case ("map") {
+      <div class="is-fullwidth" [style.height]="height">
+        <map-view
+          [locations]="locations"
+          [zoom]="14"
+          [center]="{lon: long(), lat: lat()}"
+        ></map-view>
+      </div>
+    }
+    @case ("pictures") {
+      <div class="is-fullwidth" [style.height]="height">
+        <app-carousel
+          [images]="[
+            '/public/images/GroßerGrieche.JPG',
+            '/public/images/KleinerGrieche.JPG',
+          ]"
+          [interval]="4000"
+          [autoPlay]="false"
+        >
+        </app-carousel>
+      </div>
+    }
+  }
+
+  <div class="tabs is-toggle is-centered">
+    <ul>
+      <li routerLinkActive="is-active">
+        <a routerLink="../model">
+          <ng-icon
+            name="remixCheckboxMultipleBlankFill"
+            size="1.5rem"
+            class="mr-2"
+          />
+          <span translate>digitalTwin.button.model</span>
+        </a>
+      </li>
+      <li routerLinkActive="is-active">
+        <a routerLink="../map">
+          <ng-icon name="remixMap2Fill" size="1.5rem" class="mr-2" />
+          <span translate>digitalTwin.button.map</span>
+        </a>
+      </li>
+      <li routerLinkActive="is-active">
+        <a routerLink="../pictures">
+          <ng-icon name="remixImageFill" size="1.5rem" class="mr-2" />
+          <span translate>digitalTwin.button.pictures</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<hr />
+
+<div>
+  <p class="is-size-3 m-4" translate>digitalTwin.header.currentValues</p>
+  <div class="grid is-col-min-10">
+    <div class="is-flex is-flex-direction-row">
+      <ng-icon name="remixTimeLine" size="2.5rem" class="mx-4" />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        <p>
+          <span translate>digitalTwin.label.time</span>:
+          {{ time().format("DD.MM.YY, HH:mm") }}
+        </p>
+      </div>
+    </div>
+    <div class="is-flex is-flex-direction-row">
+      <ng-icon name="remixContrastDrop2Line" size="2.5rem" class="mx-4" />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        <p>
+          <span translate>digitalTwin.header.waterLevel</span>:
+          {{ waterLevel() }} %
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr />
+
+<div>
+  <p class="is-size-3 m-4" translate>digitalTwin.header.features</p>
+  <div class="grid is-col-min-10">
+    <div class="is-flex is-flex-direction-row">
+      <ng-icon name="remixInfoCardLine" size="2.5rem" class="mx-4" />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        <p><span translate>digitalTwin.label.name</span>: {{ name() }}</p>
+      </div>
+    </div>
+    <div class="is-flex is-flex-direction-row">
+      <ng-icon name="remixCommunityLine" size="2.5rem" class="mx-4" />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        <p><span translate>digitalTwin.label.city</span>: {{ city() }}</p>
+      </div>
+    </div>
+    <div class="is-flex is-flex-direction-row">
+      <ng-icon name="remixMapPin2Line" size="2.5rem" class="mx-4" />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        <p><span translate>digitalTwin.label.latitude</span>: {{ lat() }}</p>
+      </div>
+    </div>
+    <div class="is-flex is-flex-direction-row">
+      <ng-icon name="remixMapPin2Line" size="2.5rem" class="mx-4" />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        <p><span translate>digitalTwin.label.longitude</span>: {{ long() }}</p>
+      </div>
+    </div>
+    <div class="is-flex is-flex-direction-row">
+      <ng-icon name="remixBox2Line" size="2.5rem" class="mx-4" />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        <p>
+          <span translate>digitalTwin.label.retentionVolume</span>:
+          {{ volume() }} m³
+        </p>
+      </div>
+    </div>
+    <div class="is-flex is-flex-direction-row">
+      <ng-icon name="remixCollageLine" size="2.5rem" class="mx-4" />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        <p>
+          <span translate>digitalTwin.label.catchmentArea</span>:
+          {{ catchmentArea() }} ha
+        </p>
+      </div>
+    </div>
+    <div class="is-flex is-flex-direction-row">
+      <ng-icon name="remixHome8Line" size="2.5rem" class="mx-4" />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        <p>
+          <span translate>digitalTwin.label.pavedArea</span>:
+          {{ pavedArea() }} ha
+        </p>
+      </div>
+    </div>
+    <div class="is-flex is-flex-direction-row">
+      <ng-icon name="remixTreeLine" size="2.5rem" class="mx-4" />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        <p>
+          <span translate>digitalTwin.label.unpavedArea</span>:
+          {{ unpavedArea() }} ha
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr />
+
+<div>
+  <chart
+    header="digitalTwin.header.rainForecast"
+    [chartData]="dataCurrentForecast"
+    text="mm"
+    [suggestedMax]="10"
+    chartType="bar"
+  />
+</div>
