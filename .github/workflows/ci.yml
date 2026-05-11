@@ -29,13 +29,13 @@ jobs:
             command: npm run build
             continue-on-error: false
           - name: lint
-            command: npm run lint -- --deny-warnings
+            command: npm run lint
             continue-on-error: true
           - name: doc
             command: npm run doc
             continue-on-error: true
           - name: fmt
-            command: npx prettier . --check --plugin prettier-plugin-toml
+            command: npx biome format . && npx tombi format --check
             continue-on-error: true
           - name: test
             command: npm run test

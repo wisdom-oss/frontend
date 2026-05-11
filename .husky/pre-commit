@@ -1,4 +1,4 @@
-npm run fmt
-npm run lint
+npm run fmt:staged
+npm run lint:staged
 git add .
 

@@ -1,7 +1,5 @@
-// eslint-disable-next-line no-unused-vars
-const {Plugin, PluginBuild} = require("esbuild");
-const {readFile} = require("fs/promises");
-const {join} = require("path");
+const { readFile } = require("fs/promises");
+const { join } = require("path");
 
 const isTxtRegex = /\.txt$/;
 
@@ -9,7 +7,7 @@ const isTxtRegex = /\.txt$/;
  * An esbuild plugin that a `.txt` file resolver.
  *
  * @param {object} _options Plugin options (currently unused, reserved for future extensions).
- * @returns {Plugin} The configured esbuild plugin.
+ * @returns {import("esbuild").Plugin} The configured esbuild plugin.
  */
 function loadTxtPlugin(_options = {}) {
   return {
@@ -21,12 +19,12 @@ function loadTxtPlugin(_options = {}) {
      * @param {PluginBuild} build The esbuild plugin build context.
      */
     setup(build) {
-      build.onResolve({filter: isTxtRegex}, ({path, resolveDir}) => {
-        return {path: join(resolveDir, path)};
+      build.onResolve({ filter: isTxtRegex }, ({ path, resolveDir }) => {
+        return { path: join(resolveDir, path) };
       });
-      build.onLoad({filter: isTxtRegex}, async ({path}) => {
+      build.onLoad({ filter: isTxtRegex }, async ({ path }) => {
         let contents = await readFile(path);
-        return {contents, loader: "text"};
+        return { contents, loader: "text" };
       });
     },
   };

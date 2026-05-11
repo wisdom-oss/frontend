@@ -1,17 +1,15 @@
-// eslint-disable-next-line no-unused-vars
-const {Plugin, PluginBuild} = require("esbuild");
-const {readFile, writeFile, mkdir} = require("fs/promises");
+const { readFile, writeFile, mkdir } = require("fs/promises");
 const toml = require("smol-toml");
 const xml = require("fast-xml-parser");
 const sharp = require("sharp");
-const {exec} = require("child_process");
-const {promisify} = require("util");
+const { exec } = require("child_process");
+const { promisify } = require("util");
 
 /**
  * An esbuild plugin that executes prebuild operations.
  *
  * @param {object} _options Plugin options (currently unused, reserved for future extensions).
- * @returns {Plugin} The configured esbuild plugin.
+ * @returns {import("esbuild").Plugin} The configured esbuild plugin.
  */
 function prebuildPlugin(_options = {}) {
   return {
@@ -99,7 +97,7 @@ async function buildNlwknMeasurementClassificationColorSvgs() {
  */
 async function extractRemixicons() {
   const remixicon = await import("@ng-icons/remixicon");
-  await mkdir("src/assets/generated/remixicon", {recursive: true});
+  await mkdir("src/assets/generated/remixicon", { recursive: true });
   for (let [key, svg] of Object.entries(remixicon)) {
     let name = toKebabCase(key.slice("remix".length));
     let path = `src/assets/generated/remixicon/${name}.svg`;
@@ -121,16 +119,16 @@ async function extractRemixicons() {
  */
 async function buildSpritesheets() {
   try {
-    const {spreet} = await import("@cptpiepmatz/spreet");
+    const { spreet } = await import("@cptpiepmatz/spreet");
     await spreet(
       "src/assets/generated/remixicon",
       "public/generated/remixicon",
-      {sdf: true},
+      { sdf: true },
     );
     await spreet(
       "src/assets/generated/remixicon",
       "public/generated/remixicon@2x",
-      {sdf: true, retina: true},
+      { sdf: true, retina: true },
     );
   } catch (e) {
     // TODO: let it throw when underlying errors becomes real error
@@ -144,7 +142,7 @@ async function storeGitCommitSHA() {
   let sha = process.env.GIT_COMMIT_SHA?.trim();
   if (!sha) {
     const execAsync = promisify(exec);
-    await execAsync("git rev-parse HEAD").then(({stdout}) => (sha = stdout));
+    await execAsync("git rev-parse HEAD").then(({ stdout }) => (sha = stdout));
   }
 
   await writeFile("src/assets/generated/revision.txt", sha.trim());
