@@ -56,7 +56,7 @@ export class ModelViewComponent implements OnInit, OnDestroy {
 
   waterLevel = model.required<number>();
   simulationParameter = model<SimulationParameter[]>([]);
-  readonly intervalForecast = input<SimulationIntervalOption>("5 min");
+  readonly intervalForecast = input<typeof SimulationIntervalOption[keyof typeof SimulationIntervalOption]>(SimulationIntervalOption["5 min"]);
 
   rendererContainer =
     viewChild<ElementRef<HTMLDivElement>>("rendererContainer");
