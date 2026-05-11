@@ -56,8 +56,7 @@ export class DrainageRulesComponent {
   protected drainageRuleModal: WritableSignal<DrainageRule> = signal(
     this.newDrainageRule,
   );
-  protected drainageRuleModalIndex: WritableSignal<number | undefined> =
-    signal(undefined);
+  protected drainageRuleModalIndex = signals.maybe<number>();
   protected drainageRulesModalOpen: signals.ToggleableSignal =
     signals.toggleable(false);
 

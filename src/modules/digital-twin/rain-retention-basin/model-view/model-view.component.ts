@@ -87,10 +87,7 @@ export class ModelViewComponent implements OnInit, OnDestroy {
   private resizeRaf!: number | null;
   private waterPlane: THREE.Plane | null = null;
 
-  private model_url = computed(
-    () =>
-      `/api/files/v1/rrb-digital-twin/model/${this.city()}/${this.name()}.glb`,
-  );
+  private model_url = s`/api/files/v1/rrb-digital-twin/model/${this.city()}/${this.name()}.glb`;
 
   protected time: WritableSignal<string> = signal("0");
   protected rainAmount: WritableSignal<number> = signal(0);
