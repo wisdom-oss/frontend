@@ -1,4 +1,3 @@
-import {HttpParams} from "@angular/common/http";
 import {Injectable} from "@angular/core";
 import dayjs from "dayjs";
 import typia from "typia";
@@ -30,12 +29,10 @@ export class UsageForecastsService extends api.service(URL) {
     }>,
   ): api.Signal<Self.Result> {
     let params = api.map(options, options => {
-      let params = new HttpParams();
-      for (let key of [options.key].flat()) params = params.append("key", key);
-      for (let key of [options?.options?.consumerGroup ?? []].flat()) {
-        params = params.append("consumerGroup", key);
-      }
-
+      let params = new api.QueryParams();
+      for (let key of [options.key].flat()) params.append("key", key);
+      for (let key of [options?.options?.consumerGroup ?? []].flat())
+        params.append("consumerGroup", key);
       return params;
     });
 
@@ -61,7 +58,7 @@ export class UsageForecastsService extends api.service(URL) {
       url: api.url`${URL}/${scriptIdentifier}`,
       validate: typia.createValidate<Self.Result>(),
       cache: dayjs.duration(1, "day"),
-      params: params as any,
+      params,
       body: formData,
     });
   }
