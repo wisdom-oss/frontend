@@ -15,7 +15,7 @@
     <div class="card-image" style="height: min(20rem, 40vh)">
       <mgl-map
         class="is-fullheight"
-        [style]="mapData.style"
+        [mapStyle]="mapData.style"
         [fitBounds]="$any(mapData.fitBounds())"
         [cursor]="mapData.hover() ? 'pointer' : 'grab'"
         [attributionControl]="false"
