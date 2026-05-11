@@ -11,9 +11,10 @@ import {ɵSharedStylesHost as SharedStylesHost} from "@angular/platform-browser"
  *
  * Use this only when a test does not depend on CSS. We skip all style handling.
  */
-class NoopSharedStylesHost
-  implements Pick<SharedStylesHost, keyof SharedStylesHost>
-{
+class NoopSharedStylesHost implements Pick<
+  SharedStylesHost,
+  keyof SharedStylesHost
+> {
   addStyles(): void {}
   removeStyles(): void {}
   ngOnDestroy(): void {}

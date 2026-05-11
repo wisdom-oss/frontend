@@ -9,7 +9,7 @@ ARG VOLTA_VERSION
 ARG GIT_COMMIT_SHA
 
 RUN apt update -y && apt upgrade -y
-RUN apt install -y curl
+RUN apt install -y curl libatomic1
 WORKDIR /app
 
 # install volta to install correct node version
