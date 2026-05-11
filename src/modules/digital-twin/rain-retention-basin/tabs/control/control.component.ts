@@ -26,13 +26,9 @@ export class ControlComponent {
   protected city: WritableSignal<string> = signal("Damme");
   protected name: WritableSignal<string> = signal("Nordhofe");
 
-  protected activeControl = signal<"manual" | "semi-automatic" | "automatic">(
+  readonly activeControl = signal<"manual" | "semi-automatic" | "automatic">(
     "manual",
   );
-
-  setActiveControl(control: "manual" | "semi-automatic" | "automatic") {
-    this.activeControl.set(control);
-  }
 
   protected drainageRules: WritableSignal<DrainageRule[]> = signal([
     {
