@@ -32,8 +32,8 @@ export class SimulationComponent {
   protected throttleSize: WritableSignal<number> = signal(0);
   protected throttleHeight: WritableSignal<number> = signal(0);
 
-  protected intervalForecast: WritableSignal<SimulationIntervalOption> =
-    signal("5 min");
+  protected intervalForecast: WritableSignal<typeof SimulationIntervalOption[keyof typeof SimulationIntervalOption]> =
+    signal(SimulationIntervalOption["5 min"]);
   private rainAmounts: number[] = [
     1.2, 1.4, 1.6, 1.9, 2.5, 3.2, 4.6, 8.9, 1.2, 1.1, 0.9, 0.8, 0.4, 0.4, 0.4,
     0.4, 0.3, 0.3, 0.3, 0.3, 0.2, 0.2, 0.2, 0.2,

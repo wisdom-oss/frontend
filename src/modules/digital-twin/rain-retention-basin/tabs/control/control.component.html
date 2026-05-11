@@ -16,21 +16,21 @@
         <div class="buttons has-addons">
           <button
             [class.is-active]="activeControl() === 'manual'"
-            (click)="setActiveControl('manual')"
+            (click)="activeControl.set('manual')"
             class="button"
           >
             <span translate>digitalTwin.button.manual</span>
           </button>
           <button
             [class.is-active]="activeControl() === 'semi-automatic'"
-            (click)="setActiveControl('semi-automatic')"
+            (click)="activeControl.set('semi-automatic')"
             class="button"
           >
             <span translate>digitalTwin.button.semiAutomatic</span>
           </button>
           <button
             [class.is-active]="activeControl() === 'automatic'"
-            (click)="setActiveControl('automatic')"
+            (click)="activeControl.set('automatic')"
             class="button"
           >
             <span translate>digitalTwin.button.automatic</span>

@@ -29,8 +29,8 @@ export class SimulationComponent {
     this.waterLevelSlider(),
   );
 
-  protected intervalForecast: WritableSignal<SimulationIntervalOption> =
-    signal("5 min");
+  protected intervalForecast: WritableSignal<typeof SimulationIntervalOption[keyof typeof SimulationIntervalOption]> =
+    signal(SimulationIntervalOption["5 min"]);
   protected rainForecast: WritableSignal<SimulationParameter[]> = signal([]);
 
   protected drainageRules: WritableSignal<DrainageRule[]> = signal([
