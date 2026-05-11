@@ -28,12 +28,12 @@ import {OrbitControls, GLTFLoader} from "three-stdlib";
 import * as THREE from "three";
 
 import {httpContexts} from "../../../../common/http-contexts";
+import {s} from "../../../../common/s.tag";
 import {Scopes} from "../../../../core/auth/scopes";
 import {
   SimulationIntervalOption,
   SimulationParameter,
 } from "../../common/types/SimulationTypes";
-import { s } from "../../../../common/s.tag";
 
 @Component({
   selector: "model-view-rrb",

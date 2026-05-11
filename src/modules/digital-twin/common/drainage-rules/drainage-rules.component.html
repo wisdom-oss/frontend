@@ -19,10 +19,7 @@
         <div class="card my-2">
           <header class="card-header">
             <p class="card-header-title">{{ rule.title }}</p>
-            <button
-              class="card-header-icon"
-              (click)="rule.open.toggle()"
-            >
+            <button class="card-header-icon" (click)="rule.open.toggle()">
               <ng-icon
                 [name]="
                   rule.open() ? 'remixArrowUpSLine' : 'remixArrowDownSLine'
