@@ -7,7 +7,6 @@ import {
   Component,
   OnDestroy,
   OnInit,
-  AfterViewInit,
   ElementRef,
   WritableSignal,
 } from "@angular/core";
@@ -48,7 +47,7 @@ import {
     "(window:keyup.control)": "controls.enableZoom = false",
   },
 })
-export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
+export class ModelViewComponent implements OnInit, OnDestroy {
   readonly height = input("40rem");
 
   readonly filename = input.required<string>();
@@ -80,6 +79,36 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
       const newLevel = this.waterLevel();
       this.animateWaterToLevel(newLevel);
     });
+
+    effect(() => {
+      const container = this.rendererContainer();
+      if (!container) return;
+      
+      this.renderer = new THREE.WebGLRenderer({antialias: true});
+      this.renderer.setSize(
+        container.nativeElement.clientWidth,
+        container.nativeElement.clientHeight,
+      );
+      this.renderer.localClippingEnabled = true;
+      container.nativeElement.appendChild(this.renderer.domElement);
+
+      this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+      this.controls.enableZoom = false;
+      const loader = new GLTFLoader();
+
+      loader.load("/public/model/" + this.filename(), gltf => {
+        const model = gltf.scene;
+        this.scene.add(model);
+        this.setColorMesh(model, "Water", 0x0000ff);
+        this.setColorMesh(model, "Pool", 0xffffff);
+        this.setScaleYWater(model, this.waterLevel());
+        model.rotation.y = -Math.PI / 4;
+      });
+
+      this.animate();
+      this.resizeObserver = new ResizeObserver(() => this.scheduleResize());
+      this.resizeObserver.observe(container.nativeElement);
+    });
   }
 
   ngOnInit(): void {
@@ -92,36 +121,6 @@ export class ModelViewComponent implements OnInit, AfterViewInit, OnDestroy {
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 2);
     hemiLight.position.set(0, 20, 0);
     this.scene.add(hemiLight);
-  }
-
-  ngAfterViewInit(): void {
-    const container = this.rendererContainer();
-    if (!container) return;
-
-    this.renderer = new THREE.WebGLRenderer({antialias: true});
-    this.renderer.setSize(
-      container.nativeElement.clientWidth,
-      container.nativeElement.clientHeight,
-    );
-    this.renderer.localClippingEnabled = true;
-    container.nativeElement.appendChild(this.renderer.domElement);
-
-    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-    this.controls.enableZoom = false;
-    const loader = new GLTFLoader();
-
-    loader.load("/public/model/" + this.filename(), gltf => {
-      const model = gltf.scene;
-      this.scene.add(model);
-      this.setColorMesh(model, "Water", 0x0000ff);
-      this.setColorMesh(model, "Pool", 0xffffff);
-      this.setScaleYWater(model, this.waterLevel());
-      model.rotation.y = -Math.PI / 4;
-    });
-
-    this.animate();
-    this.resizeObserver = new ResizeObserver(() => this.scheduleResize());
-    this.resizeObserver.observe(container.nativeElement);
   }
 
   ngOnDestroy(): void {

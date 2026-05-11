@@ -61,11 +61,6 @@ export class DrainageRulesComponent {
   protected drainageRulesModalOpen: signals.ToggleableSignal =
     signals.toggleable(false);
 
-  onToogleClick(event: MouseEvent, signal: signals.ToggleableSignal) {
-    event.preventDefault();
-    signal.toggle();
-  }
-
   copyDrainageRule(index: number) {
     this.drainageRuleModal.set(this.drainageRules()[index]);
   }

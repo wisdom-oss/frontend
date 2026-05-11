@@ -50,6 +50,7 @@ export class RainForecastComponent implements AfterViewInit {
   protected rainForecastModal: WritableSignal<SimulationParameter[]> = signal(
     this.rainForecast(),
   );
+  // Initially, use the length of the rain forecast as the duration, user can changed that in the modal
   protected durationForecast: WritableSignal<number> = signal(
     this.rainForecast().length,
   );
@@ -129,6 +130,7 @@ export class RainForecastComponent implements AfterViewInit {
     this.rainForecastModal.set(newArray);
   }
 
+  // Utility function to copy forecast data, used when opening the modal to avoid directly modifying the original forecast until the user confirms
   copyForecast(
     copy: WritableSignal<SimulationParameter[]>,
     copied: WritableSignal<SimulationParameter[]>,
