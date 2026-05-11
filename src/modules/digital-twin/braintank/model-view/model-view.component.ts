@@ -74,6 +74,8 @@ export class ModelViewComponent implements OnInit, OnDestroy {
   protected time: WritableSignal<string> = signal("0");
   protected rainAmount: WritableSignal<number> = signal(0);
 
+  private timeout: ReturnType<typeof setTimeout> | null = null;
+
   constructor() {
     effect(() => {
       const newLevel = this.waterLevel();
@@ -128,6 +130,7 @@ export class ModelViewComponent implements OnInit, OnDestroy {
     if (this.renderer) this.renderer.dispose();
     if (this.resizeObserver) this.resizeObserver.disconnect();
     if (this.resizeRaf) cancelAnimationFrame(this.resizeRaf);
+    if (this.timeout) clearTimeout(this.timeout);
   }
 
   private scheduleResize() {
@@ -227,7 +230,7 @@ export class ModelViewComponent implements OnInit, OnDestroy {
 
       index++;
       if (index < this.simulationParameter().length) {
-        setTimeout(runStep, 1000);
+        this.timeout = setTimeout(runStep, 1000);
       }
     };
 

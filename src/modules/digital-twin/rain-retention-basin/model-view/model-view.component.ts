@@ -1,6 +1,5 @@
 import {HttpClient, HttpContext} from "@angular/common/http";
 import {
-  computed,
   effect,
   input,
   model,
@@ -34,6 +33,7 @@ import {
   SimulationIntervalOption,
   SimulationParameter,
 } from "../../common/types/SimulationTypes";
+import { s } from "../../../../common/s.tag";
 
 @Component({
   selector: "model-view-rrb",
@@ -87,7 +87,8 @@ export class ModelViewComponent implements OnInit, OnDestroy {
   private resizeRaf!: number | null;
   private waterPlane: THREE.Plane | null = null;
 
-  private model_url = s`/api/files/v1/rrb-digital-twin/model/${this.city()}/${this.name()}.glb`;
+  private model_url = s`/api/files/v1/rrb-digital-twin/model/${this.city}/${this.name}.glb`;
+  private timeout: ReturnType<typeof setTimeout> | null = null;
 
   protected time: WritableSignal<string> = signal("0");
   protected rainAmount: WritableSignal<number> = signal(0);
@@ -172,6 +173,7 @@ export class ModelViewComponent implements OnInit, OnDestroy {
     if (this.renderer) this.renderer.dispose();
     if (this.resizeObserver) this.resizeObserver.disconnect();
     if (this.resizeRaf) cancelAnimationFrame(this.resizeRaf);
+    if (this.timeout) clearTimeout(this.timeout);
   }
 
   private async loadGltfModel(): Promise<THREE.Group> {
@@ -265,7 +267,7 @@ export class ModelViewComponent implements OnInit, OnDestroy {
 
       index++;
       if (index < this.simulationParameter().length) {
-        setTimeout(runStep, 1000);
+        this.timeout = setTimeout(runStep, 1000);
       }
     };
 
