@@ -1,17 +1,17 @@
-import {KeyValuePipe} from "@angular/common";
-import {computed, input, Component, InputSignal} from "@angular/core";
-import {provideIcons, NgIcon} from "@ng-icons/core";
+import { KeyValuePipe } from "@angular/common";
+import { computed, input, Component, InputSignal } from "@angular/core";
+import { provideIcons, NgIcon } from "@ng-icons/core";
 import {
   remixCheckboxCircleFill,
   remixErrorWarningFill,
   remixQuestionFill,
 } from "@ng-icons/remixicon";
-import {TranslateDirective} from "@ngx-translate/core";
+import { TranslateDirective } from "@ngx-translate/core";
 
-import {StatusService} from "../../api/status.service";
-import {api} from "../../common/api";
-import {keys} from "../../common/utils/keys";
-import {signals} from "../../common/signals";
+import { StatusService } from "../../api/status.service";
+import { api } from "../../common/api";
+import { keys } from "../../common/utils/keys";
+import { signals } from "../../common/signals";
 
 type ServiceRecord = Record<string, InstanceType<api.Service>>;
 type StatusRecord = Record<string, StatusService.Status[0] | undefined>;
@@ -24,42 +24,57 @@ class SidebarStatus {
   }
 
   get hasText() {
-    // prettier-ignore
+    // biome-ignore format: preserve alignment
     switch (this.value) {
-      case "ok": return "has-text-success";
-      case "unknown": return "has-text-grey-light";
-      case "warning": return "has-text-warning";
-      case "error": return "has-text-danger";
+      case "ok":
+        return "has-text-success";
+      case "unknown":
+        return "has-text-grey-light";
+      case "warning":
+        return "has-text-warning";
+      case "error":
+        return "has-text-danger";
     }
   }
 
   get hasBackground() {
-    // prettier-ignore
+    // biome-ignore format: preserve alignment
     switch (this.value) {
-      case "ok": return "has-background-success";
-      case "unknown": return "has-background-grey-light";
-      case "warning": return "has-background-warning";
-      case "error": return "has-background-danger";
+      case "ok":
+        return "has-background-success";
+      case "unknown":
+        return "has-background-grey-light";
+      case "warning":
+        return "has-background-warning";
+      case "error":
+        return "has-background-danger";
     }
   }
 
   get icon() {
-    // prettier-ignore
+    // biome-ignore format: preserve alignment
     switch (this.value) {
-      case "ok": return "remixCheckboxCircleFill";
-      case "unknown": return "remixQuestionFill";
+      case "ok":
+        return "remixCheckboxCircleFill";
+      case "unknown":
+        return "remixQuestionFill";
       case "warning":
-      case "error": return "remixErrorWarningFill";
+      case "error":
+        return "remixErrorWarningFill";
     }
   }
 
   get description() {
-    // prettier-ignore
+    // biome-ignore format: preserve alignment
     switch (this.value) {
-      case "ok": return "operational";
-      case "unknown": return "unknown";
-      case "warning": return "limited";
-      case "error": return "down";
+      case "ok":
+        return "operational";
+      case "unknown":
+        return "unknown";
+      case "warning":
+        return "limited";
+      case "error":
+        return "down";
     }
   }
 }
@@ -198,14 +213,20 @@ export class SidebarStatusInfoComponent extends SidebarStatusBaseComponent {
     Object.map(this.services(), (service, name) => {
       let path = service.URL;
       let status = this.status()?.[name];
-      // prettier-ignore
-      let sidebarStatus = () => {switch (status?.status) {
-        case undefined: return new SidebarStatus("unknown");
-        case "ok": return new SidebarStatus("ok");
-        case "down": return new SidebarStatus("error");
-        case "limited": return new SidebarStatus("warning");
-      }};
-      return {path, status: sidebarStatus(), lastUpdate: status?.lastUpdate};
+      // biome-ignore format: preserve alignment
+      let sidebarStatus = () => {
+        switch (status?.status) {
+          case undefined:
+            return new SidebarStatus("unknown");
+          case "ok":
+            return new SidebarStatus("ok");
+          case "down":
+            return new SidebarStatus("error");
+          case "limited":
+            return new SidebarStatus("warning");
+        }
+      };
+      return { path, status: sidebarStatus(), lastUpdate: status?.lastUpdate };
     }),
   );
 }

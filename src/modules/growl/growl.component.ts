@@ -1,4 +1,4 @@
-import {NgIf, DatePipe, KeyValuePipe} from "@angular/common";
+import { NgIf, DatePipe, KeyValuePipe } from "@angular/common";
 import {
   computed,
   effect,
@@ -20,24 +20,24 @@ import {
   NavigationControlDirective,
 } from "@maplibre/ngx-maplibre-gl";
 import dayjs from "dayjs";
-import {BBox, Feature, Point, Polygon} from "geojson";
-import {StyleSpecification} from "maplibre-gl";
+import { BBox, Feature, Point, Polygon } from "geojson";
+import { StyleSpecification } from "maplibre-gl";
 
 import * as turf from "@turf/turf";
 
-import {DisplayInfoControlComponent} from "./map/display-info-control/display-info-control.component";
-import {LegendControlComponent} from "./map/legend-control/legend-control.component";
-import {GrowlService} from "./growl.service";
-import {WithdrawalInfoControlComponent} from "./map/withdrawal-info-control/withdrawal-info-control.component";
-import {WaterRightsService} from "../../api/water-rights.service";
+import { DisplayInfoControlComponent } from "./map/display-info-control/display-info-control.component";
+import { LegendControlComponent } from "./map/legend-control/legend-control.component";
+import { GrowlService } from "./growl.service";
+import { WithdrawalInfoControlComponent } from "./map/withdrawal-info-control/withdrawal-info-control.component";
+import { WaterRightsService } from "../../api/water-rights.service";
 import nlwknMeasurementClassificationColors from "../../assets/nlwkn-measurement-classification-colors.toml";
 import colorful from "../../assets/map/styles/colorful.json";
-import {LayerSelectionControlComponent} from "../../common/components/map/layer-selection-control/layer-selection-control.component";
-import {ResizeMapOnLoadDirective} from "../../common/directives/resize-map-on-load.directive";
-import {signals} from "../../common/signals";
-import {RecreateOnDirective} from "../../common/directives/recreate-on.directive";
-import {keys} from "../../common/utils/keys";
-import {omit} from "../../common/utils/omit";
+import { LayerSelectionControlComponent } from "../../common/components/map/layer-selection-control/layer-selection-control.component";
+import { ResizeMapOnLoadDirective } from "../../common/directives/resize-map-on-load.directive";
+import { signals } from "../../common/signals";
+import { RecreateOnDirective } from "../../common/directives/recreate-on.directive";
+import { keys } from "../../common/utils/keys";
+import { omit } from "../../common/utils/omit";
 
 @Component({
   imports: [
@@ -67,14 +67,15 @@ export class GrowlComponent {
   protected style = colorful as any as StyleSpecification;
   protected measurementColors = nlwknMeasurementClassificationColors;
 
-  // prettier-ignore
+  // biome-ignore format: preserve alignment
   protected hoveredFeatures = {
-    groundwaterMeasurementStation: signal<GroundwaterMeasurementStationFeature | null>(null),
+    groundwaterMeasurementStation:
+      signal<GroundwaterMeasurementStationFeature | null>(null),
     groundwaterBody: signal<GroundwaterBodyFeature | null>(null),
     ndsMunicipal: signal<NdsMunicipalFeature | null>(null),
-    waterRightUsageLocationCluster: signal<ClusterFeature | null>(
-      null, {equal: (a, b) => a?.id == b?.id}
-    ),
+    waterRightUsageLocationCluster: signal<ClusterFeature | null>(null, {
+      equal: (a, b) => a?.id == b?.id,
+    }),
   };
 
   protected selectedLayers = {
@@ -88,10 +89,10 @@ export class GrowlComponent {
 
   protected attribution = computed(() => {
     return keys(omit(this.selectedLayers, "groundwaterLevelStations"))
-      .filter(key => this.selectedLayers[key]())
-      .map(key => this.service.data[key]())
-      .filter(({attribution}) => !!attribution)
-      .map(({attribution, attributionURL}) => {
+      .filter((key) => this.selectedLayers[key]())
+      .map((key) => this.service.data[key]())
+      .filter(({ attribution }) => !!attribution)
+      .map(({ attribution, attributionURL }) => {
         if (!attributionURL) return attribution;
         return `<a href="${attributionURL}" target="_blank">${attribution}</a>`;
       })

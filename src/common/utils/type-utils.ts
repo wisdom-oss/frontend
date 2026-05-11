@@ -1,7 +1,7 @@
-import {Signal} from "@angular/core";
+import { Signal } from "@angular/core";
 
 export namespace typeUtils {
-  // prettier-ignore
+  // biome-ignore format: preserve alignment
   /**
    * Updates the elements of an array by omitting specific keys and adding new
    * properties.
@@ -20,11 +20,11 @@ export namespace typeUtils {
    * // Equivalent to: { name: string; age: number; active: boolean }[]
    * ```
    */
-  export type UpdateElements<
-    A extends any[], 
-    O extends keyof A[0], 
-    U,
-  > = (Omit<A[0], O> & U)[];
+  export type UpdateElements<A extends any[], O extends keyof A[0], U> = (Omit<
+    A[0],
+    O
+  > &
+    U)[];
 
   /**
    * Overwrite fields of record from another record.

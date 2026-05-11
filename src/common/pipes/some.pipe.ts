@@ -1,6 +1,6 @@
-import {Pipe, PipeTransform} from "@angular/core";
+import { Pipe, PipeTransform } from "@angular/core";
 
-import {EmptyPipe} from "./empty.pipe";
+import { EmptyPipe } from "./empty.pipe";
 
 /**
  * Marks a value as "non-empty".
@@ -31,11 +31,14 @@ export class SomePipe implements PipeTransform {
   transform(value?: object): boolean;
   transform(value: unknown, ..._args: unknown[]): unknown {
     let empty = this.empty.transform(value as any) as boolean | null;
-    // prettier-ignore
+    // biome-ignore format: preserve alignment
     switch (empty) {
-      case true: return false;
-      case false: return true;
-      case null: return null;
+      case true:
+        return false;
+      case false:
+        return true;
+      case null:
+        return null;
     }
   }
 }

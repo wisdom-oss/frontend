@@ -1,6 +1,6 @@
-import {computed, inject, Injectable, Signal} from "@angular/core";
-import {toSignal} from "@angular/core/rxjs-interop";
-import {Params, ActivatedRoute, Router} from "@angular/router";
+import { computed, inject, Injectable, Signal } from "@angular/core";
+import { toSignal } from "@angular/core/rxjs-interop";
+import { Params, ActivatedRoute, Router } from "@angular/router";
 
 interface Options<T> {
   /** When true, the query parameter is treated as a list and reads and writes use arrays. */
@@ -30,15 +30,15 @@ type DefaultOpts<T> = Pick<Options<T>, "multi" | "default"> & {
   serialize?: never;
 };
 
-type MinimalOpts = Pick<Options<void>, "multi"> & {multi?: false};
+type MinimalOpts = Pick<Options<void>, "multi"> & { multi?: false };
 
 type ComplexOpts<T> = Pick<Options<T>, "parse" | "serialize">;
 
-type MultiComplexOpts<T> = Options<T> & {multi: true; default?: T[]};
+type MultiComplexOpts<T> = Options<T> & { multi: true; default?: T[] };
 
-type DefaultComplexOpts<T> = Options<T> & {multi?: false; default: T};
+type DefaultComplexOpts<T> = Options<T> & { multi?: false; default: T };
 
-// prettier-ignore
+// biome-ignore format: preserve alignment
 /**
  * Service for reading and writing query parameters as Angular signals.
  *
@@ -64,7 +64,7 @@ export class QueryParamService {
    * When `options.multi` is true, the parameter is handled as a list. When
    * `options.parse` or `options.serialize` is set, the value is converted between
    * strings and the generic type `T`.
-   * 
+   *
    * @example
    * ```ts
    * const query = inject(QueryParamService);
@@ -90,20 +90,26 @@ export class QueryParamService {
   signal(param: string): QueryParamSignal<string | undefined>;
 
   // generic parsed types
-  signal<T>(param: string, options: ComplexOpts<T>): QueryParamSignal<T | undefined>;
+  signal<T>(
+    param: string,
+    options: ComplexOpts<T>,
+  ): QueryParamSignal<T | undefined>;
   signal<T>(param: string, options: MultiComplexOpts<T>): QueryParamSignal<T[]>;
   signal<T>(param: string, options: DefaultComplexOpts<T>): QueryParamSignal<T>;
 
   // string
   signal(param: string, options: MultiOpts<string>): QueryParamSignal<string[]>;
   signal(param: string, options: DefaultOpts<string>): QueryParamSignal<string>;
-  signal(param: string, options: MinimalOpts): QueryParamSignal<string | undefined>;
+  signal(
+    param: string,
+    options: MinimalOpts,
+  ): QueryParamSignal<string | undefined>;
 
   // general catch-all, must be supertype of all above
   signal<T>(
     param: string,
-    options?: Partial<Options<T>>
-  ): QueryParamSignal<string | string [] | T | T[] | undefined> {
+    options?: Partial<Options<T>>,
+  ): QueryParamSignal<string | string[] | T | T[] | undefined> {
     let read = computed(() => {
       let params = this.queryParamMap();
       if (!params || !params.has(param)) {
@@ -123,20 +129,21 @@ export class QueryParamService {
     });
 
     let set = (value: T | T[]) => {
-      let queryParams: Params = {[param]: value}; 
+      let queryParams: Params = { [param]: value };
       if (value && options?.serialize) {
-        if (Array.isArray(value)) queryParams[param] = value.map(options.serialize);
+        if (Array.isArray(value))
+          queryParams[param] = value.map(options.serialize);
         else queryParams[param] = options.serialize(value);
       }
 
       return this.router.navigate([], {
-        queryParams, 
-        queryParamsHandling: "merge", 
-        replaceUrl: true
+        queryParams,
+        queryParamsHandling: "merge",
+        replaceUrl: true,
       });
     };
-    
-    return Object.assign(read, {set});
+
+    return Object.assign(read, { set });
   }
 }
 

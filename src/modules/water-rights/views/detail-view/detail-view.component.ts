@@ -1,4 +1,4 @@
-import {NgIf, DOCUMENT} from "@angular/common";
+import { NgIf, DOCUMENT } from "@angular/common";
 import {
   computed,
   inject,
@@ -9,7 +9,7 @@ import {
   WritableSignal,
   PipeTransform,
 } from "@angular/core";
-import {ActivatedRoute} from "@angular/router";
+import { ActivatedRoute } from "@angular/router";
 import {
   ControlComponent,
   LayerComponent,
@@ -18,7 +18,7 @@ import {
   AttributionControlDirective,
   NavigationControlDirective,
 } from "@maplibre/ngx-maplibre-gl";
-import {provideIcons, NgIconComponent} from "@ng-icons/core";
+import { provideIcons, NgIconComponent } from "@ng-icons/core";
 import {
   remixArticleLine,
   remixCheckboxCircleLine,
@@ -29,33 +29,33 @@ import {
   remixTimeLine,
   remixVerifiedBadgeLine,
 } from "@ng-icons/remixicon";
-import {TranslateDirective, TranslatePipe} from "@ngx-translate/core";
+import { TranslateDirective, TranslatePipe } from "@ngx-translate/core";
 import dayjs from "dayjs";
-import {BBox, FeatureCollection, Point} from "geojson";
-import {StyleSpecification} from "maplibre-gl";
+import { BBox, FeatureCollection, Point } from "geojson";
+import { StyleSpecification } from "maplibre-gl";
 
 import * as turf from "@turf/turf";
 
-import {GeoDataService} from "../../../../api/geo-data.service";
-import {WaterRightsService} from "../../../../api/water-rights.service";
+import { GeoDataService } from "../../../../api/geo-data.service";
+import { WaterRightsService } from "../../../../api/water-rights.service";
 import colorful from "../../../../assets/map/styles/colorful.json";
-import {signals} from "../../../../common/signals";
-import {MapCursorDirective} from "../../../../common/directives/map-cursor.directive";
-import {RecreateOnDirective} from "../../../../common/directives/recreate-on.directive";
-import {SomePipe} from "../../../../common/pipes/some.pipe";
+import { signals } from "../../../../common/signals";
+import { MapCursorDirective } from "../../../../common/directives/map-cursor.directive";
+import { RecreateOnDirective } from "../../../../common/directives/recreate-on.directive";
+import { SomePipe } from "../../../../common/pipes/some.pipe";
 
 type UsageLocations = FeatureCollection<
   Point,
-  {id: number; name: string; waterRight: number}
+  { id: number; name: string; waterRight: number }
 >;
 
-@Pipe({name: "kvfmt"})
+@Pipe({ name: "kvfmt" })
 export class KeyValueFormatPipe implements PipeTransform {
   transform(
-    keyValue?: {key?: number; value?: string} | null,
+    keyValue?: { key?: number; value?: string } | null,
   ): string | undefined {
     if (!keyValue) return undefined;
-    let {key, value} = keyValue;
+    let { key, value } = keyValue;
 
     if (key) {
       if (value) return `${key} ${value}`;
@@ -67,14 +67,14 @@ export class KeyValueFormatPipe implements PipeTransform {
   }
 }
 
-@Pipe({name: "ratefmt"})
+@Pipe({ name: "ratefmt" })
 export class RateFormatPipe implements PipeTransform {
   transform(rate: {
     value: number;
     unit: string;
-    per: {Microseconds: number; Days: number; Months: number};
+    per: { Microseconds: number; Days: number; Months: number };
   }): string {
-    let {value, unit} = rate;
+    let { value, unit } = rate;
     let per = dayjs
       .duration({
         milliseconds: rate.per.Microseconds * 1000,
@@ -88,7 +88,7 @@ export class RateFormatPipe implements PipeTransform {
   }
 }
 
-@Pipe({name: "landrecordfmt"})
+@Pipe({ name: "landrecordfmt" })
 export class LandRecordPipe implements PipeTransform {
   transform(
     landRecord?: WaterRightsService.UsageLocation["landRecord"],
@@ -137,24 +137,28 @@ export class DetailViewComponent {
   protected data: Signal<undefined | WaterRightsService.WaterRightDetails>;
   protected document = inject(DOCUMENT);
 
-  // prettier-ignore
+  // biome-ignore format: preserve alignment
   protected mapData: {
     style: StyleSpecification;
-    usageLocations: ReturnType<typeof DetailViewComponent["buildUsageLocations"]>;
-    fitBounds: Signal<undefined | BBox>,
-    hover: WritableSignal<undefined | number>,
+    usageLocations: ReturnType<
+      (typeof DetailViewComponent)["buildUsageLocations"]
+    >;
+    fitBounds: Signal<undefined | BBox>;
+    hover: WritableSignal<undefined | number>;
   };
 
   protected attribution = computed(() => {
     let usageLocations = this.mapData.usageLocations();
     if (!usageLocations) return;
-    let {attribution, attributionURL} = usageLocations;
+    let { attribution, attributionURL } = usageLocations;
     if (!attributionURL) return attribution;
     return `<a href="${attributionURL}" target="_blank">${attribution}</a>`;
   });
 
-  // prettier-ignore
-  private asT<T>(value: T): T { return value }
+  // biome-ignore format: preserve alignment
+  private asT<T>(value: T): T {
+    return value;
+  }
   protected asTable = this.asT<[string, undefined | null | string][]>;
   protected asRates = this.asT<
     [string, undefined | null | WaterRightsService.Helper.Rate[]][]
@@ -189,7 +193,7 @@ export class DetailViewComponent {
     dataSignal: DetailViewComponent["data"],
   ): Signal<
     | undefined
-    | {attribution?: string; attributionURL?: string; data: UsageLocations}
+    | { attribution?: string; attributionURL?: string; data: UsageLocations }
   > {
     let allUsageLocations = signals.mapTo(
       geo.fetchLayerContents(
@@ -197,12 +201,12 @@ export class DetailViewComponent {
         undefined,
         dayjs.duration(1, "day"),
       ),
-      contents => ({
+      (contents) => ({
         attribution: contents?.attribution,
         attributionURL: contents?.attributionURL,
         data: {
           type: "FeatureCollection",
-          features: (contents?.data ?? []).map(location => ({
+          features: (contents?.data ?? []).map((location) => ({
             type: "Feature" as const,
             id: location.id,
             geometry: location.geometry as Point,
@@ -223,15 +227,15 @@ export class DetailViewComponent {
       let usageLocations = allUsageLocations();
       if (!data || !usageLocations) return undefined;
 
-      let usageLocationIds = data.usageLocations.map(({id}) => id);
+      let usageLocationIds = data.usageLocations.map(({ id }) => id);
 
       return {
         attribution: usageLocations.attribution ?? undefined,
         attributionURL: usageLocations.attributionURL ?? undefined,
         data: {
           type: "FeatureCollection",
-          features: usageLocations.data.features.filter(({properties: {id}}) =>
-            usageLocationIds.includes(id),
+          features: usageLocations.data.features.filter(
+            ({ properties: { id } }) => usageLocationIds.includes(id),
           ),
         },
       };

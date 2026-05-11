@@ -4,8 +4,8 @@
       class="is-fullheight"
       [mapStyle]="style"
       [zoom]="[6.8]"
-      [center]="{lat: 52.8, lon: 9.2}"
-      [canvasContextAttributes]="{preserveDrawingBuffer: true}"
+      [center]="{ lat: 52.8, lon: 9.2 }"
+      [canvasContextAttributes]="{ preserveDrawingBuffer: true }"
       [attributionControl]="false"
       (click)="groundwaterBodyRequest.set(hoveredFeatures.groundwaterBody())"
       (click)="fitBounds.set((hoverClusterPolygonDelay() ?? {}).bbox)"
@@ -202,7 +202,7 @@
               id="nds-municipals-layer-fill"
               type="fill"
               source="nds-municipals-source"
-              [paint]="{'fill-opacity': 0}"
+              [paint]="{ 'fill-opacity': 0 }"
               (layerMouseMove)="
                 hoveredFeatures.ndsMunicipal.set($any($event.features![0]!))
               "
@@ -225,19 +225,36 @@
             selectedLayers.groundwaterLevelStations()
           ) {
             @for (color of measurementColors | keyvalue; track color.key) {
-              <!-- prettier-ignore -->
+              <!-- biome-ignore format: preserve alignment -->
               <mgl-layer
-                [id]="'groundwater-measurement-stations-layer-' + $any(color.key) + '-symbol'"
+                [id]="
+                  'groundwater-measurement-stations-layer-' +
+                  $any(color.key) +
+                  '-symbol'
+                "
                 type="symbol"
                 source="groundwater-measurement-stations-source"
                 [layout]="{
-                  'icon-image': 'measurement-classification-' + $any(color.key) + '-image',
-                  'icon-size': ['interpolate', ['linear'], ['zoom'], 5, 0.1, 12, 1],
+                  'icon-image':
+                    'measurement-classification-' + $any(color.key) + '-image',
+                  'icon-size': [
+                    'interpolate',
+                    ['linear'],
+                    ['zoom'],
+                    5,
+                    0.1,
+                    12,
+                    1,
+                  ],
                   'icon-ignore-placement': true,
                   'symbol-z-order': 'source',
                   'icon-overlap': 'always',
                 }"
-                [filter]="['==', ['get', 'classification'], '' + $any(color.key)]"
+                [filter]="[
+                  '==',
+                  ['get', 'classification'],
+                  '' + $any(color.key),
+                ]"
                 (layerMouseMove)="
                   hoveredFeatures.groundwaterMeasurementStation.set(
                     $any($event.features![0]!)

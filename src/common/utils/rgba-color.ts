@@ -1,10 +1,29 @@
-import typia, {tags} from "typia";
+import typia, { tags } from "typia";
 
-// prettier-ignore
-type HexChar = 
-  | "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
-  | "a" | "b" | "c" | "d" | "e" | "f"
-  | "A" | "B" | "C" | "D" | "E" | "F";
+// biome-ignore format: preserve alignment
+type HexChar =
+  | "0"
+  | "1"
+  | "2"
+  | "3"
+  | "4"
+  | "5"
+  | "6"
+  | "7"
+  | "8"
+  | "9"
+  | "a"
+  | "b"
+  | "c"
+  | "d"
+  | "e"
+  | "f"
+  | "A"
+  | "B"
+  | "C"
+  | "D"
+  | "E"
+  | "F";
 
 type ColorValue = number &
   tags.Type<"uint32"> &
@@ -134,7 +153,7 @@ export class RgbaColor {
   }
 
   toString(): string {
-    let {r, g, b, a} = this;
+    let { r, g, b, a } = this;
     return `rgba(${r}, ${g}, ${b}, ${a})`;
   }
 
@@ -144,7 +163,7 @@ export class RgbaColor {
    * This ignores the alpha channel.
    */
   toHex(): string {
-    const {r, g, b} = this;
+    const { r, g, b } = this;
     const hex = (n: number) => n.toString(16).padStart(2, "0");
     return `#${hex(r)}${hex(g)}${hex(b)}`;
   }
@@ -155,26 +174,30 @@ export class RgbaColor {
    * @returns A new `RgbaColor` with the updated channel
    */
   with(channel: "red" | "green" | "blue" | "alpha", value: number): RgbaColor {
-    let {r, g, b, a} = this;
-    // prettier-ignore
+    let { r, g, b, a } = this;
+    // biome-ignore format: preserve alignment
     switch (channel) {
-      case "red": return new RgbaColor(value, g, b, a);
-      case "green": return new RgbaColor(r, value, b, a);
-      case "blue": return new RgbaColor(r, g, value, a);
-      case "alpha": return new RgbaColor(r, g, b, value);
+      case "red":
+        return new RgbaColor(value, g, b, a);
+      case "green":
+        return new RgbaColor(r, value, b, a);
+      case "blue":
+        return new RgbaColor(r, g, value, a);
+      case "alpha":
+        return new RgbaColor(r, g, b, value);
     }
   }
 
   toJSON(): JSONRepresentation {
-    let {r, g, b, a} = this;
-    return {r, g, b, a};
+    let { r, g, b, a } = this;
+    return { r, g, b, a };
   }
 
   static reviver: Exclude<Parameters<typeof JSON.parse>[1], undefined> = (
     _,
     value,
   ) => {
-    let {r, g, b, a} = typia.assert<JSONRepresentation>(value);
+    let { r, g, b, a } = typia.assert<JSONRepresentation>(value);
     return new RgbaColor(r, g, b, a);
   };
 }

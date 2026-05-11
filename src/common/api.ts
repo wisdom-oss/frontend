@@ -11,15 +11,20 @@ import {
   HttpResourceRequest,
   HttpErrorResponse,
 } from "@angular/common/http";
-import {computed, isSignal, signal, Signal as CoreSignal} from "@angular/core";
-import dayjs, {Dayjs} from "dayjs";
-import {Duration} from "dayjs/plugin/duration";
-import {isTypedArray} from "three/src/animation/AnimationUtils.js";
-import typia, {tags} from "typia";
+import {
+  computed,
+  isSignal,
+  signal,
+  Signal as CoreSignal,
+} from "@angular/core";
+import dayjs, { Dayjs } from "dayjs";
+import { Duration } from "dayjs/plugin/duration";
+import { isTypedArray } from "three/src/animation/AnimationUtils.js";
+import typia, { tags } from "typia";
 
-import {httpContexts} from "./http-contexts";
-import {Once} from "./utils/once";
-import {Id} from "./id";
+import { httpContexts } from "./http-contexts";
+import { Once } from "./utils/once";
+import { Id } from "./id";
 
 /**
  * Toolkit to build API services.
@@ -169,7 +174,7 @@ export namespace api {
   export type RequestSignal<T> = T | CoreSignal<T | undefined>;
 
   function hasNoSignals<T>(components: RequestSignal<T>[]): components is T[] {
-    return components.every(component => !isSignal(component));
+    return components.every((component) => !isSignal(component));
   }
 
   /**
@@ -266,7 +271,8 @@ export namespace api {
     ) {
       for (let [key, val] of Object.entries(params)) {
         if (!this.map.has(key)) this.map.set(key, []);
-        if (Array.isArray(val)) val.forEach(val => this.map.get(key).push(val));
+        if (Array.isArray(val))
+          val.forEach((val) => this.map.get(key).push(val));
         else this.map.get(key).push(val);
       }
     }
@@ -285,7 +291,7 @@ export namespace api {
     ): RequestSignal<QueryParams> {
       // duplicate signature is necessary to expose broad signature as well as
       // use it
-      return map(params, params => new QueryParams(params));
+      return map(params, (params) => new QueryParams(params));
     }
 
     private static serialize(
@@ -324,7 +330,8 @@ export namespace api {
     }): QueryParams {
       for (let [key, val] of Object.entries(params)) {
         if (!this.map.has(key)) this.map.set(key, []);
-        if (Array.isArray(val)) val.forEach(val => this.map.get(key).push(val));
+        if (Array.isArray(val))
+          val.forEach((val) => this.map.get(key).push(val));
         this.map.get(key).push(val);
       }
       return this;
@@ -727,7 +734,7 @@ export namespace api {
       if (url === undefined) return undefined;
       let context = httpContext();
 
-      let request: HttpResourceRequest = {url};
+      let request: HttpResourceRequest = { url };
       for (let key of [
         "method",
         "body",
@@ -754,7 +761,7 @@ export namespace api {
         } else request.params = options.params.toHttpParams();
       }
 
-      return {context, ...request};
+      return { context, ...request };
     });
   }
 
@@ -779,7 +786,7 @@ export namespace api {
     validate,
     url,
   }: ResourceOptions<TResult, TRaw, TDefault>): (raw: TRaw) => TResult {
-    return raw => {
+    return (raw) => {
       let result = raw as unknown as TResult;
       if (parse) {
         if (validateRaw) {
@@ -831,12 +838,16 @@ export namespace api {
     request: () => HttpResourceRequest | undefined,
     options: HttpResourceOptions<TResult, unknown>,
   ) => HttpResourceRef<TResult | undefined> {
-    // prettier-ignore
+    // biome-ignore format: preserve alignment
     switch (responseType) {
-      case undefined: return httpResource<TResult>;
-      case "text": return httpResource.text;
-      case "arrayBuffer": return httpResource.arrayBuffer;
-      case "blob": return httpResource.blob;
+      case undefined:
+        return httpResource<TResult>;
+      case "text":
+        return httpResource.text;
+      case "arrayBuffer":
+        return httpResource.arrayBuffer;
+      case "blob":
+        return httpResource.blob;
     }
   }
 
@@ -856,7 +867,7 @@ export namespace api {
     TRaw = TResult,
     TDefault extends TResult | undefined = undefined,
   >(
-    {onError, defaultValue}: ResourceOptions<TResult, TRaw, TDefault>,
+    { onError, defaultValue }: ResourceOptions<TResult, TRaw, TDefault>,
     resourceRef: HttpResourceRef<TResult | TDefault>,
   ): CoreSignal<TResult | TDefault> {
     return computed(() => {
@@ -1069,13 +1080,14 @@ export namespace api {
       send,
     });
 
-    if (onClose) ws.addEventListener("close", ev => onClose(socket, ev));
-    if (onError) ws.addEventListener("error", ev => onError(socket, ev));
-    if (onOpen) ws.addEventListener("open", ev => onOpen(socket, ev));
-    if (onMessage) ws.addEventListener("message", ev => onMessage(socket, ev));
+    if (onClose) ws.addEventListener("close", (ev) => onClose(socket, ev));
+    if (onError) ws.addEventListener("error", (ev) => onError(socket, ev));
+    if (onOpen) ws.addEventListener("open", (ev) => onOpen(socket, ev));
+    if (onMessage)
+      ws.addEventListener("message", (ev) => onMessage(socket, ev));
 
     ws.addEventListener("open", () => waitUntilOpen.set());
-    ws.addEventListener("message", ev => {
+    ws.addEventListener("message", (ev) => {
       let message;
       if (!(assumeJson ?? true)) message = ev.data;
       else if (typeof ev.data === "string") message = JSON.parse(ev.data);
@@ -1119,9 +1131,9 @@ export namespace api {
     M extends HttpMethod,
     A extends readonly unknown[],
     T,
-  > = (M extends "GET" ? {get: (...args: A) => Promise<T>} : {}) &
-    (M extends "POST" ? {post: (...args: A) => Promise<T>} : {}) &
-    (M extends "PUT" ? {put: (...args: A) => Promise<T>} : {});
+  > = (M extends "GET" ? { get: (...args: A) => Promise<T> } : {}) &
+    (M extends "POST" ? { post: (...args: A) => Promise<T> } : {}) &
+    (M extends "PUT" ? { put: (...args: A) => Promise<T> } : {});
 
   export type Endpoint<
     A extends unknown[],
