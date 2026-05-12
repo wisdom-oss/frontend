@@ -1,0 +1,26 @@
+<div map class="is-fullheight">
+  <div
+    class="p-0 is-fullheight is-clipped"
+    style="border-radius: 0 0 0.5rem 0.5rem"
+  >
+    <mgl-map
+      class="is-fullheight"
+      [mapStyle]="style"
+      [zoom]="[zoom()]"
+      [center]="center()"
+    >
+      <ng-container sources>
+        <mgl-geojson-source
+          id="locations-source"
+          [data]="locations()"
+        ></mgl-geojson-source>
+      </ng-container>
+      <mgl-layer
+        id="locations"
+        type="symbol"
+        source="locations-source"
+        [layout]="{'icon-image': 'remixicon:map-pin-2-fill'}"
+      ></mgl-layer>
+    </mgl-map>
+  </div>
+</div>

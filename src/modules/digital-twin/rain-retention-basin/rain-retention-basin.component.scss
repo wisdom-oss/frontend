@@ -1,0 +1,16 @@
+.tabs {
+  a {
+    border-radius: 0 !important;
+    border-top: unset;
+  }
+
+  > ul {
+    li:first-of-type a {
+      border-left: unset;
+    }
+
+    li:last-of-type a {
+      border-right: unset;
+    }
+  }
+}
