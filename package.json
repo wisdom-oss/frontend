@@ -87,7 +87,7 @@
     "jest-preset-angular": "^16.1.5",
     "jsr": "^0.14.3",
     "npm-check-updates": "^22.1.1",
-    "oxlint": "^1.63.0",
+    "oxlint": "^1.64.0",
     "prettier": "3.8.3",
     "prettier-plugin-toml": "2.0.6",
     "pretty-ts-imports": "^1.1.0",
