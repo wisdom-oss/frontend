@@ -63,7 +63,7 @@
                 "path": "scripts/esbuild/load-txt.cjs",
                 "options": {}
               },
-              "scripts/esbuild/unplugin.cjs"
+              "scripts/esbuild/unplugin.mjs"
             ],
             "outputPath": "dist/wisdom-oss/frontend",
             "index": "src/index.html",
@@ -96,15 +96,16 @@
             "styles": ["src/styles.scss"],
             "scripts": [],
             "allowedCommonJsDependencies": [
-              "ajv",
-              "dayjs",
-              "maplibre-gl",
               "@turf/jsts",
+              "@typia/interface",
+              "ajv",
+              "concaveman",
+              "dayjs",
+              "earcut",
+              "fast-deep-equal",
+              "maplibre-gl",
               "rbush",
               "skmeans",
-              "concaveman",
-              "fast-deep-equal",
-              "earcut",
               "typia/lib/internal"
             ],
             "stylePreprocessorOptions": {
