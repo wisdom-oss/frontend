@@ -1054,12 +1054,14 @@ export namespace api {
         if (
           payload instanceof ArrayBuffer ||
           payload instanceof Blob ||
-          isTypedArray(payload) ||
-          payload instanceof DataView
-        )
-          ws.send(payload as ArrayBuffer | Blob | ArrayBufferLike);
-        else if (typeof payload === "string") ws.send(payload);
-        else ws.send(JSON.stringify(payload));
+          ArrayBuffer.isView(payload)
+        ) {
+          ws.send(payload as Blob | BufferSource);
+        } else if (typeof payload === "string") {
+          ws.send(payload);
+        } else {
+          ws.send(JSON.stringify(payload));
+        }
       });
     };
 
