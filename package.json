@@ -96,7 +96,7 @@
     "three-stdlib": "^2.36.0",
     "ts-patch": "^3.3.0",
     "typescript": "~6.0.3",
-    "typescript-plugin-toml": "^0.5.0"
+    "typescript-plugin-toml": "https://github.com/cptpiepmatz/typescript-plugin-toml/releases/download/ts6-a/typescript-plugin-toml-0.5.0.tgz"
   },
   "volta": {
     "node": "26.1.0",
