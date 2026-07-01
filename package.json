@@ -88,7 +88,7 @@
     "jsr": "^0.14.3",
     "npm-check-updates": "^22.2.0",
     "oxlint": "^1.67.0",
-    "prettier": "3.8.3",
+    "prettier": "3.9.4",
     "prettier-plugin-toml": "2.0.6",
     "pretty-ts-imports": "^1.1.0",
     "sharp": "^0.34.5",
