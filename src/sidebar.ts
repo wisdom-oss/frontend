@@ -44,9 +44,7 @@ type ComponentClass = new (...args: any[]) => Component;
  * - A `URL` to an image (ensure CORS allows fetching if not same-origin).
  */
 type Icon =
-  | (Record<string, string> & extraTags.RecordEntries<1>)
-  | ComponentClass
-  | URL;
+  (Record<string, string> & extraTags.RecordEntries<1>) | ComponentClass | URL;
 
 /**
  * A category entry for the sidebar.
