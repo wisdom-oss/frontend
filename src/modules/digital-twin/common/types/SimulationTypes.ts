@@ -5,8 +5,4 @@ export type SimulationParameter = {
 };
 
 export type SimulationIntervalOption =
-  | "5 min"
-  | "10 min"
-  | "15 min"
-  | "30 min"
-  | "1 h";
+  "5 min" | "10 min" | "15 min" | "30 min" | "1 h";

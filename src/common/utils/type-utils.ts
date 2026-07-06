@@ -214,9 +214,7 @@ export namespace typeUtils {
   export type LooseOptionals<T> = {
     // keys that should become loose optionals
     [K in keyof T as K extends LooseOptionalKeys<T> ? K : never]?:
-      | T[K]
-      | null
-      | undefined;
+      T[K] | null | undefined;
   } & {
     // everything else stays as is
     [K in keyof T as K extends LooseOptionalKeys<T> ? never : K]: T[K];

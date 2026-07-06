@@ -361,16 +361,18 @@ export namespace api {
   }
 
   type Request = {
-    [K in keyof Omit<
-      HttpResourceRequest,
-      | "url"
-      | "method"
-      | "context"
-      | "withCredentials"
-      | "transferCache"
-      | "cache"
-      | "params"
-    >]: RequestSignal<HttpResourceRequest[K]>;
+    [
+      K in keyof Omit<
+        HttpResourceRequest,
+        | "url"
+        | "method"
+        | "context"
+        | "withCredentials"
+        | "transferCache"
+        | "cache"
+        | "params"
+      >
+    ]: RequestSignal<HttpResourceRequest[K]>;
   };
 
   type Options<TResult, TRaw> = Omit<
@@ -573,7 +575,8 @@ export namespace api {
     }) &
     // Enforce that either `validate` is present,
     // or `validateRaw` and `parse` are both present.
-    (| {
+    (
+      | {
           validate: (input: unknown) => typia.IValidation<TResult>;
           validateRaw?: (input: unknown) => typia.IValidation<TRaw>;
           parse?: (raw: TRaw) => TResult;
