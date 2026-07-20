@@ -92,7 +92,7 @@
     "prettier-plugin-toml": "2.0.6",
     "pretty-ts-imports": "^1.1.0",
     "sharp": "^0.34.5",
-    "smol-toml": "^1.6.1",
+    "smol-toml": "^1.7.0",
     "three-stdlib": "^2.36.0",
     "ts-patch": "^4.0.1",
     "typescript": "~6.0.3",
