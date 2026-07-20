@@ -61,6 +61,41 @@ export class DateTimePickerComponent {
     alias: "selected",
   });
 
+  protected selectStart = (date: Dayjs) =>
+    this.selected.update(([_, end]) => [date, end]);
+  protected selectEnd = (date: Dayjs) =>
+    this.selected.update(([start, _]) => [start, date]);
+
+  private orderSelected = effect(() => {
+    let [start, end] = this.selected();
+    if (!start || !end) return;
+    if (end.isBefore(start)) this.selected.set([end, start]);
+  });
+
+  protected labelStart = computed(this.label(0));
+  protected labelEnd = computed(this.label(1));
+  private label(idx: number): () => string {
+    return () => {
+      let selectedDay = this.selected()[idx];
+      let day = selectedDay ?? dayjs();
+      let content = day.locale(this.lang()).format("L");
+      if (selectedDay) return content;
+      return content.replaceAll(this.matchDigits, "0");
+    };
+  }
+
+  protected requested = signal<"start" | "end">("start");
+  protected selectRequested(date: Dayjs) {
+    switch (this.requested()) {
+      case "start":
+        return this.selected.update(([_, end]) => [date, end]);
+      case "end":
+        return this.selected.update(([start, _]) => [start, date]);
+    }
+  }
+
+  private logSelected = effect(() => console.log(this.selected()));
+
   protected viewMonthStart = signal<Dayjs>(
     (this.selected()[0] ?? dayjs()).startOf("month"),
   );
@@ -80,12 +115,10 @@ export class DateTimePickerComponent {
     "sunday",
   ];
 
-  constructor() {
-    effect(() => this.isActive.set(this.isActiveInput()));
-    effect(() => this.selectedOutput.emit(this.selected()));
-
-    console.log(this.viewDay());
-  }
+  private deriveIsActive = effect(() =>
+    this.isActive.set(this.isActiveInput()),
+  );
+  private emitOutput = effect(() => this.selectedOutput.emit(this.selected()));
 
   protected previousMonth() {
     this.viewMonthStart.update(day => day.subtract(1, "month"));

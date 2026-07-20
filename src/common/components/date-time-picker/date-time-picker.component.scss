@@ -1,3 +1,5 @@
+@use "../../../variables.scss" as vars;
+
 .date-grid {
   $cell-size: 2.5em;
 
@@ -20,9 +22,28 @@
   a:nth-child(n + 7) {
     border-radius: 50%;
     border-style: none;
+    margin: 0.1em;
 
     &.is-outside-month {
       color: var(--bulma-button-static-color);
+    }
+
+    &.is-before-selected {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      // border-width: $gap;
+      background-color: vars.$primary;
+      margin-right: 0;
+      // padding: 0 0.25em;
+      // margin: 0.25em 0;
+    }
+
+    &.is-after-selected {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      // border-width: $gap;
+      background-color: vars.$primary;
+      margin-left: 0;
     }
   }
 }

@@ -17,22 +17,22 @@
     <button
       class="tag px-3"
       [class.is-flex-grow-1]="fullWidth()"
-      (click)="isActive.toggle()"
+      (click)="requested() == 'start' && isActive.toggle()"
+      (click)="requested() != 'start' && isActive.set(true)"
+      (click)="requested.set('start')"
     >
-      <span>
-        @let day = selected()[0] ?? util.dayjs();
-        @let content = day.locale(lang()).format("L");
-        @if (selected()[0]) {
-          {{ content }}
-        } @else {
-          {{ content.replaceAll(matchDigits, "0") }}
-        }
-      </span>
+      <span>{{ labelStart() }}</span>
     </button>
     @if (ranged()) {
       <span class="tag px-1" style="user-select: none">&#9135;</span>
-      <button class="tag px-3" [class.is-flex-grow-1]="fullWidth()">
-        2025-04-29
+      <button
+        class="tag px-3"
+        [class.is-flex-grow-1]="fullWidth()"
+        (click)="requested() == 'end' && isActive.toggle()"
+        (click)="requested() != 'end' && isActive.set(true)"
+        (click)="requested.set('end')"
+      >
+        <span>{{ labelEnd() }}</span>
       </button>
     }
     <button
@@ -40,6 +40,7 @@
       [class.has-text-danger]="flavor() == 'lean'"
       [class.is-danger]="flavor() == 'bold'"
       (click)="selected.set(placeholder())"
+      (click)="requested.set('start')"
     >
       <span class="icon">
         <ng-icon name="remixResetLeftLine"></ng-icon>
@@ -52,8 +53,8 @@
   >
     <div class="card">
       <div class="card-content">
-        <div class="level mb-2">
-          <div class="level-left is-flex-grow-1">
+        <div class="mb-2 is-flex">
+          <div class="is-flex-grow-1">
             <button
               class="button is-small pl-1 is-fullwidth is-justify-content-flex-start"
               style="border-style: none; box-shadow: none"
@@ -63,7 +64,7 @@
               }}</span>
             </button>
           </div>
-          <div class="level-right">
+          <div class="">
             <button
               class="button is-small"
               style="border-style: none; box-shadow: none"
@@ -94,16 +95,26 @@
             @let day = viewDay().add(i, "days");
             @let isBefore = day.isBefore(viewMonthStart());
             @let isAfter = day.isAfter(viewMonthEnd());
+            @let start = selected()[0];
+            @let end = selected()[1];
             <a
               class="button"
               [class.is-outside-month]="isBefore || isAfter"
               [class.is-primary]="
-                selected()[0] && day.isSame(selected()[0], 'day')
+                (start && day.isSame(start, 'day')) ||
+                (end && day.isSame(end, 'day'))
               "
-              (click)="selected.set([day, undefined])"
+              [class.is-before-selected]="
+                start && end && day.isBefore(end) && !day.isBefore(start)
+              "
+              [class.is-after-selected]="
+                start && end && day.isAfter(start) && !day.isAfter(end)
+              "
+              (click)="selectRequested(day)"
               (click)="isBefore && previousMonth()"
               (click)="isAfter && nextMonth()"
               (click)="!ranged() && isActive.set(false)"
+              (click)="ranged() && requested.set('end')"
               >{{ day.date() }}</a
             >
           }
