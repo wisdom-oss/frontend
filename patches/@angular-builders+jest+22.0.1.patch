@@ -1,0 +1,13 @@
+diff --git a/node_modules/@angular-builders/jest/dist/default-config.resolver.js b/node_modules/@angular-builders/jest/dist/default-config.resolver.js
+index 2b960f0..84ef42a 100644
+--- a/node_modules/@angular-builders/jest/dist/default-config.resolver.js
++++ b/node_modules/@angular-builders/jest/dist/default-config.resolver.js
+@@ -88,7 +88,7 @@ class DefaultConfigResolver {
+                         // Users who need the old behaviour can opt out via their jest.config.ts:
+                         //   transform: { '...': ['jest-preset-angular', { isolatedModules: false }] }
+                         // BREAKING CHANGE: targeted for the next major version.
+-                        isolatedModules: true,
++                        // isolatedModules: true,
+                     },
+                 ],
+             },

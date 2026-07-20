@@ -2,6 +2,9 @@
 @use "../node_modules/bulma/sass/components/navbar.scss" with (
   $navbar-breakpoint: 690px
 );
+
+@use "../node_modules/bulma/sass/utilities/initial-variables" as iv;
+@use "../node_modules/bulma/sass/utilities/css-variables" as cv;
 @use "../node_modules/bulma/sass/" as bulma;
 
 @use "../node_modules/bulma-slider/src/sass/" as bulma-slider;
@@ -47,5 +50,75 @@ html {
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
+  }
+}
+
+/* 
+ * .is-spinning
+ * Adds a continuous spin animation to an element.
+ * - Base: spins every 0.8s (infinite loop).
+ * - .is-fast: speeds up spin to 0.2s.
+ * - .is-slow: slows spin to 2s.
+ * Perfect for loaders or rotating icons.
+ */
+.is-spinning {
+  display: grid;
+  animation: spin 0.8s linear infinite;
+
+  &.is-fast {
+    animation-duration: 0.2s;
+  }
+
+  &.is-slow {
+    animation-duration: 2s;
+  }
+
+  &.once {
+    animation-iteration-count: 1;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+/* 
+ * .has-stack
+ * Creates a stacking layout where all direct children overlap.
+ * - Uses a single-cell grid (grid-area: 1 / 1).
+ * - All children are placed in the same cell, stacking visually.
+ * Great for layering images, text, or overlays in one spot.
+ */
+.has-stack {
+  display: grid;
+
+  > * {
+    grid-area: 1 / 1;
+  }
+}
+
+.button > .icon > * {
+  display: flex;
+}
+
+// Border-only color for messages
+@each $name, $components in bulma.$message-colors {
+  .#{iv.$class-prefix}message.#{iv.$class-prefix}border-is-#{$name} {
+    // Do NOT touch message-h/s/background/text vars here.
+    // Only override the body border color directly.
+    .#{iv.$class-prefix}message-body {
+      border-inline-start-color: hsl(
+        #{cv.getVar($name, "", "-h")},
+        #{cv.getVar($name, "", "-s")},
+        calc(
+          #{cv.getVar($name, "", "-l")} + #{cv.getVar("message-border-l-delta")}
+        )
+      );
+    }
   }
 }

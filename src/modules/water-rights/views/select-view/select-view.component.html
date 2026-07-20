@@ -6,7 +6,7 @@
     <mgl-map
       class="is-fullheight"
       [class.skeleton-block]="!usageLocations()"
-      [style]="style"
+      [mapStyle]="style"
       [zoom]="[6.8]"
       [center]="{lat: 52.8, lon: 9.2}"
       [cursor]="clusterHoverId() || hover()?.waterRight ? 'pointer' : 'grab'"
@@ -25,14 +25,13 @@
           ></map-layer-selection-control>
         </mgl-control>
         @let attribution = this.attribution();
-        <ng-container *recreateOn="attribution">
-          <mgl-control
-            mglAttribution
-            position="bottom-right"
-            [compact]="true"
-            [customAttribution]="attribution"
-          ></mgl-control>
-        </ng-container>
+        <mgl-control
+          *recreateOn="attribution"
+          mglAttribution
+          position="bottom-right"
+          [compact]="true"
+          [customAttribution]="attribution"
+        ></mgl-control>
       </ng-container>
       <ng-container sources>
         <mgl-geojson-source

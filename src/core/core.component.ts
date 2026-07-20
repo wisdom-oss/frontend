@@ -6,7 +6,7 @@ import {NavbarComponent} from "./navbar/navbar.component";
 import {SidebarComponent} from "./sidebar/sidebar.component";
 import {signals} from "../common/signals";
 import {IsAutoHideDirective} from "../common/directives/is-auto-hide.directive";
-import {StorageService} from "../common/storage.service";
+import {StorageService} from "../common/services/storage.service";
 
 @Component({
   selector: "core",

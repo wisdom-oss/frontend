@@ -69,3 +69,11 @@ de = "Wasserverbrauch"
 [sidebar.category.waterworks]
 en = "Waterworks"
 de = "Wasserwerke"
+
+[sidebar.category.digital-twin]
+en = "Digital Twin"
+de = "Digitaler Zwilling"
+
+[sidebar.category.water-demand-prediction]
+en = "Water Demand Prediction"
+de = "Wasserbedarfsvorhersage"

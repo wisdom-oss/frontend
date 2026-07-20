@@ -33,7 +33,7 @@ jobs:
         uses: actions/checkout@v4
 
       - uses: wisdom-oss/actions/docker-build/multiplatform/build@main
-        name:
+        name: Docker Build
         with:
           registry-password: ${{ secrets.GITHUB_TOKEN }}
           target-platform: ${{ matrix.platforms }}
@@ -45,7 +45,7 @@ jobs:
       - build
     steps:
       - uses: wisdom-oss/actions/docker-build/multiplatform/merge@main
-        name:
+        name: Docker Image Merge
         with:
           registry-password: ${{ secrets.GITHUB_TOKEN }}
 
@@ -75,6 +75,9 @@ jobs:
 
       - name: restart-container
         run: ssh ${{ secrets.USERNAME }}@${{ vars.HOSTNAME }} "FRONTEND_VERSION='${{ env.IMAGE_TAG }}' docker compose up -d frontend"
+
+      - name: remove-old-images
+        run: ssh ${{ secrets.USERNAME }}@${{ vars.HOSTNAME }} "FRONTEND_VERSION='${{ env.IMAGE_TAG }}' docker image prune -a -f"
 
   deploy-protected:
     strategy:
@@ -107,3 +110,6 @@ jobs:
 
       - name: restart-container
         run: ssh ${{ secrets.USERNAME }}@${{ vars.HOSTNAME }} "FRONTEND_VERSION='${{ env.IMAGE_TAG }}' docker compose up -d frontend"
+
+      - name: remove-old-images
+        run: ssh ${{ secrets.USERNAME }}@${{ vars.HOSTNAME }} "FRONTEND_VERSION='${{ env.IMAGE_TAG }}' docker image prune -a -f"

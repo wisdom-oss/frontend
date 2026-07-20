@@ -3,6 +3,8 @@ import dayjs from "dayjs";
 import {Duration} from "dayjs/plugin/duration";
 import Dexie from "dexie";
 
+import revision from "../../assets/generated/revision.txt";
+
 /**
  * A simple caching service using IndexedDB via Dexie.
  *
@@ -27,12 +29,25 @@ export class CacheService extends Dexie {
     string
   >;
 
+  private meta: Dexie.Table<{key: string; value: string}, string>;
+
   constructor() {
     super("CacheDB");
+
     this.version(1).stores({
       cache: "key", // use "key" as primary key
     });
+    this.version(2).stores({
+      cache: "key",
+      meta: "key",
+    });
+
     this.cache = this.table("cache");
+    this.meta = this.table("meta");
+
+    this.ensuredRevision = this.open()
+      .then(() => this.ensureRevision())
+      .catch(e => console.error(e));
   }
 
   /**
@@ -46,6 +61,7 @@ export class CacheService extends Dexie {
     value: any,
     ttl: Duration = dayjs.duration(1, "day"),
   ): Promise<void> {
+    await this.ensuredRevision;
     let expire = dayjs().add(ttl);
     await this.cache.put({key, value, expire: expire.toJSON()});
   }
@@ -56,6 +72,7 @@ export class CacheService extends Dexie {
    * @returns The stored value if it exists and is valid, otherwise null.
    */
   async get(key: string): Promise<any | null> {
+    await this.ensuredRevision;
     let entry = await this.cache.get(key);
 
     if (entry && dayjs(entry.expire).isAfter(dayjs())) {
@@ -68,6 +85,18 @@ export class CacheService extends Dexie {
 
   /** Clears all entries from the cache. */
   async clear(): Promise<void> {
+    await this.ensuredRevision;
     await this.cache.clear();
+  }
+
+  private ensuredRevision: PromiseLike<void>;
+  private async ensureRevision(): Promise<void> {
+    const stored = await this.meta.get("revision");
+    if (!stored || stored.value != revision) {
+      await this.transaction("readwrite", this.cache, this.meta, async tx => {
+        await tx.table("cache").clear();
+        await tx.table("meta").put({key: "revision", value: revision});
+      });
+    }
   }
 }

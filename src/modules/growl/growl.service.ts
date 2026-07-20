@@ -145,7 +145,7 @@ export class GrowlService {
     type: G["type"],
     cacheTtl: Duration,
   ): Signal<Attributed<FeatureCollection<G, GeoProperties>>> {
-    return signals.map(
+    return signals.mapTo(
       service.fetchLayerContents(layerName, undefined, cacheTtl),
       contents => ({
         attribution: contents?.attribution ?? undefined,
@@ -182,7 +182,7 @@ export class GrowlService {
           i,
           [
             day,
-            signals.map(
+            signals.mapTo(
               service.fetchMeasurementClassifications(day),
               data => data || {},
             ),

@@ -59,7 +59,11 @@
                 "path": "scripts/esbuild/prebuild.cjs",
                 "options": {}
               },
-              "scripts/esbuild/unplugin.cjs"
+              {
+                "path": "scripts/esbuild/load-txt.cjs",
+                "options": {}
+              },
+              "scripts/esbuild/unplugin.mjs"
             ],
             "outputPath": "dist/wisdom-oss/frontend",
             "index": "src/index.html",
@@ -92,20 +96,25 @@
             "styles": ["src/styles.scss"],
             "scripts": [],
             "allowedCommonJsDependencies": [
-              "ajv",
-              "dayjs",
-              "maplibre-gl",
               "@turf/jsts",
+              "@typia/interface",
+              "ajv",
+              "concaveman",
+              "dayjs",
+              "earcut",
+              "fast-deep-equal",
+              "maplibre-gl",
               "rbush",
               "skmeans",
-              "concaveman",
-              "fast-deep-equal",
-              "earcut",
               "typia/lib/internal"
             ],
             "stylePreprocessorOptions": {
               "sass": {
-                "silenceDeprecations": ["global-builtin", "import"]
+                "silenceDeprecations": [
+                  "global-builtin",
+                  "import",
+                  "if-function"
+                ]
               }
             }
           },
@@ -152,7 +161,7 @@
         "test": {
           "builder": "@angular-builders/jest:run",
           "options": {
-            "configPath": "jest.config.ts"
+            "config": "jest.config.ts"
           }
         }
       }

@@ -1,0 +1,125 @@
+@let lang = this.lang();
+@let chartOptions =
+  {
+    barThickness: "flex",
+    responsive: true,
+    maintainAspectRatio: false,
+    elements: {
+      line: {
+        tension: 0.1,
+      },
+    },
+    scales: {
+      y: {
+        min: scaleMin(),
+        max: scaleMax(),
+        stacked: false,
+        title: {
+          display: true,
+          text:
+            ("water-demand-prediction.legend.water-demand" | translate) +
+            " [m³]",
+        },
+        grid: {
+          display: true,
+          color: "#000000",
+          lineWidth: 0.4,
+        },
+        ticks: {},
+      },
+      x: {
+        grid: {
+          display: false,
+          color: "#000000",
+          lineWidth: 0.4,
+        },
+        ticks: {
+          callback: xTicks(lang),
+        },
+      },
+    },
+    plugins: {
+      tooltip: {
+        callbacks: {
+          title: tooltipTitle(lang),
+          label: tooltipLabel,
+        },
+      },
+    },
+  };
+
+<div class="box is-fullheight main-layout">
+  <div class="inner-layout is-fullheight">
+    <div
+      class="pl-4"
+      style="grid-area: sidebar; border-left: 0.1rem solid rgba(0, 0, 0, 0.25)"
+    >
+      <div class="is-flex is-fullwidth is-justify-content-flex-end">
+        <div class="is-flex is-flex-direction-column">
+          <button
+            class="button mb-4 is-primary has-tooltip-arrow has-tooltip-left"
+            [translate-attr]="{
+              attr: 'data-tooltip',
+              key: 'water-demand-prediction.buttons.add-prediction',
+            }"
+            (click)="addModel.emit()"
+          >
+            <span class="icon">
+              <ng-icon name="remixAddLargeFill"></ng-icon>
+            </span>
+          </button>
+          <button
+            class="button mb-4 is-danger has-tooltip-arrow has-tooltip-left"
+            [translate-attr]="{
+              attr: 'data-tooltip',
+              key: 'water-demand-prediction.buttons.clear-charts',
+            }"
+            (click)="clearChart.emit()"
+          >
+            <span class="icon">
+              <ng-icon name="remixCloseLargeFill"></ng-icon>
+            </span>
+          </button>
+        </div>
+      </div>
+      <div class="m-2">
+        <!-- <ng-container
+            *ngTemplateOutlet="modelTable; context: {$implicit: {model, meter}}"
+          ></ng-container> -->
+      </div>
+    </div>
+    @for (title of ["historic", "prediction"]; track title) {
+      <div
+        [style.grid-area]="'title-' + title"
+        class="is-flex is-justify-content-center"
+      >
+        <p
+          class="title is-4"
+          [translate]="'water-demand-prediction.data-group.' + title"
+        ></p>
+      </div>
+    }
+    <div [style.grid-area]="'legend-historic'"></div>
+    <div [style.grid-area]="'legend-prediction'"></div>
+    <div [style.grid-area]="'chart-historic'">
+      <canvas
+        baseChart
+        type="bar"
+        class="is-fullheight is-fullwidth"
+        [labels]="historicLabels()"
+        [options]="chartOptions"
+        [datasets]="historicDatasets()"
+      ></canvas>
+    </div>
+    <div [style.grid-area]="'chart-prediction'">
+      <canvas
+        baseChart
+        [type]="$any('barWithErrorBars')"
+        class="is-fullheight is-fullwidth"
+        [labels]="predictionLabels()"
+        [options]="chartOptions"
+        [datasets]="predictionDatasets()"
+      ></canvas>
+    </div>
+  </div>
+</div>

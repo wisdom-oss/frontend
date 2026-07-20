@@ -1,0 +1,20 @@
+diff --git a/node_modules/pretty-ts-imports/node_modules/yargs/package.json b/node_modules/pretty-ts-imports/node_modules/yargs/package.json
+index 389cc6b..e690eb9 100644
+--- a/node_modules/pretty-ts-imports/node_modules/yargs/package.json
++++ b/node_modules/pretty-ts-imports/node_modules/yargs/package.json
+@@ -23,9 +23,9 @@
+     "./yargs": [
+       {
+         "import": "./yargs.mjs",
+-        "require": "./yargs"
++        "require": "./yargs.cjs"
+       },
+-      "./yargs"
++      "./yargs.cjs"
+     ]
+   },
+   "type": "module",
+diff --git a/node_modules/pretty-ts-imports/node_modules/yargs/yargs b/node_modules/pretty-ts-imports/node_modules/yargs/yargs.cjs
+similarity index 100%
+rename from node_modules/pretty-ts-imports/node_modules/yargs/yargs
+rename to node_modules/pretty-ts-imports/node_modules/yargs/yargs.cjs

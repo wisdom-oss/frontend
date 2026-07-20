@@ -1,0 +1,248 @@
+import {
+  effect,
+  input,
+  model,
+  signal,
+  viewChild,
+  Component,
+  OnDestroy,
+  OnInit,
+  ElementRef,
+  WritableSignal,
+} from "@angular/core";
+import {provideIcons, NgIconComponent} from "@ng-icons/core";
+import {
+  remixCalendar2Line,
+  remixContrastDrop2Line,
+  remixRainyLine,
+  remixTimeLine,
+} from "@ng-icons/remixicon";
+import {TranslateDirective} from "@ngx-translate/core";
+import {gsap} from "gsap";
+import {OrbitControls, GLTFLoader} from "three-stdlib";
+
+import * as THREE from "three";
+
+import {
+  SimulationIntervalOption,
+  SimulationParameter,
+} from "../../common/types/SimulationTypes";
+
+@Component({
+  selector: "model-view-braintank",
+  imports: [NgIconComponent, TranslateDirective],
+  templateUrl: "./model-view.component.html",
+  providers: [
+    provideIcons({
+      remixRainyLine,
+      remixTimeLine,
+      remixCalendar2Line,
+      remixContrastDrop2Line,
+    }),
+  ],
+  host: {
+    "(window:keydown.shift)": "controls.enableZoom = true",
+    "(window:keydown.control)": "controls.enableZoom = true",
+    "(window:keyup.shift)": "controls.enableZoom = false",
+    "(window:keyup.control)": "controls.enableZoom = false",
+  },
+})
+export class ModelViewComponent implements OnInit, OnDestroy {
+  readonly height = input("40rem");
+
+  readonly filename = input.required<string>();
+  readonly cam = input.required<{x: number; y: number; z: number}>();
+  readonly isSimulation = input.required<boolean>();
+
+  waterLevel = model.required<number>();
+  simulationParameter = model<SimulationParameter[]>([]);
+  readonly intervalForecast = input<SimulationIntervalOption>("5 min");
+
+  rendererContainer =
+    viewChild<ElementRef<HTMLDivElement>>("rendererContainer");
+  protected cursor = signal("grab");
+
+  protected scene!: THREE.Scene;
+  protected camera!: THREE.PerspectiveCamera;
+  protected renderer!: THREE.WebGLRenderer;
+  protected controls!: OrbitControls;
+  protected animationFrameId!: number;
+  protected resizeObserver!: ResizeObserver;
+  protected resizeRaf!: number | null;
+
+  protected originalY: number = 1;
+  protected time: WritableSignal<string> = signal("0");
+  protected rainAmount: WritableSignal<number> = signal(0);
+
+  private timeout: ReturnType<typeof setTimeout> | null = null;
+
+  constructor() {
+    effect(() => {
+      const newLevel = this.waterLevel();
+      this.animateWaterToLevel(newLevel);
+    });
+
+    effect(() => {
+      const container = this.rendererContainer();
+      if (!container) return;
+
+      this.renderer = new THREE.WebGLRenderer({antialias: true});
+      this.renderer.setSize(
+        container.nativeElement.clientWidth,
+        container.nativeElement.clientHeight,
+      );
+      this.renderer.localClippingEnabled = true;
+      container.nativeElement.appendChild(this.renderer.domElement);
+
+      this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+      this.controls.enableZoom = false;
+      const loader = new GLTFLoader();
+
+      loader.load("/public/model/" + this.filename(), gltf => {
+        const model = gltf.scene;
+        this.scene.add(model);
+        this.setColorMesh(model, "Water", 0x0000ff);
+        this.setColorMesh(model, "Pool", 0xffffff);
+        this.setScaleYWater(model, this.waterLevel());
+        model.rotation.y = -Math.PI / 4;
+      });
+
+      this.animate();
+      this.resizeObserver = new ResizeObserver(() => this.scheduleResize());
+      this.resizeObserver.observe(container.nativeElement);
+    });
+  }
+
+  ngOnInit(): void {
+    this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color(0xeeeeee);
+
+    this.camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+    this.camera.position.set(this.cam().x, this.cam().y, this.cam().z);
+
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 2);
+    hemiLight.position.set(0, 20, 0);
+    this.scene.add(hemiLight);
+  }
+
+  ngOnDestroy(): void {
+    cancelAnimationFrame(this.animationFrameId);
+    if (this.renderer) this.renderer.dispose();
+    if (this.resizeObserver) this.resizeObserver.disconnect();
+    if (this.resizeRaf) cancelAnimationFrame(this.resizeRaf);
+    if (this.timeout) clearTimeout(this.timeout);
+  }
+
+  private scheduleResize() {
+    if (this.resizeRaf) cancelAnimationFrame(this.resizeRaf);
+    this.resizeRaf = requestAnimationFrame(() => this.onContainerResize());
+  }
+
+  private onContainerResize = () => {
+    const container = this.rendererContainer();
+    if (!container) return;
+
+    const width = container.nativeElement.clientWidth;
+    const height = container.nativeElement.clientHeight;
+
+    this.camera.aspect = width / height;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(width, height);
+  };
+
+  private animate = () => {
+    this.animationFrameId = requestAnimationFrame(this.animate);
+    this.controls.update();
+    this.renderer.render(this.scene, this.camera);
+  };
+
+  private setColorMesh = (
+    model: THREE.Group<THREE.Object3DEventMap>,
+    objectName: string,
+    color: string | number,
+  ) => {
+    const mesh = model.getObjectByName(objectName) as THREE.Mesh;
+
+    if (mesh && mesh.material instanceof THREE.MeshStandardMaterial) {
+      mesh.material.color.set(color);
+    }
+  };
+
+  private setScaleYWater = (
+    model: THREE.Group<THREE.Object3DEventMap>,
+    scaleY: number,
+  ) => {
+    const water = model.getObjectByName("Water");
+
+    if (!water) return;
+
+    this.originalY = water.scale.y;
+    let newY = (scaleY / 100) * this.originalY;
+
+    if (newY < 0 || newY > this.originalY) {
+      newY = 0;
+    }
+
+    if (water) {
+      water.scale.set(water.scale.x, newY, water.scale.z);
+      water.position.y =
+        this.originalY * this.originalY * (newY - this.originalY);
+    }
+
+    water.renderOrder = 1;
+  };
+
+  private animateWaterToLevel(newScale: number) {
+    const water = this.scene.getObjectByName("Water");
+
+    if (!water) return;
+
+    gsap.to(water.scale, {
+      y: (newScale / 100) * this.originalY,
+      duration: 0.5,
+      ease: "power2.out",
+    });
+
+    // keep bottom anchored
+    gsap.to(water.position, {
+      y:
+        this.originalY *
+        this.originalY *
+        ((newScale / 100) * this.originalY - this.originalY),
+      duration: 0.5,
+      ease: "power2.out",
+    });
+
+    this.waterLevel.set(newScale);
+  }
+
+  protected startWaterSimulation() {
+    this.computeSimulationParameter();
+
+    let index = 0;
+
+    const runStep = () => {
+      const nextLevel = this.simulationParameter()[index];
+
+      this.animateWaterToLevel(nextLevel.waterLevel);
+      this.time.set(nextLevel.time);
+      this.rainAmount.set(nextLevel.rainAmount);
+
+      index++;
+      if (index < this.simulationParameter().length) {
+        this.timeout = setTimeout(runStep, 1000);
+      }
+    };
+
+    runStep();
+  }
+
+  protected computeSimulationParameter() {
+    this.simulationParameter.set(
+      this.simulationParameter().map(param => {
+        //TODO: Compute simulation
+        return param;
+      }),
+    );
+  }
+}

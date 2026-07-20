@@ -1,14 +1,18 @@
 import {computed, inject, Component, Signal} from "@angular/core";
 import {
   remixBarChartFill,
+  remixBnbLine,
   remixBuilding3Fill,
   remixDatabase2Fill,
   remixDrizzleFill,
   remixFilePaper2Fill,
+  remixHeavyShowersLine,
   remixInstanceLine,
   remixMap2Fill,
+  remixNumbersFill,
   remixRfidLine,
   remixSunCloudyFill,
+  remixSwap2Line,
   remixWaterPercentFill,
 } from "@ng-icons/remixicon";
 
@@ -18,11 +22,13 @@ import {GeoDataService} from "./api/geo-data.service";
 import {WaterRightsService} from "./api/water-rights.service";
 import {UsageForecastsService} from "./api/usage-forecasts.service";
 import {BeWaterSmartService} from "./api/be-water-smart.service";
+import {PmdArimaPredictionService} from "./api/pmd-arima-prediction.service";
 import {extraTags} from "./common/utils/extra-tags";
 import {api} from "./common/api";
 import {AuthService} from "./core/auth/auth.service";
 import {Scopes} from "./core/auth/scopes";
 import {OowvActionMapIconComponent} from "./core/sidebar/icons/oowv-action-map-icon/oowv-action-map-icon.component";
+import {DIGITAL_TWIN_SCOPES} from "./modules/digital-twin/scopes";
 import {OowvActionMapComponent} from "./modules/oowv/action-map/action-map.component";
 import {PumpModelsComponent} from "./modules/pump-models/pump-models.component";
 
@@ -38,9 +44,7 @@ type ComponentClass = new (...args: any[]) => Component;
  * - A `URL` to an image (ensure CORS allows fetching if not same-origin).
  */
 type Icon =
-  | (Record<string, string> & extraTags.RecordEntries<1>)
-  | ComponentClass
-  | URL;
+  (Record<string, string> & extraTags.RecordEntries<1>) | ComponentClass | URL;
 
 /**
  * A category entry for the sidebar.
@@ -182,6 +186,40 @@ export function sidebar(): readonly SidebarEntry[] {
           link: "/oowv/action-map",
           services: {GeoDataService},
           scopes: OowvActionMapComponent.SCOPES,
+        },
+        {
+          module: "core.sidebar.category.water-demand-prediction",
+          icon: {remixNumbersFill},
+          link: "/oowv/water-demand-prediction2",
+          services: {PmdArimaPredictionService},
+        },
+      ],
+    },
+    {
+      category: "core.sidebar.category.digital-twin",
+      icon: {remixSwap2Line},
+      modules: [
+        {
+          module: "b:rainTank",
+          icon: {remixBnbLine},
+          link: "/digital-twin/braintank",
+          services: {},
+          scopes: DIGITAL_TWIN_SCOPES,
+          visible: () => {
+            const auth = inject(AuthService);
+            return computed(() => auth.scopes().has(...DIGITAL_TWIN_SCOPES));
+          },
+        },
+        {
+          module: "digitalTwin.display.module.rrb",
+          icon: {remixHeavyShowersLine},
+          link: "/digital-twin/rain-retention-basin",
+          services: {},
+          scopes: DIGITAL_TWIN_SCOPES,
+          visible: () => {
+            const auth = inject(AuthService);
+            return computed(() => auth.scopes().has(...DIGITAL_TWIN_SCOPES));
+          },
         },
       ],
     },

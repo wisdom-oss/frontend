@@ -6,7 +6,7 @@ import {firstValueFrom} from "rxjs";
 import typia from "typia";
 
 import {Scopes} from "./scopes";
-import {StorageService} from "../../common/storage.service";
+import {StorageService} from "../../common/services/storage.service";
 import {httpContexts} from "../../common/http-contexts";
 
 const API_URL = "/api/auth";
