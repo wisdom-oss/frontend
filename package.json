@@ -51,7 +51,7 @@
     "chart.js": "^4.5.1",
     "chartjs-chart-error-bars": "^4.4.5",
     "dayjs": "^1.11.20",
-    "dexie": "^4.4.2",
+    "dexie": "^4.4.4",
     "gravatar-gen": "^1.0.2",
     "gsap": "^3.13.0",
     "jwt-decode": "^4.0.0",
