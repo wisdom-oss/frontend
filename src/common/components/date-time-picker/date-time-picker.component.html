@@ -1,4 +1,5 @@
-<div style="position: relative" is-auto-hide [is-active-signal]="isActive">
+<div style="position: relative" is-auto-hide [is-active-signal]="showPicker">
+  <!-- visual label -->
   <div
     class="tags has-addons mb-0"
     [class.are-normal]="size() == 'small'"
@@ -17,8 +18,8 @@
     <button
       class="tag px-3"
       [class.is-flex-grow-1]="fullWidth()"
-      (click)="requested() == 'start' && isActive.toggle()"
-      (click)="requested() != 'start' && isActive.set(true)"
+      (click)="requested() == 'start' && showPicker.toggle()"
+      (click)="requested() != 'start' && showPicker.set(true)"
       (click)="requested.set('start')"
     >
       <span>{{ labelStart() }}</span>
@@ -28,8 +29,8 @@
       <button
         class="tag px-3"
         [class.is-flex-grow-1]="fullWidth()"
-        (click)="requested() == 'end' && isActive.toggle()"
-        (click)="requested() != 'end' && isActive.set(true)"
+        (click)="requested() == 'end' && showPicker.toggle()"
+        (click)="requested() != 'end' && showPicker.set(true)"
         (click)="requested.set('end')"
       >
         <span>{{ labelEnd() }}</span>
@@ -47,76 +48,94 @@
       </span>
     </button>
   </div>
+
+  <!-- date selector popup -->
   <div
     style="position: absolute; z-index: 1"
-    [style.display]="isActive() ? 'unset' : 'none'"
+    [style.display]="showPicker() ? 'unset' : 'none'"
   >
     <div class="card">
       <div class="card-content">
-        <div class="mb-2 is-flex">
-          <div class="is-flex-grow-1">
-            <button
-              class="button is-small pl-1 is-fullwidth is-justify-content-flex-start"
-              style="border-style: none; box-shadow: none"
-            >
-              <span class="is-size-5">{{
-                viewMonthStart().locale(lang()).format("MMMM YYYY")
-              }}</span>
-            </button>
+        <div [style.display]="picker() == 'date' ? 'unset' : 'none'">
+          <div class="mb-2 is-flex">
+            <div class="is-flex-grow-1">
+              <button
+                class="button is-small pl-1 is-fullwidth is-justify-content-flex-start"
+                style="border-style: none; box-shadow: none"
+                (click)="picker.set('year')"
+              >
+                <span class="is-size-5">{{
+                  pickerMonthStart().locale(lang()).format("MMMM YYYY")
+                }}</span>
+              </button>
+            </div>
+            <div class="">
+              <button
+                class="button is-small"
+                style="border-style: none; box-shadow: none"
+                (click)="previousMonth()"
+              >
+                <span class="icon is-size-5">
+                  <ng-icon name="remixArrowUpSFill"></ng-icon>
+                </span>
+              </button>
+              <button
+                class="button is-small"
+                style="border-style: none; box-shadow: none"
+                (click)="nextMonth()"
+              >
+                <span class="icon is-size-5">
+                  <ng-icon name="remixArrowDownSFill"></ng-icon>
+                </span>
+              </button>
+            </div>
           </div>
-          <div class="">
-            <button
-              class="button is-small"
-              style="border-style: none; box-shadow: none"
-              (click)="previousMonth()"
-            >
-              <span class="icon is-size-5">
-                <ng-icon name="remixArrowUpSFill"></ng-icon>
-              </span>
-            </button>
-            <button
-              class="button is-small"
-              style="border-style: none; box-shadow: none"
-              (click)="nextMonth()"
-            >
-              <span class="icon is-size-5">
-                <ng-icon name="remixArrowDownSFill"></ng-icon>
-              </span>
-            </button>
+          <div class="date-grid">
+            @for (day of days; track day) {
+              <div
+                [translate]="'common.components.date-time-picker.day.' + day"
+              ></div>
+            }
+            @for (i of util.range(42); track i) {
+              @let day = pickerDay().add(i, "days");
+              @let isBefore = day.isBefore(pickerMonthStart());
+              @let isAfter = day.isAfter(pickerMonthEnd());
+              @let start = selected()[0];
+              @let end = selected()[1];
+              <a
+                class="button"
+                [class.is-outside-month]="isBefore || isAfter"
+                [class.is-primary]="
+                  (start && day.isSame(start, 'day')) ||
+                  (end && day.isSame(end, 'day'))
+                "
+                [class.is-before-selected]="
+                  start && end && day.isBefore(end) && !day.isBefore(start)
+                "
+                [class.is-after-selected]="
+                  start && end && day.isAfter(start) && !day.isAfter(end)
+                "
+                (click)="selectRequested(day)"
+                (click)="isBefore && previousMonth()"
+                (click)="isAfter && nextMonth()"
+                (click)="!ranged() && showPicker.set(false)"
+                (click)="ranged() && requested.set('end')"
+                >{{ day.date() }}</a
+              >
+            }
           </div>
         </div>
-        <div class="date-grid">
-          @for (day of days; track day) {
-            <div
-              [translate]="'common.components.date-time-picker.day.' + day"
-            ></div>
-          }
-          @for (i of util.range(42); track i) {
-            @let day = viewDay().add(i, "days");
-            @let isBefore = day.isBefore(viewMonthStart());
-            @let isAfter = day.isAfter(viewMonthEnd());
-            @let start = selected()[0];
-            @let end = selected()[1];
-            <a
-              class="button"
-              [class.is-outside-month]="isBefore || isAfter"
-              [class.is-primary]="
-                (start && day.isSame(start, 'day')) ||
-                (end && day.isSame(end, 'day'))
-              "
-              [class.is-before-selected]="
-                start && end && day.isBefore(end) && !day.isBefore(start)
-              "
-              [class.is-after-selected]="
-                start && end && day.isAfter(start) && !day.isAfter(end)
-              "
-              (click)="selectRequested(day)"
-              (click)="isBefore && previousMonth()"
-              (click)="isAfter && nextMonth()"
-              (click)="!ranged() && isActive.set(false)"
-              (click)="ranged() && requested.set('end')"
-              >{{ day.date() }}</a
+        <div [style.display]="picker() == 'year' ? 'unset' : 'none'">
+          @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+            <button
+              class="button px-5 is-small is-fullwidth is-justify-content-flex-start"
+              style="border-style: none; box-shadow: none"
+              (click)="picker.set('year')"
             >
+              <span class="is-size-5">{{
+                pickerMonthStart().add(i, 'year').locale(lang()).format("YYYY")
+              }}</span>
+            </button>
           }
         </div>
       </div>

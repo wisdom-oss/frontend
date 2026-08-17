@@ -40,8 +40,8 @@ export class DateTimePickerComponent {
   readonly fullWidth = input(false);
   readonly flavor = input<"lean" | "bold">("bold");
   readonly size = input<"small" | "medium" | "large">("large");
-  readonly isActiveInput = input(false, {alias: "isActive"});
-  readonly isActive = signals.toggleable(this.isActiveInput());
+  readonly showPickerInput = input(false, {alias: "showPicker"});
+  readonly showPicker = signals.toggleable(this.showPickerInput());
 
   readonly placeholder = input<
     [undefined, undefined] | [Dayjs, undefined] | [Dayjs, Dayjs],
@@ -95,12 +95,19 @@ export class DateTimePickerComponent {
   }
 
   private logSelected = effect(() => console.log(this.selected()));
+  private logIsActive = effect(() => console.log(this.showPicker()));
 
-  protected viewMonthStart = signal<Dayjs>(
+  protected picker = signal<"date" | "year">("date");
+
+  protected pickerMonthStart = signal<Dayjs>(
     (this.selected()[0] ?? dayjs()).startOf("month"),
   );
-  protected viewMonthEnd = computed(() => this.viewMonthStart().endOf("month"));
-  protected viewDay = computed(() => this.viewMonthStart().startOf("isoWeek"));
+  protected pickerMonthEnd = computed(() =>
+    this.pickerMonthStart().endOf("month"),
+  );
+  protected pickerDay = computed(() =>
+    this.pickerMonthStart().startOf("isoWeek"),
+  );
 
   protected util = {range, dayjs};
   protected lang = signals.lang();
@@ -116,15 +123,15 @@ export class DateTimePickerComponent {
   ];
 
   private deriveIsActive = effect(() =>
-    this.isActive.set(this.isActiveInput()),
+    this.showPicker.set(this.showPickerInput()),
   );
   private emitOutput = effect(() => this.selectedOutput.emit(this.selected()));
 
   protected previousMonth() {
-    this.viewMonthStart.update(day => day.subtract(1, "month"));
+    this.pickerMonthStart.update(day => day.subtract(1, "month"));
   }
 
   protected nextMonth() {
-    this.viewMonthStart.update(day => day.add(1, "month"));
+    this.pickerMonthStart.update(day => day.add(1, "month"));
   }
 }
