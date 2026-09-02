@@ -55,7 +55,7 @@
     "gravatar-gen": "^1.0.2",
     "gsap": "^3.13.0",
     "jwt-decode": "^4.0.0",
-    "maplibre-gl": "^5.24.0",
+    "maplibre-gl": "^6.6.0",
     "ng2-charts": "^10.0.0",
     "patch-package": "^8.0.1",
     "rollup": "^4.62.2",
