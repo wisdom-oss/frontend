@@ -19,7 +19,8 @@
     "docker:start": "npm run docker:run",
     "docker:run": "docker run --rm -p 5000:5000 wisdom-oss/frontend",
     "git-hooks": "husky",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "e2e": "ng e2e"
   },
   "private": true,
   "dependencies": {
@@ -73,6 +74,7 @@
     "@angular/cli": "^22.0.7",
     "@angular/compiler-cli": "^22.0.7",
     "@compodoc/compodoc": "^1.2.1",
+    "@playwright/test": "1.63.0",
     "@types/didyoumean": "^1.2.3",
     "@types/geojson": "^7946.0.16",
     "@types/jest": "^30.0.0",
@@ -88,6 +90,7 @@
     "jsr": "^0.14.3",
     "npm-check-updates": "^22.2.9",
     "oxlint": "^1.73.0",
+    "playwright-ng-schematics": "^22.1.2",
     "prettier": "3.9.4",
     "prettier-plugin-toml": "2.0.6",
     "pretty-ts-imports": "^1.1.0",
