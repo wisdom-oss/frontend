@@ -4,10 +4,10 @@ import {expect, test} from "@playwright/test";
 import groundwaterLevelsFixture from "./e2e/fixture.json";
 
 test("map renders as expected", async ({page}) => {
-  // pin clock to ensure that rendered date is correct
+  // freeze time so the rendered date stays deterministic
   await page.clock.setFixedTime(new Date("2026-09-21T12:00:00Z"));
 
-  // mock api response to ensure that same data is rendered
+  // mock the api response so the map renders the same data each run
   await page.route("**/api/groundwater-levels/graphql", async route => {
     await route.fulfill({json: groundwaterLevelsFixture});
   });
@@ -30,28 +30,21 @@ test("map renders as expected", async ({page}) => {
 
   await page.goto("/growl");
 
-  // wait until Map is available
-  await page.waitForFunction(() => {
-    let mapElement = document.querySelector("main mgl-map");
-    if (!mapElement) return;
-    return window.ng?.getComponent<MapComponent>(mapElement)?.mapInstance;
-  });
-
-  // ensure map has all the data
+  // ensure all required map data has loaded
   await groundwaterMeasurementStations.then(response => response.finished());
   await groundwaterLevels.then(response => response.finished());
   await groundwaterBodies.then(response => response.finished());
 
-  // wait until map is done
-  await page.locator("main mgl-map").evaluate(
-    mapElement =>
-      new Promise<void>(resolve => {
-        window
-          .ng!.getComponent<MapComponent>(mapElement)!
-          .mapInstance.once("idle", () => resolve());
-      }),
-  );
+  // wait until the map has finished rendering
+  await page.waitForFunction(() => {
+    const mapElement = document.querySelector("main mgl-map");
+    const mapInstance = mapElement
+      ? window.ng?.getComponent<MapComponent>(mapElement)?.mapInstance
+      : undefined;
 
-  // should look like we expect the map to look like
+    return mapInstance?.loaded() && !mapInstance.isMoving();
+  });
+
+  // verify the final map appearance
   await expect(page.locator("main")).toHaveScreenshot({maxDiffPixels: 50});
 });
