@@ -1,3 +1,4 @@
+import { MapComponent } from "@maplibre/ngx-maplibre-gl";
 import { expect, test } from "@playwright/test";
 
 test("map renders as expected", async ({ page }) => {
@@ -26,8 +27,8 @@ test("map renders as expected", async ({ page }) => {
   await page.locator("main mgl-map").evaluate(
     (mapElement) =>
       new Promise<void>((resolve) => {
-        (window as any).ng
-          .getComponent(mapElement)
+        window.ng!
+          .getComponent<MapComponent>(mapElement)!
           .mapInstance.once("idle", () => resolve());
       }),
   );

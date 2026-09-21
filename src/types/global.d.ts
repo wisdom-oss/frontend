@@ -1,6 +1,10 @@
-export {};
+import type { ɵFrameworkAgnosticGlobalUtils } from '@angular/core';
 
 declare global {
+  interface Window {
+    ng?: ɵFrameworkAgnosticGlobalUtils;
+  }
+
   interface ObjectConstructor {
     /**
      * Run fn on each value in obj and get back a new object
@@ -11,13 +15,13 @@ declare global {
      * @returns    a fresh object where each key maps to fn’s result
      *
      * @example
-     * const nums = { a: 1, b: 2 }
-     * const doubled = mapObj(nums, n => n * 2)
+     * const nums = { a: 1, b: 2 };
+     * const doubled = Object.map(nums, n => n * 2);
      * // doubled is { a: 2, b: 4 }
      */
     map<T extends Record<PropertyKey, any>, U>(
       obj: T,
       fn: (v: T[keyof T], k: keyof T) => U,
-    ): {[K in keyof T]: U};
+    ): { [K in keyof T]: U };
   }
 }
