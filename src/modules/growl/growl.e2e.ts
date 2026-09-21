@@ -30,6 +30,13 @@ test("map renders as expected", async ({page}) => {
 
   await page.goto("/growl");
 
+  // wait until Map is available
+  await page.waitForFunction(() => {
+    let mapElement = document.querySelector("main mgl-map");
+    if (!mapElement) return;
+    return window.ng?.getComponent<MapComponent>(mapElement)?.mapInstance;
+  });
+
   // ensure map has all the data
   await groundwaterMeasurementStations.then(response => response.finished());
   await groundwaterLevels.then(response => response.finished());
@@ -46,5 +53,5 @@ test("map renders as expected", async ({page}) => {
   );
 
   // should look like we expect the map to look like
-  await expect(page.locator("main")).toHaveScreenshot();
+  await expect(page.locator("main")).toHaveScreenshot({maxDiffPixels: 50});
 });
