@@ -40,6 +40,9 @@ jobs:
           - name: test
             command: npm run test
             continue-on-error: false
+          - name: test
+            command: npm run e2e
+            continue-on-error: false
 
     steps:
       - uses: actions/checkout@v4
