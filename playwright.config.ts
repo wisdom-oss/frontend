@@ -34,7 +34,7 @@ export default defineConfig({
   expect: {
     toHaveScreenshot: {
       pathTemplate:
-        "{testDir}/{testFileDir}/e2e/screenshots/{projectName}/{arg}{ext}",
+        "{testDir}/{testFileDir}/e2e/screenshots/{platform}/{projectName}/{arg}{ext}",
     },
   },
 

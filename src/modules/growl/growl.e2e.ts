@@ -1,8 +1,16 @@
 import {MapComponent} from "@maplibre/ngx-maplibre-gl";
 import {expect, test} from "@playwright/test";
 
+import groundwaterLevelsFixture from "./e2e/fixture.json";
+
 test("map renders as expected", async ({page}) => {
-  // TODO: mock API response for measurement station values
+  // pin clock to ensure that rendered date is correct
+  await page.clock.setFixedTime(new Date("2026-09-21T12:00:00Z"));
+
+  // mock api response to ensure that same data is rendered
+  await page.route("**/api/groundwater-levels/graphql", async route => {
+    await route.fulfill({json: groundwaterLevelsFixture});
+  });
 
   function waitForApiResponseOk(endpoint: string) {
     return page.waitForResponse(
@@ -22,10 +30,12 @@ test("map renders as expected", async ({page}) => {
 
   await page.goto("/growl");
 
+  // ensure map has all the data
   await groundwaterMeasurementStations.then(response => response.finished());
   await groundwaterLevels.then(response => response.finished());
   await groundwaterBodies.then(response => response.finished());
 
+  // wait until map is done
   await page.locator("main mgl-map").evaluate(
     mapElement =>
       new Promise<void>(resolve => {
@@ -35,5 +45,6 @@ test("map renders as expected", async ({page}) => {
       }),
   );
 
+  // should look like we expect the map to look like
   await expect(page.locator("main")).toHaveScreenshot();
 });
