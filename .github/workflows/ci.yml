@@ -40,8 +40,10 @@ jobs:
           - name: test
             command: npm run test
             continue-on-error: false
-          - name: test
-            command: npm run e2e
+          - name: e2e
+            command: |
+              npx playwright install --with-deps chromium firefox
+              npm run e2e
             continue-on-error: false
 
     steps:
