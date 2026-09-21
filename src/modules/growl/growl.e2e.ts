@@ -2,6 +2,8 @@ import { MapComponent } from "@maplibre/ngx-maplibre-gl";
 import { expect, test } from "@playwright/test";
 
 test("map renders as expected", async ({ page }) => {
+  // TODO: mock API response for measurement station values
+
   function waitForApiResponseOk(endpoint: string) {
     return page.waitForResponse((response) =>
       response.url().endsWith(endpoint) && response.ok()
