@@ -1,21 +1,5 @@
 {
-  "files.exclude": {
-    "**/.git": true,
-    "**/.svn": true,
-    "**/.hg": true,
-    "**/CVS": true,
-    "**/.DS_Store": true,
-    "**/Thumbs.db": true,
-    "**/.classpath": true,
-    "**/.factorypath": true,
-    "**/.project": true,
-    "**/.settings": true
-  },
-  "files.associations": {
-    "*.prettierignore": "ignore"
-  },
   "cSpell.language": "en,de-DE",
-  "typescript.tsdk": "./node_modules/typescript/lib",
   "cSpell.words": [
     "bbox",
     "greenable",
@@ -25,7 +9,26 @@
     "timeframes",
     "typia"
   ],
+  "files.associations": {
+    "*.prettierignore": "ignore"
+  },
+  "files.exclude": {
+    "**/.DS_Store": true,
+    "**/.classpath": true,
+    "**/.factorypath": true,
+    "**/.git": true,
+    "**/.hg": true,
+    "**/.project": true,
+    "**/.settings": true,
+    "**/.svn": true,
+    "**/CVS": true,
+    "**/Thumbs.db": true
+  },
   "files.watcherExclude": {
     "**/target": true
-  }
+  },
+  "material-icon-theme.files.associations": {
+    "*.e2e.ts": "test-ts"
+  },
+  "typescript.tsdk": "./node_modules/typescript/lib"
 }
