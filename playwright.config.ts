@@ -31,6 +31,12 @@ export default defineConfig({
     trace: "on-first-retry",
   },
 
+  expect: {
+    toHaveScreenshot: {
+      pathTemplate: "{testDir}/{testFileDir}/e2e/screenshots/{projectName}/{arg}{ext}"
+    }
+  },
+
   /* Configure projects for major browsers */
   projects: [
     {
