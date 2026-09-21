@@ -1,4 +1,4 @@
-import type { ɵFrameworkAgnosticGlobalUtils } from '@angular/core';
+import type {ɵFrameworkAgnosticGlobalUtils} from "@angular/core";
 
 declare global {
   interface Window {
@@ -22,6 +22,6 @@ declare global {
     map<T extends Record<PropertyKey, any>, U>(
       obj: T,
       fn: (v: T[keyof T], k: keyof T) => U,
-    ): { [K in keyof T]: U };
+    ): {[K in keyof T]: U};
   }
 }

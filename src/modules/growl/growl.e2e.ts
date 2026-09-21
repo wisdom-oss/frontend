@@ -1,12 +1,12 @@
-import { MapComponent } from "@maplibre/ngx-maplibre-gl";
-import { expect, test } from "@playwright/test";
+import {MapComponent} from "@maplibre/ngx-maplibre-gl";
+import {expect, test} from "@playwright/test";
 
-test("map renders as expected", async ({ page }) => {
+test("map renders as expected", async ({page}) => {
   // TODO: mock API response for measurement station values
 
   function waitForApiResponseOk(endpoint: string) {
-    return page.waitForResponse((response) =>
-      response.url().endsWith(endpoint) && response.ok()
+    return page.waitForResponse(
+      response => response.url().endsWith(endpoint) && response.ok(),
     );
   }
 
@@ -21,16 +21,16 @@ test("map renders as expected", async ({ page }) => {
   );
 
   await page.goto("/growl");
-  
-  await groundwaterMeasurementStations.then((response) => response.finished());
-  await groundwaterLevels.then((response) => response.finished());
-  await groundwaterBodies.then((response) => response.finished());
+
+  await groundwaterMeasurementStations.then(response => response.finished());
+  await groundwaterLevels.then(response => response.finished());
+  await groundwaterBodies.then(response => response.finished());
 
   await page.locator("main mgl-map").evaluate(
-    (mapElement) =>
-      new Promise<void>((resolve) => {
-        window.ng!
-          .getComponent<MapComponent>(mapElement)!
+    mapElement =>
+      new Promise<void>(resolve => {
+        window
+          .ng!.getComponent<MapComponent>(mapElement)!
           .mapInstance.once("idle", () => resolve());
       }),
   );
