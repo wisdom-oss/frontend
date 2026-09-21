@@ -55,3 +55,9 @@ jobs:
           key: ${{ runner.os }}-dev-node_modules-${{ hashFiles('package-lock.json') }}
       - run: npm ci --include dev
       - run: ${{ matrix.job.command }}
+      - uses: actions/upload-artifact@v4
+        if: always() && matrix.job.name == 'e2e'
+        with:
+          name: playwright-test-results
+          path: test-results/
+          if-no-files-found: ignore
