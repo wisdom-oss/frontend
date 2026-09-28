@@ -6,6 +6,7 @@ import {
   AddProtocolAction,
   RequestParameters,
   GetResourceResponse,
+  setWorkerUrl,
 } from "maplibre-gl";
 import {firstValueFrom} from "rxjs";
 
@@ -17,6 +18,10 @@ import {firstValueFrom} from "rxjs";
  */
 export const provideMaplibreSettings = () =>
   provideAppInitializer(() => {
+    setWorkerUrl(
+      new URL("maplibre-gl/maplibre-gl-worker.mjs", inject(DOCUMENT).baseURI)
+        .href,
+    );
     addOriginProtocol();
   });
 
