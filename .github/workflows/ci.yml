@@ -17,13 +17,18 @@ jobs:
       - run: npm ci --include dev
 
   npm:
-    name: ${{ matrix.job.name }}
-    runs-on: ${{ matrix.job.runs-on || 'ubuntu-latest' }}
+    name: ${{ matrix.job.name }} (${{ matrix.host.name }})
+    runs-on: ${{ matrix.host.host }}
     needs: install
     continue-on-error: ${{ matrix.job.continue-on-error || false }}
 
     strategy:
       matrix:
+        host:
+          - name: linux
+            host: ubuntu-latest
+          - name: windows
+            host: windows-latest
         job:
           - name: build
             command: npm run build
@@ -46,7 +51,6 @@ jobs:
             command: |
               npx playwright install --with-deps chromium firefox
               npm run e2e
-            runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v4
