@@ -1,0 +1,1133 @@
+{
+  "data": {
+    "measurements": [
+      {
+        "station": "14767010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": -0.7,
+        "waterLevelGOK": 1.4
+      },
+      {
+        "station": "14768010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "hoch",
+        "waterLevelNHN": 0.03,
+        "waterLevelGOK": 0.4
+      },
+      {
+        "station": "14769010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "normal",
+        "waterLevelNHN": 0.08,
+        "waterLevelGOK": 2.59
+      },
+      {
+        "station": "14770010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "niedrig",
+        "waterLevelNHN": 1.62,
+        "waterLevelGOK": 7.09
+      },
+      {
+        "station": "14771010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 0.65,
+        "waterLevelGOK": 2.97
+      },
+      {
+        "station": "14772010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "normal",
+        "waterLevelNHN": 8.71,
+        "waterLevelGOK": 2
+      },
+      {
+        "station": "14773010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 4.32,
+        "waterLevelGOK": 4.29
+      },
+      {
+        "station": "14774010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "normal",
+        "waterLevelNHN": -0.37,
+        "waterLevelGOK": 2.2
+      },
+      {
+        "station": "14775010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "niedrig",
+        "waterLevelNHN": 0.18,
+        "waterLevelGOK": 2.59
+      },
+      {
+        "station": "14776010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "normal",
+        "waterLevelNHN": 1.62,
+        "waterLevelGOK": 2.01
+      },
+      {
+        "station": "14777010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "niedrig",
+        "waterLevelNHN": 3.89,
+        "waterLevelGOK": 1.28
+      },
+      {
+        "station": "14778010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": -1.36,
+        "waterLevelGOK": 1.42
+      },
+      {
+        "station": "14779010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "normal",
+        "waterLevelNHN": -0.26,
+        "waterLevelGOK": 1.41
+      },
+      {
+        "station": "14780010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "normal",
+        "waterLevelNHN": -0.37,
+        "waterLevelGOK": 1.17
+      },
+      {
+        "station": "14781010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "normal",
+        "waterLevelNHN": 0.22,
+        "waterLevelGOK": 1.54
+      },
+      {
+        "station": "14782010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "normal",
+        "waterLevelNHN": 4.18,
+        "waterLevelGOK": 2.18
+      },
+      {
+        "station": "14783010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 19.34,
+        "waterLevelGOK": 11.08
+      },
+      {
+        "station": "14784010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 32.15,
+        "waterLevelGOK": 2.75
+      },
+      {
+        "station": "14785010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "Niedrigstwert unterschritten",
+        "waterLevelNHN": -0.28,
+        "waterLevelGOK": 1.37
+      },
+      {
+        "station": "14787010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 5.98,
+        "waterLevelGOK": 2.35
+      },
+      {
+        "station": "14788010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "niedrig",
+        "waterLevelNHN": 5.2,
+        "waterLevelGOK": 2.1
+      },
+      {
+        "station": "14789010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 12.36,
+        "waterLevelGOK": 5.76
+      },
+      {
+        "station": "14790010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "normal",
+        "waterLevelNHN": 0.31,
+        "waterLevelGOK": 1.09
+      },
+      {
+        "station": "14791010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "Niedrigstwert unterschritten",
+        "waterLevelNHN": 6.83,
+        "waterLevelGOK": 2.89
+      },
+      {
+        "station": "14792010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "normal",
+        "waterLevelNHN": 0.24,
+        "waterLevelGOK": 1.18
+      },
+      {
+        "station": "14793010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "Niedrigstwert unterschritten",
+        "waterLevelNHN": 42.71,
+        "waterLevelGOK": 2.54
+      },
+      {
+        "station": "14794010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 42.26,
+        "waterLevelGOK": 3.43
+      },
+      {
+        "station": "14795010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "Niedrigstwert unterschritten",
+        "waterLevelNHN": 72.7,
+        "waterLevelGOK": 7.05
+      },
+      {
+        "station": "14796010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 35.79,
+        "waterLevelGOK": 4.36
+      },
+      {
+        "station": "14797010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 79.3,
+        "waterLevelGOK": 1.61
+      },
+      {
+        "station": "14798010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 5.95,
+        "waterLevelGOK": 2.12
+      },
+      {
+        "station": "14799010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 22.21,
+        "waterLevelGOK": 1.98
+      },
+      {
+        "station": "14800010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "normal",
+        "waterLevelNHN": 101.13,
+        "waterLevelGOK": 3.86
+      },
+      {
+        "station": "14801010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 41.71,
+        "waterLevelGOK": 1.98
+      },
+      {
+        "station": "14802010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "Niedrigstwert unterschritten",
+        "waterLevelNHN": 81.65,
+        "waterLevelGOK": 13.61
+      },
+      {
+        "station": "14803010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 27.23,
+        "waterLevelGOK": 7.4
+      },
+      {
+        "station": "14804010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "Niedrigstwert unterschritten",
+        "waterLevelNHN": 28.43,
+        "waterLevelGOK": 6.82
+      },
+      {
+        "station": "14805010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 26.31,
+        "waterLevelGOK": 2.32
+      },
+      {
+        "station": "14806010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 14.43,
+        "waterLevelGOK": 2.23
+      },
+      {
+        "station": "14807010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 38.36,
+        "waterLevelGOK": 1.88
+      },
+      {
+        "station": "14808010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "Niedrigstwert unterschritten",
+        "waterLevelNHN": 30.61,
+        "waterLevelGOK": 8.25
+      },
+      {
+        "station": "14809010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 1.65,
+        "waterLevelGOK": 1.18
+      },
+      {
+        "station": "14810010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 19.33,
+        "waterLevelGOK": 2.98
+      },
+      {
+        "station": "14811010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 56.88,
+        "waterLevelGOK": 1.75
+      },
+      {
+        "station": "14812010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 49.1,
+        "waterLevelGOK": 4.4
+      },
+      {
+        "station": "14813010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 30.58,
+        "waterLevelGOK": 3.22
+      },
+      {
+        "station": "14814010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 24.69,
+        "waterLevelGOK": 2.34
+      },
+      {
+        "station": "14815010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 51.07,
+        "waterLevelGOK": 3.07
+      },
+      {
+        "station": "14816010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "Niedrigstwert unterschritten",
+        "waterLevelNHN": 42.97,
+        "waterLevelGOK": 2.7
+      },
+      {
+        "station": "14817010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "Niedrigstwert unterschritten",
+        "waterLevelNHN": 35.85,
+        "waterLevelGOK": 2.48
+      },
+      {
+        "station": "14818010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 34.12,
+        "waterLevelGOK": 3.22
+      },
+      {
+        "station": "14819010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "normal",
+        "waterLevelNHN": 194.65,
+        "waterLevelGOK": 16.71
+      },
+      {
+        "station": "14821010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 48.2,
+        "waterLevelGOK": 5.18
+      },
+      {
+        "station": "14822010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "normal",
+        "waterLevelNHN": 40.07,
+        "waterLevelGOK": 2.15
+      },
+      {
+        "station": "14823010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 59.05,
+        "waterLevelGOK": 6.14
+      },
+      {
+        "station": "14824010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 59.33,
+        "waterLevelGOK": 3.84
+      },
+      {
+        "station": "14825010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 64.96,
+        "waterLevelGOK": 20.28
+      },
+      {
+        "station": "14826010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 39.66,
+        "waterLevelGOK": 2.27
+      },
+      {
+        "station": "14827010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "Niedrigstwert unterschritten",
+        "waterLevelNHN": 70.31,
+        "waterLevelGOK": 20.44
+      },
+      {
+        "station": "14828010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 61.39,
+        "waterLevelGOK": 1.65
+      },
+      {
+        "station": "14829010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 58.38,
+        "waterLevelGOK": 4.03
+      },
+      {
+        "station": "14830010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "normal",
+        "waterLevelNHN": 6.38,
+        "waterLevelGOK": 1.57
+      },
+      {
+        "station": "14831010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 22.74,
+        "waterLevelGOK": 5.06
+      },
+      {
+        "station": "14832010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 11.02,
+        "waterLevelGOK": 1.55
+      },
+      {
+        "station": "14833010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 20.89,
+        "waterLevelGOK": 3.6
+      },
+      {
+        "station": "14834010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 27.37,
+        "waterLevelGOK": 11.34
+      },
+      {
+        "station": "14835010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "normal",
+        "waterLevelNHN": 45.4,
+        "waterLevelGOK": 1.99
+      },
+      {
+        "station": "14836010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "normal",
+        "waterLevelNHN": 31.73,
+        "waterLevelGOK": 4.95
+      },
+      {
+        "station": "14837010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 0.36,
+        "waterLevelGOK": 3.17
+      },
+      {
+        "station": "14838010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 24.64,
+        "waterLevelGOK": 2.74
+      },
+      {
+        "station": "14839010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 15.08,
+        "waterLevelGOK": 1.98
+      },
+      {
+        "station": "14840010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "Niedrigstwert unterschritten",
+        "waterLevelNHN": 34.94,
+        "waterLevelGOK": 2.41
+      },
+      {
+        "station": "14841010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "Niedrigstwert unterschritten",
+        "waterLevelNHN": 12.88,
+        "waterLevelGOK": 3.96
+      },
+      {
+        "station": "14842010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 11.98,
+        "waterLevelGOK": 2.37
+      },
+      {
+        "station": "14843010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 18.75,
+        "waterLevelGOK": 4.23
+      },
+      {
+        "station": "14844010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "normal",
+        "waterLevelNHN": 8.16,
+        "waterLevelGOK": 1.3
+      },
+      {
+        "station": "14845010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 28.86,
+        "waterLevelGOK": 9.92
+      },
+      {
+        "station": "14846010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 9.06,
+        "waterLevelGOK": 2.61
+      },
+      {
+        "station": "14847010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 28.98,
+        "waterLevelGOK": 6.15
+      },
+      {
+        "station": "14848010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 29.41,
+        "waterLevelGOK": 2.06
+      },
+      {
+        "station": "14849010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "niedrig",
+        "waterLevelNHN": 12.64,
+        "waterLevelGOK": 6.97
+      },
+      {
+        "station": "14850010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 18.24,
+        "waterLevelGOK": 6.96
+      },
+      {
+        "station": "14851010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 6.98,
+        "waterLevelGOK": 3.44
+      },
+      {
+        "station": "14852010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 15.69,
+        "waterLevelGOK": 2.89
+      },
+      {
+        "station": "14853010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 33.3,
+        "waterLevelGOK": 2.39
+      },
+      {
+        "station": "14854010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 26.69,
+        "waterLevelGOK": 2.03
+      },
+      {
+        "station": "14855010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 12.18,
+        "waterLevelGOK": 6.12
+      },
+      {
+        "station": "14856010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "niedrig",
+        "waterLevelNHN": 0.11,
+        "waterLevelGOK": 3.48
+      },
+      {
+        "station": "14857010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "normal",
+        "waterLevelNHN": -0.94,
+        "waterLevelGOK": 0.94
+      },
+      {
+        "station": "14858010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "",
+        "waterLevelNHN": null,
+        "waterLevelGOK": null
+      },
+      {
+        "station": "14859010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 19.61,
+        "waterLevelGOK": 7.44
+      },
+      {
+        "station": "14860010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 6.3,
+        "waterLevelGOK": 2.92
+      },
+      {
+        "station": "14861010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "normal",
+        "waterLevelNHN": -0.75,
+        "waterLevelGOK": 1.74
+      },
+      {
+        "station": "14862010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "niedrig",
+        "waterLevelNHN": 4.56,
+        "waterLevelGOK": 6.14
+      },
+      {
+        "station": "14863010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "normal",
+        "waterLevelNHN": -0.77,
+        "waterLevelGOK": 1.27
+      },
+      {
+        "station": "14864010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 10.2,
+        "waterLevelGOK": 2.12
+      },
+      {
+        "station": "14865010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "normal",
+        "waterLevelNHN": 3.02,
+        "waterLevelGOK": 1.47
+      },
+      {
+        "station": "14866010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 11.89,
+        "waterLevelGOK": 16.93
+      },
+      {
+        "station": "14867010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 4.25,
+        "waterLevelGOK": 8.6
+      },
+      {
+        "station": "14868010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "normal",
+        "waterLevelNHN": -0.56,
+        "waterLevelGOK": 1.06
+      },
+      {
+        "station": "14869010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "niedrig",
+        "waterLevelNHN": 6.56,
+        "waterLevelGOK": 1.58
+      },
+      {
+        "station": "14870010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 2.78,
+        "waterLevelGOK": 1.52
+      },
+      {
+        "station": "14871010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": -0.72,
+        "waterLevelGOK": 4.7
+      },
+      {
+        "station": "14872010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 23.35,
+        "waterLevelGOK": 4.25
+      },
+      {
+        "station": "14873010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 38.44,
+        "waterLevelGOK": 5.55
+      },
+      {
+        "station": "14874010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 32.67,
+        "waterLevelGOK": 7.86
+      },
+      {
+        "station": "14875010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "niedrig",
+        "waterLevelNHN": 236.47,
+        "waterLevelGOK": 42.75
+      },
+      {
+        "station": "14876010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 179.28,
+        "waterLevelGOK": 25.73
+      },
+      {
+        "station": "14877010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 73.59,
+        "waterLevelGOK": 2.72
+      },
+      {
+        "station": "14878010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 60.03,
+        "waterLevelGOK": 3.39
+      },
+      {
+        "station": "14879010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 68.88,
+        "waterLevelGOK": 3.15
+      },
+      {
+        "station": "14880010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 180.54,
+        "waterLevelGOK": 41.96
+      },
+      {
+        "station": "14881010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "niedrig",
+        "waterLevelNHN": 105.91,
+        "waterLevelGOK": 1.98
+      },
+      {
+        "station": "14882010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 62.18,
+        "waterLevelGOK": 4.82
+      },
+      {
+        "station": "14883010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 72.82,
+        "waterLevelGOK": 1.46
+      },
+      {
+        "station": "14884010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 79.07,
+        "waterLevelGOK": 3.81
+      },
+      {
+        "station": "14885010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 61.52,
+        "waterLevelGOK": 2.87
+      },
+      {
+        "station": "14886010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "Niedrigstwert unterschritten",
+        "waterLevelNHN": 160.25,
+        "waterLevelGOK": 6.51
+      },
+      {
+        "station": "14887010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "niedrig",
+        "waterLevelNHN": 114.7,
+        "waterLevelGOK": 2.3
+      },
+      {
+        "station": "14888010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 73.39,
+        "waterLevelGOK": 3.51
+      },
+      {
+        "station": "14889010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 74.55,
+        "waterLevelGOK": 3.95
+      },
+      {
+        "station": "14890010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 51.61,
+        "waterLevelGOK": 4.23
+      },
+      {
+        "station": "14891010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 54.82,
+        "waterLevelGOK": 2.63
+      },
+      {
+        "station": "14892010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 55.21,
+        "waterLevelGOK": 2.49
+      },
+      {
+        "station": "14893010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 75.22,
+        "waterLevelGOK": 2.82
+      },
+      {
+        "station": "14894010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 155.15,
+        "waterLevelGOK": 7.73
+      },
+      {
+        "station": "14895010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 77.56,
+        "waterLevelGOK": 2.94
+      },
+      {
+        "station": "14896010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 7.77,
+        "waterLevelGOK": 2.32
+      },
+      {
+        "station": "14897010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 36.91,
+        "waterLevelGOK": 2.76
+      },
+      {
+        "station": "14898010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 35.64,
+        "waterLevelGOK": 3.13
+      },
+      {
+        "station": "14899010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "Niedrigstwert unterschritten",
+        "waterLevelNHN": 38.17,
+        "waterLevelGOK": 2.39
+      },
+      {
+        "station": "14900010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 45.39,
+        "waterLevelGOK": 4.66
+      },
+      {
+        "station": "14901010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 36.37,
+        "waterLevelGOK": 2.62
+      },
+      {
+        "station": "14902010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 40.1,
+        "waterLevelGOK": 6.17
+      },
+      {
+        "station": "14903010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "Niedrigstwert unterschritten",
+        "waterLevelNHN": 35.57,
+        "waterLevelGOK": 15.01
+      },
+      {
+        "station": "14904010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 36.44,
+        "waterLevelGOK": 2.11
+      },
+      {
+        "station": "14905010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 15.89,
+        "waterLevelGOK": 4.79
+      },
+      {
+        "station": "14906010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 52.53,
+        "waterLevelGOK": 4.65
+      },
+      {
+        "station": "14907010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 47.54,
+        "waterLevelGOK": 8.25
+      },
+      {
+        "station": "14908010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 33.59,
+        "waterLevelGOK": 3.54
+      },
+      {
+        "station": "14909010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 37.87,
+        "waterLevelGOK": 3.5
+      },
+      {
+        "station": "14910010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 26.44,
+        "waterLevelGOK": 2.6
+      },
+      {
+        "station": "14911010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "Niedrigstwert unterschritten",
+        "waterLevelNHN": 55.98,
+        "waterLevelGOK": 4.4
+      },
+      {
+        "station": "14912010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 50.19,
+        "waterLevelGOK": 3.68
+      },
+      {
+        "station": "14913010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 20.88,
+        "waterLevelGOK": 27.04
+      },
+      {
+        "station": "14914010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 50.16,
+        "waterLevelGOK": 17.38
+      },
+      {
+        "station": "14915010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "Niedrigstwert unterschritten",
+        "waterLevelNHN": 64.77,
+        "waterLevelGOK": 8.54
+      },
+      {
+        "station": "14916010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "niedrig",
+        "waterLevelNHN": 65.31,
+        "waterLevelGOK": 4.34
+      },
+      {
+        "station": "14917010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 22.35,
+        "waterLevelGOK": 3.25
+      },
+      {
+        "station": "14918010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 59.85,
+        "waterLevelGOK": 8.84
+      },
+      {
+        "station": "14919010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "normal",
+        "waterLevelNHN": 41.31,
+        "waterLevelGOK": 2.71
+      },
+      {
+        "station": "14920010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "Niedrigstwert unterschritten",
+        "waterLevelNHN": 10.29,
+        "waterLevelGOK": 2.83
+      },
+      {
+        "station": "14921010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 52,
+        "waterLevelGOK": 4.1
+      },
+      {
+        "station": "14922010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 10.41,
+        "waterLevelGOK": 1.93
+      },
+      {
+        "station": "14923010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 19.46,
+        "waterLevelGOK": 4.79
+      },
+      {
+        "station": "14924010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "Niedrigstwert unterschritten",
+        "waterLevelNHN": 27.49,
+        "waterLevelGOK": 4.46
+      },
+      {
+        "station": "14925010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "Niedrigstwert unterschritten",
+        "waterLevelNHN": 10.17,
+        "waterLevelGOK": 7.17
+      },
+      {
+        "station": "14926010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "",
+        "waterLevelNHN": null,
+        "waterLevelGOK": null
+      },
+      {
+        "station": "14927010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "sehr niedrig",
+        "waterLevelNHN": 3.93,
+        "waterLevelGOK": 2.82
+      },
+      {
+        "station": "17884010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "niedrig",
+        "waterLevelNHN": -0.39,
+        "waterLevelGOK": 2.58
+      },
+      {
+        "station": "19999010",
+        "date": "2026-09-21T00:00:00Z",
+        "classification": "niedrig",
+        "waterLevelNHN": 48.84,
+        "waterLevelGOK": 8.46
+      }
+    ]
+  }
+}

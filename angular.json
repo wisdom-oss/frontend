@@ -163,11 +163,23 @@
           "options": {
             "config": "jest.config.ts"
           }
+        },
+        "e2e": {
+          "builder": "playwright-ng-schematics:playwright",
+          "options": {
+            "devServerTarget": "@wisdom-oss/frontend:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "@wisdom-oss/frontend:serve:production"
+            }
+          }
         }
       }
     }
   },
   "cli": {
-    "analytics": false
+    "analytics": false,
+    "schematicCollections": ["@schematics/angular", "playwright-ng-schematics"]
   }
 }
