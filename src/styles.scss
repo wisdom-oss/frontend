@@ -54,6 +54,8 @@ body {
 .maplibregl-map {
   // avoid inherited colors from outer components for the map
   color: bulma.$text;
+  // override maplibre's full font shorthand so controls use the app font
+  font-family: iv.$family-sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
