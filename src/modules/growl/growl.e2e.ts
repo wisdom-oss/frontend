@@ -68,5 +68,5 @@ test("map renders as expected", async ({page}) => {
   });
 
   // verify the final map appearance
-  await expect(page.locator("main")).toHaveScreenshot({maxDiffPixels: 50});
+  await expect(page.locator("main")).toHaveScreenshot();
 });
