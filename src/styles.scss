@@ -11,11 +11,20 @@
 @use "../node_modules/bulma-switch/src/sass" as bulma-switch;
 @use "../node_modules/bulma-v1-tooltip/src/sass/" as bulma-tooltip;
 
+@import "@fontsource/figtree/latin.css";
+@import "@fontsource/figtree/latin-ext.css";
+@import "@fontsource/figtree/latin-italic.css";
+@import "@fontsource/figtree/latin-ext-italic.css";
 @import "../node_modules/maplibre-gl/dist/maplibre-gl.css";
 
 html {
   // override bulma's default behavior
+  font-family: iv.$family-sans-serif;
   overflow-y: auto;
+}
+
+body {
+  font-family: iv.$family-sans-serif;
 }
 
 .is-user-select-none {
