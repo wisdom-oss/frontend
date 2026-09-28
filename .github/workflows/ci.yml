@@ -17,17 +17,16 @@ jobs:
       - run: npm ci --include dev
 
   npm:
-    name: npm ${{ matrix.job.name }}
+    name: ${{ matrix.job.name }}
     runs-on: ${{ matrix.job.runs-on || 'ubuntu-latest' }}
     needs: install
-    continue-on-error: ${{ matrix.job.continue-on-error }}
+    continue-on-error: ${{ matrix.job.continue-on-error || false }}
 
     strategy:
       matrix:
         job:
           - name: build
             command: npm run build
-            continue-on-error: false
           - name: lint
             command: npm run lint -- --deny-warnings
             continue-on-error: true
@@ -39,12 +38,15 @@ jobs:
             continue-on-error: true
           - name: test
             command: npm run test
-            continue-on-error: false
-          - name: e2e
+          - name: e2e (linux)
             command: |
               npx playwright install --with-deps chromium firefox
               xvfb-run --auto-servernum npm run e2e
-            continue-on-error: false
+          - name: e2e (windows)
+            command: |
+              npx playwright install --with-deps chromium firefox
+              xvfb-run --auto-servernum npm run e2e
+            runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v4
