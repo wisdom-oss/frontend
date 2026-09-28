@@ -3,10 +3,10 @@ import {HttpClient} from "@angular/common/http";
 import {inject, provideAppInitializer} from "@angular/core";
 import {
   addProtocol,
+  setWorkerUrl,
   AddProtocolAction,
   RequestParameters,
   GetResourceResponse,
-  setWorkerUrl,
 } from "maplibre-gl";
 import {firstValueFrom} from "rxjs";
 
