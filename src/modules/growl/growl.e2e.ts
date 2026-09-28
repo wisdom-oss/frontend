@@ -36,7 +36,7 @@ test("map renders as expected", async ({page}) => {
   await groundwaterBodies.then(response => response.finished());
 
   // wait until both groundwater bodies and station markers render in the viewport
-  await page.waitForFunction(async () => {
+  await page.waitForFunction(() => {
     const mapElement = document.querySelector("main mgl-map");
     const mapInstance = mapElement
       ? window.ng?.getComponent<MapComponent>(mapElement)?.mapInstance
@@ -45,7 +45,7 @@ test("map renders as expected", async ({page}) => {
     if (!mapInstance) return false;
 
     const features = mapInstance.queryRenderedFeatures();
-    const hasRequiredFeatures =
+    return (
       features.some(
         ({layer}) => layer.id === "groundwater-bodies-layer-fill",
       ) &&
@@ -53,12 +53,18 @@ test("map renders as expected", async ({page}) => {
         ({layer}) =>
           layer.type === "symbol" &&
           layer.source === "groundwater-measurement-stations-source",
-      );
-    if (!hasRequiredFeatures) return false;
+      )
+    );
+  });
 
-    // wait until this same map finishes rendering after a repaint
-    const idle = mapInstance.once("idle");
-    mapInstance.triggerRepaint();
+  // wait until the map finishes rendering after a repaint
+  await page.waitForFunction(async () => {
+    const mapElement = document.querySelector("main mgl-map")!;
+    const map = window.ng?.getComponent<MapComponent>(mapElement)?.mapInstance;
+    if (!map) return false;
+
+    const idle = map.once("idle");
+    map.triggerRepaint();
     await idle;
     return true;
   });
