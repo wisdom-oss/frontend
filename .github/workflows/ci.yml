@@ -5,8 +5,17 @@ on:
 
 jobs:
   install:
-    name: install
-    runs-on: ubuntu-latest
+    name: install (${{ matrix.host.name }})
+    runs-on: ${{ matrix.host.host }}
+
+    strategy:
+      matrix:
+        host:
+          - name: linux
+            host: ubuntu-latest
+          - name: windows
+            host: windows-latest
+
     steps:
       - uses: actions/checkout@v4
       - uses: volta-cli/action@v4
