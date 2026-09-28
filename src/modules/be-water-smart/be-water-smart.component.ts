@@ -134,7 +134,7 @@ export class BeWaterSmartComponent implements OnInit {
     datasets: [], // data points
   };
 
-  backgroundPlugin: Plugin<"bar"> = {
+  backgroundPlugin: Plugin<ChartType> = {
     id: "custom_canvas_background_color",
     beforeDraw: chart => {
       const ctx = chart.ctx;

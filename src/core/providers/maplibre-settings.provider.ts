@@ -3,6 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {inject, provideAppInitializer} from "@angular/core";
 import {
   addProtocol,
+  setWorkerUrl,
   AddProtocolAction,
   RequestParameters,
   GetResourceResponse,
@@ -17,6 +18,10 @@ import {firstValueFrom} from "rxjs";
  */
 export const provideMaplibreSettings = () =>
   provideAppInitializer(() => {
+    setWorkerUrl(
+      new URL("maplibre-gl/maplibre-gl-worker.mjs", inject(DOCUMENT).baseURI)
+        .href,
+    );
     addOriginProtocol();
   });
 

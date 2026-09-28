@@ -30,5 +30,5 @@
   "material-icon-theme.files.associations": {
     "*.e2e.ts": "test-ts"
   },
-  "typescript.tsdk": "./node_modules/typescript/lib"
+  "js/ts.tsdk.path": "./node_modules/typescript/lib"
 }

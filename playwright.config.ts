@@ -44,8 +44,12 @@ export default defineConfig({
       name: "firefox",
       use: {
         ...devices["Desktop Firefox"],
-        // run with a visible browser on ci under xvfb and headless locally
-        headless: !process.env["CI"],
+        launchOptions: {
+          firefoxUserPrefs: {
+            "webgl.force-enabled": true,
+            "webgl.angle.force-warp": true,
+          },
+        },
       },
     },
   ],

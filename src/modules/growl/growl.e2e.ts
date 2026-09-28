@@ -58,13 +58,15 @@ test("map renders as expected", async ({page}) => {
   });
 
   // wait until the map finishes rendering after a repaint
-  await page.evaluate(async () => {
+  await page.waitForFunction(async () => {
     const mapElement = document.querySelector("main mgl-map")!;
-    const map = window.ng!.getComponent<MapComponent>(mapElement)!.mapInstance!;
+    const map = window.ng?.getComponent<MapComponent>(mapElement)?.mapInstance;
+    if (!map) return false;
 
     const idle = map.once("idle");
     map.triggerRepaint();
     await idle;
+    return true;
   });
 
   // verify the final map appearance

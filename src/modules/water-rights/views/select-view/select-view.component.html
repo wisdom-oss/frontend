@@ -7,7 +7,7 @@
       class="is-fullheight"
       [class.skeleton-block]="!usageLocations()"
       [mapStyle]="style"
-      [zoom]="[6.8]"
+      [zoom]="6.8"
       [center]="{lat: 52.8, lon: 9.2}"
       [cursor]="clusterHoverId() || hover()?.waterRight ? 'pointer' : 'grab'"
       [fitBounds]="$any(fitBounds())"
