@@ -42,7 +42,11 @@ export default defineConfig({
 
     {
       name: "firefox",
-      use: {...devices["Desktop Firefox"]},
+      use: {
+        ...devices["Desktop Firefox"],
+        // allow webgl 2 for maplibre on ci runners
+        firefoxUserPrefs: {"webgl.force-enabled": true},
+      },
     },
   ],
 });
