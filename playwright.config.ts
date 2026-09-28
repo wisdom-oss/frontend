@@ -44,12 +44,14 @@ export default defineConfig({
       name: "firefox",
       use: {
         ...devices["Desktop Firefox"],
-        firefoxUserPrefs: {
-          "webgl.force-enabled": true,
-          // use software rendering when the windows runner has no gpu
-          ...(process.env["CI"] && process.platform === "win32"
-            ? {"webgl.angle.force-warp": true}
-            : {}),
+        launchOptions: {
+          firefoxUserPrefs: {
+            "webgl.force-enabled": true,
+            // use software rendering when the windows runner has no gpu
+            ...(process.env["CI"] && process.platform === "win32"
+              ? {"webgl.angle.force-warp": true}
+              : {}),
+          },
         },
       },
     },
