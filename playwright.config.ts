@@ -1,44 +1,39 @@
 import {defineConfig, devices} from "@playwright/test";
 
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// require('dotenv').config();
-
-/**
- * See https://playwright.dev/docs/test-configuration.
- */
 export default defineConfig({
+  // look for tests in the source directory
   testDir: "./src",
+  // only run files ending in .e2e.ts
   testMatch: "*.e2e.ts",
-  /* Run tests in files in parallel */
+  // allow tests within the same file to run in parallel
   fullyParallel: true,
-  /* Fail the build on CI if you accidentally left test.only in the source code. */
+  // fail on ci if a test is marked with test.only
   forbidOnly: !!process.env["CI"],
-  /* Retry on CI only */
+  // retry failed tests twice on ci and skip retries locally
   retries: process.env["CI"] ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
+  // use one worker on ci and the default worker count locally
   workers: process.env["CI"] ? 1 : undefined,
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
+  // print a line for each test result
   reporter: "list",
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+  // share these browser settings across all projects
   use: {
-    /* Base URL to use in actions like `await page.goto('/')`. */
+    // resolve relative urls against the configured server or the local dev server
     baseURL: process.env["PLAYWRIGHT_TEST_BASE_URL"] ?? "http://localhost:4200",
 
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
+    // record a trace on the first retry to help debug failed tests
     trace: "on-first-retry",
   },
 
+  // configure assertion defaults
   expect: {
+    // configure screenshot comparisons
     toHaveScreenshot: {
+      // keep reference screenshots beside each test, grouped by platform and project
       pathTemplate:
         "{testDir}/{testFileDir}/e2e/screenshots/{platform}/{projectName}/{arg}{ext}",
     },
   },
 
-  /* Configure projects for major browsers */
   projects: [
     {
       name: "chromium",
@@ -49,28 +44,9 @@ export default defineConfig({
       name: "firefox",
       use: {
         ...devices["Desktop Firefox"],
+        // run with a visible browser on ci under xvfb and headless locally
         headless: !process.env["CI"],
       },
     },
-
-    /* Test against mobile viewports. */
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: { ...devices['Pixel 5'] },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: { ...devices['iPhone 12'] },
-    // },
-
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    // },
   ],
 });
