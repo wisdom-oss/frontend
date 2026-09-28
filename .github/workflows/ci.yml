@@ -43,7 +43,7 @@ jobs:
           - name: e2e
             command: |
               npx playwright install --with-deps chromium firefox
-              npm run e2e
+              xvfb-run --auto-servernum npm run e2e
             continue-on-error: false
 
     steps:
