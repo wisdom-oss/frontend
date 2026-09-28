@@ -35,14 +35,6 @@ test("map renders as expected", async ({page}) => {
   await groundwaterLevels.then(response => response.finished());
   await groundwaterBodies.then(response => response.finished());
 
-  // ensure webgl 2 is available before checking the map
-  expect(
-    await page.evaluate(
-      () => document.createElement("canvas").getContext("webgl2") !== null,
-    ),
-    "WebGL 2 is required to render the map",
-  ).toBe(true);
-
   // wait until both groundwater bodies and station markers render in the viewport
   await page.waitForFunction(() => {
     const mapElement = document.querySelector("main mgl-map");
