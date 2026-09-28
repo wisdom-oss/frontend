@@ -35,14 +35,36 @@ test("map renders as expected", async ({page}) => {
   await groundwaterLevels.then(response => response.finished());
   await groundwaterBodies.then(response => response.finished());
 
-  // wait until the map has finished rendering
+  // wait until both groundwater bodies and station markers render in the viewport
   await page.waitForFunction(() => {
     const mapElement = document.querySelector("main mgl-map");
     const mapInstance = mapElement
       ? window.ng?.getComponent<MapComponent>(mapElement)?.mapInstance
       : undefined;
 
-    return mapInstance?.loaded() && !mapInstance.isMoving();
+    if (!mapInstance) return false;
+
+    const features = mapInstance.queryRenderedFeatures();
+    return (
+      features.some(
+        ({layer}) => layer.id === "groundwater-bodies-layer-fill",
+      ) &&
+      features.some(
+        ({layer}) =>
+          layer.type === "symbol" &&
+          layer.source === "groundwater-measurement-stations-source",
+      )
+    );
+  });
+
+  // wait until the map finishes rendering after a repaint
+  await page.evaluate(async () => {
+    const mapElement = document.querySelector("main mgl-map")!;
+    const map = window.ng!.getComponent<MapComponent>(mapElement)!.mapInstance!;
+
+    const idle = map.once("idle");
+    map.triggerRepaint();
+    await idle;
   });
 
   // verify the final map appearance
