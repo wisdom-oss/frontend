@@ -5,7 +5,7 @@ import {RouterTestingHarness} from "@angular/router/testing";
 
 import {QueryParamService} from "./query-param.service";
 
-@Component({})
+@Component({template: ""})
 class TestComponent {}
 
 describe("QueryParamService", () => {

@@ -1,4 +1,4 @@
-import {ClassProvider} from "@angular/core";
+import {ClassProvider, Injectable} from "@angular/core";
 import {ɵSharedStylesHost as SharedStylesHost} from "@angular/platform-browser";
 
 /**
@@ -11,6 +11,7 @@ import {ɵSharedStylesHost as SharedStylesHost} from "@angular/platform-browser"
  *
  * Use this only when a test does not depend on CSS. We skip all style handling.
  */
+@Injectable()
 class NoopSharedStylesHost implements Pick<
   SharedStylesHost,
   keyof SharedStylesHost

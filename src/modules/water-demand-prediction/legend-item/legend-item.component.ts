@@ -4,12 +4,11 @@ import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {remixSquareFill} from "@ng-icons/remixicon";
 import {TranslateDirective} from "@ngx-translate/core";
 
-import {WaterDemandPredictionService} from "../../../api/water-demand-prediction.service";
 import {RgbaColor} from "../../../common/utils/rgba-color";
 import {signals} from "../../../common/signals";
 import {TranslateAttrDirective} from "../../../common/directives/translate-attr.directive";
 
-type Resolution = WaterDemandPredictionService.Resolution;
+type Resolution = "hourly" | "daily" | "weekly";
 
 @Component({
   selector: "legend-item",
