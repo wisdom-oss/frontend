@@ -42,11 +42,7 @@ export default defineConfig({
 
     {
       name: "firefox",
-      use: {
-        ...devices["Desktop Firefox"],
-        // run with a visible browser on ci under xvfb and headless locally
-        headless: !process.env["CI"],
-      },
+      use: {...devices["Desktop Firefox"]},
     },
   ],
 });
