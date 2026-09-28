@@ -47,10 +47,7 @@ export default defineConfig({
         launchOptions: {
           firefoxUserPrefs: {
             "webgl.force-enabled": true,
-            // use software rendering when the windows runner has no gpu
-            ...(process.env["CI"] && process.platform === "win32"
-              ? {"webgl.angle.force-warp": true}
-              : {}),
+            "webgl.angle.force-warp": true,
           },
         },
       },
