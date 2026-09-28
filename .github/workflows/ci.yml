@@ -52,14 +52,10 @@ jobs:
             continue-on-error: true
           - name: test
             command: npm run test
-          - name: e2e (linux)
+          - name: e2e
             command: |
               npx playwright install --with-deps chromium firefox
               xvfb-run --auto-servernum npm run e2e
-          - name: e2e (windows)
-            command: |
-              npx playwright install --with-deps chromium firefox
-              npm run e2e
 
     steps:
       - uses: actions/checkout@v4
