@@ -5,6 +5,7 @@
   "compilerOptions": {
     "outDir": "./out-tsc/app",
     "rootDir": "./src",
+    "isolatedModules": false, // Typia needs TypeScript emit
     "types": []
   },
   "files": ["src/main.ts"],

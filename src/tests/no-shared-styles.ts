@@ -1,4 +1,4 @@
-import {ClassProvider, Injectable} from "@angular/core";
+import {Injectable, ClassProvider} from "@angular/core";
 import {ɵSharedStylesHost as SharedStylesHost} from "@angular/platform-browser";
 
 /**
