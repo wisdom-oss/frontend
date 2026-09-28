@@ -45,7 +45,7 @@ jobs:
           - name: e2e (windows)
             command: |
               npx playwright install --with-deps chromium firefox
-              xvfb-run --auto-servernum npm run e2e
+              npm run e2e
             runs-on: windows-latest
 
     steps:
@@ -58,8 +58,8 @@ jobs:
       - run: npm ci --include dev
       - run: ${{ matrix.job.command }}
       - uses: actions/upload-artifact@v4
-        if: always() && matrix.job.name == 'e2e'
+        if: always() && startsWith(matrix.job.name, 'e2e')
         with:
-          name: playwright-test-results
+          name: playwright-test-results-${{ matrix.job.name }}
           path: test-results/
           if-no-files-found: ignore
