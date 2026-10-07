@@ -84,7 +84,7 @@
     "didyoumean": "^1.2.2",
     "esbuild-plugin-toml": "^0.0.1",
     "fake-indexeddb": "^6.2.5",
-    "fast-xml-parser": "^5.11.1",
+    "fast-xml-parser": "^5.11.2",
     "jest": "^30.5.2",
     "jest-environment-jsdom": "^30.5.2",
     "jest-preset-angular": "^17.0.1",
