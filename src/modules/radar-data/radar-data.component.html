@@ -1,1 +1,17 @@
-<p>radar-data works!</p>
+<div class="card block is-fullheight is-flex is-flex-direction-column">
+  <div class="card-content p-0 is-clipped is-flex-grow-1 is-fullheight">
+    <mgl-map
+      class="is-fullheight"
+      [mapStyle]="style"
+      [zoom]="6.8"
+      [center]="{lat: 52.8, lon: 9.2}"
+      [attributionControl]="{compact: true}"
+    >
+      <mgl-control
+        mglNavigation
+        [showCompass]="false"
+        position="top-left"
+      ></mgl-control>
+    </mgl-map>
+  </div>
+</div>
