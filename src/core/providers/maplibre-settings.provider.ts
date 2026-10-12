@@ -1,10 +1,10 @@
 import {DOCUMENT} from "@angular/common";
 import {HttpClient} from "@angular/common/http";
 import {inject, provideAppInitializer} from "@angular/core";
+import {provideMaplibreWorker} from "@maplibre/ngx-maplibre-gl/config";
 import {
   addProtocol,
   getVersion,
-  setWorkerUrl,
   AddProtocolAction,
   RequestParameters,
   GetResourceResponse,
@@ -17,16 +17,12 @@ import {firstValueFrom} from "rxjs";
  * This provider is designed to configure MapLibre globally, ensuring that
  * custom settings are applied before the application initializes.
  */
-export const provideMaplibreSettings = () =>
+export const provideMaplibreSettings = () => [
+  provideMaplibreWorker(`maplibre-gl/maplibre-gl-worker.mjs?v=${getVersion()}`),
   provideAppInitializer(() => {
-    setWorkerUrl(
-      new URL(
-        `maplibre-gl/maplibre-gl-worker.mjs?v=${getVersion()}`,
-        inject(DOCUMENT).baseURI,
-      ).href,
-    );
     addOriginProtocol();
-  });
+  }),
+];
 
 /**
  * Adds the `origin://` protocol to MapLibre, enabling requests relative to
