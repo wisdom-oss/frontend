@@ -37,16 +37,26 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: {...devices["Desktop Chrome"]},
+      use: {
+        ...devices["Desktop Chrome"],
+        // use viewport-sized screen dimensions instead of the device's monitor
+        // size so screen-dependent layouts match the screenshot baselines
+        screen: undefined,
+      },
     },
 
     {
       name: "firefox",
       use: {
         ...devices["Desktop Firefox"],
+        // use viewport-sized screen dimensions instead of the device's monitor
+        // size so screen-dependent layouts match the screenshot baselines
+        screen: undefined,
         launchOptions: {
           firefoxUserPrefs: {
+            // allow WebGL on CI even when Firefox blocks the graphics driver
             "webgl.force-enabled": true,
+            // use Windows' WARP software renderer for ANGLE on GPU-less CI runners
             "webgl.angle.force-warp": true,
           },
         },
