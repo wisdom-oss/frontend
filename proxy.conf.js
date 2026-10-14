@@ -16,6 +16,7 @@
  *
  * @example
  * WISDOM_FRONTEND_DEV_PROXIES=bws,geo ng serve
+ * $env:WISDOM_FRONTEND_DEV_PROXIES="rrb"; ng serve
  */
 
 const didYouMean = require("didyoumean");
@@ -55,6 +56,15 @@ const OPTIONAL_PROXY_CONFIGS = {
       rewrite: path => path.replace(/^\/api\/pmdarima-predictions/, ""),
     },
   ],
+  rrb: [
+    "/api/rrb-digital-twin/**",
+    {
+      target: "http://localhost:8000",
+      secure: false,
+      changeOrigin: true,
+      rewrite: path => path.replace(/^\/api\/rrb-digital-twin/, ""),
+    },  
+  ]
 };
 
 /**
