@@ -1,10 +1,13 @@
-import {inject} from "@angular/core";
 import {CanActivateFn, Router, Routes} from "@angular/router";
 
-import {ControlComponent} from "./tabs/control/control.component";
-import {HistoryComponent} from "./tabs/history/history.component";
-import {OverviewComponent} from "./tabs/overview/overview.component";
-import {SimulationComponent} from "./tabs/simulation/simulation.component";
+import { TabViewComponent } from "./tab-view/tab-view.component";
+import { SelectBasinViewComponent } from "./select-basin-view/select-basin-view.component";
+import { queryParameterGuard } from "../../../core/query-parameter.guard";
+import { inject } from "@angular/core";
+import { ControlComponent } from "./tabs/control/control.component";
+import { HistoryComponent } from "./tabs/history/history.component";
+import { OverviewComponent } from "./tabs/overview/overview.component";
+import { SimulationComponent } from "./tabs/simulation/simulation.component";
 
 const viewGuard: CanActivateFn = (route, state) => {
   switch (route.params["view"]) {
@@ -18,13 +21,27 @@ const viewGuard: CanActivateFn = (route, state) => {
 };
 
 export const rainRetentionBasinRoutes: Routes = [
+  {path: "", component: SelectBasinViewComponent},
   {
-    path: "overview/:view",
-    component: OverviewComponent,
-    canActivate: [viewGuard],
+    path: "tabs", 
+    component: TabViewComponent,
+    canActivate: [queryParameterGuard("id", "/digital-twin/rain-retention-basin")],
+    children: [
+      {
+        path: "overview/:view",
+        component: OverviewComponent,
+        canActivate: [viewGuard],
+      },
+      { path: "history", component: HistoryComponent },
+      { path: "simulation", component: SimulationComponent },
+      { path: "control", component: ControlComponent },
+      
+      // Standard-Tab, wenn man nur /tabs aufruft
+      { path: "", redirectTo: "overview/model", pathMatch: "full" },
+      // Wildcard für falsche Unterpfade innerhalb der Tabs
+      { path: "**", redirectTo: "overview/model" }
+    ]
+
   },
-  {path: "history", component: HistoryComponent},
-  {path: "simulation", component: SimulationComponent},
-  {path: "control", component: ControlComponent},
-  {path: "**", redirectTo: "overview/model"}, // wildcard fallback
+  {path: "**", redirectTo: ""}, // wildcard fallback
 ];

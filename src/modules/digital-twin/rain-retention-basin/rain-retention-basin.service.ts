@@ -10,6 +10,10 @@ export class RainRetentionBasinService {
         basins: computed(() => this.rrb.basins()) as Signal<RrbDigitalTwinService.BasinFeatureCollection>,
     };
 
+     getBasinById(currentId: string) {
+        return this.data.basins().features.find(basin => basin.id === currentId) ?? null;
+    }
+
     private rrb: {
         service: RrbDigitalTwinService;
         basins: Signal<RrbDigitalTwinService.BasinFeatureCollection>,

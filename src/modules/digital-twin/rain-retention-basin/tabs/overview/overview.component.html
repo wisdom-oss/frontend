@@ -13,12 +13,35 @@
       />
     }
     @case ("map") {
-      <div class="is-fullwidth" [style.height]="height">
-        <map-view
-          [locations]="locations"
-          [zoom]="14"
-          [center]="{lon: long(), lat: lat()}"
-        ></map-view>
+      <div id="map" class="is-fullwidth" [style.height]="height">
+        <div 
+          class="p-0 is-fullheight is-clipped"
+          style="border-radius: 0 0 0.5rem 0.5rem"
+        >
+          <mgl-map
+            class="is-fullheight"
+            [mapStyle]="style"
+            [zoom]="[15]"
+            [center]="[long(), lat()]"
+          >
+            <ng-container sources>
+              <mgl-geojson-source
+                id="locations-source"
+                [data]="locations()"
+              ></mgl-geojson-source>
+            </ng-container>
+            <mgl-layer
+              id="locations"
+              type="symbol"
+              source="locations-source"
+              [layout]="{
+                'icon-image': 'remixicon:map-pin-2-line', 
+                'icon-size': 1.5, 
+                'icon-allow-overlap': true
+              }"
+            ></mgl-layer>
+          </mgl-map>
+        </div>
       </div>
     }
     @case ("pictures") {
@@ -39,7 +62,7 @@
   <div class="tabs is-toggle is-centered">
     <ul>
       <li routerLinkActive="is-active">
-        <a routerLink="../model">
+        <a routerLink="../model" queryParamsHandling="preserve">
           <ng-icon
             name="remixCheckboxMultipleBlankFill"
             size="1.5rem"
@@ -49,18 +72,68 @@
         </a>
       </li>
       <li routerLinkActive="is-active">
-        <a routerLink="../map">
+        <a routerLink="../map" queryParamsHandling="preserve">
           <ng-icon name="remixMap2Fill" size="1.5rem" class="mr-2" />
           <span translate>digitalTwin.button.map</span>
         </a>
       </li>
       <li routerLinkActive="is-active">
-        <a routerLink="../pictures">
+        <a routerLink="../pictures" queryParamsHandling="preserve">
           <ng-icon name="remixImageFill" size="1.5rem" class="mr-2" />
           <span translate>digitalTwin.button.pictures</span>
         </a>
       </li>
     </ul>
+  </div>
+</div>
+
+<hr />
+
+<div>
+  <p class="is-size-3 m-4" translate>digitalTwin.header.features</p>
+  <div class="grid is-col-min-10">
+    <div class="is-flex is-flex-direction-row">
+      <ng-icon name="remixInfoCardLine" size="2.5rem" class="mx-4" />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        <p><span translate>digitalTwin.label.name</span>:</p>
+        <p>{{ name() }}</p>
+      </div>
+    </div>
+    <div class="is-flex is-flex-direction-row">
+      <ng-icon name="remixCommunityLine" size="2.5rem" class="mx-4" />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        <p><span translate>digitalTwin.label.city</span>:</p>
+        <p>{{ city() }}</p>
+      </div>
+    </div>
+    <div class="is-flex is-flex-direction-row">
+      <ng-icon name="remixBox2Line" size="2.5rem" class="mx-4" />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        <p><span translate>digitalTwin.label.retentionVolume</span>:</p>
+        <p>{{ volume() }} m³</p>
+      </div>
+    </div>
+    <div class="is-flex is-flex-direction-row">
+      <ng-icon name="remixCollageLine" size="2.5rem" class="mx-4" />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        <p><span translate>digitalTwin.label.catchmentArea</span>:</p>
+        <p>{{ catchmentArea() }} ha</p>
+      </div>
+    </div>
+    <div class="is-flex is-flex-direction-row">
+      <ng-icon name="remixHome8Line" size="2.5rem" class="mx-4" />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        <p><span translate>digitalTwin.label.pavedArea</span>:</p>
+        <p>{{ pavedArea() }} ha</p>
+      </div>
+    </div>
+    <div class="is-flex is-flex-direction-row">
+      <ng-icon name="remixTreeLine" size="2.5rem" class="mx-4" />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        <p><span translate>digitalTwin.label.unpavedArea</span>:</p>
+        <p>{{ unpavedArea() }} ha</p>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -84,74 +157,6 @@
         <p>
           <span translate>digitalTwin.header.waterLevel</span>:
           {{ waterLevel() }} %
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<hr />
-
-<div>
-  <p class="is-size-3 m-4" translate>digitalTwin.header.features</p>
-  <div class="grid is-col-min-10">
-    <div class="is-flex is-flex-direction-row">
-      <ng-icon name="remixInfoCardLine" size="2.5rem" class="mx-4" />
-      <div class="is-flex is-flex-direction-column is-justify-content-center">
-        <p><span translate>digitalTwin.label.name</span>: {{ name() }}</p>
-      </div>
-    </div>
-    <div class="is-flex is-flex-direction-row">
-      <ng-icon name="remixCommunityLine" size="2.5rem" class="mx-4" />
-      <div class="is-flex is-flex-direction-column is-justify-content-center">
-        <p><span translate>digitalTwin.label.city</span>: {{ city() }}</p>
-      </div>
-    </div>
-    <div class="is-flex is-flex-direction-row">
-      <ng-icon name="remixMapPin2Line" size="2.5rem" class="mx-4" />
-      <div class="is-flex is-flex-direction-column is-justify-content-center">
-        <p><span translate>digitalTwin.label.latitude</span>: {{ lat() }}</p>
-      </div>
-    </div>
-    <div class="is-flex is-flex-direction-row">
-      <ng-icon name="remixMapPin2Line" size="2.5rem" class="mx-4" />
-      <div class="is-flex is-flex-direction-column is-justify-content-center">
-        <p><span translate>digitalTwin.label.longitude</span>: {{ long() }}</p>
-      </div>
-    </div>
-    <div class="is-flex is-flex-direction-row">
-      <ng-icon name="remixBox2Line" size="2.5rem" class="mx-4" />
-      <div class="is-flex is-flex-direction-column is-justify-content-center">
-        <p>
-          <span translate>digitalTwin.label.retentionVolume</span>:
-          {{ volume() }} m³
-        </p>
-      </div>
-    </div>
-    <div class="is-flex is-flex-direction-row">
-      <ng-icon name="remixCollageLine" size="2.5rem" class="mx-4" />
-      <div class="is-flex is-flex-direction-column is-justify-content-center">
-        <p>
-          <span translate>digitalTwin.label.catchmentArea</span>:
-          {{ catchmentArea() }} ha
-        </p>
-      </div>
-    </div>
-    <div class="is-flex is-flex-direction-row">
-      <ng-icon name="remixHome8Line" size="2.5rem" class="mx-4" />
-      <div class="is-flex is-flex-direction-column is-justify-content-center">
-        <p>
-          <span translate>digitalTwin.label.pavedArea</span>:
-          {{ pavedArea() }} ha
-        </p>
-      </div>
-    </div>
-    <div class="is-flex is-flex-direction-row">
-      <ng-icon name="remixTreeLine" size="2.5rem" class="mx-4" />
-      <div class="is-flex is-flex-direction-column is-justify-content-center">
-        <p>
-          <span translate>digitalTwin.label.unpavedArea</span>:
-          {{ unpavedArea() }} ha
         </p>
       </div>
     </div>

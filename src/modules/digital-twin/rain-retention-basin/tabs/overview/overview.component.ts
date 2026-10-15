@@ -4,6 +4,8 @@ import {
   signal,
   Component,
   WritableSignal,
+  effect,
+  Signal,
 } from "@angular/core";
 import {toSignal} from "@angular/core/rxjs-interop";
 import {RouterLinkActive, RouterLink, ActivatedRoute} from "@angular/router";
@@ -30,13 +32,16 @@ import {
 import {TranslateDirective} from "@ngx-translate/core";
 import {ChartData} from "chart.js";
 import dayjs, {Dayjs} from "dayjs";
-import {StyleSpecification} from "maplibre-gl";
+import {StyleSpecification, Map} from "maplibre-gl";
 
 import colorful from "../../../../../assets/map/styles/colorful.json";
 import {CarouselComponent} from "../../../common/carousel/carousel.component";
 import {ChartComponent} from "../../../common/chart/chart.component";
-import {MapViewComponent} from "../../../common/map-view/map-view.component";
 import {ModelViewComponent} from "../../model-view/model-view.component";
+import {RrbDigitalTwinService} from "../../../../../api/rrb-digital-twin.service";
+import {RainRetentionBasinService} from "../../rain-retention-basin.service";
+import { map } from "rxjs";
+import { MapComponent, GeoJSONSourceComponent, LayerComponent } from "@maplibre/ngx-maplibre-gl";
 
 @Component({
   selector: "rrb-overview",
@@ -44,12 +49,14 @@ import {ModelViewComponent} from "../../model-view/model-view.component";
     TranslateDirective,
     NgIconComponent,
     CarouselComponent,
-    MapViewComponent,
     ModelViewComponent,
     ChartComponent,
     RouterLink,
     RouterLinkActive,
-  ],
+    MapComponent,
+    GeoJSONSourceComponent,
+    LayerComponent
+],
   templateUrl: "./overview.component.html",
   styleUrl: "./overview.component.scss",
   providers: [
@@ -75,20 +82,37 @@ import {ModelViewComponent} from "../../model-view/model-view.component";
   ],
 })
 export class OverviewComponent {
+  protected service = inject(RainRetentionBasinService);
+  private route = inject(ActivatedRoute);
+
+  readonly id = toSignal(
+    this.route.queryParams.pipe(map(params => params['id'])),
+    { initialValue: undefined }
+  );
+
+  readonly basin = signal<RrbDigitalTwinService.BasinFeature | null>(null);
+
+  protected lat = computed (() => (this.basin()?.geometry as GeoJSON.Point)?.coordinates[1]);
+  protected long = computed (() => (this.basin()?.geometry as GeoJSON.Point)?.coordinates[0]);
+  protected city = computed (() => this.basin()?.properties.city ?? "");
+  protected name = computed (() => this.basin()?.properties.name ?? "");
+  protected volume = computed(() => this.basin()?.properties.maxVolume ?? 0);
+
+  constructor() {
+    effect(() => {
+      if (this.id()) {
+        this.basin.set(this.service.getBasinById(this.id()));
+      }
+    });
+  }
+
   protected time: WritableSignal<Dayjs> = signal(dayjs());
   protected waterLevel: WritableSignal<number> = signal(10);
 
-  protected lat: WritableSignal<number> = signal(52.524639);
-  protected long: WritableSignal<number> = signal(8.185833);
-  protected city: WritableSignal<string> = signal("Damme");
-  protected name: WritableSignal<string> = signal("Nordhofe");
-
-  protected volume: WritableSignal<number> = signal(14325);
   protected catchmentArea: WritableSignal<number> = signal(92.29);
   protected pavedArea: WritableSignal<number> = signal(38.34);
   protected unpavedArea: WritableSignal<number> = signal(53.95);
 
-  protected route = inject(ActivatedRoute);
   protected params = toSignal(this.route.params);
   protected activeView = computed<"model" | "map" | "pictures">(
     () => this.params()?.["view"],
@@ -117,7 +141,7 @@ export class OverviewComponent {
 
   protected style = colorful as any as StyleSpecification;
 
-  protected locations: GeoJSON.FeatureCollection = {
+  protected locations =  computed(() => ({
     type: "FeatureCollection",
     features: [
       {
@@ -127,9 +151,9 @@ export class OverviewComponent {
           coordinates: [this.long(), this.lat()],
         },
         properties: {
-          name: "Test Point",
+          name: this.name(),
         },
       },
     ],
-  };
+  })) as Signal<GeoJSON.FeatureCollection<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>>;
 }
