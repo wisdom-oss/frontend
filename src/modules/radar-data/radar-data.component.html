@@ -1,24 +1,102 @@
 <div class="card block is-fullheight is-flex is-flex-direction-column">
   <div class="card-content p-0 is-clipped is-flex-grow-1 is-fullheight">
+    <div
+      style="
+        position: absolute;
+        z-index: 10;
+        display: flex;
+        height: 100%;
+        width: 100%;
+        justify-content: flex-end;
+        align-items: flex-start;
+        pointer-events: none;
+      "
+    >
+      @if (timeLapseDate(); as timeLapseDate) {
+        <div
+          class="buttons has-addons theme-light"
+          style="margin-top: 10px; margin-right: 10px; pointer-events: auto"
+        >
+          <div class="button is-small" style="pointer-events: none">
+            {{ timeLapseDate.locale(lang()).format("lll") }}
+          </div>
+          <button class="button is-small">
+            <span class="icon">
+              <ng-icon name="remixRewindStartFill"></ng-icon>
+            </span>
+          </button>
+          @let timeLapseStatus = this.timeLapseStatus();
+          <button
+            class="button is-small"
+            (click)="
+              this.timeLapseStatus.set(
+                timeLapseStatus == 'play' ? 'pause' : 'play'
+              )
+            "
+          >
+            <span class="icon">
+              @switch (timeLapseStatus) {
+                @case ("play") {
+                  <ng-icon name="remixPauseLargeFill"></ng-icon>
+                }
+                @case ("pause") {
+                  <ng-icon name="remixPlayLargeFill"></ng-icon>
+                }
+              }
+            </span>
+          </button>
+        </div>
+      }
+    </div>
     <mgl-map
       class="is-fullheight"
       [mapStyle]="style"
       [zoom]="6.8"
       [center]="{lat: 52.8, lon: 9.2}"
       [attributionControl]="{compact: true}"
+      (mapLoad)="this.map.set($event)"
     >
-      @if (coordinates(); as coordinates) {
+      @if (lowerSaxonyMask(); as mask) {
+        <mgl-geojson-source
+          id="lower-saxony-mask-source"
+          [data]="mask"
+        ></mgl-geojson-source>
+        <mgl-layer
+          id="lower-saxony-mask"
+          type="fill"
+          source="lower-saxony-mask-source"
+          before="lower-saxony-mask-border"
+          [paint]="{
+            'fill-color': '#444',
+          }"
+        ></mgl-layer>
+        <mgl-layer
+          id="lower-saxony-mask-border"
+          type="line"
+          source="lower-saxony-mask-source"
+          [paint]="{
+            'line-color': '#111',
+            'line-width': 2,
+          }"
+        ></mgl-layer>
+      }
+
+      @let rasterBounds = this.rasterBounds();
+      @let timeLapseImage = this.timeLapseImage();
+      @if (rasterBounds && timeLapseImage) {
         <mgl-image-source
           id="radar-data-source"
-          url="/api/files/v1/public/idw-radar/2012-01-01T00:00:00+01:00.png"
-          [coordinates]="coordinates"
+          [url]="timeLapseImage"
+          [coordinates]="rasterBounds"
         ></mgl-image-source>
         <mgl-layer
           id="radar-data"
           type="raster"
           source="radar-data-source"
+          before="lower-saxony-mask"
         ></mgl-layer>
       }
+
       <mgl-control
         mglNavigation
         [showCompass]="false"
