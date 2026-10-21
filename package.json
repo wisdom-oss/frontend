@@ -94,7 +94,7 @@
     "playwright-ng-schematics": "^22.1.2",
     "prettier": "3.9.10",
     "prettier-plugin-toml": "3.0.2",
-    "pretty-ts-imports": "^1.1.0",
+    "pretty-ts-imports": "^1.1.1",
     "sharp": "^0.35.5",
     "smol-toml": "^1.9.1",
     "three-stdlib": "^2.36.1",
