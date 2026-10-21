@@ -1,5 +1,5 @@
 import {Service} from "@angular/core";
-import {Dayjs} from "dayjs";
+import dayjs, {Dayjs} from "dayjs";
 import {Duration} from "dayjs/plugin/duration";
 import typia, {tags} from "typia";
 
@@ -13,7 +13,13 @@ export class RadarDataService {
     return api.resource({
       url: `${URL}/radar_manifest.json`,
       validateRaw: typia.createValidate<Raw.Manifest>(),
-      parse: () => null as any,
+      parse: raw => ({
+        ...raw,
+        start: dayjs(raw.start),
+        end: dayjs(raw.end),
+        stepSize: dayjs.duration(raw.stepSize),
+        imageUseISO8601: typia.assert<true>(raw.imageUseISO8601),
+      }),
     });
   }
 }

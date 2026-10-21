@@ -7,6 +7,18 @@
       [center]="{lat: 52.8, lon: 9.2}"
       [attributionControl]="{compact: true}"
     >
+      @if (coordinates(); as coordinates) {
+        <mgl-image-source
+          id="radar-data-source"
+          url="/api/files/v1/public/idw-radar/2012-01-01T00:00:00+01:00.png"
+          [coordinates]="coordinates"
+        ></mgl-image-source>
+        <mgl-layer
+          id="radar-data"
+          type="raster"
+          source="radar-data-source"
+        ></mgl-layer>
+      }
       <mgl-control
         mglNavigation
         [showCompass]="false"
