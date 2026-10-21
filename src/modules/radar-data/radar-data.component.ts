@@ -24,7 +24,10 @@ import {mask} from "@turf/turf";
 import {Dayjs} from "dayjs";
 import {MultiPolygon, Polygon} from "geojson";
 import {Map, ImageSourceSpecification, StyleSpecification} from "maplibre-gl";
+import {Underzoom} from "maplibre-xy";
 import typia, {TypeGuardError} from "typia";
+
+import * as maplibregl from "maplibre-gl";
 
 import {RadarDataService} from "./radar-data.service";
 import {GeoDataService} from "../../api/geo-data.service";
@@ -58,6 +61,7 @@ export class RadarDataComponent {
   protected lang = signals.lang();
 
   protected style = colorful as any as StyleSpecification;
+  protected underzoom = new Underzoom(maplibregl);
 
   protected map = signals.maybe<Map>();
 
@@ -82,6 +86,7 @@ export class RadarDataComponent {
     let map = this.map();
     if (!manifest || !map) return;
     map.fitBounds(manifest.bbox);
+    map.setTransformConstrain(this.underzoom.transformConstrain);
     map.setMaxBounds(manifest.bbox);
   });
 
