@@ -20,22 +20,14 @@
           <div class="button is-small" style="pointer-events: none">
             {{ timeLapseDate.locale(lang()).format("lll") }}
           </div>
-          <button class="button is-small">
+          <button class="button is-small" (click)="rewindTimeLapse()">
             <span class="icon">
               <ng-icon name="remixRewindStartFill"></ng-icon>
             </span>
           </button>
-          @let timeLapseStatus = this.timeLapseStatus();
-          <button
-            class="button is-small"
-            (click)="
-              this.timeLapseStatus.set(
-                timeLapseStatus == 'play' ? 'pause' : 'play'
-              )
-            "
-          >
+          <button class="button is-small" (click)="toggleTimeLapse()">
             <span class="icon">
-              @switch (timeLapseStatus) {
+              @switch (timeLapseStatus()) {
                 @case ("play") {
                   <ng-icon name="remixPauseLargeFill"></ng-icon>
                 }

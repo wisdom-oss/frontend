@@ -36,6 +36,13 @@ import colorful from "../../assets/map/styles/colorful.json";
 import {ResizeMapOnLoadDirective} from "../../common/directives/resize-map-on-load.directive";
 import {signals} from "../../common/signals";
 
+type TimerId = ReturnType<typeof setInterval>;
+
+// TODO:
+// - press spacebar to pause
+// - press backspace to rewind
+// - provide legend
+
 @Component({
   imports: [
     ControlComponent,
@@ -91,8 +98,10 @@ export class RadarDataComponent {
     map.setMaxBounds(manifest.bbox);
   });
 
-  protected timeLapseStatus = signal<"play" | "pause">("pause");
   protected timeLapseDate = signals.maybe<Dayjs>();
+  protected timeLapseStatus = computed(() =>
+    !!this.timeLapseIntervalId() ? "play" : "pause",
+  );
 
   private _initTimeLapseDate = effect(() => {
     let manifest = this.manifest();
@@ -111,25 +120,48 @@ export class RadarDataComponent {
     return manifest.folderPath + date.format("YYYY-MM-DDTHH:mm:ssZ") + ".png";
   });
 
-  private timeLapseIntervalId = signals.maybe<ReturnType<typeof setInterval>>();
-  private _timeLapseInterval = effect(() => {
+  private timeLapseIntervalId = signal<TimerId | null>(null);
+  protected toggleTimeLapse() {
     let manifest = this.manifest();
-    let status = this.timeLapseStatus();
-    let date = untracked(() => this.timeLapseDate());
-    if (!manifest || !status || !date) return;
+    let date = this.timeLapseDate();
+    if (!manifest || !date) return;
 
-    let timeLapseIntervalId = untracked(() => this.timeLapseIntervalId());
-    if (status == "pause") {
-      if (timeLapseIntervalId) clearInterval(timeLapseIntervalId);
+    let timeLapseIntervalId = this.timeLapseIntervalId();
+    if (timeLapseIntervalId) {
+      clearInterval(timeLapseIntervalId);
+      this.timeLapseIntervalId.set(null);
       return;
     }
 
-    this.timeLapseIntervalId.set(
-      setInterval(() => {
-        let date = untracked(() => this.timeLapseDate()!);
-        this.timeLapseDate.set(date.add(manifest.stepSize));
-      }, 1000),
-    );
+    let timerId = setInterval(() => {
+      let date = this.timeLapseDate()!;
+      this.timeLapseDate.set(date.add(manifest.stepSize));
+    }, 1000);
+    this.timeLapseIntervalId.set(timerId);
+  }
+
+  protected rewindTimeLapse() {
+    let manifest = this.manifest();
+    if (!manifest) return;
+
+    let timeLapseIntervalId = this.timeLapseIntervalId();
+    if (timeLapseIntervalId) {
+      clearInterval(timeLapseIntervalId);
+      this.timeLapseIntervalId.set(null);
+    }
+
+    this.timeLapseDate.set(manifest.start);
+  }
+
+  private _checkTimeLapseEnd = effect(() => {
+    let manifest = this.manifest();
+    let date = this.timeLapseDate();
+    let intervalId = this.timeLapseIntervalId();
+    if (!manifest || !date || !intervalId) return;
+
+    if (date.isBefore(manifest.end)) return;
+    clearInterval(intervalId);
+    this.timeLapseIntervalId.set(null);
   });
 
   protected states = this.geoDataService.fetchLayerContents("states");
