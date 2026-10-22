@@ -1,12 +1,4 @@
-import {
-  computed,
-  effect,
-  inject,
-  signal,
-  untracked,
-  viewChild,
-  Component,
-} from "@angular/core";
+import {computed, effect, inject, signal, Component} from "@angular/core";
 import {
   ControlComponent,
   LayerComponent,
@@ -26,7 +18,7 @@ import {Dayjs} from "dayjs";
 import {MultiPolygon, Polygon} from "geojson";
 import {Map, ImageSourceSpecification, StyleSpecification} from "maplibre-gl";
 import {Underzoom} from "maplibre-xy";
-import typia, {TypeGuardError} from "typia";
+import typia from "typia";
 
 import * as maplibregl from "maplibre-gl";
 
@@ -102,7 +94,7 @@ export class RadarDataComponent {
 
   protected timeLapseDate = signals.maybe<Dayjs>();
   protected timeLapseStatus = computed(() =>
-    !!this.timeLapseIntervalId() ? "play" : "pause",
+    this.timeLapseIntervalId() ? "play" : "pause",
   );
 
   private _initTimeLapseDate = effect(() => {
