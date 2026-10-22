@@ -21,23 +21,24 @@
           <mgl-map
             class="is-fullheight"
             [mapStyle]="style"
-            [zoom]="[15]"
-            [center]="[long(), lat()]"
+            [zoom]="[14]"
+            [center]="{lat: 52.524, lon: 8.185}"
           >
             <ng-container sources>
-              <mgl-geojson-source
-                id="locations-source"
-                [data]="locations()"
-              ></mgl-geojson-source>
+              @let basin = this.basin();
+              @if (basin) {
+                <mgl-geojson-source
+                  id="basin-source"
+                  [data]="basin"
+                ></mgl-geojson-source>
+              }
             </ng-container>
             <mgl-layer
-              id="locations"
-              type="symbol"
-              source="locations-source"
-              [layout]="{
-                'icon-image': 'remixicon:map-pin-2-line', 
-                'icon-size': 1.5, 
-                'icon-allow-overlap': true
+              id="basin"
+              type="fill"
+              source="basin-source"
+              [paint]="{
+                'fill-color': '#66CCFF'
               }"
             ></mgl-layer>
           </mgl-map>

@@ -22,8 +22,6 @@ import {
   remixImageFill,
   remixInfoCardLine,
   remixMap2Fill,
-  remixMapPin2Fill,
-  remixMapPin2Line,
   remixRainyLine,
   remixTimeLine,
   remixTreeLine,
@@ -32,7 +30,9 @@ import {
 import {TranslateDirective} from "@ngx-translate/core";
 import {ChartData} from "chart.js";
 import dayjs, {Dayjs} from "dayjs";
-import {StyleSpecification, Map} from "maplibre-gl";
+import {StyleSpecification} from "maplibre-gl";
+import { map } from "rxjs";
+import { MapComponent, GeoJSONSourceComponent, LayerComponent } from "@maplibre/ngx-maplibre-gl";
 
 import colorful from "../../../../../assets/map/styles/colorful.json";
 import {CarouselComponent} from "../../../common/carousel/carousel.component";
@@ -40,8 +40,6 @@ import {ChartComponent} from "../../../common/chart/chart.component";
 import {ModelViewComponent} from "../../model-view/model-view.component";
 import {RrbDigitalTwinService} from "../../../../../api/rrb-digital-twin.service";
 import {RainRetentionBasinService} from "../../rain-retention-basin.service";
-import { map } from "rxjs";
-import { MapComponent, GeoJSONSourceComponent, LayerComponent } from "@maplibre/ngx-maplibre-gl";
 
 @Component({
   selector: "rrb-overview",
@@ -65,12 +63,10 @@ import { MapComponent, GeoJSONSourceComponent, LayerComponent } from "@maplibre/
       remixWaterPercentLine,
       remixTimeLine,
       remixHome8Line,
-      remixMapPin2Line,
       remixRainyLine,
       remixMap2Fill,
       remixImageFill,
       remixCheckboxMultipleBlankFill,
-      remixMapPin2Fill,
       remixArrowLeftWideLine,
       remixArrowRightWideLine,
       remixCommunityLine,
@@ -90,10 +86,9 @@ export class OverviewComponent {
     { initialValue: undefined }
   );
 
-  readonly basin = signal<RrbDigitalTwinService.BasinFeature | null>(null);
-
-  protected lat = computed (() => (this.basin()?.geometry as GeoJSON.Point)?.coordinates[1]);
-  protected long = computed (() => (this.basin()?.geometry as GeoJSON.Point)?.coordinates[0]);
+  readonly basin = signal<RrbDigitalTwinService.BasinFeature | undefined>(undefined);
+  readonly basinLayer = computed(() => {});
+  
   protected city = computed (() => this.basin()?.properties.city ?? "");
   protected name = computed (() => this.basin()?.properties.name ?? "");
   protected volume = computed(() => this.basin()?.properties.maxVolume ?? 0);
@@ -140,20 +135,4 @@ export class OverviewComponent {
   };
 
   protected style = colorful as any as StyleSpecification;
-
-  protected locations =  computed(() => ({
-    type: "FeatureCollection",
-    features: [
-      {
-        type: "Feature",
-        geometry: {
-          type: "Point",
-          coordinates: [this.long(), this.lat()],
-        },
-        properties: {
-          name: this.name(),
-        },
-      },
-    ],
-  })) as Signal<GeoJSON.FeatureCollection<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>>;
 }

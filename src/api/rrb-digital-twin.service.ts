@@ -21,7 +21,6 @@ export class RrbDigitalTwinService extends api.service(URL) {
 export namespace RrbDigitalTwinService {
     export type BasinFeatureCollection = {
         type: "FeatureCollection";
-        bbox: [number, number, number, number];
         features: BasinFeature[];
     };
 

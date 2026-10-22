@@ -11,7 +11,7 @@ export class RainRetentionBasinService {
     };
 
      getBasinById(currentId: string) {
-        return this.data.basins().features.find(basin => basin.id === currentId) ?? null;
+        return this.data.basins().features.find(basin => basin.id === currentId);
     }
 
     private rrb: {
@@ -32,12 +32,11 @@ export class RainRetentionBasinService {
                 service.fetchGetBasins(),
                 (basins): RrbDigitalTwinService.BasinFeatureCollection => ({
                     type: "FeatureCollection",
-                    bbox: basins?.bbox ?? [0, 0, 0, 0],
                     features: (basins?.features ?? [])
                     .map(feature => ({
                         type: "Feature",
                         id: feature?.id ?? "",
-                        geometry: feature?.geometry ?? {type: "Point", coordinates: [0, 0]},
+                        geometry: feature?.geometry ?? {type: "MultiPolygon", coordinates: []},
                         properties: feature?.properties ?? {city: "", maxSurfaceArea: 0, maxVolume: 0, name: "", soleArea: 0},
                    })),
                }),

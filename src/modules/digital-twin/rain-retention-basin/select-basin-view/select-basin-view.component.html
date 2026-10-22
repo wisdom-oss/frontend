@@ -3,12 +3,12 @@
     class="is-fullheight"
     [mapStyle]="style"
     [zoom]="[13]"
-    [center]="{lat: 52.52, lon: 8.19}"
+    [center]="{lat: 52.524, lon: 8.185}"
   >
     <ng-container sources>
       <mgl-geojson-source
         id="basins-source"
-        [data]="basins()"
+        [data]="basinMarkers()"
       ></mgl-geojson-source>
     </ng-container>
     <mgl-layer
@@ -26,7 +26,7 @@
     ></mgl-layer>
     @if (hoveredBasin(); as basin) {
       <mgl-popup 
-        [lngLat]="basin.geometry.type === 'Point' ? [basin.geometry.coordinates[0], basin.geometry.coordinates[1]] : undefined" 
+        [lngLat]="getLngLat(basin.geometry)" 
         [closeButton]="false" 
         [closeOnClick]="false"
         >
