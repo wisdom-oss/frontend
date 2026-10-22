@@ -39,8 +39,6 @@ import {signals} from "../../common/signals";
 type TimerId = ReturnType<typeof setInterval>;
 
 // TODO:
-// - press spacebar to pause
-// - press backspace to rewind
 // - provide legend
 
 @Component({
@@ -62,6 +60,10 @@ type TimerId = ReturnType<typeof setInterval>;
       remixRewindStartFill,
     }),
   ],
+  host: {
+    "(document:keydown.space)": "toggleTimeLapse()",
+    "(document:keydown.backspace)": "rewindTimeLapse()",
+  },
 })
 export class RadarDataComponent {
   protected service = inject(RadarDataService);
