@@ -3,6 +3,7 @@ import {
   effect,
   inject,
   signal,
+  untracked,
   viewChild,
   Component,
 } from "@angular/core";
@@ -99,11 +100,36 @@ export class RadarDataComponent {
     this.timeLapseDate.set(manifest.start);
   });
 
+  private _timeLapseDate = effect(() =>
+    console.log(this.timeLapseDate()?.toISOString()),
+  );
+
   private timeLapseImage = computed(() => {
     let manifest = this.manifest();
     let date = this.timeLapseDate();
     if (!manifest || !date) return;
     return manifest.folderPath + date.format("YYYY-MM-DDTHH:mm:ssZ") + ".png";
+  });
+
+  private timeLapseIntervalId = signals.maybe<ReturnType<typeof setInterval>>();
+  private _timeLapseInterval = effect(() => {
+    let manifest = this.manifest();
+    let status = this.timeLapseStatus();
+    let date = untracked(() => this.timeLapseDate());
+    if (!manifest || !status || !date) return;
+
+    let timeLapseIntervalId = untracked(() => this.timeLapseIntervalId());
+    if (status == "pause") {
+      if (timeLapseIntervalId) clearInterval(timeLapseIntervalId);
+      return;
+    }
+
+    this.timeLapseIntervalId.set(
+      setInterval(() => {
+        let date = untracked(() => this.timeLapseDate()!);
+        this.timeLapseDate.set(date.add(manifest.stepSize));
+      }, 1000),
+    );
   });
 
   protected states = this.geoDataService.fetchLayerContents("states");
