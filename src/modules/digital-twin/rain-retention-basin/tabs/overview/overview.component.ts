@@ -78,28 +78,38 @@ import {RainRetentionBasinService} from "../../rain-retention-basin.service";
   ],
 })
 export class OverviewComponent {
-  protected service = inject(RainRetentionBasinService);
+  private rrb= inject(RainRetentionBasinService);
   private route = inject(ActivatedRoute);
 
-  readonly id = toSignal(
-    this.route.queryParams.pipe(map(params => params['id'])),
-    { initialValue: undefined }
+  protected style = colorful as any as StyleSpecification;
+
+  protected params = toSignal(this.route.params);
+  protected activeView = computed<"model" | "map" | "pictures">(
+    () => this.params()?.["view"],
   );
 
-  readonly basin = signal<RrbDigitalTwinService.BasinFeature | undefined>(undefined);
-  readonly basinLayer = computed(() => {});
-  
-  protected city = computed (() => this.basin()?.properties.city ?? "");
-  protected name = computed (() => this.basin()?.properties.name ?? "");
-  protected volume = computed(() => this.basin()?.properties.maxVolume ?? 0);
+  protected basinId: Signal<string> = toSignal(
+    this.route.queryParams.pipe(map(params => params['id'])),
+    { initialValue: "" }
+  );
+
+  readonly basin: Signal<RrbDigitalTwinService.BasinFeature | undefined> = computed(() => this.rrb.getBasinById(this.basinId()));
+
+  readonly catchmentAreas: Signal<RrbDigitalTwinService.CatchmentAreaFeatureCollection> = this.rrb.getCatchmentAreas("1");
+  readonly catchmentAreasPolygons: Signal<RrbDigitalTwinService.CatchmentAreaFeatureCollection> = computed(() => this.splitGeometryCollection(this.catchmentAreas(), ["Polygon", "MultiPolygon"]));
+  readonly catchmentAreasLineStrings: Signal<RrbDigitalTwinService.CatchmentAreaFeatureCollection> = computed(() => this.splitGeometryCollection(this.catchmentAreas(), ["LineString", "MultiLineString"]));
 
   constructor() {
     effect(() => {
-      if (this.id()) {
-        this.basin.set(this.service.getBasinById(this.id()));
+      if (this.basin()) {
+        // this.catchmentAreas.set(this.rrb.getCatchmentAreas(this.basinId())());
       }
     });
-  }
+  };
+
+  protected city = computed (() => this.basin()?.properties.city ?? "");
+  protected name = computed (() => this.basin()?.properties.name ?? "");
+  protected volume = computed(() => this.basin()?.properties.maxVolume ?? 0);
 
   protected time: WritableSignal<Dayjs> = signal(dayjs());
   protected waterLevel: WritableSignal<number> = signal(10);
@@ -107,11 +117,6 @@ export class OverviewComponent {
   protected catchmentArea: WritableSignal<number> = signal(92.29);
   protected pavedArea: WritableSignal<number> = signal(38.34);
   protected unpavedArea: WritableSignal<number> = signal(53.95);
-
-  protected params = toSignal(this.route.params);
-  protected activeView = computed<"model" | "map" | "pictures">(
-    () => this.params()?.["view"],
-  );
 
   dataCurrentForecast: ChartData<"bar", {x: string; y: number}[]> = {
     datasets: [
@@ -134,5 +139,29 @@ export class OverviewComponent {
     ],
   };
 
-  protected style = colorful as any as StyleSpecification;
+  private splitGeometryCollection(catchmentAreas: RrbDigitalTwinService.CatchmentAreaFeatureCollection, types: string[]) : RrbDigitalTwinService.CatchmentAreaFeatureCollection {
+    let result: RrbDigitalTwinService.CatchmentAreaFeature[]= [];
+
+    catchmentAreas.features.forEach((feature) => {
+      const geometries = feature.geometry.type === "GeometryCollection"
+        ? feature.geometry.geometries
+        : [feature.geometry];
+
+      geometries.forEach((geometry) => {
+        if (types.includes(geometry.type)) {
+          result = result.concat([{
+                  type: "Feature",
+                  id: feature.id,
+                  geometry: geometry,
+                  properties: { ... feature.properties}
+              }]);
+        }
+      });
+    });
+
+    return {
+        type: "FeatureCollection",
+        features: result
+    }
+  };
 }

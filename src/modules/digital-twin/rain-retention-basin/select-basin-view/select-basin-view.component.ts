@@ -27,15 +27,15 @@ import { remixMapPin2Line } from "@ng-icons/remixicon";
   ],
 })
 export class SelectBasinViewComponent {
-  protected service = inject(RainRetentionBasinService);
-
-  constructor(private router: Router, private route: ActivatedRoute) {}
+  private rrb = inject(RainRetentionBasinService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   protected style = colorful as any as StyleSpecification;
 
-  protected basins: Signal<RrbDigitalTwinService.BasinFeatureCollection> = computed(() => this.service.data.basins());
+  protected basins: Signal<RrbDigitalTwinService.BasinFeatureCollection | undefined> = computed(() => this.rrb.basins());
   protected basinMarkers = computed<FeatureCollection>(() => {
-    const markerFeatures = this.basins().features.map(feature => {
+    const markerFeatures = this.basins()?.features.map(feature => {
       const center = centerOfMass(feature); 
 
       center.properties = { ...feature.properties };
@@ -46,7 +46,7 @@ export class SelectBasinViewComponent {
 
     return {
       type: 'FeatureCollection',
-      features: markerFeatures
+      features: markerFeatures? markerFeatures : []
     };
   });
   

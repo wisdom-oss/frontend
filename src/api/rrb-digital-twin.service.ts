@@ -16,6 +16,13 @@ export class RrbDigitalTwinService extends api.service(URL) {
             validate: typia.createValidate<RrbDigitalTwinService.BasinFeatureCollection>()
         });
     }
+
+    fetchGetCatchmentAreasOfBasin(basinId: api.RequestSignal<string>): api.Signal<RrbDigitalTwinService.CatchmentAreaFeatureCollection> {
+        return api.resource({
+            url: `${URL}/v1/get-catchment-areas-of-basin?basin_id=${basinId}`,
+            validate: typia.createValidate<RrbDigitalTwinService.CatchmentAreaFeatureCollection>()
+        });
+    }
 }
 
 export namespace RrbDigitalTwinService {
@@ -36,4 +43,22 @@ export namespace RrbDigitalTwinService {
             soleArea: number;
         };
     };
+
+    export type CatchmentAreaFeatureCollection = {
+        type: "FeatureCollection";
+        features: CatchmentAreaFeature[];
+    }
+
+    export type CatchmentAreaFeature = {
+        type: "Feature";
+        id: string;
+        geometry: Geometry;
+        properties: {
+            basinId: number;
+            name: string;
+            area: number;
+            pavedArea: number;
+            unpavedArea: number;
+        };
+    }
 }

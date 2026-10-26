@@ -32,7 +32,59 @@
                   [data]="basin"
                 ></mgl-geojson-source>
               }
+
+              @let catchmentAreasPolygons = this.catchmentAreasPolygons();
+              @if (catchmentAreasPolygons) {
+                <mgl-geojson-source
+                  id="catchment-areas-polygons-source"
+                  [data]="catchmentAreasPolygons"
+                ></mgl-geojson-source>
+              }
+
+              @let catchmentAreasLineStrings = this.catchmentAreasLineStrings();
+              @if (catchmentAreasLineStrings) {
+                <mgl-geojson-source
+                  id="catchment-areas-line-strings-source"
+                  [data]="catchmentAreasLineStrings"
+                ></mgl-geojson-source>
+              }
             </ng-container>
+            <mgl-layer
+              id="catchmentAreasPolygons"
+              type="fill"
+              source="catchment-areas-polygons-source"
+              [paint]="{
+                'fill-color': [
+                  'match',
+                  ['id'],
+                  1, '#0000FF',
+                  2, '#00FF00',
+                  3, '#FF8000',
+                  4, '#FF007F',
+                  5, '#FF0000',
+                  '#FFFF00'
+                ],
+                'fill-opacity': 0.25
+              }"
+            ></mgl-layer>
+             <mgl-layer
+              id="catchmentAreasLineStrings"
+              type="line"
+              source="catchment-areas-line-strings-source"
+              [paint]="{
+                'line-color': [
+                  'match',
+                  ['id'],
+                  1, '#0000FF',
+                  2, '#00FF00',
+                  3, '#FF8000',
+                  4, '#FF007F',
+                  5, '#FF0000',
+                  '#FFFF00'
+                ],
+                'line-width': 2
+              }"
+            ></mgl-layer>
             <mgl-layer
               id="basin"
               type="fill"
