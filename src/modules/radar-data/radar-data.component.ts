@@ -24,7 +24,14 @@ import {
 import {mask} from "@turf/turf";
 import {Dayjs} from "dayjs";
 import {MultiPolygon, Polygon} from "geojson";
-import {Map, ImageSourceSpecification, StyleSpecification, MercatorCoordinate, MapMouseEvent, ImageSource} from "maplibre-gl";
+import {
+  MercatorCoordinate,
+  MapMouseEvent,
+  Map,
+  ImageSource,
+  ImageSourceSpecification,
+  StyleSpecification,
+} from "maplibre-gl";
 import {Underzoom} from "maplibre-xy";
 import typia from "typia";
 
@@ -77,6 +84,23 @@ export class RadarDataComponent {
   protected map = signals.maybe<Map>();
 
   protected hoveredRasterPixel = signal<{x: number; y: number} | null>(null);
+  protected hoveredMask = signal(false);
+
+  private _trackHoveredMask = effect(onCleanup => {
+    let map = this.map();
+    if (!map) return;
+
+    const onMouseMove = (event: MapMouseEvent) => {
+      const layers = ["lower-saxony-mask", "lower-saxony-mask-border"];
+      this.hoveredMask.set(
+        layers.length > 0 &&
+          map.queryRenderedFeatures(event.point, {layers}).length > 0,
+      );
+    };
+
+    map.on("mousemove", onMouseMove);
+    onCleanup(() => map.off("mousemove", onMouseMove));
+  });
 
   protected cursorTooltip = new maplibregl.Popup({
     closeButton: false,
@@ -92,7 +116,8 @@ export class RadarDataComponent {
   private _updateCursorTooltip = effect(() => {
     const map = this.map();
     const pixel = this.hoveredRasterPixel();
-    if (!map || !pixel) {
+    const onMask = this.hoveredMask();
+    if (!map || !pixel || onMask) {
       this.cursorTooltip.remove();
       return;
     }
