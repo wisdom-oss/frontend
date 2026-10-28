@@ -1,23 +1,11 @@
 <div class="card block is-fullheight is-flex is-flex-direction-column">
   <div class="card-content p-0 is-clipped is-flex-grow-1 is-fullheight">
     <div
-      style="
-        position: absolute;
-        z-index: 10;
-        display: flex;
-        height: 100%;
-        width: 100%;
-        justify-content: flex-end;
-        align-items: flex-start;
-        pointer-events: none;
-      "
+      class="timelapse-overlay is-flex is-fullheight is-justify-content-flex-end is-align-items-flex-start"
     >
       @if (timelapseDate(); as timelapseDate) {
-        <div
-          class="buttons has-addons theme-light"
-          style="margin-top: 10px; margin-right: 10px; pointer-events: auto"
-        >
-          <div class="button is-small" style="pointer-events: none">
+        <div class="timelapse-controls buttons has-addons theme-light">
+          <div class="timelapse-date button is-small">
             {{ timelapseDate.locale(lang()).format("lll") }}
           </div>
           <button class="button is-small" (click)="rewindTimelapse()">
@@ -99,17 +87,15 @@
         <div class="maplibregl-ctrl-group p-2">
           <div class="is-flex">
             <div
-              class="py-1"
-              style="width: 1.5em; height: 26em; border-radius: 0.25em"
+              class="legend-gradient py-1"
               [style.background]="turboGradient"
             ></div>
             <div
-              class="is-flex is-flex-direction-column is-justify-content-space-between"
-              style="margin-top: -0.5em; margin-bottom: -0.5em"
+              class="legend-labels is-flex is-flex-direction-column is-justify-content-space-between"
             >
               @for (value of legendValues(); track value) {
-                <p class="line">
-                  <span class="dash"></span>
+                <p class="legend-line">
+                  <span class="legend-dash"></span>
                   <span>{{ value }} {{ manifest()?.unit }}</span>
                 </p>
               }

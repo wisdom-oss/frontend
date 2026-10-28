@@ -1,10 +1,38 @@
-.line {
+.timelapse-overlay {
+  position: absolute;
+  z-index: 10;
+  width: 100%;
+  pointer-events: none;
+}
+
+.timelapse-controls {
+  margin-top: 10px;
+  margin-right: 10px;
+  pointer-events: auto;
+}
+
+.timelapse-date {
+  pointer-events: none;
+}
+
+.legend-gradient {
+  width: 1.5em;
+  height: 16em;
+  border-radius: 0.25em;
+}
+
+.legend-labels {
+  margin-top: -0.5em;
+  margin-bottom: -0.5em;
+}
+
+.legend-line {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.dash {
+.legend-dash {
   height: 1px;
   background: currentColor;
   width: 0.6em;

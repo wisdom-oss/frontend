@@ -232,7 +232,7 @@ export class RadarDataComponent {
     const manifest = this.manifest();
     if (!manifest) return [];
 
-    const steps = 16;
+    const steps = 8;
     const stepSize = (manifest.max - manifest.min) / (steps - 1);
     return Array.from({length: steps}, (_, i) =>
       Math.floor(manifest.max - i * stepSize),
