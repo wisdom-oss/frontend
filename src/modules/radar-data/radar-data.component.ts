@@ -144,6 +144,8 @@ export class RadarDataComponent {
     closeButton: false,
     closeOnClick: false,
     className: "radar-cursor-tooltip",
+    anchor: "left",
+    offset: [12, 0],
   });
   private _attachCursorTooltip = effect(onCleanup => {
     let map = this.map();
@@ -156,16 +158,28 @@ export class RadarDataComponent {
     if (position) this.cursorTooltip.setLngLat(position);
   });
 
+  private cursorTooltipContent = viewChild<ElementRef<HTMLDivElement>>(
+    "cursorTooltipContent",
+  );
+  protected cursorTooltipText = computed(() => {
+    const value = this.hoveredRasterValue();
+    const manifest = this.manifest();
+    return value === null || !manifest
+      ? ""
+      : `≈ ${Math.floor(value)} ${manifest.unit}`;
+  });
+
   private _updateCursorTooltipValue = effect(() => {
     const map = this.map();
     const value = this.hoveredRasterValue();
     const manifest = this.manifest();
-    if (!map || value === null || !manifest) {
+    const content = this.cursorTooltipContent();
+    if (!map || value === null || !manifest || !content) {
       this.cursorTooltip.remove();
       return;
     }
 
-    this.cursorTooltip.setText(`≈ ${Math.floor(value)} ${manifest.unit}`);
+    this.cursorTooltip.setDOMContent(content.nativeElement);
     if (!this.cursorTooltip.isOpen()) this.cursorTooltip.addTo(map);
   });
 

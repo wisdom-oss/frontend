@@ -1,4 +1,18 @@
 <canvas #timelapseCanvas hidden></canvas>
+<div hidden>
+  <div #cursorTooltipContent class="radar-tooltip-content">
+    @if (hoveredRasterRgb(); as rgb) {
+      <span
+        class="radar-tooltip-color"
+        aria-hidden="true"
+        [style.background-color]="
+          'rgb(' + rgb.r + ', ' + rgb.g + ', ' + rgb.b + ')'
+        "
+      ></span>
+    }
+    <span>{{ cursorTooltipText() }}</span>
+  </div>
+</div>
 @if (this.timelapseImage(); as url) {
   <img
     #frameImage
