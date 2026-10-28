@@ -1,4 +1,5 @@
 import {computed, signal, Service, Signal} from "@angular/core";
+
 import * as turboColormap from "turbo-colormap";
 
 import {RadarDataService} from "./radar-data.service";

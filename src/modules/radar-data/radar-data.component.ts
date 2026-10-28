@@ -6,8 +6,8 @@ import {
   untracked,
   viewChild,
   Component,
-  ElementRef,
   Injector,
+  ElementRef,
 } from "@angular/core";
 import {
   ControlComponent,

@@ -1,11 +1,11 @@
 import {effect, inject, signal, Injector, Service, Signal} from "@angular/core";
 import {
-  ImageSource,
-  ImageSourceSpecification,
+  MercatorCoordinate,
+  MapMouseEvent,
   LngLat,
   Map,
-  MapMouseEvent,
-  MercatorCoordinate,
+  ImageSource,
+  ImageSourceSpecification,
 } from "maplibre-gl";
 
 @Service()
