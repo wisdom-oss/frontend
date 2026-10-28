@@ -1,4 +1,12 @@
-import {computed, effect, inject, signal, Component} from "@angular/core";
+import {
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+  Component,
+  Injector,
+} from "@angular/core";
 import {
   ControlComponent,
   LayerComponent,
@@ -27,11 +35,13 @@ import {GeoDataService} from "../../api/geo-data.service";
 import colorful from "../../assets/map/styles/colorful.json";
 import {ResizeMapOnLoadDirective} from "../../common/directives/resize-map-on-load.directive";
 import {signals} from "../../common/signals";
+import {range} from "../../common/utils/range";
 
 type TimerId = ReturnType<typeof setInterval>;
 
 // TODO:
 // - provide legend
+// - preload images
 
 @Component({
   imports: [
@@ -53,11 +63,12 @@ type TimerId = ReturnType<typeof setInterval>;
     }),
   ],
   host: {
-    "(document:keydown.space)": "toggleTimeLapse()",
-    "(document:keydown.backspace)": "rewindTimeLapse()",
+    "(document:keydown.space)": "toggleTimelapse()",
+    "(document:keydown.backspace)": "rewindTimelapse()",
   },
 })
 export class RadarDataComponent {
+  private injector = inject(Injector);
   protected service = inject(RadarDataService);
   protected geoDataService = inject(GeoDataService);
   protected lang = signals.lang();
@@ -92,70 +103,114 @@ export class RadarDataComponent {
     map.setMaxBounds(manifest.bbox);
   });
 
-  protected timeLapseDate = signals.maybe<Dayjs>();
-  protected timeLapseStatus = computed(() =>
-    this.timeLapseIntervalId() ? "play" : "pause",
+  protected timelapseDate = signals.maybe<Dayjs>();
+  protected timelapseStatus = computed(() =>
+    this.timelapseIntervalId() ? "play" : "pause",
   );
 
-  private _initTimeLapseDate = effect(() => {
+  private _initTimelapseDate = effect(() => {
     let manifest = this.manifest();
     if (!manifest) return;
-    this.timeLapseDate.set(manifest.start);
+    this.timelapseDate.set(manifest.start);
   });
 
-  private _timeLapseDate = effect(() =>
-    console.log(this.timeLapseDate()?.toISOString()),
+  private _timelapseDate = effect(() =>
+    console.log(this.timelapseDate()?.toISOString()),
   );
 
-  private timeLapseImage = computed(() => {
-    let manifest = this.manifest();
-    let date = this.timeLapseDate();
-    if (!manifest || !date) return;
+  private rasterUrl(manifest: RadarDataService.Manifest, date: Dayjs) {
     return manifest.folderPath + date.format("YYYY-MM-DDTHH:mm:ssZ") + ".png";
+  }
+
+  private timelapseImage = computed(() => {
+    let manifest = this.manifest();
+    let date = this.timelapseDate();
+    if (!manifest || !date) return;
+    return this.rasterUrl(manifest, date);
   });
 
-  private timeLapseIntervalId = signal<TimerId | null>(null);
-  protected toggleTimeLapse() {
+  private timelapseIntervalId = signal<TimerId | null>(null);
+  protected toggleTimelapse() {
     let manifest = this.manifest();
-    let date = this.timeLapseDate();
+    let date = this.timelapseDate();
     if (!manifest || !date) return;
 
-    let timeLapseIntervalId = this.timeLapseIntervalId();
-    if (timeLapseIntervalId) {
-      clearInterval(timeLapseIntervalId);
-      this.timeLapseIntervalId.set(null);
+    let timelapseIntervalId = this.timelapseIntervalId();
+    if (timelapseIntervalId) {
+      clearInterval(timelapseIntervalId);
+      this.timelapseIntervalId.set(null);
       return;
     }
 
     let timerId = setInterval(() => {
-      let date = this.timeLapseDate()!;
-      this.timeLapseDate.set(date.add(manifest.stepSize));
+      let date = this.timelapseDate()!;
+      this.timelapseDate.set(date.add(manifest.stepSize));
     }, 1000);
-    this.timeLapseIntervalId.set(timerId);
+    this.timelapseIntervalId.set(timerId);
   }
 
-  protected rewindTimeLapse() {
+  protected rewindTimelapse() {
     let manifest = this.manifest();
     if (!manifest) return;
 
-    let timeLapseIntervalId = this.timeLapseIntervalId();
-    if (timeLapseIntervalId) {
-      clearInterval(timeLapseIntervalId);
-      this.timeLapseIntervalId.set(null);
+    let timelapseIntervalId = this.timelapseIntervalId();
+    if (timelapseIntervalId) {
+      clearInterval(timelapseIntervalId);
+      this.timelapseIntervalId.set(null);
     }
 
-    this.timeLapseDate.set(manifest.start);
+    this.timelapseDate.set(manifest.start);
+    this.preloadTimelapseFrames(manifest);
   }
 
-  private _checkTimeLapseEnd = effect(() => {
+  private _checkTimelapseEnd = effect(() => {
     let manifest = this.manifest();
-    let date = this.timeLapseDate();
-    let intervalId = this.timeLapseIntervalId();
+    let date = this.timelapseDate();
+    let intervalId = this.timelapseIntervalId();
     if (!manifest || !date || !intervalId) return;
 
     if (date.isBefore(manifest.end)) return;
     clearInterval(intervalId);
-    this.timeLapseIntervalId.set(null);
+    this.timelapseIntervalId.set(null);
+  });
+
+  private timelapsePreloaders = [new Image(), new Image()];
+  private preloadTimelapseFrames(manifest: RadarDataService.Manifest) {
+    let date = manifest.start;
+    for (let preloader of this.timelapsePreloaders) {
+      preloader.src = this.rasterUrl(manifest, date);
+      date = date.add(manifest.stepSize);
+    }
+  }
+
+  private _preloadTimelapseFrames = effect(() => {
+    let manifest = this.manifest();
+    if (!manifest) return;
+    this.preloadTimelapseFrames(manifest);
+  });
+
+  private _slideTimelapseFrame = effect(onCleanup => {
+    let manifest = this.manifest();
+    if (!manifest) return;
+
+    let inner = untracked(() =>
+      effect(
+        () => {
+          let date = this.timelapseDate();
+          if (!date) return;
+          let preloaderCount = this.timelapsePreloaders.length;
+          let preloader = this.timelapsePreloaders.shift();
+          if (!preloader) return;
+          for (let _ in range(preloaderCount))
+            date = date.add(manifest.stepSize);
+          preloader.src = this.rasterUrl(manifest, date);
+          this.timelapsePreloaders.push(preloader);
+        },
+        {injector: this.injector},
+      ),
+    );
+
+    onCleanup(() => inner.destroy());
   });
 
   protected states = this.geoDataService.fetchLayerContents("states");

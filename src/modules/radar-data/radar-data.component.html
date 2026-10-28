@@ -12,22 +12,22 @@
         pointer-events: none;
       "
     >
-      @if (timeLapseDate(); as timeLapseDate) {
+      @if (timelapseDate(); as timelapseDate) {
         <div
           class="buttons has-addons theme-light"
           style="margin-top: 10px; margin-right: 10px; pointer-events: auto"
         >
           <div class="button is-small" style="pointer-events: none">
-            {{ timeLapseDate.locale(lang()).format("lll") }}
+            {{ timelapseDate.locale(lang()).format("lll") }}
           </div>
-          <button class="button is-small" (click)="rewindTimeLapse()">
+          <button class="button is-small" (click)="rewindTimelapse()">
             <span class="icon">
               <ng-icon name="remixRewindStartFill"></ng-icon>
             </span>
           </button>
-          <button class="button is-small" (click)="toggleTimeLapse()">
+          <button class="button is-small" (click)="toggleTimelapse()">
             <span class="icon">
-              @switch (timeLapseStatus()) {
+              @switch (timelapseStatus()) {
                 @case ("play") {
                   <ng-icon name="remixPauseLargeFill"></ng-icon>
                 }
@@ -74,11 +74,11 @@
       }
 
       @let rasterBounds = this.rasterBounds();
-      @let timeLapseImage = this.timeLapseImage();
-      @if (rasterBounds && timeLapseImage) {
+      @let timelapseImage = this.timelapseImage();
+      @if (rasterBounds && timelapseImage) {
         <mgl-image-source
           id="radar-data-source"
-          [url]="timeLapseImage"
+          [url]="timelapseImage"
           [coordinates]="rasterBounds"
         ></mgl-image-source>
         <mgl-layer
