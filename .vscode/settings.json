@@ -4,9 +4,12 @@
     "bbox",
     "greenable",
     "oowv",
+    "preloader",
+    "preloaders",
     "smartmeter",
     "timeframe",
     "timeframes",
+    "timelapse",
     "typia"
   ],
   "files.associations": {
