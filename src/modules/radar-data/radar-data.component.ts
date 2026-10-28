@@ -29,6 +29,7 @@ import {Underzoom} from "maplibre-xy";
 import typia from "typia";
 
 import * as maplibregl from "maplibre-gl";
+import * as turboColormap from "turbo-colormap";
 
 import {RadarDataService} from "./radar-data.service";
 import {GeoDataService} from "../../api/geo-data.service";
@@ -38,10 +39,6 @@ import {signals} from "../../common/signals";
 import {range} from "../../common/utils/range";
 
 type TimerId = ReturnType<typeof setInterval>;
-
-// TODO:
-// - provide legend
-// - preload images
 
 @Component({
   imports: [
@@ -55,6 +52,7 @@ type TimerId = ReturnType<typeof setInterval>;
     NgIconComponent,
   ],
   templateUrl: "./radar-data.component.html",
+  styleUrl: "./radar-data.component.scss",
   providers: [
     provideIcons({
       remixPlayLargeFill,
@@ -224,5 +222,20 @@ export class RadarDataComponent {
     let polygon = typia.assert<Polygon | MultiPolygon>(layerContent.geometry);
 
     return mask(polygon);
+  });
+
+  protected turboGradient = `linear-gradient(to top, ${turboColormap.rgbColormap
+    .map(([r, g, b]) => `rgb(${r}, ${g}, ${b})`)
+    .join(", ")})`;
+
+  protected legendValues = computed(() => {
+    const manifest = this.manifest();
+    if (!manifest) return [];
+
+    const steps = 16;
+    const stepSize = (manifest.max - manifest.min) / (steps - 1);
+    return Array.from({length: steps}, (_, i) =>
+      Math.floor(manifest.max - i * stepSize),
+    );
   });
 }

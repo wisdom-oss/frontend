@@ -94,6 +94,29 @@
         [showCompass]="false"
         position="top-left"
       ></mgl-control>
+
+      <mgl-control position="bottom-left">
+        <div class="maplibregl-ctrl-group p-2">
+          <div class="is-flex">
+            <div
+              class="py-1"
+              style="width: 1.5em; height: 26em; border-radius: 0.25em"
+              [style.background]="turboGradient"
+            ></div>
+            <div
+              class="is-flex is-flex-direction-column is-justify-content-space-between"
+              style="margin-top: -0.5em; margin-bottom: -0.5em"
+            >
+              @for (value of legendValues(); track value) {
+                <p class="line">
+                  <span class="dash"></span>
+                  <span>{{ value }} {{ manifest()?.unit }}</span>
+                </p>
+              }
+            </div>
+          </div>
+        </div>
+      </mgl-control>
     </mgl-map>
   </div>
 </div>

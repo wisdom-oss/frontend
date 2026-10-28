@@ -1,0 +1,11 @@
+.line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dash {
+  height: 1px;
+  background: currentColor;
+  width: 0.6em;
+}

@@ -19,6 +19,7 @@ export class RadarDataService {
         end: dayjs(raw.end),
         stepSize: dayjs.duration(raw.stepSize),
         imageUseISO8601: typia.assert<true>(raw.imageUseISO8601),
+        unit: typia.assert<"mm">(raw.unit),
       }),
     });
   }
@@ -37,6 +38,9 @@ namespace Raw {
       number & tags.Type<"double">,
       number & tags.Type<"double">,
     ];
+    min: number & tags.Type<"double">;
+    max: number & tags.Type<"double">;
+    unit: string;
   };
 }
 
@@ -48,6 +52,9 @@ export namespace RadarDataService {
     stepSize: Duration;
     imageUseISO8601: true;
     bbox: Raw.Manifest["bbox"];
+    min: Raw.Manifest["min"];
+    max: Raw.Manifest["min"];
+    unit: "mm";
   };
 }
 
