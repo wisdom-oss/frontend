@@ -24,7 +24,7 @@ import {
 import {mask} from "@turf/turf";
 import {Dayjs} from "dayjs";
 import {MultiPolygon, Polygon} from "geojson";
-import {Map, ImageSourceSpecification, StyleSpecification} from "maplibre-gl";
+import {Map, ImageSourceSpecification, StyleSpecification, MercatorCoordinate, MapMouseEvent, ImageSource} from "maplibre-gl";
 import {Underzoom} from "maplibre-xy";
 import typia from "typia";
 
@@ -76,16 +76,64 @@ export class RadarDataComponent {
 
   protected map = signals.maybe<Map>();
 
+  protected hoveredRasterPixel = signal<{x: number; y: number} | null>(null);
+
   protected cursorTooltip = new maplibregl.Popup({
     closeButton: false,
     closeOnClick: false,
-    className: "radar-cursor-tooltip"
-  }).setText("lol").trackPointer();
+    className: "radar-cursor-tooltip",
+  }).trackPointer();
   private _attachCursorTooltip = effect(onCleanup => {
     let map = this.map();
     if (!map) return;
-    this.cursorTooltip.addTo(map);
     onCleanup(() => this.cursorTooltip.remove());
+  });
+
+  private _updateCursorTooltip = effect(() => {
+    const map = this.map();
+    const pixel = this.hoveredRasterPixel();
+    if (!map || !pixel) {
+      this.cursorTooltip.remove();
+      return;
+    }
+
+    this.cursorTooltip.setText(`Pixel: x=${pixel.x}, y=${pixel.y}`);
+    if (!this.cursorTooltip.isOpen()) this.cursorTooltip.addTo(map);
+  });
+
+  private _trackHoveredRasterPixel = effect(onCleanup => {
+    let map = this.map();
+    let bounds = this.rasterBounds();
+    this.hoveredRasterPixel.set(null);
+    if (!map || !bounds) return;
+
+    let topLeft = MercatorCoordinate.fromLngLat(bounds[0]);
+    let bottomRight = MercatorCoordinate.fromLngLat(bounds[2]);
+
+    const onMouseMove = (event: MapMouseEvent) => {
+      let source = map.getSource<ImageSource>("radar-data-source");
+      let image = source?.image;
+      if (!image || !image.width || !image.height) {
+        this.hoveredRasterPixel.set(null);
+        return;
+      }
+
+      const position = MercatorCoordinate.fromLngLat(event.lngLat);
+      const u = (position.x - topLeft.x) / (bottomRight.x - topLeft.x);
+      const v = (position.y - topLeft.y) / (bottomRight.y - topLeft.y);
+      if (u < 0 || u >= 1 || v < 0 || v >= 1) {
+        this.hoveredRasterPixel.set(null);
+        return;
+      }
+
+      // original image pixels, zero-based from the top-left corner
+      const x = Math.floor(u * image.width);
+      const y = Math.floor(v * image.height);
+      this.hoveredRasterPixel.set({x, y});
+    };
+
+    map.on("mousemove", onMouseMove);
+    onCleanup(() => map.off("mousemove", onMouseMove));
   });
 
   protected manifest = this.service.fetchManifest();
