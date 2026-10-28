@@ -1,3 +1,13 @@
+<canvas #timelapseCanvas hidden></canvas>
+@if (this.timelapseImage(); as url) {
+  <img
+    #frameImage
+    hidden
+    [src]="url"
+    (load)="drawTimelapseImage(frameImage, url)"
+  />
+}
+
 <div class="card block is-fullheight is-flex is-flex-direction-column">
   <div class="card-content p-0 is-clipped is-flex-grow-1 is-fullheight">
     <div

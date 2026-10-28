@@ -4,7 +4,9 @@ import {
   inject,
   signal,
   untracked,
+  viewChild,
   Component,
+  ElementRef,
   Injector,
 } from "@angular/core";
 import {
@@ -86,6 +88,31 @@ export class RadarDataComponent {
   protected hoveredRasterPixel = signal<{x: number; y: number} | null>(null);
   protected hoveredMask = signal(false);
 
+  protected hoveredRasterRgb = computed<{
+    r: number;
+    g: number;
+    b: number;
+  } | null>(() => {
+    const pixel = this.hoveredRasterPixel();
+    const frame = this.loadedTimelapseFrame();
+    const context = this.timelapseContext();
+    if (
+      this.hoveredMask() ||
+      !pixel ||
+      !frame ||
+      frame !== this.timelapseImage() ||
+      !context
+    )
+      return null;
+
+    const {width, height} = context.canvas;
+    if (pixel.x < 0 || pixel.x >= width || pixel.y < 0 || pixel.y >= height)
+      return null;
+
+    const {data} = context.getImageData(pixel.x, pixel.y, 1, 1);
+    return {r: data[0], g: data[1], b: data[2]};
+  });
+
   private _trackHoveredMask = effect(onCleanup => {
     let map = this.map();
     if (!map) return;
@@ -117,12 +144,13 @@ export class RadarDataComponent {
     const map = this.map();
     const pixel = this.hoveredRasterPixel();
     const onMask = this.hoveredMask();
-    if (!map || !pixel || onMask) {
+    const pixelRgb = this.hoveredRasterRgb();
+    if (!map || !pixel || onMask || !pixelRgb) {
       this.cursorTooltip.remove();
       return;
     }
 
-    this.cursorTooltip.setText(`Pixel: x=${pixel.x}, y=${pixel.y}`);
+    this.cursorTooltip.setText(`Pixel: x=${pixel.x}, y=${pixel.y}, r=${pixelRgb.r}, g=${pixelRgb.g}, r=${pixelRgb.b}`);
     if (!this.cursorTooltip.isOpen()) this.cursorTooltip.addTo(map);
   });
 
@@ -205,12 +233,37 @@ export class RadarDataComponent {
     return manifest.folderPath + date.format("YYYY-MM-DDTHH:mm:ssZ") + ".png";
   }
 
-  private timelapseImage = computed(() => {
+  protected timelapseImage = computed(() => {
     let manifest = this.manifest();
     let date = this.timelapseDate();
     if (!manifest || !date) return;
     return this.rasterUrl(manifest, date);
   });
+
+  private timelapseCanvas =
+    viewChild<ElementRef<HTMLCanvasElement>>("timelapseCanvas");
+  private timelapseContext = computed(() =>
+    this.timelapseCanvas()?.nativeElement.getContext("2d", {
+      willReadFrequently: true,
+    }),
+  );
+  private loadedTimelapseFrame = signal<string | null>(null);
+
+  protected drawTimelapseImage(image: HTMLImageElement, url: string) {
+    this.loadedTimelapseFrame.set(null);
+    const context = this.timelapseContext();
+    if (!context) return;
+
+    const canvas = context.canvas;
+    canvas.width = image.naturalWidth;
+    canvas.height = image.naturalHeight;
+    try {
+      context.drawImage(image, 0, 0);
+      this.loadedTimelapseFrame.set(url);
+    } catch (error) {
+      console.warn("Could not read radar image pixel data", error);
+    }
+  }
 
   private timelapseIntervalId = signal<TimerId | null>(null);
   protected toggleTimelapse() {
