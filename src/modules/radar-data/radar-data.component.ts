@@ -167,7 +167,7 @@ export class RadarDataComponent {
     let timerId = setInterval(() => {
       let date = this.timelapseDate()!;
       this.timelapseDate.set(date.add(manifest.stepSize));
-    }, 1000);
+    }, 100);
     this.timelapseIntervalId.set(timerId);
   }
 
@@ -197,7 +197,7 @@ export class RadarDataComponent {
   });
 
   // timelapse frame preloading
-  private timelapsePreloaders = [new Image(), new Image()];
+  private timelapsePreloaders = Array.from({length: 20}, () => new Image());
   private preloadTimelapseFrames(manifest: RadarDataService.Manifest) {
     let date = manifest.start;
     for (let preloader of this.timelapsePreloaders) {
