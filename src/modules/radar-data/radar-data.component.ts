@@ -76,6 +76,18 @@ export class RadarDataComponent {
 
   protected map = signals.maybe<Map>();
 
+  protected cursorTooltip = new maplibregl.Popup({
+    closeButton: false,
+    closeOnClick: false,
+    className: "radar-cursor-tooltip"
+  }).setText("lol").trackPointer();
+  private _attachCursorTooltip = effect(onCleanup => {
+    let map = this.map();
+    if (!map) return;
+    this.cursorTooltip.addTo(map);
+    onCleanup(() => this.cursorTooltip.remove());
+  });
+
   protected manifest = this.service.fetchManifest();
   protected rasterBounds = computed<
     ImageSourceSpecification["coordinates"] | undefined
