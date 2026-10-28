@@ -87,6 +87,7 @@ export class RadarDataComponent {
 
   protected hoveredRasterPixel = signal<{x: number; y: number} | null>(null);
   protected hoveredMask = signal(false);
+  protected cursorLngLat = signal<maplibregl.LngLat | null>(null);
 
   protected hoveredRasterRgb = computed<{
     r: number;
@@ -110,7 +111,17 @@ export class RadarDataComponent {
       return null;
 
     const {data} = context.getImageData(pixel.x, pixel.y, 1, 1);
+    if (data[3] === 0) return null;
     return {r: data[0], g: data[1], b: data[2]};
+  });
+
+  protected hoveredRasterValue = computed<number | null>(() => {
+    const rgb = this.hoveredRasterRgb();
+    const manifest = this.manifest();
+    if (!rgb || !manifest) return null;
+
+    const intensity = turboColormap.snapColorToIntensity([rgb.r, rgb.g, rgb.b]);
+    return manifest.min + (intensity / 255) * (manifest.max - manifest.min);
   });
 
   private _trackHoveredMask = effect(onCleanup => {
@@ -133,24 +144,28 @@ export class RadarDataComponent {
     closeButton: false,
     closeOnClick: false,
     className: "radar-cursor-tooltip",
-  }).trackPointer();
+  });
   private _attachCursorTooltip = effect(onCleanup => {
     let map = this.map();
     if (!map) return;
     onCleanup(() => this.cursorTooltip.remove());
   });
 
-  private _updateCursorTooltip = effect(() => {
+  private _updateCursorTooltipPosition = effect(() => {
+    const position = this.cursorLngLat();
+    if (position) this.cursorTooltip.setLngLat(position);
+  });
+
+  private _updateCursorTooltipValue = effect(() => {
     const map = this.map();
-    const pixel = this.hoveredRasterPixel();
-    const onMask = this.hoveredMask();
-    const pixelRgb = this.hoveredRasterRgb();
-    if (!map || !pixel || onMask || !pixelRgb) {
+    const value = this.hoveredRasterValue();
+    const manifest = this.manifest();
+    if (!map || value === null || !manifest) {
       this.cursorTooltip.remove();
       return;
     }
 
-    this.cursorTooltip.setText(`Pixel: x=${pixel.x}, y=${pixel.y}, r=${pixelRgb.r}, g=${pixelRgb.g}, r=${pixelRgb.b}`);
+    this.cursorTooltip.setText(`≈ ${Math.floor(value)} ${manifest.unit}`);
     if (!this.cursorTooltip.isOpen()) this.cursorTooltip.addTo(map);
   });
 
@@ -164,6 +179,7 @@ export class RadarDataComponent {
     let bottomRight = MercatorCoordinate.fromLngLat(bounds[2]);
 
     const onMouseMove = (event: MapMouseEvent) => {
+      this.cursorLngLat.set(event.lngLat);
       let source = map.getSource<ImageSource>("radar-data-source");
       let image = source?.image;
       if (!image || !image.width || !image.height) {
