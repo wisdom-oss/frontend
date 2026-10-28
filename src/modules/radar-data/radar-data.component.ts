@@ -26,14 +26,7 @@ import {
 import {mask} from "@turf/turf";
 import {Dayjs} from "dayjs";
 import {MultiPolygon, Polygon} from "geojson";
-import {
-  MercatorCoordinate,
-  MapMouseEvent,
-  Map,
-  ImageSource,
-  ImageSourceSpecification,
-  StyleSpecification,
-} from "maplibre-gl";
+import {Map, ImageSourceSpecification, StyleSpecification} from "maplibre-gl";
 import {Underzoom} from "maplibre-xy";
 import typia from "typia";
 
@@ -41,6 +34,8 @@ import * as maplibregl from "maplibre-gl";
 import * as turboColormap from "turbo-colormap";
 
 import {RadarDataService} from "./radar-data.service";
+import {RadarDataCursorService} from "./radar-data-cursor.service";
+import {RadarDataImageSamplingService} from "./radar-data-image-sampling.service";
 import {GeoDataService} from "../../api/geo-data.service";
 import colorful from "../../assets/map/styles/colorful.json";
 import {ResizeMapOnLoadDirective} from "../../common/directives/resize-map-on-load.directive";
@@ -63,6 +58,8 @@ type TimerId = ReturnType<typeof setInterval>;
   templateUrl: "./radar-data.component.html",
   styleUrl: "./radar-data.component.scss",
   providers: [
+    RadarDataCursorService,
+    RadarDataImageSamplingService,
     provideIcons({
       remixPlayLargeFill,
       remixPauseLargeFill,
@@ -75,151 +72,21 @@ type TimerId = ReturnType<typeof setInterval>;
   },
 })
 export class RadarDataComponent {
+  // dependencies and shared data
   private injector = inject(Injector);
   protected service = inject(RadarDataService);
+  protected cursor = inject(RadarDataCursorService);
+  protected sampling = inject(RadarDataImageSamplingService);
   protected geoDataService = inject(GeoDataService);
   protected lang = signals.lang();
+  protected manifest = this.service.fetchManifest();
 
+  // map setup and geographic layers
   protected style = colorful as any as StyleSpecification;
   protected underzoom = new Underzoom(maplibregl);
 
   protected map = signals.maybe<Map>();
 
-  protected hoveredRasterPixel = signal<{x: number; y: number} | null>(null);
-  protected hoveredMask = signal(false);
-  protected cursorLngLat = signal<maplibregl.LngLat | null>(null);
-
-  protected hoveredRasterRgb = computed<{
-    r: number;
-    g: number;
-    b: number;
-  } | null>(() => {
-    const pixel = this.hoveredRasterPixel();
-    const frame = this.loadedTimelapseFrame();
-    const context = this.timelapseContext();
-    if (
-      this.hoveredMask() ||
-      !pixel ||
-      !frame ||
-      frame !== this.timelapseImage() ||
-      !context
-    )
-      return null;
-
-    const {width, height} = context.canvas;
-    if (pixel.x < 0 || pixel.x >= width || pixel.y < 0 || pixel.y >= height)
-      return null;
-
-    const {data} = context.getImageData(pixel.x, pixel.y, 1, 1);
-    if (data[3] === 0) return null;
-    return {r: data[0], g: data[1], b: data[2]};
-  });
-
-  protected hoveredRasterValue = computed<number | null>(() => {
-    const rgb = this.hoveredRasterRgb();
-    const manifest = this.manifest();
-    if (!rgb || !manifest) return null;
-
-    const intensity = turboColormap.snapColorToIntensity([rgb.r, rgb.g, rgb.b]);
-    return manifest.min + (intensity / 255) * (manifest.max - manifest.min);
-  });
-
-  private _trackHoveredMask = effect(onCleanup => {
-    let map = this.map();
-    if (!map) return;
-
-    const onMouseMove = (event: MapMouseEvent) => {
-      const layers = ["lower-saxony-mask", "lower-saxony-mask-border"];
-      this.hoveredMask.set(
-        layers.length > 0 &&
-          map.queryRenderedFeatures(event.point, {layers}).length > 0,
-      );
-    };
-
-    map.on("mousemove", onMouseMove);
-    onCleanup(() => map.off("mousemove", onMouseMove));
-  });
-
-  protected cursorTooltip = new maplibregl.Popup({
-    closeButton: false,
-    closeOnClick: false,
-    className: "radar-cursor-tooltip",
-    anchor: "left",
-    offset: [12, 0],
-  });
-  private _attachCursorTooltip = effect(onCleanup => {
-    let map = this.map();
-    if (!map) return;
-    onCleanup(() => this.cursorTooltip.remove());
-  });
-
-  private _updateCursorTooltipPosition = effect(() => {
-    const position = this.cursorLngLat();
-    if (position) this.cursorTooltip.setLngLat(position);
-  });
-
-  private cursorTooltipContent = viewChild<ElementRef<HTMLDivElement>>(
-    "cursorTooltipContent",
-  );
-  protected cursorTooltipText = computed(() => {
-    const value = this.hoveredRasterValue();
-    const manifest = this.manifest();
-    return value === null || !manifest
-      ? ""
-      : `≈ ${Math.floor(value)} ${manifest.unit}`;
-  });
-
-  private _updateCursorTooltipValue = effect(() => {
-    const map = this.map();
-    const value = this.hoveredRasterValue();
-    const manifest = this.manifest();
-    const content = this.cursorTooltipContent();
-    if (!map || value === null || !manifest || !content) {
-      this.cursorTooltip.remove();
-      return;
-    }
-
-    this.cursorTooltip.setDOMContent(content.nativeElement);
-    if (!this.cursorTooltip.isOpen()) this.cursorTooltip.addTo(map);
-  });
-
-  private _trackHoveredRasterPixel = effect(onCleanup => {
-    let map = this.map();
-    let bounds = this.rasterBounds();
-    this.hoveredRasterPixel.set(null);
-    if (!map || !bounds) return;
-
-    let topLeft = MercatorCoordinate.fromLngLat(bounds[0]);
-    let bottomRight = MercatorCoordinate.fromLngLat(bounds[2]);
-
-    const onMouseMove = (event: MapMouseEvent) => {
-      this.cursorLngLat.set(event.lngLat);
-      let source = map.getSource<ImageSource>("radar-data-source");
-      let image = source?.image;
-      if (!image || !image.width || !image.height) {
-        this.hoveredRasterPixel.set(null);
-        return;
-      }
-
-      const position = MercatorCoordinate.fromLngLat(event.lngLat);
-      const u = (position.x - topLeft.x) / (bottomRight.x - topLeft.x);
-      const v = (position.y - topLeft.y) / (bottomRight.y - topLeft.y);
-      if (u < 0 || u >= 1 || v < 0 || v >= 1) {
-        this.hoveredRasterPixel.set(null);
-        return;
-      }
-
-      // original image pixels, zero-based from the top-left corner
-      const x = Math.floor(u * image.width);
-      const y = Math.floor(v * image.height);
-      this.hoveredRasterPixel.set({x, y});
-    };
-
-    map.on("mousemove", onMouseMove);
-    onCleanup(() => map.off("mousemove", onMouseMove));
-  });
-
-  protected manifest = this.service.fetchManifest();
   protected rasterBounds = computed<
     ImageSourceSpecification["coordinates"] | undefined
   >(() => {
@@ -244,7 +111,22 @@ export class RadarDataComponent {
     map.setMaxBounds(manifest.bbox);
   });
 
+  protected states = this.geoDataService.fetchLayerContents("states");
+  protected lowerSaxonyMask = computed(() => {
+    let states = this.states();
+    if (!states) return;
+
+    // "03" is the key for Lower Saxony, officially defined
+    let layerContent = states.data.find(shape => shape.key == "03");
+    if (!layerContent) throw new Error("could not find Lower Saxony shape");
+    let polygon = typia.assert<Polygon | MultiPolygon>(layerContent.geometry);
+
+    return mask(polygon);
+  });
+
+  // timelapse selection and playback
   protected timelapseDate = signals.maybe<Dayjs>();
+  private timelapseIntervalId = signal<TimerId | null>(null);
   protected timelapseStatus = computed(() =>
     this.timelapseIntervalId() ? "play" : "pause",
   );
@@ -270,32 +152,6 @@ export class RadarDataComponent {
     return this.rasterUrl(manifest, date);
   });
 
-  private timelapseCanvas =
-    viewChild<ElementRef<HTMLCanvasElement>>("timelapseCanvas");
-  private timelapseContext = computed(() =>
-    this.timelapseCanvas()?.nativeElement.getContext("2d", {
-      willReadFrequently: true,
-    }),
-  );
-  private loadedTimelapseFrame = signal<string | null>(null);
-
-  protected drawTimelapseImage(image: HTMLImageElement, url: string) {
-    this.loadedTimelapseFrame.set(null);
-    const context = this.timelapseContext();
-    if (!context) return;
-
-    const canvas = context.canvas;
-    canvas.width = image.naturalWidth;
-    canvas.height = image.naturalHeight;
-    try {
-      context.drawImage(image, 0, 0);
-      this.loadedTimelapseFrame.set(url);
-    } catch (error) {
-      console.warn("Could not read radar image pixel data", error);
-    }
-  }
-
-  private timelapseIntervalId = signal<TimerId | null>(null);
   protected toggleTimelapse() {
     let manifest = this.manifest();
     let date = this.timelapseDate();
@@ -340,6 +196,7 @@ export class RadarDataComponent {
     this.timelapseIntervalId.set(null);
   });
 
+  // timelapse frame preloading
   private timelapsePreloaders = [new Image(), new Image()];
   private preloadTimelapseFrames(manifest: RadarDataService.Manifest) {
     let date = manifest.start;
@@ -379,19 +236,66 @@ export class RadarDataComponent {
     onCleanup(() => inner.destroy());
   });
 
-  protected states = this.geoDataService.fetchLayerContents("states");
-  protected lowerSaxonyMask = computed(() => {
-    let states = this.states();
-    if (!states) return;
+  // cursor tracking and image sampling setup
+  private timelapseCanvas =
+    viewChild<ElementRef<HTMLCanvasElement>>("timelapseCanvas");
 
-    // "03" is the key for Lower Saxony, officially defined
-    let layerContent = states.data.find(shape => shape.key == "03");
-    if (!layerContent) throw new Error("could not find Lower Saxony shape");
-    let polygon = typia.assert<Polygon | MultiPolygon>(layerContent.geometry);
+  constructor() {
+    this.cursor.track(this.map, this.rasterBounds);
+    this.sampling.connect({
+      canvas: computed(() => this.timelapseCanvas()?.nativeElement),
+      imageUrl: this.timelapseImage,
+      pixel: this.cursor.hoveredRasterPixel,
+      masked: this.cursor.hoveredMask,
+      manifest: this.manifest,
+    });
+  }
 
-    return mask(polygon);
+  // cursor tooltip presentation
+  protected cursorTooltip = new maplibregl.Popup({
+    closeButton: false,
+    closeOnClick: false,
+    className: "radar-cursor-tooltip",
+    anchor: "left",
+    offset: [12, 0],
+  });
+  private cursorTooltipContent = viewChild<ElementRef<HTMLDivElement>>(
+    "cursorTooltipContent",
+  );
+  protected cursorTooltipText = computed(() => {
+    const value = this.sampling.hoveredRasterValue();
+    const manifest = this.manifest();
+    return value === null || !manifest
+      ? ""
+      : `≈ ${Math.floor(value)} ${manifest.unit}`;
   });
 
+  private _attachCursorTooltip = effect(onCleanup => {
+    let map = this.map();
+    if (!map) return;
+    onCleanup(() => this.cursorTooltip.remove());
+  });
+
+  private _updateCursorTooltipPosition = effect(() => {
+    const position = this.cursor.cursorLngLat();
+    if (position) this.cursorTooltip.setLngLat(position);
+  });
+
+  private _updateCursorTooltipValue = effect(() => {
+    const map = this.map();
+    const value = this.sampling.hoveredRasterValue();
+    const manifest = this.manifest();
+    const content = this.cursorTooltipContent();
+    if (!map || value === null || !manifest || !content) {
+      this.cursorTooltip.remove();
+      return;
+    }
+
+    this.cursorTooltip.setDOMContent(content.nativeElement);
+    if (!this.cursorTooltip.isOpen()) this.cursorTooltip.addTo(map);
+  });
+
+  // color scale legend
   protected turboGradient = `linear-gradient(to top, ${turboColormap.rgbColormap
     .map(([r, g, b]) => `rgb(${r}, ${g}, ${b})`)
     .join(", ")})`;

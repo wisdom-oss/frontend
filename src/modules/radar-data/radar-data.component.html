@@ -1,7 +1,7 @@
 <canvas #timelapseCanvas hidden></canvas>
 <div hidden>
   <div #cursorTooltipContent class="radar-tooltip-content">
-    @if (hoveredRasterRgb(); as rgb) {
+    @if (sampling.hoveredRasterRgb(); as rgb) {
       <span
         class="radar-tooltip-color"
         aria-hidden="true"
@@ -18,7 +18,7 @@
     #frameImage
     hidden
     [src]="url"
-    (load)="drawTimelapseImage(frameImage, url)"
+    (load)="sampling.drawImage(frameImage, url)"
   />
 }
 
