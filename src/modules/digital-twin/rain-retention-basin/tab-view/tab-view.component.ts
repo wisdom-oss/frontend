@@ -4,8 +4,8 @@ import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {
   remixGamepadLine,
   remixLineChartLine,
-  remixMovieLine,
-  remixProfileLine,
+  remixPlayCircleLine,
+  remixLiveLine,
   remixMapPin2Line,
 } from "@ng-icons/remixicon";
 import { TranslateDirective } from "@ngx-translate/core";
@@ -23,8 +23,8 @@ import { TranslateDirective } from "@ngx-translate/core";
   providers: [
     provideIcons({
       remixLineChartLine,
-      remixMovieLine,
-      remixProfileLine,
+      remixPlayCircleLine,
+      remixLiveLine,
       remixGamepadLine,
       remixMapPin2Line,
     }),

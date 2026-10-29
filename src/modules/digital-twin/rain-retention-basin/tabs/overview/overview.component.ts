@@ -1,9 +1,7 @@
 import {
   computed,
   inject,
-  signal,
   Component,
-  WritableSignal,
   effect,
   Signal,
 } from "@angular/core";
@@ -22,14 +20,13 @@ import {
   remixImageFill,
   remixInfoCardLine,
   remixMap2Fill,
-  remixRainyLine,
+  remixShowersLine,
   remixTimeLine,
   remixTreeLine,
   remixWaterPercentLine,
 } from "@ng-icons/remixicon";
 import {TranslateDirective} from "@ngx-translate/core";
 import {ChartData} from "chart.js";
-import dayjs, {Dayjs} from "dayjs";
 import {StyleSpecification} from "maplibre-gl";
 import { map } from "rxjs";
 import { MapComponent, GeoJSONSourceComponent, LayerComponent } from "@maplibre/ngx-maplibre-gl";
@@ -63,7 +60,7 @@ import {RainRetentionBasinService} from "../../rain-retention-basin.service";
       remixWaterPercentLine,
       remixTimeLine,
       remixHome8Line,
-      remixRainyLine,
+      remixShowersLine,
       remixMap2Fill,
       remixImageFill,
       remixCheckboxMultipleBlankFill,
@@ -99,6 +96,13 @@ export class OverviewComponent {
   readonly catchmentAreasPolygons: Signal<RrbDigitalTwinService.CatchmentAreaFeatureCollection> = computed(() => this.splitGeometryCollection(this.catchmentAreas(), ["Polygon", "MultiPolygon"]));
   readonly catchmentAreasLineStrings: Signal<RrbDigitalTwinService.CatchmentAreaFeatureCollection> = computed(() => this.splitGeometryCollection(this.catchmentAreas(), ["LineString", "MultiLineString"]));
 
+  readonly throttles: Signal<RrbDigitalTwinService.ThrottleFeatureCollection> = this.rrb.getThrottles("1");
+  readonly waterLevelSensor: Signal<RrbDigitalTwinService.WaterLevelSensorFeature> = this.rrb.getWaterLevelSensor("1");
+  readonly latestWaterLevel: Signal<RrbDigitalTwinService.WaterLevel> = this.rrb.getLatestWaterLevel("1");
+
+  readonly rainStation: Signal<RrbDigitalTwinService.RainStationFeature> = this.rrb.getNearestRainStation("1");
+  readonly latestRain: Signal<RrbDigitalTwinService.Rain> = this.rrb.getLatestRain("1056");
+
   constructor() {
     effect(() => {
       if (this.basin()) {
@@ -107,16 +111,12 @@ export class OverviewComponent {
     });
   };
 
-  protected city = computed (() => this.basin()?.properties.city ?? "");
-  protected name = computed (() => this.basin()?.properties.name ?? "");
-  protected volume = computed(() => this.basin()?.properties.maxVolume ?? 0);
-
-  protected time: WritableSignal<Dayjs> = signal(dayjs());
-  protected waterLevel: WritableSignal<number> = signal(10);
-
-  protected catchmentArea: WritableSignal<number> = signal(92.29);
-  protected pavedArea: WritableSignal<number> = signal(38.34);
-  protected unpavedArea: WritableSignal<number> = signal(53.95);
+  readonly city = computed (() => this.basin()?.properties.city ?? "");
+  readonly name = computed (() => this.basin()?.properties.name ?? "");
+  readonly volume = computed(() => this.basin()?.properties.maxVolume ?? 0);
+  readonly catchmentArea: Signal<number> = computed(() => this.getSumOfArea(this.catchmentAreas(), "all"));
+  readonly pavedArea: Signal<number> = computed(() => this.getSumOfArea(this.catchmentAreas(), "paved"));
+  readonly unpavedArea: Signal<number> = computed(() => this.getSumOfArea(this.catchmentAreas(), "unpaved"));
 
   dataCurrentForecast: ChartData<"bar", {x: string; y: number}[]> = {
     datasets: [
@@ -164,4 +164,26 @@ export class OverviewComponent {
         features: result
     }
   };
+
+  private getSumOfArea(catchmentAreas: RrbDigitalTwinService.CatchmentAreaFeatureCollection, type: string) : number {
+    const features = catchmentAreas.features;
+
+    let sum = 0;
+
+    switch(type) {
+      case "all": 
+        features.forEach((feature) => sum = sum + feature.properties.area);
+        break;
+      case "paved":
+        features.forEach((feature) => sum = sum + feature.properties.pavedArea);
+        break;
+      case "unpaved":
+        features.forEach((feature) => sum = sum + feature.properties.unpavedArea);
+        break;
+      default:
+        break;
+    }
+
+    return Math.round(sum * 100) / 100;
+  }
 }

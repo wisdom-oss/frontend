@@ -16,7 +16,7 @@ const viewGuard: CanActivateFn = (route, state) => {
     case "pictures":
       return true;
     default:
-      return inject(Router).createUrlTree([state.url, "../model"]);
+      return inject(Router).createUrlTree([state.url, "../map"]);
   }
 };
 
@@ -37,9 +37,9 @@ export const rainRetentionBasinRoutes: Routes = [
       { path: "control", component: ControlComponent },
       
       // Standard-Tab, wenn man nur /tabs aufruft
-      { path: "", redirectTo: "overview/model", pathMatch: "full" },
+      { path: "", redirectTo: "overview/map", pathMatch: "full" },
       // Wildcard für falsche Unterpfade innerhalb der Tabs
-      { path: "**", redirectTo: "overview/model" }
+      { path: "**", redirectTo: "overview/map" }
     ]
 
   },

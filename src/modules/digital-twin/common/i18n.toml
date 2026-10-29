@@ -66,6 +66,10 @@ de = "Ablaufdrossel"
 en = "Features"
 de = "Eigenschaften"
 
+[header.precipitation]
+en = "Precipitation"
+de = "Niederschlag"
+
 [header.rainForecast]
 en = "Rain Forecast"
 de = "Regenvorhersage"
@@ -98,6 +102,10 @@ de = "Zeitpunkt wählen"
 en = "City/Municipality"
 de = "Stadt/Gemeinde"
 
+[label.description]
+en = "Description"
+de = "Beschreibung"
+
 [label.drainage.yes]
 en = "Draining since"
 de = "Entwässern seit"
@@ -114,6 +122,10 @@ de = "Entwässerungsvorlauf"
 en = "Latitude"
 de = "Breitengrad"
 
+[label.level]
+en = "Level"
+de = "Pegel"
+
 [label.location]
 en = "Location"
 de = "Standort"
@@ -122,13 +134,13 @@ de = "Standort"
 en = "Longitude"
 de = "Längengrad"
 
-[label.pavedArea]
-en = "Paved area"
-de = "Befestigte Fläche"
-
 [label.name]
 en = "Name"
 de = "Name"
+
+[label.pavedArea]
+en = "Paved area"
+de = "Befestigte Fläche"
 
 [label.rainAmount]
 en = "Rain Amount"
@@ -186,6 +198,10 @@ de = "Titel"
 en = "Unpaved area"
 de = "Unbefestigte Fläche"
 
+[label.volume]
+en = "Volume"
+de = "Volumen"
+
 [notification.success]
 en = "No drainage is currently necessary or planned!"
 de = "Derzeit keine Entwässerung notwendig und geplant!"
@@ -199,8 +215,8 @@ en = "History"
 de = "Historie"
 
 [tab.overview]
-en = "Overview"
-de = "Übersicht"
+en = "Current Status"
+de = "Ist-Zustand"
 
 [tab.simulation]
 en = "Simulation"

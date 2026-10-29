@@ -7,7 +7,7 @@
         filename="RRB_Damme_Water.glb"
         [cam]="{x: -96, y: 40, z: 4}"
         [isSimulation]="false"
-        [(waterLevel)]="waterLevel"
+        [(waterLevel)]="latestWaterLevel().level"
         [city]="city()"
         [name]="name()"
       />
@@ -48,6 +48,30 @@
                   [data]="catchmentAreasLineStrings"
                 ></mgl-geojson-source>
               }
+
+              @let throttles = this.throttles();
+              @if (throttles) {
+                <mgl-geojson-source
+                  id="throttles-source"
+                  [data]="throttles"
+                ></mgl-geojson-source>
+              }
+
+              @let waterLevelSensor = this.waterLevelSensor();
+              @if (waterLevelSensor) {
+                <mgl-geojson-source
+                  id="water-level-sensor-source"
+                  [data]="waterLevelSensor"
+                ></mgl-geojson-source>
+              }
+
+              @let rainStation = this.rainStation();
+              @if (rainStation) {
+                <mgl-geojson-source
+                  id="rain-station-source"
+                  [data]="rainStation"
+                ></mgl-geojson-source>
+              }
             </ng-container>
             <mgl-layer
               id="catchmentAreasPolygons"
@@ -67,21 +91,21 @@
                 'fill-opacity': 0.25
               }"
             ></mgl-layer>
-             <mgl-layer
+            <mgl-layer
               id="catchmentAreasLineStrings"
               type="line"
               source="catchment-areas-line-strings-source"
               [paint]="{
-                'line-color': [
-                  'match',
-                  ['id'],
-                  1, '#0000FF',
-                  2, '#00FF00',
-                  3, '#FF8000',
-                  4, '#FF007F',
-                  5, '#FF0000',
-                  '#FFFF00'
-                ],
+                'line-color': '#000000',
+                'line-width': 2
+              }"
+            ></mgl-layer>
+            <mgl-layer
+              id="throttles"
+              type="line"
+              source="throttles-source"
+              [paint]="{
+                'line-color': '#000000',
                 'line-width': 2
               }"
             ></mgl-layer>
@@ -91,6 +115,24 @@
               source="basin-source"
               [paint]="{
                 'fill-color': '#66CCFF'
+              }"
+            ></mgl-layer>
+            <mgl-layer
+              id="water-level-sensor"
+              type="symbol"
+              source="water-level-sensor-source"
+              [layout]="{
+                'icon-image': 'remixicon:contrast-drop-2-line',
+                'icon-allow-overlap': true
+              }"
+            ></mgl-layer>
+            <mgl-layer
+              id="rain-station"
+              type="symbol"
+              source="rain-station-source"
+              [layout]="{
+                'icon-image': 'remixicon:showers-line',
+                'icon-allow-overlap': true
               }"
             ></mgl-layer>
           </mgl-map>
@@ -194,26 +236,57 @@
 
 <div>
   <p class="is-size-3 m-4" translate>digitalTwin.header.currentValues</p>
+
+  <p class="is-size-4 m-4" translate>digitalTwin.header.waterLevel</p>
   <div class="grid is-col-min-10">
+    <div class="is-flex is-flex-direction-row">
+      <ng-icon name="remixInfoCardLine" size="2.5rem" class="mx-4" />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        <p><span translate>digitalTwin.label.description</span>:</p>
+        <p>{{ waterLevelSensor().properties.name }} ({{ waterLevelSensor().properties.type}})</p>
+      </div>
+    </div>
     <div class="is-flex is-flex-direction-row">
       <ng-icon name="remixTimeLine" size="2.5rem" class="mx-4" />
       <div class="is-flex is-flex-direction-column is-justify-content-center">
-        <p>
-          <span translate>digitalTwin.label.time</span>:
-          {{ time().format("DD.MM.YY, HH:mm") }}
-        </p>
+        <p><span translate>digitalTwin.label.time</span>:</p>
+        <p>{{ latestWaterLevel().timestamp.format("DD.MM.YY, HH:mm") }}</p>
       </div>
     </div>
     <div class="is-flex is-flex-direction-row">
       <ng-icon name="remixContrastDrop2Line" size="2.5rem" class="mx-4" />
       <div class="is-flex is-flex-direction-column is-justify-content-center">
-        <p>
-          <span translate>digitalTwin.header.waterLevel</span>:
-          {{ waterLevel() }} %
-        </p>
+        <p><span translate>digitalTwin.label.level</span> / <span translate>digitalTwin.label.volume</span>:</p>
+        <p>{{ latestWaterLevel().level }} {{ waterLevelSensor().properties.unit }} / {{ latestWaterLevel().volume }} m³</p>
       </div>
     </div>
   </div>
+
+  <p class="is-size-4 m-4" translate>digitalTwin.header.precipitation</p>
+  <div class="grid is-col-min-10">
+    <div class="is-flex is-flex-direction-row">
+      <ng-icon name="remixInfoCardLine" size="2.5rem" class="mx-4" />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        <p><span translate>digitalTwin.label.description</span>:</p>
+        <p>{{ rainStation().properties.name }} ({{ rainStation().properties.type }})</p>
+      </div>
+    </div>
+    <div class="is-flex is-flex-direction-row">
+      <ng-icon name="remixTimeLine" size="2.5rem" class="mx-4" />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        <p><span translate>digitalTwin.label.time</span>:</p>
+        <p>{{ latestRain().timestamp.format("DD.MM.YY, HH:mm") }}</p>
+      </div>
+    </div>
+    <div class="is-flex is-flex-direction-row">
+      <ng-icon name="remixShowersLine" size="2.5rem" class="mx-4" />
+      <div class="is-flex is-flex-direction-column is-justify-content-center">
+        <p><span translate>digitalTwin.label.rainAmount</span>:</p>
+        <p>{{ latestRain().value }} {{ rainStation().properties.unit }}</p>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <hr />
