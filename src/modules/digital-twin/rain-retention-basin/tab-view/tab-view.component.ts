@@ -2,7 +2,7 @@ import {Component} from "@angular/core";
 import {RouterLinkActive, RouterLink, RouterOutlet} from "@angular/router";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {
-  remixGamepadLine,
+  remixBarChart2Line,
   remixLineChartLine,
   remixPlayCircleLine,
   remixLiveLine,
@@ -25,7 +25,7 @@ import { TranslateDirective } from "@ngx-translate/core";
       remixLineChartLine,
       remixPlayCircleLine,
       remixLiveLine,
-      remixGamepadLine,
+      remixBarChart2Line,
       remixMapPin2Line,
     }),
   ],

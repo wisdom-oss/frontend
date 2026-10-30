@@ -4,9 +4,9 @@ import { TabViewComponent } from "./tab-view/tab-view.component";
 import { SelectBasinViewComponent } from "./select-basin-view/select-basin-view.component";
 import { queryParameterGuard } from "../../../core/query-parameter.guard";
 import { inject } from "@angular/core";
-import { ControlComponent } from "./tabs/control/control.component";
+import { ValidationComponent } from "./tabs/validation/validation.component";
 import { HistoryComponent } from "./tabs/history/history.component";
-import { OverviewComponent } from "./tabs/overview/overview.component";
+import { CurrentStatusComponent } from "./tabs/current-status/current-status.component";
 import { SimulationComponent } from "./tabs/simulation/simulation.component";
 
 const viewGuard: CanActivateFn = (route, state) => {
@@ -28,18 +28,18 @@ export const rainRetentionBasinRoutes: Routes = [
     canActivate: [queryParameterGuard("id", "/digital-twin/rain-retention-basin")],
     children: [
       {
-        path: "overview/:view",
-        component: OverviewComponent,
+        path: "current-status/:view",
+        component: CurrentStatusComponent,
         canActivate: [viewGuard],
       },
       { path: "history", component: HistoryComponent },
       { path: "simulation", component: SimulationComponent },
-      { path: "control", component: ControlComponent },
+      { path: "validation", component: ValidationComponent },
       
       // Standard-Tab, wenn man nur /tabs aufruft
-      { path: "", redirectTo: "overview/map", pathMatch: "full" },
+      { path: "", redirectTo: "current-status/map", pathMatch: "full" },
       // Wildcard für falsche Unterpfade innerhalb der Tabs
-      { path: "**", redirectTo: "overview/map" }
+      { path: "**", redirectTo: "current-status/map" }
     ]
 
   },

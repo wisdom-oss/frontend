@@ -39,7 +39,7 @@ import {RrbDigitalTwinService} from "../../../../../api/rrb-digital-twin.service
 import {RainRetentionBasinService} from "../../rain-retention-basin.service";
 
 @Component({
-  selector: "rrb-overview",
+  selector: "rrb-current-status",
   imports: [
     TranslateDirective,
     NgIconComponent,
@@ -52,8 +52,8 @@ import {RainRetentionBasinService} from "../../rain-retention-basin.service";
     GeoJSONSourceComponent,
     LayerComponent
 ],
-  templateUrl: "./overview.component.html",
-  styleUrl: "./overview.component.scss",
+  templateUrl: "./current-status.component.html",
+  styleUrl: "./current-status.component.scss",
   providers: [
     provideIcons({
       remixContrastDrop2Line,
@@ -74,7 +74,7 @@ import {RainRetentionBasinService} from "../../rain-retention-basin.service";
     }),
   ],
 })
-export class OverviewComponent {
+export class CurrentStatusComponent {
   private rrb= inject(RainRetentionBasinService);
   private route = inject(ActivatedRoute);
 

@@ -206,18 +206,19 @@ de = "Volumen"
 en = "No drainage is currently necessary or planned!"
 de = "Derzeit keine Entwässerung notwendig und geplant!"
 
-[tab.control]
-en = "Control"
-de = "Steuerung"
+
+[tab.currentStatus]
+en = "Current Status"
+de = "Ist-Zustand"
 
 [tab.history]
 en = "History"
 de = "Historie"
 
-[tab.overview]
-en = "Current Status"
-de = "Ist-Zustand"
-
 [tab.simulation]
 en = "Simulation"
 de = "Simulation"
+
+[tab.validation]
+en = "Validation"
+de = "Validierung"
