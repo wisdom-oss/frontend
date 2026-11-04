@@ -40,7 +40,7 @@ import {RadarDataService} from "./radar-data.service";
 import {RadarDataCursorService} from "./radar-data-cursor.service";
 import {RadarDataImageSamplingService} from "./radar-data-image-sampling.service";
 import {GeoDataService} from "../../api/geo-data.service";
-import colorful from "../../assets/map/styles/colorful.json";
+import mapStyle from "../../assets/map/styles/radar-data.json";
 import {ResizeMapOnLoadDirective} from "../../common/directives/resize-map-on-load.directive";
 import {signals} from "../../common/signals";
 import {range} from "../../common/utils/range";
@@ -89,10 +89,22 @@ export class RadarDataComponent implements OnInit {
   protected manifest = this.service.fetchManifest();
 
   // map setup and geographic layers
-  protected style = colorful as any as StyleSpecification;
   protected underzoom = new Underzoom(maplibregl);
+  protected style = mapStyle as any as StyleSpecification;
 
   protected map = signals.maybe<Map>();
+
+  private _blackLabels = effect(() => {
+    let map = this.map();
+    if (!map) return;
+    for (let layer of this.style.layers) {
+      if (!layer.id.startsWith("label-")) continue;
+      map.setPaintProperty(layer.id, "text-color", "#000");
+      map.setLayoutProperty(layer.id, "text-font", [
+        "Figtree Semibold, sans-serif"
+      ]);
+    }
+  });
 
   protected rasterBounds = computed<
     ImageSourceSpecification["coordinates"] | undefined
@@ -129,6 +141,25 @@ export class RadarDataComponent implements OnInit {
     let polygon = typia.assert<Polygon | MultiPolygon>(layerContent.geometry);
 
     return mask(polygon);
+  });
+
+  private layerOrder = [
+    "radar-data",
+    ...this.style.layers
+      .map(({id}) => id)
+      .filter(id => id.startsWith("label-")),
+    "lower-saxony-mask",
+    "lower-saxony-mask-border",
+  ];
+
+  private sortLayers = effect(() => {
+    let map = this.map();
+    let lowerSaxonyMask = this.lowerSaxonyMask();
+    let rasterBounds = this.rasterBounds();
+    let timelapseImage = this.timelapseImage();
+    if (!map || !lowerSaxonyMask || !rasterBounds || !timelapseImage) return;
+    for (let layer of this.layerOrder) map.moveLayer(layer, "anchor");
+    this.sortLayers.destroy;
   });
 
   // timelapse selection and playback

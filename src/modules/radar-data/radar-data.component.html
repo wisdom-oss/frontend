@@ -60,6 +60,12 @@
       [attributionControl]="{compact: true}"
       (mapLoad)="this.map.set($event)"
     >
+      <mgl-layer
+        id="anchor"
+        type="background"
+        [paint]="{'background-opacity': 0}"
+      ></mgl-layer>
+
       @if (lowerSaxonyMask(); as mask) {
         <mgl-geojson-source
           id="lower-saxony-mask-source"
@@ -69,7 +75,6 @@
           id="lower-saxony-mask"
           type="fill"
           source="lower-saxony-mask-source"
-          before="lower-saxony-mask-border"
           [paint]="{
             'fill-color': '#444',
           }"
@@ -97,7 +102,6 @@
           id="radar-data"
           type="raster"
           source="radar-data-source"
-          before="lower-saxony-mask"
         ></mgl-layer>
       }
 
