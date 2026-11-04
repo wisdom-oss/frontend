@@ -29,7 +29,7 @@
     >
       @if (timelapseDate(); as timelapseDate) {
         <div class="timelapse-controls buttons has-addons theme-light">
-          <div class="timelapse-date button is-small">
+          <div class="timelapse-date button is-small has-tabular-nums">
             {{ timelapseDate.locale(lang()).format("lll") }}
           </div>
           <button class="button is-small" (click)="rewindTimelapse()">
