@@ -49,6 +49,15 @@ type TimerId = ReturnType<typeof setInterval>;
 
 const TIMELAPSE_DATE_FORMAT = "YYYY-MM-DDTHH:mm:ssZ";
 
+// TODO: The input for the datetime does not enforce the step size properly.
+//       To combat this, we can get the duration between the manifest.start and
+//       our selected time. The modulo of this duration and the stepsize should
+//       be zero. If that is not the case, then we can round to next best
+//       multiple of the stepsize that would return rest 0 of that modulo
+//       calculation. This way we can calculate if a timestamp is valid without
+//       calculating every timestamp in between.
+//       Then apply the same correction code to the query param loading.
+
 @Component({
   imports: [
     ControlComponent,
@@ -77,6 +86,11 @@ const TIMELAPSE_DATE_FORMAT = "YYYY-MM-DDTHH:mm:ssZ";
   },
 })
 export class RadarDataComponent implements OnInit {
+  onChange(event: any) {
+    // TODO: set timelapse date after rounding
+    console.log(event);
+  }
+
   // dependencies and shared data
   private injector = inject(Injector);
   private location = inject(Location);
@@ -101,7 +115,7 @@ export class RadarDataComponent implements OnInit {
       if (!layer.id.startsWith("label-")) continue;
       map.setPaintProperty(layer.id, "text-color", "#000");
       map.setLayoutProperty(layer.id, "text-font", [
-        "Figtree Semibold, sans-serif"
+        "Figtree Semibold, sans-serif",
       ]);
     }
   });
@@ -174,6 +188,9 @@ export class RadarDataComponent implements OnInit {
     if (!manifest || untracked(this.timelapseDate)) return;
     this.timelapseDate.set(manifest.start);
   });
+
+  protected timelapseInput =
+    viewChild.required<HTMLInputElement>("timelapseInput");
 
   // url is only modified here, so parsing once is fine
   private timelapseUrl = this.router.parseUrl(this.location.path(true));

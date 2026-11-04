@@ -29,9 +29,24 @@
     >
       @if (timelapseDate(); as timelapseDate) {
         <div class="timelapse-controls buttons has-addons theme-light">
-          <div class="timelapse-date button is-small has-tabular-nums">
+          <button
+            class="button is-small has-tabular-nums"
+            style="width: 10.5em"
+            (click)="timelapseInput.showPicker()"
+          >
             {{ timelapseDate.locale(lang()).format("lll") }}
-          </div>
+          </button>
+          <input
+            type="datetime-local"
+            class="button is-small is-position-absolute is-invisible"
+            style="width: 10.5em"
+            [value]="timelapseDate.format('YYYY-MM-DDTHH:mm')"
+            [min]="manifest()?.start.format('YYYY-MM-DDTHH:mm')"
+            [max]="manifest()?.end.format('YYYY-MM-DDTHH:mm')"
+            [step]="manifest()?.stepSize.asSeconds()"
+            (change)="onChange($event)"
+            #timelapseInput
+          />
           <button class="button is-small" (click)="rewindTimelapse()">
             <span class="icon">
               <ng-icon name="remixRewindStartFill"></ng-icon>
