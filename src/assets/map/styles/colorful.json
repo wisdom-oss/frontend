@@ -34,7 +34,7 @@
   "sprite": [
     {
       "id": "base",
-      "url": "https://wisdom02.vlba.uni-oldenburg.de/assets/sprites/sprites"
+      "url": "https://wisdom02.vlba.uni-oldenburg.de/assets/sprites/base"
     },
     {
       "id": "remixicon",
