@@ -1,3 +1,4 @@
+import {Location} from "@angular/common";
 import {
   computed,
   effect,
@@ -6,9 +7,11 @@ import {
   untracked,
   viewChild,
   Component,
+  OnInit,
   Injector,
   ElementRef,
 } from "@angular/core";
+import {Router} from "@angular/router";
 import {
   ControlComponent,
   LayerComponent,
@@ -24,7 +27,7 @@ import {
   remixRewindStartFill,
 } from "@ng-icons/remixicon";
 import {mask} from "@turf/turf";
-import {Dayjs} from "dayjs";
+import dayjs, {Dayjs} from "dayjs";
 import {MultiPolygon, Polygon} from "geojson";
 import {Map, ImageSourceSpecification, StyleSpecification} from "maplibre-gl";
 import {Underzoom} from "maplibre-xy";
@@ -43,6 +46,8 @@ import {signals} from "../../common/signals";
 import {range} from "../../common/utils/range";
 
 type TimerId = ReturnType<typeof setInterval>;
+
+const TIMELAPSE_DATE_FORMAT = "YYYY-MM-DDTHH:mm:ssZ";
 
 @Component({
   imports: [
@@ -71,9 +76,11 @@ type TimerId = ReturnType<typeof setInterval>;
     "(document:keydown.backspace)": "rewindTimelapse()",
   },
 })
-export class RadarDataComponent {
+export class RadarDataComponent implements OnInit {
   // dependencies and shared data
   private injector = inject(Injector);
+  private location = inject(Location);
+  private router = inject(Router);
   protected service = inject(RadarDataService);
   protected cursor = inject(RadarDataCursorService);
   protected sampling = inject(RadarDataImageSamplingService);
@@ -133,16 +140,36 @@ export class RadarDataComponent {
 
   private _initTimelapseDate = effect(() => {
     let manifest = this.manifest();
-    if (!manifest) return;
+    if (!manifest || untracked(this.timelapseDate)) return;
     this.timelapseDate.set(manifest.start);
   });
 
-  private _timelapseDate = effect(() =>
-    console.log(this.timelapseDate()?.toISOString()),
-  );
+  // url is only modified here, so parsing once is fine
+  private timelapseUrl = this.router.parseUrl(this.location.path(true));
+
+  ngOnInit() {
+    let value = this.timelapseUrl.queryParamMap.get("date");
+    if (!value) return;
+
+    let date = dayjs(value);
+    if (date.isValid()) this.timelapseDate.set(date);
+  }
+
+  private _syncTimelapseDateToUrl = effect(() => {
+    if (this.timelapseStatus() != "pause") return;
+    let date = this.timelapseDate();
+    if (!date) return;
+
+    this.timelapseUrl.queryParams["date"] = date.format(TIMELAPSE_DATE_FORMAT);
+    this.location.replaceState(
+      this.router.serializeUrl(this.timelapseUrl),
+      "",
+      this.location.getState(),
+    );
+  });
 
   private rasterUrl(manifest: RadarDataService.Manifest, date: Dayjs) {
-    return manifest.folderPath + date.format("YYYY-MM-DDTHH:mm:ssZ") + ".png";
+    return manifest.folderPath + date.format(TIMELAPSE_DATE_FORMAT) + ".png";
   }
 
   protected timelapseImage = computed(() => {
