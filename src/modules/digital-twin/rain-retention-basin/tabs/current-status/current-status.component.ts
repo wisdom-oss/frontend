@@ -2,7 +2,6 @@ import {
   computed,
   inject,
   Component,
-  effect,
   Signal,
 } from "@angular/core";
 import {toSignal} from "@angular/core/rxjs-interop";
@@ -16,6 +15,7 @@ import {
   remixCollageLine,
   remixCommunityLine,
   remixContrastDrop2Line,
+  remixExchangeLine,
   remixHome8Line,
   remixImageFill,
   remixInfoCardLine,
@@ -71,6 +71,7 @@ import {RainRetentionBasinService} from "../../rain-retention-basin.service";
       remixTreeLine,
       remixCollageLine,
       remixBox2Line,
+      remixExchangeLine,
     }),
   ],
 })
@@ -95,21 +96,16 @@ export class CurrentStatusComponent {
   readonly catchmentAreas: Signal<RrbDigitalTwinService.CatchmentAreaFeatureCollection> = this.rrb.getCatchmentAreas("1");
   readonly catchmentAreasPolygons: Signal<RrbDigitalTwinService.CatchmentAreaFeatureCollection> = computed(() => this.splitGeometryCollection(this.catchmentAreas(), ["Polygon", "MultiPolygon"]));
   readonly catchmentAreasLineStrings: Signal<RrbDigitalTwinService.CatchmentAreaFeatureCollection> = computed(() => this.splitGeometryCollection(this.catchmentAreas(), ["LineString", "MultiLineString"]));
+  readonly inflowSensors: Signal<RrbDigitalTwinService.InflowSensorFeatureCollection> = this.rrb.getInflowSensors("1");
 
   readonly throttles: Signal<RrbDigitalTwinService.ThrottleFeatureCollection> = this.rrb.getThrottles("1");
-  readonly waterLevelSensor: Signal<RrbDigitalTwinService.WaterLevelSensorFeature> = this.rrb.getWaterLevelSensor("1");
+  readonly outflowSensors: Signal<RrbDigitalTwinService.OutflowSensorFeatureCollection> = this.rrb.getOutflowSensors("1");
+
+  readonly waterLevelSensors: Signal<RrbDigitalTwinService.WaterLevelSensorFeatureCollection> = this.rrb.getWaterLevelSensors("1");
   readonly latestWaterLevel: Signal<RrbDigitalTwinService.WaterLevel> = this.rrb.getLatestWaterLevel("1");
 
   readonly rainStation: Signal<RrbDigitalTwinService.RainStationFeature> = this.rrb.getNearestRainStation("1");
   readonly latestRain: Signal<RrbDigitalTwinService.Rain> = this.rrb.getLatestRain("1056");
-
-  constructor() {
-    effect(() => {
-      if (this.basin()) {
-        // this.catchmentAreas.set(this.rrb.getCatchmentAreas(this.basinId())());
-      }
-    });
-  };
 
   readonly city = computed (() => this.basin()?.properties.city ?? "");
   readonly name = computed (() => this.basin()?.properties.name ?? "");

@@ -66,6 +66,14 @@ de = "Ablaufdrossel"
 en = "Features"
 de = "Eigenschaften"
 
+[header.inflow]
+en = "Inflow"
+de = "Zufluss"
+
+[header.outflow]
+en = "Outflow"
+de = "Abfluss"
+
 [header.precipitation]
 en = "Precipitation"
 de = "Niederschlag"
@@ -117,6 +125,10 @@ de = "Keine Entwässerung"
 [label.drainageForerun]
 en = "Drainage Forerun"
 de = "Entwässerungsvorlauf"
+
+[label.flowRate]
+en = "Flow Rate"
+de = "Durchflussmenge"
 
 [label.latitude]
 en = "Latitude"

@@ -11,31 +11,45 @@ const URL = "/api/rrb-digital-twin" as const;
     providedIn: "root"
 })
 export class RrbDigitalTwinService extends api.service(URL) {
-    fetchGetBasins(): api.Signal<RrbDigitalTwinService.BasinFeatureCollection> {
+    fetchBasins(): api.Signal<RrbDigitalTwinService.BasinFeatureCollection> {
         return api.resource({
             url: `${URL}/v1/get-basins`,
             validate: typia.createValidate<RrbDigitalTwinService.BasinFeatureCollection>()
         });
     };
 
-    fetchGetCatchmentAreasOfBasin(basinId: api.RequestSignal<string>): api.Signal<RrbDigitalTwinService.CatchmentAreaFeatureCollection> {
+    fetchCatchmentAreasOfBasin(basinId: api.RequestSignal<string>): api.Signal<RrbDigitalTwinService.CatchmentAreaFeatureCollection> {
         return api.resource({
             url: `${URL}/v1/get-catchment-areas-of-basin?id=${basinId}`,
             validate: typia.createValidate<RrbDigitalTwinService.CatchmentAreaFeatureCollection>()
         });
     };
 
-    fetchGetThrottlesOfBasin(basinId: api.RequestSignal<string>): api.Signal<RrbDigitalTwinService.ThrottleFeatureCollection> {
+    fetchThrottlesOfBasin(basinId: api.RequestSignal<string>): api.Signal<RrbDigitalTwinService.ThrottleFeatureCollection> {
         return api.resource({
             url: `${URL}/v1/get-throttles-of-basin?id=${basinId}`,
             validate: typia.createValidate<RrbDigitalTwinService.ThrottleFeatureCollection>()
         });
     };
 
-    fetchWaterLevelSensorOfBasin(basinId: api.RequestSignal<string>): api.Signal<RrbDigitalTwinService.WaterLevelSensorFeature> {
+    fetchInflowSensorsOfBasin(basinId: api.RequestSignal<string>): api.Signal<RrbDigitalTwinService.InflowSensorFeatureCollection> {
         return api.resource({
-            url: `${URL}/v1/get-water-level-sensor-of-basin?id=${basinId}`,
-            validate: typia.createValidate<RrbDigitalTwinService.WaterLevelSensorFeature>()
+            url: `${URL}/v1/get-inflow-sensors-of-basin?id=${basinId}`,
+            validate: typia.createValidate<RrbDigitalTwinService.InflowSensorFeatureCollection>(),
+        });
+    };
+    
+    fetchOutflowSensorsOfBasin(basinId: api.RequestSignal<string>): api.Signal<RrbDigitalTwinService.OutflowSensorFeatureCollection> {
+        return api.resource({
+            url: `${URL}/v1/get-outflow-sensors-of-basin?id=${basinId}`,
+            validate: typia.createValidate<RrbDigitalTwinService.OutflowSensorFeatureCollection>(),
+        });
+    };
+
+    fetchWaterLevelSensorsOfBasin(basinId: api.RequestSignal<string>): api.Signal<RrbDigitalTwinService.WaterLevelSensorFeatureCollection> {
+        return api.resource({
+            url: `${URL}/v1/get-water-level-sensors-of-basin?id=${basinId}`,
+            validate: typia.createValidate<RrbDigitalTwinService.WaterLevelSensorFeatureCollection>()
         });
     };
 
@@ -110,6 +124,23 @@ export namespace RrbDigitalTwinService {
         };
     };
 
+    export type InflowSensorFeatureCollection = {
+        type: "FeatureCollection";
+        features: InflowSensorFeature[];
+    };
+
+    export type InflowSensorFeature = {
+        type: "Feature";
+        id: string;
+        geometry: Geometry;
+        properties: {
+            catchmentAreaId: number;
+            name: string;
+            type: string;
+            unit: string;
+        };
+    };
+
     export type ThrottleFeatureCollection = {
         type: "FeatureCollection";
         features: ThrottleFeature[];
@@ -129,6 +160,28 @@ export namespace RrbDigitalTwinService {
             localLossFactor: number;
             roughness: number;
         };
+    };
+
+    export type OutflowSensorFeatureCollection = {
+        type: "FeatureCollection";
+        features: OutflowSensorFeature[];
+    };
+
+    export type OutflowSensorFeature = {
+        type: "Feature";
+        id: string;
+        geometry: Geometry;
+        properties: {
+            throttleId: number;
+            name: string;
+            type: string;
+            unit: string;
+        };
+    };
+
+    export type WaterLevelSensorFeatureCollection = {
+        type: "FeatureCollection";
+        features: WaterLevelSensorFeature[];
     };
 
     export type WaterLevelSensorFeature = {

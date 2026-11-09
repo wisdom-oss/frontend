@@ -9,14 +9,14 @@ import dayjs from "dayjs";
 export class RainRetentionBasinService {
     private rrb = inject(RrbDigitalTwinService);
 
-    readonly basins = this.rrb.fetchGetBasins();
+    readonly basins = this.rrb.fetchBasins();
 
     getBasinById(currentId: string) {
         return this.basins()?.features.find(basin => basin.id === currentId);
     };
 
     getCatchmentAreas(basinId: string) {
-        return signals.mapTo(this.rrb.fetchGetCatchmentAreasOfBasin(basinId), 
+        return signals.mapTo(this.rrb.fetchCatchmentAreasOfBasin(basinId), 
             (catchmentAreas): RrbDigitalTwinService.CatchmentAreaFeatureCollection => ({
                 type: "FeatureCollection",
                 features: (catchmentAreas?.features ?? [])
@@ -30,8 +30,23 @@ export class RainRetentionBasinService {
         );
     };
 
+    getInflowSensors(basinId: string) {
+        return signals.mapTo(this.rrb.fetchInflowSensorsOfBasin(basinId), 
+            (sensors): RrbDigitalTwinService.InflowSensorFeatureCollection => ({
+                type: "FeatureCollection",
+                features: (sensors?.features ?? [])
+                .map(feature => ({
+                    type: "Feature",
+                    id: feature?.id ?? "",
+                    geometry: feature?.geometry ?? {type: "Point", coordinates: []},
+                    properties: feature?.properties ?? {catchmentAreaId: 0, name: "", type: "", unit: ""},
+                })),
+            }),
+        );
+    };
+
     getThrottles(basinId: string) {
-        return signals.mapTo(this.rrb.fetchGetThrottlesOfBasin(basinId), 
+        return signals.mapTo(this.rrb.fetchThrottlesOfBasin(basinId), 
             (throttles): RrbDigitalTwinService.ThrottleFeatureCollection => ({
                 type: "FeatureCollection",
                 features: (throttles?.features ?? [])
@@ -45,13 +60,32 @@ export class RainRetentionBasinService {
         );
     };
 
-    getWaterLevelSensor(basinId: string) {
-        return signals.mapTo(this.rrb.fetchWaterLevelSensorOfBasin(basinId), 
-            (sensor): RrbDigitalTwinService.WaterLevelSensorFeature => ({
-                type: "Feature",
-                id: sensor?.id ?? "",
-                geometry: sensor?.geometry ?? {type: "Point", coordinates: []},
-                properties: sensor?.properties ?? {basinId: 0, name: "", type: "", unit: ""},
+    getOutflowSensors(basinId: string) {
+        return signals.mapTo(this.rrb.fetchOutflowSensorsOfBasin(basinId), 
+            (sensors): RrbDigitalTwinService.OutflowSensorFeatureCollection => ({
+                type: "FeatureCollection",
+                features: (sensors?.features ?? [])
+                .map(feature => ({
+                    type: "Feature",
+                    id: feature?.id ?? "",
+                    geometry: feature?.geometry ?? {type: "Point", coordinates: []},
+                    properties: feature?.properties ?? {catchmentAreaId: 0, name: "", type: "", unit: ""},
+                })),
+            }),
+        );
+    };
+
+    getWaterLevelSensors(basinId: string) {
+        return signals.mapTo(this.rrb.fetchWaterLevelSensorsOfBasin(basinId), 
+            (sensors): RrbDigitalTwinService.WaterLevelSensorFeatureCollection => ({
+                type: "FeatureCollection",
+                features: (sensors?.features ?? [])
+                .map(feature => ({
+                    type: "Feature",
+                    id: feature?.id ?? "",
+                    geometry: feature?.geometry ?? {type: "Point", coordinates: []},
+                    properties: feature?.properties ?? {basinId: 0, name: "", type: "", unit: ""},
+                })),
             }),
         );
     };

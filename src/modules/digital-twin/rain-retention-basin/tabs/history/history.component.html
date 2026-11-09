@@ -15,7 +15,17 @@
   <chart
     header="digitalTwin.header.waterLevel"
     [chartData]="dataWaterLevel"
-    text="%"
+    text="m"
+    [suggestedMax]="4"
+    chartType="line"
+  />
+
+  <hr />
+
+  <chart
+    header="digitalTwin.header.inflow"
+    [chartData]="dataDrainage"
+    text="l/s"
     [suggestedMax]="100"
     chartType="line"
   />
@@ -23,11 +33,11 @@
   <hr />
 
   <chart
-    header="digitalTwin.header.drainage"
+    header="digitalTwin.header.outflow"
     [chartData]="dataDrainage"
-    text="min"
-    [suggestedMax]="60"
-    chartType="bar"
+    text="l/s"
+    [suggestedMax]="100"
+    chartType="line"
   />
 
   <hr />

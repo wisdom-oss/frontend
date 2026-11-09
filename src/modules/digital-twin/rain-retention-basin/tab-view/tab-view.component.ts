@@ -5,8 +5,8 @@ import {
   remixBarChart2Line,
   remixLineChartLine,
   remixPlayCircleLine,
-  remixLiveLine,
   remixMapPin2Line,
+  remixBinocularsLine,
 } from "@ng-icons/remixicon";
 import { TranslateDirective } from "@ngx-translate/core";
 
@@ -24,7 +24,7 @@ import { TranslateDirective } from "@ngx-translate/core";
     provideIcons({
       remixLineChartLine,
       remixPlayCircleLine,
-      remixLiveLine,
+      remixBinocularsLine,
       remixBarChart2Line,
       remixMapPin2Line,
     }),
