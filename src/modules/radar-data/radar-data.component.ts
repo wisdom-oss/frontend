@@ -168,7 +168,7 @@ export class RadarDataComponent implements OnInit {
     let timelapseImage = this.timelapseImage();
     if (!map || !lowerSaxonyMask || !rasterBounds || !timelapseImage) return;
     for (let layer of this.layerOrder) map.moveLayer(layer, "anchor");
-    this.sortLayers.destroy;
+    this.sortLayers.destroy();
   });
 
   // timelapse selection and playback
