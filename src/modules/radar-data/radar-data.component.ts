@@ -210,7 +210,8 @@ export class RadarDataComponent implements OnInit {
     let durationTillValid = stepSize * steps;
     let nearest = manifest.start.add(durationTillValid);
 
-    if (nearest.isBefore(manifest.start)) nearest = nearest.add(stepSize);
+    // we don't need to check before because we only add positive values to
+    // the start, hence never before start
     if (nearest.isAfter(manifest.end)) nearest = nearest.subtract(stepSize);
     return nearest;
   }
