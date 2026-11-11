@@ -86,11 +86,6 @@ const TIMELAPSE_DATE_FORMAT = "YYYY-MM-DDTHH:mm:ssZ";
   },
 })
 export class RadarDataComponent implements OnInit {
-  onChange(event: any) {
-    // TODO: set timelapse date after rounding
-    console.log(event);
-  }
-
   // dependencies and shared data
   private injector = inject(Injector);
   private location = inject(Location);
@@ -192,6 +187,43 @@ export class RadarDataComponent implements OnInit {
   protected timelapseInput =
     viewChild.required<HTMLInputElement>("timelapseInput");
 
+  protected timelapseInputOnChange(event: Event) {
+    if (!(event.target instanceof HTMLInputElement)) return;
+    let value = event.target.value.trim();
+    if (!value.length) return;
+    let selected = dayjs(value);
+
+    let manifest = this.manifest();
+    if (!manifest) return;
+
+    let nearest = this.findNearestTimelapseDate(manifest, selected);
+    if (!nearest) return;
+
+    this.timelapseDate.set(nearest);
+    this.preloadTimelapseFrames(manifest);
+  }
+
+  protected findNearestTimelapseDate(
+    manifest: RadarDataService.Manifest,
+    input: Dayjs,
+  ): Dayjs | null {
+    // all durations use millis here, is dayjs default
+
+    if (input.isBefore(manifest.start)) return null;
+    if (input.isAfter(manifest.end)) return null;
+
+    let diff = Math.abs(input.diff(manifest.start));
+    let stepSize = manifest.stepSize.asMilliseconds();
+
+    let steps = Math.round(diff / stepSize);
+    let durationTillValid = stepSize * steps;
+    let nearest = manifest.start.add(durationTillValid);
+
+    if (nearest.isBefore(manifest.start)) nearest = nearest.add(stepSize);
+    if (nearest.isAfter(manifest.end)) nearest = nearest.subtract(stepSize);
+    return nearest;
+  }
+
   // url is only modified here, so parsing once is fine
   private timelapseUrl = this.router.parseUrl(this.location.path(true));
 
@@ -274,7 +306,7 @@ export class RadarDataComponent implements OnInit {
   // timelapse frame preloading
   private timelapsePreloaders = Array.from({length: 20}, () => new Image());
   private preloadTimelapseFrames(manifest: RadarDataService.Manifest) {
-    let date = manifest.start;
+    let date = untracked(this.timelapseDate) ?? manifest.start;
     for (let preloader of this.timelapsePreloaders) {
       preloader.src = this.rasterUrl(manifest, date);
       date = date.add(manifest.stepSize);

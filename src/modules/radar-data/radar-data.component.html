@@ -44,7 +44,7 @@
             [min]="manifest()?.start.format('YYYY-MM-DDTHH:mm')"
             [max]="manifest()?.end.format('YYYY-MM-DDTHH:mm')"
             [step]="manifest()?.stepSize.asSeconds()"
-            (change)="onChange($event)"
+            (change)="timelapseInputOnChange($event)"
             #timelapseInput
           />
           <button class="button is-small" (click)="rewindTimelapse()">
