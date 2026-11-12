@@ -10,7 +10,7 @@ const CLASS_NAME = RadarDataComponent.name;
 const METHOD_NAME =
   RadarDataComponent.prototype["findNearestTimelapseDate"].name;
 
-describe.skip(`${CLASS_NAME}#${METHOD_NAME}`, () => {
+describe(`${CLASS_NAME}#${METHOD_NAME}`, () => {
   const find = RadarDataComponent.prototype["findNearestTimelapseDate"];
   const m: RadarDataService.Manifest = {
     start: dayjs("2026-01-01T00:00:00Z"),
@@ -24,12 +24,12 @@ describe.skip(`${CLASS_NAME}#${METHOD_NAME}`, () => {
   });
 
   it("correctly find inside values", () => {
-    expect(find(m, m.start.add(1, "millisecond"))).toBe(m.start);
-    expect(find(m, m.end.subtract(1, "millisecond"))).toBe(m.end);
+    expect(find(m, m.start.add(1, "millisecond"))).toBeSameDate(m.start);
+    expect(find(m, m.end.subtract(1, "millisecond"))).toBeSameDate(m.end);
 
     let validPoint = m.start.add(m.stepSize).add(m.stepSize);
-    expect(find(m, validPoint.add(1, "minute"))).toBe(validPoint);
-    expect(find(m, validPoint.subtract(1, "minute"))).toBe(validPoint);
+    expect(find(m, validPoint.add(1, "minute"))).toBeSameDate(validPoint);
+    expect(find(m, validPoint.subtract(1, "minute"))).toBeSameDate(validPoint);
   });
 
   it("should correctly avoid overshooting the end", () => {
@@ -39,6 +39,6 @@ describe.skip(`${CLASS_NAME}#${METHOD_NAME}`, () => {
       end: dayjs("2026-01-01T00:59:00Z"),
     };
 
-    expect(find(m2, m2.end)).toBe(dayjs("2026-01-01T00:55:00Z"));
+    expect(find(m2, m2.end)).toBeSameDate(dayjs("2026-01-01T00:55:00Z"));
   });
 });
