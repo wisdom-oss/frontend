@@ -1,0 +1,154 @@
+<canvas #timelapseCanvas hidden></canvas>
+<div hidden>
+  <div #cursorTooltipContent class="radar-tooltip-content">
+    @if (sampling.hoveredRasterRgb(); as rgb) {
+      <span
+        class="radar-tooltip-color"
+        aria-hidden="true"
+        [style.background-color]="
+          'rgb(' + rgb.r + ', ' + rgb.g + ', ' + rgb.b + ')'
+        "
+      ></span>
+    }
+    <span>{{ cursorTooltipText() }}</span>
+  </div>
+</div>
+@if (this.timelapseImage(); as url) {
+  <img
+    #frameImage
+    hidden
+    [src]="url"
+    (load)="sampling.drawImage(frameImage, url)"
+  />
+}
+
+<div class="card block is-fullheight is-flex is-flex-direction-column">
+  <div class="card-content p-0 is-clipped is-flex-grow-1 is-fullheight">
+    <div
+      class="timelapse-overlay is-flex is-fullheight is-justify-content-flex-end is-align-items-flex-start"
+    >
+      @if (timelapseDate(); as timelapseDate) {
+        <div class="timelapse-controls buttons has-addons theme-light">
+          <button
+            class="button is-small has-tabular-nums"
+            (click)="timelapseInput.showPicker()"
+          >
+            {{ timelapseDate.locale(lang()).format("lll") }}
+            <input
+              type="datetime-local"
+              class="button is-small is-position-absolute is-invisible"
+              style="width: 100%; height: 100%"
+              ;
+              [value]="timelapseDate.format('YYYY-MM-DDTHH:mm')"
+              [min]="manifest()?.start.format('YYYY-MM-DDTHH:mm')"
+              [max]="manifest()?.end.format('YYYY-MM-DDTHH:mm')"
+              [step]="manifest()?.stepSize.asSeconds()"
+              (change)="timelapseInputOnChange($event)"
+              #timelapseInput
+            />
+          </button>
+          <button class="button is-small" (click)="rewindTimelapse()">
+            <span class="icon">
+              <ng-icon name="remixRewindStartFill"></ng-icon>
+            </span>
+          </button>
+          <button class="button is-small" (click)="toggleTimelapse()">
+            <span class="icon">
+              @switch (timelapseStatus()) {
+                @case ("play") {
+                  <ng-icon name="remixPauseLargeFill"></ng-icon>
+                }
+                @case ("pause") {
+                  <ng-icon name="remixPlayLargeFill"></ng-icon>
+                }
+              }
+            </span>
+          </button>
+        </div>
+      }
+    </div>
+    <mgl-map
+      class="is-fullheight"
+      [mapStyle]="style"
+      [zoom]="6.8"
+      [center]="{lat: 52.8, lon: 9.2}"
+      [attributionControl]="{
+        compact: true,
+        customAttribution: this.manifest()?.attribution,
+      }"
+      (mapLoad)="this.map.set($event)"
+    >
+      <mgl-layer
+        id="anchor"
+        type="background"
+        [paint]="{'background-opacity': 0}"
+      ></mgl-layer>
+
+      @if (lowerSaxonyMask(); as mask) {
+        <mgl-geojson-source
+          id="lower-saxony-mask-source"
+          [data]="mask"
+        ></mgl-geojson-source>
+        <mgl-layer
+          id="lower-saxony-mask"
+          type="fill"
+          source="lower-saxony-mask-source"
+          [paint]="{
+            'fill-color': '#444',
+          }"
+        ></mgl-layer>
+        <mgl-layer
+          id="lower-saxony-mask-border"
+          type="line"
+          source="lower-saxony-mask-source"
+          [paint]="{
+            'line-color': '#111',
+            'line-width': 2,
+          }"
+        ></mgl-layer>
+      }
+
+      @let rasterBounds = this.rasterBounds();
+      @let timelapseImage = this.timelapseImage();
+      @if (rasterBounds && timelapseImage) {
+        <mgl-image-source
+          id="radar-data-source"
+          [url]="timelapseImage"
+          [coordinates]="rasterBounds"
+        ></mgl-image-source>
+        <mgl-layer
+          id="radar-data"
+          type="raster"
+          source="radar-data-source"
+        ></mgl-layer>
+      }
+
+      <mgl-control
+        mglNavigation
+        [showCompass]="false"
+        position="top-left"
+      ></mgl-control>
+
+      <mgl-control position="bottom-left">
+        <div class="maplibregl-ctrl-group p-2">
+          <div class="is-flex">
+            <div
+              class="legend-gradient py-1"
+              [style.background]="turboGradient"
+            ></div>
+            <div
+              class="legend-labels is-flex is-flex-direction-column is-justify-content-space-between"
+            >
+              @for (value of legendValues(); track value) {
+                <p class="legend-line">
+                  <span class="legend-dash"></span>
+                  <span>{{ value }} {{ manifest()?.unit }}</span>
+                </p>
+              }
+            </div>
+          </div>
+        </div>
+      </mgl-control>
+    </mgl-map>
+  </div>
+</div>

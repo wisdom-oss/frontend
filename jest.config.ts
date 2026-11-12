@@ -1,4 +1,7 @@
 import type {Config} from "jest";
+import presets from "jest-preset-angular/presets/index.js";
+
+const esmPreset = presets.createEsmPreset();
 
 /**
  * Jest test configuration.
@@ -8,10 +11,15 @@ import type {Config} from "jest";
  * tests.
  */
 const config: Config = {
+  ...esmPreset,
+  // prefer published JavaScript over any TypeScript sources shipped alongside it
+  moduleFileExtensions: ["js", "mjs", "ts", "html", "json"],
   globalSetup: "<rootDir>/scripts/jest/global-setup.cjs",
-  setupFiles: ["fake-indexeddb/auto", "<rootDir>/src/tests/setup.ts"],
-  testEnvironment: "./src/tests/setup.ts",
+  setupFiles: ["fake-indexeddb/auto"],
+  setupFilesAfterEnv: ["<rootDir>/src/tests/initialize.ts"],
+  testEnvironment: "./src/tests/environment.ts",
   transform: {
+    ...esmPreset.transform,
     "\\.txt$": "<rootDir>/src/tests/txt-transformer.ts",
   },
 };

@@ -1,12 +1,16 @@
 // cspell:ignore pmdarima rmse
 
+import {HttpClient, HttpContext} from "@angular/common/http";
 import {inject, Injectable} from "@angular/core";
 import dayjs, {Dayjs} from "dayjs";
 import {Duration} from "dayjs/plugin/duration";
+import {firstValueFrom} from "rxjs";
 import typia, {tags} from "typia";
 
 import {api} from "../common/api";
 import {Id} from "../common/id";
+import {typeUtils} from "../common/utils/type-utils";
+import {httpContexts} from "../common/http-contexts";
 
 const URL = "/api/pmdarima-predictions" as const;
 
@@ -388,7 +392,3 @@ export namespace PmdArimaPredictionService {
 }
 
 import Self = PmdArimaPredictionService;
-import {typeUtils} from "../common/utils/type-utils";
-import {HttpClient, HttpContext} from "@angular/common/http";
-import {firstValueFrom} from "rxjs";
-import {httpContexts} from "../common/http-contexts";

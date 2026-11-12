@@ -11,24 +11,24 @@
 @use "../node_modules/bulma-switch/src/sass" as bulma-switch;
 @use "../node_modules/bulma-v1-tooltip/src/sass/" as bulma-tooltip;
 
+@import "../node_modules/maplibre-gl/dist/maplibre-gl.css";
+
 @import "@fontsource/figtree/latin.css";
 @import "@fontsource/figtree/latin-ext.css";
 @import "@fontsource/figtree/latin-italic.css";
 @import "@fontsource/figtree/latin-ext-italic.css";
-@import "../node_modules/maplibre-gl/dist/maplibre-gl.css";
 
 html {
   // override bulma's default behavior
-  font-family: iv.$family-sans-serif;
   overflow-y: auto;
-}
-
-body {
-  font-family: iv.$family-sans-serif;
 }
 
 .is-user-select-none {
   user-select: none;
+}
+
+.has-tabular-nums {
+  font-variant-numeric: tabular-nums;
 }
 
 .is-fullwidth {
@@ -55,7 +55,7 @@ body {
   // avoid inherited colors from outer components for the map
   color: bulma.$text;
   // override maplibre's full font shorthand so controls use the app font
-  font-family: iv.$family-sans-serif;
+  font-family: cv.getVar("family-primary");
 }
 
 @media (prefers-color-scheme: dark) {

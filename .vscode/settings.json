@@ -2,11 +2,15 @@
   "cSpell.language": "en,de-DE",
   "cSpell.words": [
     "bbox",
+    "colormap",
     "greenable",
     "oowv",
+    "preloader",
+    "preloaders",
     "smartmeter",
     "timeframe",
     "timeframes",
+    "timelapse",
     "typia"
   ],
   "files.associations": {
