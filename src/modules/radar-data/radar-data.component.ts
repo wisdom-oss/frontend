@@ -9,7 +9,7 @@ import {
   Component,
   OnInit,
   Injector,
-  ElementRef
+  ElementRef,
 } from "@angular/core";
 import {Router} from "@angular/router";
 import {
@@ -18,13 +18,13 @@ import {
   MapComponent,
   ImageSourceComponent,
   GeoJSONSourceComponent,
-  NavigationControlDirective
+  NavigationControlDirective,
 } from "@maplibre/ngx-maplibre-gl";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {
   remixPauseLargeFill,
   remixPlayLargeFill,
-  remixRewindStartFill
+  remixRewindStartFill,
 } from "@ng-icons/remixicon";
 import {mask} from "@turf/turf";
 import dayjs, {Dayjs} from "dayjs";
