@@ -1,5 +1,6 @@
 import {expect} from "@jest/globals";
-import dayjs, {type Dayjs} from "dayjs";
+
+import dayjs, {Dayjs} from "dayjs";
 import type {MatcherFunction} from "expect";
 
 const toBeSameDate: MatcherFunction<[expected: Dayjs]> = function (
