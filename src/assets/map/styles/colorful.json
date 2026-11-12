@@ -44,6 +44,7 @@
   "sources": {
     "versatiles-shortbread": {
       "type": "vector",
+      "attribution": "© <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
       "tiles": ["https://wisdom02.vlba.uni-oldenburg.de/tiles/osm/{z}/{x}/{y}"],
       "minzoom": 0,
       "maxzoom": 14,
