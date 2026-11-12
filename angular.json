@@ -108,6 +108,7 @@
               "dayjs",
               "earcut",
               "fast-deep-equal",
+              "kdtree-typescript",
               "maplibre-gl",
               "rbush",
               "skmeans",
