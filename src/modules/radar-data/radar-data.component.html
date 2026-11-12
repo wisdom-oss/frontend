@@ -72,7 +72,10 @@
       [mapStyle]="style"
       [zoom]="6.8"
       [center]="{lat: 52.8, lon: 9.2}"
-      [attributionControl]="{compact: true}"
+      [attributionControl]="{
+        compact: true,
+        customAttribution: this.manifest()?.attribution,
+      }"
       (mapLoad)="this.map.set($event)"
     >
       <mgl-layer

@@ -27,6 +27,7 @@ export class RadarDataService {
 
 namespace Raw {
   export type Manifest = {
+    attribution: string;
     folderPath: string & tags.Format<"uri-reference">;
     start: string & tags.Format<"date-time">;
     end: string & tags.Format<"date-time">;
@@ -46,6 +47,7 @@ namespace Raw {
 
 export namespace RadarDataService {
   export type Manifest = {
+    attribution: Raw.Manifest["attribution"];
     folderPath: Raw.Manifest["folderPath"];
     start: Dayjs;
     end: Dayjs;
