@@ -74,7 +74,7 @@
     "@angular-builders/custom-esbuild": "^22.0.1",
     "@angular-builders/jest": "^22.0.1",
     "@angular/build": "^22.2.2",
-    "@angular/cli": "^22.2.2",
+    "@angular/cli": "^22.2.7",
     "@angular/compiler-cli": "^22.2.2",
     "@compodoc/compodoc": "^2.0.0",
     "@playwright/test": "1.64.0",
