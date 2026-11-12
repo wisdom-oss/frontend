@@ -40,7 +40,7 @@ import {RadarDataService} from "./radar-data.service";
 import {RadarDataCursorService} from "./radar-data-cursor.service";
 import {RadarDataImageSamplingService} from "./radar-data-image-sampling.service";
 import {GeoDataService} from "../../api/geo-data.service";
-import mapStyle from "../../assets/map/styles/radar-data.json";
+import mapStyle from "../../assets/map/styles/radar-data.json" with {type: "json"};
 import {ResizeMapOnLoadDirective} from "../../common/directives/resize-map-on-load.directive";
 import {signals} from "../../common/signals";
 import {range} from "../../common/utils/range";

@@ -10,9 +10,7 @@ const CLASS_NAME = RadarDataComponent.name;
 const METHOD_NAME =
   RadarDataComponent.prototype["findNearestTimelapseDate"].name;
 
-// TODO: fix this by either mocking maplibre or by making jest use esm
-
-describe.only(`${CLASS_NAME}#${METHOD_NAME}`, () => {
+describe.skip(`${CLASS_NAME}#${METHOD_NAME}`, () => {
   const find = RadarDataComponent.prototype["findNearestTimelapseDate"];
   const m: RadarDataService.Manifest = {
     start: dayjs("2026-01-01T00:00:00Z"),

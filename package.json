@@ -10,7 +10,7 @@
     "watch": "ng build --watch --configuration development",
     "lint": "oxlint",
     "fmt": "primp src -r && prettier . --write --plugin prettier-plugin-toml",
-    "test": "ng test",
+    "test": "node --experimental-vm-modules --disable-warning=ExperimentalWarning node_modules/jest/bin/jest.js",
     "doc": "npm run compodoc:build",
     "compodoc:build": "compodoc -p tsconfig.doc.json",
     "compodoc:build-and-serve": "compodoc -p tsconfig.doc.json -s",
