@@ -18,6 +18,7 @@ import {
   MapComponent,
   ImageSourceComponent,
   GeoJSONSourceComponent,
+  AttributionControlDirective,
   NavigationControlDirective,
 } from "@maplibre/ngx-maplibre-gl";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
@@ -51,14 +52,15 @@ const TIMELAPSE_DATE_FORMAT = "YYYY-MM-DDTHH:mm:ssZ";
 
 @Component({
   imports: [
+    AttributionControlDirective,
     ControlComponent,
     GeoJSONSourceComponent,
     ImageSourceComponent,
     LayerComponent,
     MapComponent,
     NavigationControlDirective,
-    ResizeMapOnLoadDirective,
     NgIconComponent,
+    ResizeMapOnLoadDirective,
   ],
   templateUrl: "./radar-data.component.html",
   styleUrl: "./radar-data.component.scss",
