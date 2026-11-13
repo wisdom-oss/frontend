@@ -72,10 +72,7 @@
       [mapStyle]="style"
       [zoom]="6.8"
       [center]="{lat: 52.8, lon: 9.2}"
-      [attributionControl]="{
-        compact: true,
-        customAttribution: this.manifest()?.attribution,
-      }"
+      [attributionControl]="false"
       (mapLoad)="this.map.set($event)"
     >
       <mgl-layer
@@ -128,6 +125,15 @@
         [showCompass]="false"
         position="top-left"
       ></mgl-control>
+
+      @if (this.manifest(); as manifest) {
+        <mgl-control
+          mglAttribution
+          position="bottom-right"
+          [compact]="true"
+          [customAttribution]="manifest.attribution"
+        ></mgl-control>
+      }
 
       <mgl-control position="bottom-left">
         <div class="maplibregl-ctrl-group p-2">
