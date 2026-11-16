@@ -13,6 +13,7 @@ export class HistoryComponent {
   dataWaterLevel: ChartData<"line", {x: string; y: number}[]> = {
     datasets: [
       {
+        label: "Aquatos Web LTX",
         data: [
           {x: "0:00", y: 0.3},
           {x: "3:00", y: 0.55},
@@ -35,6 +36,7 @@ export class HistoryComponent {
   dataDrainage: ChartData<"bar", {x: string; y: number}[]> = {
     datasets: [
       {
+        label: "Nivus Flow Mobile 750",
         data: [
           {x: "0:00", y: 10},
           {x: "3:00", y: 20},

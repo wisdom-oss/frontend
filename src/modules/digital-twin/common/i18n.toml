@@ -94,6 +94,10 @@ de = "Simulationsverlauf"
 en = "Water Level"
 de = "Wasserpegel"
 
+[header.validationComparison]
+en = "Comparison at"
+de = "Vergleich am"
+
 [label.applyRainForecast]
 en = "Apply rain forecast"
 de = "Regenvorhersage übernehmen"
