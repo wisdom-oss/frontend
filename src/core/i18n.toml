@@ -1,12 +1,12 @@
-[lang] # the currently selected language
+[lang]  # the currently selected language
 en = "English"
 de = "Deutsch"
 
-[langs.english] # labels for english language
+[langs.english]  # labels for english language
 en = "English"
 de = "Englisch"
 
-[langs.german] # labels for german language
+[langs.german]  # labels for german language
 en = "German"
 de = "Deutsch"
 

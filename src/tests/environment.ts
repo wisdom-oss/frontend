@@ -1,9 +1,5 @@
 import {JestEnvironmentConfig, EnvironmentContext} from "@jest/environment";
-import dayjs from "dayjs";
-import duration from "dayjs/plugin/duration";
-import JSDOMEnvironment from "jest-environment-jsdom";
-
-dayjs.extend(duration);
+import {TestEnvironment as JSDOMEnvironment} from "jest-environment-jsdom";
 
 export default class WisdomTestEnvironment extends JSDOMEnvironment {
   constructor(config: JestEnvironmentConfig, context: EnvironmentContext) {

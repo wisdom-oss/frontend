@@ -1,0 +1,62 @@
+.timelapse-overlay {
+  position: absolute;
+  z-index: 10;
+  width: 100%;
+  pointer-events: none;
+}
+
+.timelapse-controls {
+  margin-top: 10px;
+  margin-right: 10px;
+  pointer-events: auto;
+}
+
+.radar-tooltip-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.radar-tooltip-color {
+  width: 0.75em;
+  height: 0.75em;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+// mapLibre creates popup elements without angular's scoped attributes
+:host ::ng-deep .radar-cursor-tooltip {
+  pointer-events: none;
+
+  .maplibregl-popup-tip {
+    display: none;
+  }
+
+  .maplibregl-popup-content {
+    padding: 4px 10px;
+    pointer-events: none;
+  }
+}
+
+.legend-gradient {
+  width: 1.5em;
+  height: 16em;
+  border-radius: 0.25em;
+}
+
+.legend-labels {
+  margin-top: -0.5em;
+  margin-bottom: -0.5em;
+}
+
+.legend-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-dash {
+  height: 1px;
+  background: currentColor;
+  width: 0.6em;
+}

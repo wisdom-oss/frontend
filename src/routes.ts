@@ -14,6 +14,7 @@ import {GrowlComponent} from "./modules/growl/growl.component";
 import {longTermForecastRoutes} from "./modules/long-term-forecast/routes";
 import {OowvActionMapComponent} from "./modules/oowv/action-map/action-map.component";
 import {PumpModelsComponent} from "./modules/pump-models/pump-models.component";
+import {RadarDataComponent} from "./modules/radar-data/radar-data.component";
 import {WaterDemandPrediction2Component} from "./modules/water-demand-prediction/water-demand-prediction.component";
 import {WaterRightsComponent} from "./modules/water-rights/water-rights.component";
 import {waterRightsRoutes} from "./modules/water-rights/routes";
@@ -27,6 +28,7 @@ export const routes: Routes = [
     children: [
       {path: "", component: GreeterComponent}, // Default child route
       {path: "weather-data", component: WeatherDataComponent},
+      {path: "radar-data", component: RadarDataComponent},
       {path: "be-water-smart", component: BeWaterSmartComponent},
       {path: "growl", component: GrowlComponent},
       {

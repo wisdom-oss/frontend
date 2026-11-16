@@ -20,7 +20,7 @@ export namespace GrowlService {
   // geo data
   export type GroundwaterBodies = MultiPolygons;
   export type GroundwaterMeasurementStations = Points<
-    Partial<LenientMeasurement>
+    Partial<SerializableMeasurement>
   >;
   export type NdsMunicipals = MultiPolygons;
   export type WaterRightUsageLocations = Points;
@@ -227,14 +227,17 @@ export class GrowlService {
     return {
       type: "FeatureCollection",
       features: stations.data.features.map(station => {
-        let measurement = measurements[station.properties.key] ?? {};
+        let measurement: Partial<Measurement> =
+          measurements[station.properties.key] ?? {};
+        let {date, classification, ...properties} = measurement;
         return {
           type: "Feature" as const,
           geometry: station.geometry,
           properties: {
             ...station.properties,
-            ...measurement,
-            classification: measurement.classification ?? "null",
+            ...properties,
+            date: date?.toISOString() ?? null,
+            classification: classification ?? "null",
           },
         };
       }),
@@ -245,6 +248,9 @@ export class GrowlService {
 type Measurement = GroundwaterLevelsService.Measurement;
 type LenientMeasurement = Omit<Measurement, "classification"> & {
   classification: GroundwaterLevelsService.MeasurementClassification | "null";
+};
+type SerializableMeasurement = Omit<LenientMeasurement, "date"> & {
+  date: string | null;
 };
 
 type GeoProperties<P = {}> = {name?: string | null; key: string} & P;

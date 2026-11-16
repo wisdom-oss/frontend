@@ -5,7 +5,7 @@ import {RouterTestingHarness} from "@angular/router/testing";
 
 import {QueryParamService} from "./query-param.service";
 
-@Component({})
+@Component({template: ""})
 class TestComponent {}
 
 describe("QueryParamService", () => {
@@ -161,7 +161,7 @@ describe("QueryParamService", () => {
     expect(ids()).toEqual([5, 7]);
   });
 
-  it.only("should use default for parsed multi value when param is missing", async () => {
+  it("should use default for parsed multi value when param is missing", async () => {
     let numbers = service.signal("num", {
       multi: true,
       parse: raw => Number(raw),

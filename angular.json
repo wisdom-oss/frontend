@@ -88,6 +88,11 @@
                 "output": "web-ifc"
               },
               {
+                "glob": "maplibre-gl-worker.mjs",
+                "input": "node_modules/maplibre-gl/dist",
+                "output": "maplibre-gl"
+              },
+              {
                 "glob": "**/*",
                 "input": "public",
                 "output": "public"
@@ -103,6 +108,7 @@
               "dayjs",
               "earcut",
               "fast-deep-equal",
+              "kdtree-typescript",
               "maplibre-gl",
               "rbush",
               "skmeans",
@@ -163,11 +169,23 @@
           "options": {
             "config": "jest.config.ts"
           }
+        },
+        "e2e": {
+          "builder": "playwright-ng-schematics:playwright",
+          "options": {
+            "devServerTarget": "@wisdom-oss/frontend:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "@wisdom-oss/frontend:serve:production"
+            }
+          }
         }
       }
     }
   },
   "cli": {
-    "analytics": false
+    "analytics": false,
+    "schematicCollections": ["@schematics/angular", "playwright-ng-schematics"]
   }
 }

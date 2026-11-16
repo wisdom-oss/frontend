@@ -13,6 +13,11 @@
 
 @import "../node_modules/maplibre-gl/dist/maplibre-gl.css";
 
+@import "@fontsource/figtree/latin.css";
+@import "@fontsource/figtree/latin-ext.css";
+@import "@fontsource/figtree/latin-italic.css";
+@import "@fontsource/figtree/latin-ext-italic.css";
+
 html {
   // override bulma's default behavior
   overflow-y: auto;
@@ -20,6 +25,10 @@ html {
 
 .is-user-select-none {
   user-select: none;
+}
+
+.has-tabular-nums {
+  font-variant-numeric: tabular-nums;
 }
 
 .is-fullwidth {
@@ -45,6 +54,8 @@ html {
 .maplibregl-map {
   // avoid inherited colors from outer components for the map
   color: bulma.$text;
+  // override maplibre's full font shorthand so controls use the app font
+  font-family: cv.getVar("family-primary");
 }
 
 @media (prefers-color-scheme: dark) {

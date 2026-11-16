@@ -1,21 +1,19 @@
 import {computed, input, output, Component} from "@angular/core";
+import {provideIcons, NgIconComponent} from "@ng-icons/core";
+import {remixAddLargeFill, remixCloseLargeFill} from "@ng-icons/remixicon";
+import {TranslateDirective, TranslatePipe} from "@ngx-translate/core";
+import {TooltipItem, Scale} from "chart.js";
+import dayjs from "dayjs";
+import {BaseChartDirective} from "ng2-charts";
 
 import {WaterDemandPrediction2Service as Service} from "../../water-demand-prediction.service";
-import {typeUtils} from "../../../../common/utils/type-utils";
-
-import Signaled = typeUtils.Signaled;
-import {BaseChartDirective} from "ng2-charts";
-import {NgIconComponent, provideIcons} from "@ng-icons/core";
-import {remixAddLargeFill, remixCloseLargeFill} from "@ng-icons/remixicon";
 import {TranslateAttrDirective} from "../../../../common/directives/translate-attr.directive";
+import type {typeUtils} from "../../../../common/utils/type-utils";
 import {chain} from "../../../../common/utils/chain";
-import {Scale, TooltipItem} from "chart.js";
-import dayjs from "dayjs";
 import {signals} from "../../../../common/signals";
-import {TranslateDirective, TranslatePipe} from "@ngx-translate/core";
 
-type Labels = Signaled<ReturnType<Service["labels"]>>;
-type Datasets = Signaled<ReturnType<Service["datasets"]>>;
+type Labels = typeUtils.Signaled<ReturnType<Service["labels"]>>;
+type Datasets = typeUtils.Signaled<ReturnType<Service["datasets"]>>;
 
 @Component({
   selector: "wdp-charts-view",

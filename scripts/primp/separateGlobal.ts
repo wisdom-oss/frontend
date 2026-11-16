@@ -1,4 +1,4 @@
-import {SeparateByFunction, Import} from "pretty-ts-imports";
+import type {SeparateByFunction, Import} from "@primp/primp";
 
 function hasGlobal(imp: Import) {
   return imp.source.name.toLowerCase().includes("global");

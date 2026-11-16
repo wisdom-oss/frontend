@@ -9,6 +9,7 @@ import {RouterOutlet} from "@angular/router";
 import {TranslateService} from "@ngx-translate/core";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
+import localizedFormat from "dayjs/plugin/localizedFormat";
 import relativeTime from "dayjs/plugin/relativeTime";
 
 import {StorageService} from "./common/services/storage.service";
@@ -28,6 +29,7 @@ export class AppComponent {
     dayjs.extend(duration);
     dayjs.extend(relativeTime);
     dayjs.extend(durationExt);
+    dayjs.extend(localizedFormat);
     configureTranslations(translate, storage);
     translate.onLangChange.subscribe(({lang}) => dayjs.locale(lang));
     registerLocaleData(localeDe, "de", localeDeExtra);
