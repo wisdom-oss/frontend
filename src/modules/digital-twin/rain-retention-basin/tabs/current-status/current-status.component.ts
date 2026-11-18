@@ -1,11 +1,11 @@
-import {
-  computed,
-  inject,
-  Component,
-  Signal,
-} from "@angular/core";
+import {computed, inject, Component, Signal} from "@angular/core";
 import {toSignal} from "@angular/core/rxjs-interop";
 import {RouterLinkActive, RouterLink, ActivatedRoute} from "@angular/router";
+import {
+  LayerComponent,
+  MapComponent,
+  GeoJSONSourceComponent,
+} from "@maplibre/ngx-maplibre-gl";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {
   remixArrowLeftWideLine,
@@ -28,14 +28,13 @@ import {
 import {TranslateDirective} from "@ngx-translate/core";
 import {ChartData} from "chart.js";
 import {StyleSpecification} from "maplibre-gl";
-import { map } from "rxjs";
-import { MapComponent, GeoJSONSourceComponent, LayerComponent } from "@maplibre/ngx-maplibre-gl";
+import {map} from "rxjs";
 
+import {RrbDigitalTwinService} from "../../../../../api/rrb-digital-twin.service";
 import colorful from "../../../../../assets/map/styles/colorful.json";
 import {CarouselComponent} from "../../../common/carousel/carousel.component";
 import {ChartComponent} from "../../../common/chart/chart.component";
 import {ModelViewComponent} from "../../model-view/model-view.component";
-import {RrbDigitalTwinService} from "../../../../../api/rrb-digital-twin.service";
 import {RainRetentionBasinService} from "../../rain-retention-basin.service";
 
 @Component({
@@ -50,8 +49,8 @@ import {RainRetentionBasinService} from "../../rain-retention-basin.service";
     RouterLinkActive,
     MapComponent,
     GeoJSONSourceComponent,
-    LayerComponent
-],
+    LayerComponent,
+  ],
   templateUrl: "./current-status.component.html",
   styleUrl: "./current-status.component.scss",
   providers: [
@@ -76,7 +75,7 @@ import {RainRetentionBasinService} from "../../rain-retention-basin.service";
   ],
 })
 export class CurrentStatusComponent {
-  private rrb= inject(RainRetentionBasinService);
+  private rrb = inject(RainRetentionBasinService);
   private route = inject(ActivatedRoute);
 
   protected style = colorful as any as StyleSpecification;
@@ -87,32 +86,59 @@ export class CurrentStatusComponent {
   );
 
   protected basinId: Signal<string> = toSignal(
-    this.route.queryParams.pipe(map(params => params['id'])),
-    { initialValue: "" }
+    this.route.queryParams.pipe(map(params => params["id"])),
+    {initialValue: ""},
   );
 
-  readonly basin: Signal<RrbDigitalTwinService.BasinFeature | undefined> = computed(() => this.rrb.getBasinById(this.basinId()));
+  readonly basin: Signal<RrbDigitalTwinService.BasinFeature | undefined> =
+    computed(() => this.rrb.getBasinById(this.basinId()));
 
-  readonly catchmentAreas: Signal<RrbDigitalTwinService.CatchmentAreaFeatureCollection> = this.rrb.getCatchmentAreas("1");
-  readonly catchmentAreasPolygons: Signal<RrbDigitalTwinService.CatchmentAreaFeatureCollection> = computed(() => this.splitGeometryCollection(this.catchmentAreas(), ["Polygon", "MultiPolygon"]));
-  readonly catchmentAreasLineStrings: Signal<RrbDigitalTwinService.CatchmentAreaFeatureCollection> = computed(() => this.splitGeometryCollection(this.catchmentAreas(), ["LineString", "MultiLineString"]));
-  readonly inflowSensors: Signal<RrbDigitalTwinService.InflowSensorFeatureCollection> = this.rrb.getInflowSensors("1");
+  readonly catchmentAreas: Signal<RrbDigitalTwinService.CatchmentAreaFeatureCollection> =
+    this.rrb.getCatchmentAreas("1");
+  readonly catchmentAreasPolygons: Signal<RrbDigitalTwinService.CatchmentAreaFeatureCollection> =
+    computed(() =>
+      this.splitGeometryCollection(this.catchmentAreas(), [
+        "Polygon",
+        "MultiPolygon",
+      ]),
+    );
+  readonly catchmentAreasLineStrings: Signal<RrbDigitalTwinService.CatchmentAreaFeatureCollection> =
+    computed(() =>
+      this.splitGeometryCollection(this.catchmentAreas(), [
+        "LineString",
+        "MultiLineString",
+      ]),
+    );
+  readonly inflowSensors: Signal<RrbDigitalTwinService.InflowSensorFeatureCollection> =
+    this.rrb.getInflowSensors("1");
 
-  readonly throttles: Signal<RrbDigitalTwinService.ThrottleFeatureCollection> = this.rrb.getThrottles("1");
-  readonly outflowSensors: Signal<RrbDigitalTwinService.OutflowSensorFeatureCollection> = this.rrb.getOutflowSensors("1");
+  readonly throttles: Signal<RrbDigitalTwinService.ThrottleFeatureCollection> =
+    this.rrb.getThrottles("1");
+  readonly outflowSensors: Signal<RrbDigitalTwinService.OutflowSensorFeatureCollection> =
+    this.rrb.getOutflowSensors("1");
 
-  readonly waterLevelSensors: Signal<RrbDigitalTwinService.WaterLevelSensorFeatureCollection> = this.rrb.getWaterLevelSensors("1");
-  readonly latestWaterLevel: Signal<RrbDigitalTwinService.WaterLevel> = this.rrb.getLatestWaterLevel("1");
+  readonly waterLevelSensors: Signal<RrbDigitalTwinService.WaterLevelSensorFeatureCollection> =
+    this.rrb.getWaterLevelSensors("1");
+  readonly latestWaterLevel: Signal<RrbDigitalTwinService.WaterLevel> =
+    this.rrb.getLatestWaterLevel("1");
 
-  readonly rainStation: Signal<RrbDigitalTwinService.RainStationFeature> = this.rrb.getNearestRainStation("1");
-  readonly latestRain: Signal<RrbDigitalTwinService.Rain> = this.rrb.getLatestRain("1056");
+  readonly rainStation: Signal<RrbDigitalTwinService.RainStationFeature> =
+    this.rrb.getNearestRainStation("1");
+  readonly latestRain: Signal<RrbDigitalTwinService.Rain> =
+    this.rrb.getLatestRain("1056");
 
-  readonly city = computed (() => this.basin()?.properties.city ?? "");
-  readonly name = computed (() => this.basin()?.properties.name ?? "");
+  readonly city = computed(() => this.basin()?.properties.city ?? "");
+  readonly name = computed(() => this.basin()?.properties.name ?? "");
   readonly volume = computed(() => this.basin()?.properties.maxVolume ?? 0);
-  readonly catchmentArea: Signal<number> = computed(() => this.getSumOfArea(this.catchmentAreas(), "all"));
-  readonly pavedArea: Signal<number> = computed(() => this.getSumOfArea(this.catchmentAreas(), "paved"));
-  readonly unpavedArea: Signal<number> = computed(() => this.getSumOfArea(this.catchmentAreas(), "unpaved"));
+  readonly catchmentArea: Signal<number> = computed(() =>
+    this.getSumOfArea(this.catchmentAreas(), "all"),
+  );
+  readonly pavedArea: Signal<number> = computed(() =>
+    this.getSumOfArea(this.catchmentAreas(), "paved"),
+  );
+  readonly unpavedArea: Signal<number> = computed(() =>
+    this.getSumOfArea(this.catchmentAreas(), "unpaved"),
+  );
 
   dataCurrentForecast: ChartData<"bar", {x: string; y: number}[]> = {
     datasets: [
@@ -135,46 +161,57 @@ export class CurrentStatusComponent {
     ],
   };
 
-  private splitGeometryCollection(catchmentAreas: RrbDigitalTwinService.CatchmentAreaFeatureCollection, types: string[]) : RrbDigitalTwinService.CatchmentAreaFeatureCollection {
-    let result: RrbDigitalTwinService.CatchmentAreaFeature[]= [];
+  private splitGeometryCollection(
+    catchmentAreas: RrbDigitalTwinService.CatchmentAreaFeatureCollection,
+    types: string[],
+  ): RrbDigitalTwinService.CatchmentAreaFeatureCollection {
+    let result: RrbDigitalTwinService.CatchmentAreaFeature[] = [];
 
-    catchmentAreas.features.forEach((feature) => {
-      const geometries = feature.geometry.type === "GeometryCollection"
-        ? feature.geometry.geometries
-        : [feature.geometry];
+    catchmentAreas.features.forEach(feature => {
+      const geometries =
+        feature.geometry.type === "GeometryCollection"
+          ? feature.geometry.geometries
+          : [feature.geometry];
 
-      geometries.forEach((geometry) => {
+      geometries.forEach(geometry => {
         if (types.includes(geometry.type)) {
-          result = result.concat([{
-                  type: "Feature",
-                  id: feature.id,
-                  geometry: geometry,
-                  properties: { ... feature.properties}
-              }]);
+          result = result.concat([
+            {
+              type: "Feature",
+              id: feature.id,
+              geometry: geometry,
+              properties: {...feature.properties},
+            },
+          ]);
         }
       });
     });
 
     return {
-        type: "FeatureCollection",
-        features: result
-    }
-  };
+      type: "FeatureCollection",
+      features: result,
+    };
+  }
 
-  private getSumOfArea(catchmentAreas: RrbDigitalTwinService.CatchmentAreaFeatureCollection, type: string) : number {
+  private getSumOfArea(
+    catchmentAreas: RrbDigitalTwinService.CatchmentAreaFeatureCollection,
+    type: string,
+  ): number {
     const features = catchmentAreas.features;
 
     let sum = 0;
 
-    switch(type) {
-      case "all": 
-        features.forEach((feature) => sum = sum + feature.properties.area);
+    switch (type) {
+      case "all":
+        features.forEach(feature => (sum = sum + feature.properties.area));
         break;
       case "paved":
-        features.forEach((feature) => sum = sum + feature.properties.pavedArea);
+        features.forEach(feature => (sum = sum + feature.properties.pavedArea));
         break;
       case "unpaved":
-        features.forEach((feature) => sum = sum + feature.properties.unpavedArea);
+        features.forEach(
+          feature => (sum = sum + feature.properties.unpavedArea),
+        );
         break;
       default:
         break;

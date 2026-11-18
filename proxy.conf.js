@@ -63,8 +63,8 @@ const OPTIONAL_PROXY_CONFIGS = {
       secure: false,
       changeOrigin: true,
       rewrite: path => path.replace(/^\/api\/rrb-digital-twin/, ""),
-    },  
-  ]
+    },
+  ],
 };
 
 /**

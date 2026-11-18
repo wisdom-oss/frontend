@@ -1,15 +1,21 @@
-import {Component, computed, inject, Signal, signal} from "@angular/core";
-import { LayerComponent, MapComponent, GeoJSONSourceComponent, PopupComponent } from "@maplibre/ngx-maplibre-gl";
+import {computed, inject, signal, Component, Signal} from "@angular/core";
+import {ActivatedRoute, Router} from "@angular/router";
+import {
+  LayerComponent,
+  MapComponent,
+  PopupComponent,
+  GeoJSONSourceComponent,
+} from "@maplibre/ngx-maplibre-gl";
+import {provideIcons} from "@ng-icons/core";
+import {remixMapPin2Line} from "@ng-icons/remixicon";
+import {TranslateDirective} from "@ngx-translate/core";
+import {centerOfMass} from "@turf/turf";
+import {FeatureCollection} from "geojson";
+import {LngLatLike, StyleSpecification} from "maplibre-gl";
+
+import {RrbDigitalTwinService} from "../../../../api/rrb-digital-twin.service";
 import colorful from "../../../../assets/map/styles/colorful.json";
-import { LngLatLike, StyleSpecification } from "maplibre-gl";
-import { RrbDigitalTwinService } from "../../../../api/rrb-digital-twin.service";
-import { RainRetentionBasinService } from "../rain-retention-basin.service";
-import { TranslateDirective } from "@ngx-translate/core";
-import { ActivatedRoute, Router } from "@angular/router";
-import { centerOfMass } from "@turf/turf";
-import { FeatureCollection } from "geojson";
-import { provideIcons } from "@ng-icons/core";
-import { remixMapPin2Line } from "@ng-icons/remixicon";
+import {RainRetentionBasinService} from "../rain-retention-basin.service";
 
 @Component({
   imports: [
@@ -33,34 +39,38 @@ export class SelectBasinViewComponent {
 
   protected style = colorful as any as StyleSpecification;
 
-  protected basins: Signal<RrbDigitalTwinService.BasinFeatureCollection | undefined> = computed(() => this.rrb.basins());
+  protected basins: Signal<
+    RrbDigitalTwinService.BasinFeatureCollection | undefined
+  > = computed(() => this.rrb.basins());
   protected basinMarkers = computed<FeatureCollection>(() => {
     const markerFeatures = this.basins()?.features.map(feature => {
-      const center = centerOfMass(feature); 
+      const center = centerOfMass(feature);
 
-      center.properties = { ...feature.properties };
+      center.properties = {...feature.properties};
       if (feature.id) center.id = feature.id;
 
       return center;
     });
 
     return {
-      type: 'FeatureCollection',
-      features: markerFeatures? markerFeatures : []
+      type: "FeatureCollection",
+      features: markerFeatures ? markerFeatures : [],
     };
   });
-  
-  protected hoveredBasin = signal<RrbDigitalTwinService.BasinFeature | null>(null);
+
+  protected hoveredBasin = signal<RrbDigitalTwinService.BasinFeature | null>(
+    null,
+  );
 
   protected openTabView(selectedBasin: RrbDigitalTwinService.BasinFeature) {
     this.router.navigate(["tabs"], {
       relativeTo: this.route,
-      queryParams: { id: selectedBasin.id },
+      queryParams: {id: selectedBasin.id},
     });
   }
 
-  protected getLngLat(geometry: GeoJSON.Geometry) : LngLatLike {
+  protected getLngLat(geometry: GeoJSON.Geometry): LngLatLike {
     const center = centerOfMass(geometry).geometry.coordinates;
-    return [center[0], center[1]]
+    return [center[0], center[1]];
   }
 }

@@ -14,7 +14,7 @@
     }
     @case ("map") {
       <div id="map" class="is-fullwidth" [style.height]="height">
-        <div 
+        <div
           class="p-0 is-fullheight is-clipped"
           style="border-radius: 0 0 0.5rem 0.5rem"
         >
@@ -97,14 +97,19 @@
                 'fill-color': [
                   'match',
                   ['id'],
-                  1, '#0000FF',
-                  2, '#00FF00',
-                  3, '#FF8000',
-                  4, '#FF007F',
-                  5, '#FF0000',
-                  '#FFFF00'
+                  1,
+                  '#0000FF',
+                  2,
+                  '#00FF00',
+                  3,
+                  '#FF8000',
+                  4,
+                  '#FF007F',
+                  5,
+                  '#FF0000',
+                  '#FFFF00',
                 ],
-                'fill-opacity': 0.25
+                'fill-opacity': 0.25,
               }"
             ></mgl-layer>
             <mgl-layer
@@ -112,7 +117,7 @@
               type="fill"
               source="basin-source"
               [paint]="{
-                'fill-color': '#66CCFF'
+                'fill-color': '#66CCFF',
               }"
             ></mgl-layer>
             <mgl-layer
@@ -121,7 +126,7 @@
               source="catchment-areas-line-strings-source"
               [paint]="{
                 'line-color': '#000000',
-                'line-width': 2
+                'line-width': 2,
               }"
             ></mgl-layer>
             <mgl-layer
@@ -131,7 +136,7 @@
               [layout]="{
                 'icon-image': 'remixicon:exchange-line',
                 'icon-size': 1.25,
-                'icon-allow-overlap': true
+                'icon-allow-overlap': true,
               }"
             ></mgl-layer>
             <mgl-layer
@@ -140,7 +145,7 @@
               source="throttles-source"
               [paint]="{
                 'line-color': '#000000',
-                'line-width': 2
+                'line-width': 2,
               }"
             ></mgl-layer>
             <mgl-layer
@@ -150,7 +155,7 @@
               [layout]="{
                 'icon-image': 'remixicon:exchange-line',
                 'icon-size': 1.25,
-                'icon-allow-overlap': true
+                'icon-allow-overlap': true,
               }"
             ></mgl-layer>
             <mgl-layer
@@ -160,7 +165,7 @@
               [layout]="{
                 'icon-image': 'remixicon:contrast-drop-2-line',
                 'icon-size': 1.25,
-                'icon-allow-overlap': true
+                'icon-allow-overlap': true,
               }"
             ></mgl-layer>
             <mgl-layer
@@ -170,7 +175,7 @@
               [layout]="{
                 'icon-image': 'remixicon:showers-line',
                 'icon-size': 1.25,
-                'icon-allow-overlap': true
+                'icon-allow-overlap': true,
               }"
             ></mgl-layer>
           </mgl-map>
@@ -257,14 +262,14 @@
       <ng-icon name="remixHome8Line" size="2.5rem" class="mx-4" />
       <div class="is-flex is-flex-direction-column is-justify-content-center">
         <p><span translate>digitalTwin.label.pavedArea</span>:</p>
-        <p> - ha</p>
+        <p>- ha</p>
       </div>
     </div>
     <div class="is-flex is-flex-direction-row">
       <ng-icon name="remixTreeLine" size="2.5rem" class="mx-4" />
       <div class="is-flex is-flex-direction-column is-justify-content-center">
         <p><span translate>digitalTwin.label.unpavedArea</span>:</p>
-        <p> -  ha</p>
+        <p>- ha</p>
       </div>
     </div>
   </div>
@@ -277,13 +282,20 @@
 
   <p class="is-size-4 m-4" translate>digitalTwin.header.waterLevel</p>
 
-  @for (waterLevelSensor of waterLevelSensors().features; track waterLevelSensor.id) {
+  @for (
+    waterLevelSensor of waterLevelSensors().features;
+    track waterLevelSensor.id
+  ) {
     <div class="grid is-col-min-10">
       <div class="is-flex is-flex-direction-row">
         <ng-icon name="remixInfoCardLine" size="2.5rem" class="mx-4" />
         <div class="is-flex is-flex-direction-column is-justify-content-center">
           <p><span translate>digitalTwin.label.description</span>:</p>
-          <p>{{ waterLevelSensor.properties.name }} ({{ waterLevelSensor.properties.type }})</p>
+          <p>
+            {{ waterLevelSensor.properties.name }} ({{
+              waterLevelSensor.properties.type
+            }})
+          </p>
         </div>
       </div>
       <div class="is-flex is-flex-direction-row">
@@ -296,8 +308,15 @@
       <div class="is-flex is-flex-direction-row">
         <ng-icon name="remixContrastDrop2Line" size="2.5rem" class="mx-4" />
         <div class="is-flex is-flex-direction-column is-justify-content-center">
-          <p><span translate>digitalTwin.label.level</span> / <span translate>digitalTwin.label.volume</span>:</p>
-        <p>{{ latestWaterLevel().level }} {{ waterLevelSensor.properties.unit }} / {{ latestWaterLevel().volume }} m³</p>
+          <p>
+            <span translate>digitalTwin.label.level</span> /
+            <span translate>digitalTwin.label.volume</span>:
+          </p>
+          <p>
+            {{ latestWaterLevel().level }}
+            {{ waterLevelSensor.properties.unit }} /
+            {{ latestWaterLevel().volume }} m³
+          </p>
         </div>
       </div>
     </div>
@@ -309,7 +328,11 @@
       <ng-icon name="remixInfoCardLine" size="2.5rem" class="mx-4" />
       <div class="is-flex is-flex-direction-column is-justify-content-center">
         <p><span translate>digitalTwin.label.description</span>:</p>
-        <p>{{ rainStation().properties.name }} ({{ rainStation().properties.type }})</p>
+        <p>
+          {{ rainStation().properties.name }} ({{
+            rainStation().properties.type
+          }})
+        </p>
       </div>
     </div>
     <div class="is-flex is-flex-direction-row">
@@ -329,61 +352,68 @@
   </div>
 
   <p class="is-size-4 m-4" translate>digitalTwin.header.inflow</p>
-  
+
   @for (inflowSensor of inflowSensors().features; track inflowSensor.id) {
     <div class="grid is-col-min-10">
       <div class="is-flex is-flex-direction-row">
         <ng-icon name="remixInfoCardLine" size="2.5rem" class="mx-4" />
         <div class="is-flex is-flex-direction-column is-justify-content-center">
           <p><span translate>digitalTwin.label.description</span>:</p>
-          <p>{{ inflowSensor.properties.name }} ({{ inflowSensor.properties.type }})</p>
+          <p>
+            {{ inflowSensor.properties.name }} ({{
+              inflowSensor.properties.type
+            }})
+          </p>
         </div>
       </div>
       <div class="is-flex is-flex-direction-row">
         <ng-icon name="remixTimeLine" size="2.5rem" class="mx-4" />
         <div class="is-flex is-flex-direction-column is-justify-content-center">
           <p><span translate>digitalTwin.label.time</span>:</p>
-          <p> - </p>
+          <p>-</p>
         </div>
       </div>
       <div class="is-flex is-flex-direction-row">
         <ng-icon name="remixExchangeLine" size="2.5rem" class="mx-4" />
         <div class="is-flex is-flex-direction-column is-justify-content-center">
           <p><span translate>digitalTwin.label.flowRate</span>:</p>
-          <p> - {{ inflowSensor.properties.unit }}</p>
+          <p>- {{ inflowSensor.properties.unit }}</p>
         </div>
       </div>
     </div>
   }
 
   <p class="is-size-4 m-4" translate>digitalTwin.header.outflow</p>
-  
+
   @for (outflowSensor of outflowSensors().features; track outflowSensor.id) {
     <div class="grid is-col-min-10">
       <div class="is-flex is-flex-direction-row">
         <ng-icon name="remixInfoCardLine" size="2.5rem" class="mx-4" />
         <div class="is-flex is-flex-direction-column is-justify-content-center">
           <p><span translate>digitalTwin.label.description</span>:</p>
-          <p>{{ outflowSensor.properties.name }} ({{ outflowSensor.properties.type }})</p>
+          <p>
+            {{ outflowSensor.properties.name }} ({{
+              outflowSensor.properties.type
+            }})
+          </p>
         </div>
       </div>
       <div class="is-flex is-flex-direction-row">
         <ng-icon name="remixTimeLine" size="2.5rem" class="mx-4" />
         <div class="is-flex is-flex-direction-column is-justify-content-center">
           <p><span translate>digitalTwin.label.time</span>:</p>
-          <p> - </p>
+          <p>-</p>
         </div>
       </div>
       <div class="is-flex is-flex-direction-row">
         <ng-icon name="remixExchangeLine" size="2.5rem" class="mx-4" />
         <div class="is-flex is-flex-direction-column is-justify-content-center">
           <p><span translate>digitalTwin.label.flowRate</span>:</p>
-          <p> - {{ outflowSensor.properties.unit }}</p>
+          <p>- {{ outflowSensor.properties.unit }}</p>
         </div>
       </div>
     </div>
   }
-
 </div>
 
 <hr />

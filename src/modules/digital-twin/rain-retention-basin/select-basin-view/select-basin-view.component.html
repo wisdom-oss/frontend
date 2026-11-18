@@ -1,5 +1,5 @@
 <div class="card-content p-0 is-clipped is-flex-grow-1 is-fullheight">
-  <mgl-map 
+  <mgl-map
     class="is-fullheight"
     [mapStyle]="style"
     [zoom]="13"
@@ -18,22 +18,30 @@
       [layout]="{
         'icon-image': 'remixicon:map-pin-2-line',
         'icon-size': 1.5,
-        'icon-allow-overlap': true
+        'icon-allow-overlap': true,
       }"
       (layerMouseEnter)="hoveredBasin.set($any($event.features![0]!))"
       (layerMouseLeave)="hoveredBasin.set(null)"
       (layerClick)="openTabView($any($event.features![0]!))"
     ></mgl-layer>
     @if (hoveredBasin(); as basin) {
-      <mgl-popup 
-        [lngLat]="getLngLat(basin.geometry)" 
-        [closeButton]="false" 
+      <mgl-popup
+        [lngLat]="getLngLat(basin.geometry)"
+        [closeButton]="false"
         [closeOnClick]="false"
-        >
+      >
         <div class="py-1 px-2">
-          <p class="has-text-weight-bold is-size-6">{{ basin.properties.name }}</p>
-          <p class="has-text-weight-semi-bold is-size-7"><span translate>digitalTwin.label.city</span>: {{ basin.properties.city }}</p>
-          <p class="has-text-weight-semi-bold is-size-7"><span translate>digitalTwin.label.retentionVolume</span>: {{ basin.properties.maxVolume }} m³</p>
+          <p class="has-text-weight-bold is-size-6">
+            {{ basin.properties.name }}
+          </p>
+          <p class="has-text-weight-semi-bold is-size-7">
+            <span translate>digitalTwin.label.city</span>:
+            {{ basin.properties.city }}
+          </p>
+          <p class="has-text-weight-semi-bold is-size-7">
+            <span translate>digitalTwin.label.retentionVolume</span>:
+            {{ basin.properties.maxVolume }} m³
+          </p>
         </div>
       </mgl-popup>
     }

@@ -1,5 +1,5 @@
 import {signal, Component, WritableSignal} from "@angular/core";
-import {signals} from "../../../../../common/signals";
+
 import {DrainThrottleComponent} from "../../../common/drain-throttle/drain-throttle.component";
 import {RainForecastComponent} from "../../../common/rain-forecast/rain-forecast.component";
 import {

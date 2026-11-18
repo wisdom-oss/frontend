@@ -3,12 +3,12 @@ import {RouterLinkActive, RouterLink, RouterOutlet} from "@angular/router";
 import {provideIcons, NgIconComponent} from "@ng-icons/core";
 import {
   remixBarChart2Line,
-  remixLineChartLine,
-  remixPlayCircleLine,
-  remixMapPin2Line,
   remixBinocularsLine,
+  remixLineChartLine,
+  remixMapPin2Line,
+  remixPlayCircleLine,
 } from "@ng-icons/remixicon";
-import { TranslateDirective } from "@ngx-translate/core";
+import {TranslateDirective} from "@ngx-translate/core";
 
 @Component({
   imports: [
@@ -17,7 +17,7 @@ import { TranslateDirective } from "@ngx-translate/core";
     RouterOutlet,
     RouterLink,
     RouterLinkActive,
-],
+  ],
   templateUrl: "./tab-view.component.html",
   styleUrl: "./tab-view.component.scss",
   providers: [

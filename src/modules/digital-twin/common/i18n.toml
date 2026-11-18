@@ -222,7 +222,6 @@ de = "Volumen"
 en = "No drainage is currently necessary or planned!"
 de = "Derzeit keine Entwässerung notwendig und geplant!"
 
-
 [tab.currentStatus]
 en = "Current Status"
 de = "Ist-Zustand"
